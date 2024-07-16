@@ -1,7 +1,9 @@
+import UserLayout from "@/components/layouts/UserLayout";
+
 export default function Home() {
   return (
     <div>
-      DEFAULT PAGE
+      <UserLayout/>
     </div>
   );
 }
