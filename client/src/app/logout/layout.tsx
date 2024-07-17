@@ -10,7 +10,7 @@ export default function LoginLayout({
           className="min-h-screen bg-cover bg-center flex items-center justify-center h-screen"
           style={{ backgroundImage: "url('/images/logoutbg.png')" }}
         >
-          <div className="relative z-10 flex w-[50%] h-[80%] rounded-md">
+          <div className="relative z-10 flex w-[50%] h-[80%] rounded-md text-white">
             {children}
           </div>
         </div>
