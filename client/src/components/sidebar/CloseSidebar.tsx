@@ -3,93 +3,166 @@ import React, { useState } from 'react';
 import Image from 'next/image';
 import logo from '@/assets/virginia-logo.png';
 import { iconMap } from '@/utils/iconMap';
+import { Tooltip } from "@nextui-org/react";
+import usePath from '@/hooks/usePath';
+import MiniSidebar from './MiniSidebar';
 
-interface IconConfig {
+interface IconClosedConfig {
   iconName: string;
   className?: string;
+  tooltip?: string;
   route?: string;
 }
 
-const mainMenu: IconConfig[] = [
-  { iconName: 'RiDashboard2Fill', className: 'text-[3em]', route: 'dashboard' },
-  { iconName: 'BsFillFolderFill', className: 'text-[2.5em]'},
-  { iconName: 'RiFormula', className: 'text-[2.5em]'},
-  { iconName: 'BiSolidReport', className: 'text-[3em]' },
-  { iconName: 'GiMoneyStack', className: 'text-[3em]' },
-  { iconName: 'MdOutlineInventory', className: 'text-[3em]' },
-  { iconName: 'GoHistory', className: 'text-[3em]' },
-];
-
-const userDefaultMenu: IconConfig[] = [
-  { iconName: 'RiDashboard2Fill', className: 'text-[3em]', route: 'dashboard' },
-  { iconName: 'BsFillFolderFill', className: 'text-[2.5em]'},
-  { iconName: 'RiFormula', className: 'text-[2.5em]'},
-];
-
-const adminDefaultMenu: IconConfig[] = [
-  { iconName: 'RiDashboard2Fill', className: 'text-[3em]', route: 'dashboard' },
-  { iconName: 'BsFillFolderFill', className: 'text-[2.5em]'},
-  { iconName: 'RiFormula', className: 'text-[2.5em]'},
-];
-
 const CloseSidebar: React.FC = () => {
-  const [isAdmin,setIsAdmin]= useState(false);
-  
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [isMore, setIsMore] = useState(false);
+  const path = usePath();
+
   return (
-    <div className='fixed flex flex-col w-[120px] bg-primary h-full'>
-      {/* Logo */}
-      <div className='flex justify-center my-[20px]'>
-        <Image src={logo} alt={'Virginia Logo'} className='w-[90px]' />
+    <>
+      <div className='flex justify-center bg-primary w-full min-h-screen h-full'>
+        <div className='relative top-0'>
+          {/* Logo */}
+          <div className='flex justify-center my-[25px]'>
+            <Image src={logo} alt={'Virginia Logo'} className='w-[90px] h-auto' />
+          </div>
+
+          {/* Account Profile */}
+          <div className='flex justify-center mb-[10px]'>
+            <img
+              src="https://i.imgur.com/AZOtzD7.jpg"
+              alt={'Profile Picture'}
+              className='flex object-cover w-[80px] h-[80px] rounded-full border cursor-pointer'
+            />
+          </div>
+
+          {/* Pages */}
+          <div className='mx-auto h-auto'>
+            <ul className='flex flex-col justify-center items-center text-white'>
+              {mainMenu.map(({ iconName, className, tooltip, route }, index) => {
+                const IconComponent = iconMap[iconName];
+                return (
+                  <Tooltip
+                    key="#FFD3D3"
+                    content={tooltip}
+                    placement={"right"}
+                    classNames={{
+                      base: [
+                        "before:bg-[#FFD3D3] dark:before:bg-white",
+                      ],
+                      content: [
+                        "py-2 px-4 shadow-xl",
+                        "font-poppins text-primary text-[20px] font-semibold bg-[#FFD3D3] from-white to-neutral-400",
+                      ],
+                    }}
+                  >
+                    <li key={index} className={`hover:animate-shrink-in hover:text-[#FFD3D3] cursor-pointer ${path === route ?
+                      'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
+                      'my-[15px]'}`}>
+                      <IconComponent className={className} />
+                    </li>
+                  </Tooltip>
+                );
+              })}
+            </ul>
+          </div>
+          <hr className='mx-[15px] my-[15px]' />
+          {/* Others */}
+          <div className='bg-primary'>
+            <ul className='flex flex-col justify-center items-center text-white'>
+              {!isAdmin
+                ?
+                (userDefaultMenu.map(({ iconName, className, tooltip, route }, index) => {
+                  const IconComponent = iconMap[iconName];
+                  return (
+                    <Tooltip
+                      key="#FFD3D3"
+                      content={tooltip}
+                      placement={"right"}
+                      classNames={{
+                        base: [
+                          "before:bg-[#FFD3D3] dark:before:bg-white",
+                        ],
+                        content: [
+                          "py-2 px-4 shadow-xl",
+                          "font-poppins text-primary text-[20px] font-semibold bg-[#FFD3D3] from-white to-neutral-400",
+                        ],
+                      }}
+                    >
+                      <li key={index} className={`hover:animate-shrink-in hover:text-[#FFD3D3] cursor-pointer ${path === route ?
+                        'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
+                        'my-[13px]'}`}>
+                        <IconComponent className={className} />
+                      </li>
+                    </Tooltip>
+                  );
+                }))
+                :
+                (adminDefaultMenu.map(({ iconName, className, tooltip, route }, index) => {
+                  const IconComponent = iconMap[iconName];
+                  return tooltip !== 'More' ? (
+                    <Tooltip
+                      key="#FFD3D3"
+                      content={tooltip}
+                      placement={"right"}
+                      classNames={{
+                        base: [
+                          "before:bg-[#FFD3D3] dark:before:bg-white",
+                        ],
+                        content: [
+                          "py-2 px-4 shadow-xl",
+                          "font-poppins text-primary text-[20px] font-semibold bg-[#FFD3D3] from-white to-neutral-400",
+                        ],
+                      }}
+                    >
+                      <li key={index} className={`hover:animate-shrink-in hover:text-[#FFD3D3] cursor-pointer ${path === route ?
+                        'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
+                        'my-[12px]'}`}>
+                        <IconComponent className={className} />
+                      </li>
+                    </Tooltip>
+                  )
+                    :
+                    (
+                      <li key={index} className={`hover:animate-shrink-in hover:text-[#FFD3D3] cursor-pointer ${path === route ?
+                        'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
+                        'my-[12px]'}`}
+                        onMouseEnter={() => setIsMore(true)}>
+                        <IconComponent className={className} />
+                      </li>
+                    )
+                }))
+              }
+            </ul>
+          </div>
+        </div>
       </div>
-      {/* Account Profile */}
-      <div className='flex justify-center my-[10px]'>
-        <img
-          src="https://i.imgur.com/AZOtzD7.jpg"
-          alt={'Profile Picture'}
-          className='flex object-cover w-[89px] h-[89px] rounded-full border cursor-pointer'
-        />
-      </div>
-      {/* Pages */}
-      <div className='mx-auto'>
-        <ul className='flex flex-col justify-center items-center text-white'>
-          {mainMenu.map(({ iconName, className }, index) => {
-            const IconComponent = iconMap[iconName];
-            return (
-              <li key={index} className='my-[13px]'>
-                <IconComponent className={className} />
-              </li>
-            );
-          })}
-        </ul>
-      </div>
-      <hr className='mx-[15px] my-[12px]' />
-      {/* Others */}
-      <div>
-      <ul className='flex flex-col justify-center items-center text-white'>
-        {isAdmin 
-        ?
-          (userDefaultMenu.map(({ iconName, className }, index) => {
-            const IconComponent = iconMap[iconName];
-            return (
-              <li key={index} className='my-[12px]'>
-                <IconComponent className={className} />
-              </li>
-            );
-          }))
-        :
-          (adminDefaultMenu.map(({ iconName, className }, index) => {
-            const IconComponent = iconMap[iconName];
-            return (
-              <li key={index} className='my-[12px]'>
-                <IconComponent className={className} />
-              </li>
-            );
-          }))
-        }
-        </ul>
-      </div>
-    </div>
+      {isMore && <MiniSidebar setIsMore={setIsMore}/>}
+    </>
   );
 };
 
 export default CloseSidebar;
+
+const mainMenu: IconClosedConfig[] = [
+  { iconName: 'RiDashboard2Fill', route: 'dashboard', tooltip: 'Dashboard', className: 'text-[2.8em]' },
+  { iconName: 'BsFillFolderFill', tooltip: 'File Manager', className: 'text-[2.3em]' },
+  { iconName: 'RiFormula', tooltip: 'Formulations', className: 'text-[2.3em]' },
+  { iconName: 'BiSolidReport', tooltip: 'Report Generation', className: 'text-[2.8em]' },
+  { iconName: 'GiMoneyStack', tooltip: 'Projected Costing', className: 'text-[2.8em]' },
+  { iconName: 'MdOutlineInventory', tooltip: 'Inventory', className: 'text-[2.8em]' },
+  { iconName: 'GoHistory', tooltip: 'Audit Log', className: 'text-[2.8em]' },
+];
+
+const userDefaultMenu: IconClosedConfig[] = [
+  { iconName: 'FaBell', tooltip: 'Notifications', className: 'text-[2.3em]' },
+  { iconName: 'MdOutlineQuestionMark', tooltip: 'Help', className: 'text-[2.8em] mr-[5px]' },
+  { iconName: 'MdLogout', tooltip: 'Log Out', className: 'text-[2.3em]' },
+];
+
+const adminDefaultMenu: IconClosedConfig[] = [
+  { iconName: 'FaBell', tooltip: 'Notifications', className: 'text-[2.3em]' },
+  { iconName: 'MdMoreHoriz', tooltip: 'More', className: 'text-[2.8em]' },
+  { iconName: 'MdLogout', tooltip: 'Log Out', className: 'text-[2.3em]' },
+];

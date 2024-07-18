@@ -3,9 +3,12 @@ import { IconType } from 'react-icons';
 import { RiDashboard2Fill, RiFormula } from 'react-icons/ri';
 import { BsFillFolderFill } from 'react-icons/bs';
 import { BiSolidReport } from 'react-icons/bi';
-import { GiMoneyStack } from 'react-icons/gi';
-import { MdOutlineInventory } from 'react-icons/md';
+import { GiMoneyStack, GiBookmarklet } from 'react-icons/gi';
+import { MdOutlineInventory, MdOutlineQuestionMark, MdLogout, MdMoreHoriz } from 'react-icons/md';
 import { GoHistory } from 'react-icons/go';
+import { FaBell } from "react-icons/fa";
+import { ImUsers } from "react-icons/im";
+import { HiWrenchScrewdriver } from "react-icons/hi2";
 
 interface IconMap {
   [key: string]: IconType;
@@ -19,4 +22,11 @@ export const iconMap: IconMap = {
   GiMoneyStack,
   MdOutlineInventory,
   GoHistory,
+  FaBell,
+  MdOutlineQuestionMark,
+  MdLogout,
+  MdMoreHoriz,
+  ImUsers,
+  HiWrenchScrewdriver,
+  GiBookmarklet
 };
