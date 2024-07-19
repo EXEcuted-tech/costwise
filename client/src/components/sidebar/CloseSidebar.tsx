@@ -12,6 +12,7 @@ interface IconClosedConfig {
   className?: string;
   tooltip?: string;
   route?: string;
+  routes?: string[];
 }
 
 const CloseSidebar: React.FC = () => {
@@ -99,8 +100,9 @@ const CloseSidebar: React.FC = () => {
                   );
                 }))
                 :
-                (adminDefaultMenu.map(({ iconName, className, tooltip, route }, index) => {
+                (adminDefaultMenu.map(({ iconName, className, tooltip, route, routes}, index) => {
                   const IconComponent = iconMap[iconName];
+                  const isRoute = routes?.some(e => e === path);
                   return tooltip !== 'More' ? (
                     <Tooltip
                       key="#FFD3D3"
@@ -125,7 +127,7 @@ const CloseSidebar: React.FC = () => {
                   )
                     :
                     (
-                      <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
+                      <li key={index} className={`hover:animate-shrink-in cursor-pointer ${isRoute ?
                         'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
                         'my-[12px] hover:text-[#FFD3D3]'}`}
                         onMouseEnter={() => setIsMore(true)}>
@@ -147,22 +149,23 @@ export default CloseSidebar;
 
 const mainMenu: IconClosedConfig[] = [
   { iconName: 'RiDashboard2Fill', route: 'dashboard', tooltip: 'Dashboard', className: 'text-[2.8em]' },
-  { iconName: 'BsFillFolderFill', tooltip: 'File Manager', className: 'text-[2.3em]' },
-  { iconName: 'RiFormula', tooltip: 'Formulations', className: 'text-[2.3em]' },
-  { iconName: 'BiSolidReport', tooltip: 'Report Generation', className: 'text-[2.8em]' },
-  { iconName: 'GiMoneyStack', tooltip: 'Projected Costing', className: 'text-[2.8em]' },
-  { iconName: 'MdOutlineInventory', tooltip: 'Inventory', className: 'text-[2.8em]' },
-  { iconName: 'GoHistory', tooltip: 'Audit Log', className: 'text-[2.8em]' },
+  { iconName: 'BsFillFolderFill', route: 'file', tooltip: 'File Manager', className: 'text-[2.3em]' },
+  { iconName: 'RiFormula', route: 'formulation', tooltip: 'Formulations', className: 'text-[2.3em]' },
+  { iconName: 'BiSolidReport', route: 'report', tooltip: 'Report Generation', className: 'text-[2.8em]' },
+  { iconName: 'GiMoneyStack', route: 'costing', tooltip: 'Projected Costing', className: 'text-[2.8em]' },
+  { iconName: 'MdOutlineInventory', route: 'inventory', tooltip: 'Inventory', className: 'text-[2.8em]' },
+  { iconName: 'GoHistory', route: 'log', tooltip: 'Audit Log', className: 'text-[2.8em]' },
 ];
 
 const userDefaultMenu: IconClosedConfig[] = [
-  { iconName: 'FaBell', tooltip: 'Notifications', className: 'text-[2.3em]' },
-  { iconName: 'MdOutlineQuestionMark', tooltip: 'Help', className: 'text-[2.8em] mr-[5px]' },
-  { iconName: 'MdLogout', tooltip: 'Log Out', className: 'text-[2.3em]' },
+  { iconName: 'FaBell', route: 'notification', tooltip: 'Notifications', className: 'text-[2.3em]' },
+  { iconName: 'MdOutlineQuestionMark', route: 'help', tooltip: 'Help', className: 'text-[2.8em] mr-[5px]' },
+  { iconName: 'MdLogout', route: 'logout', tooltip: 'Log Out', className: 'text-[2.3em]' },
 ];
 
 const adminDefaultMenu: IconClosedConfig[] = [
-  { iconName: 'FaBell', tooltip: 'Notifications', className: 'text-[2.3em]' },
-  { iconName: 'MdMoreHoriz', tooltip: 'More', className: 'text-[2.8em]' },
-  { iconName: 'MdLogout', tooltip: 'Log Out', className: 'text-[2.3em]' },
+  { iconName: 'FaBell', route: 'notification', tooltip: 'Notifications', className: 'text-[2.3em]' },
+  { iconName: 'MdMoreHoriz', routes: ["help","maintenance","users"], tooltip: 'More', className: 'text-[2.8em]' },
+  { iconName: 'MdLogout', route: 'logout',  tooltip: 'Log Out', className: 'text-[2.3em]' },
 ];
+

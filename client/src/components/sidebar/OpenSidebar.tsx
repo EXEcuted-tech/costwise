@@ -11,6 +11,7 @@ export interface IconOpenConfig {
   menuName: string;
   className?: string;
   route?: string;
+  routes?: string[];
 }
 const OpenSidebar: React.FC = () => {
   const [isAdmin, setIsAdmin] = useState(true);
@@ -82,8 +83,9 @@ const OpenSidebar: React.FC = () => {
                   );
                 }))
                 :
-                (adminDefaultMenu.map(({ iconName, className, menuName, route }, index) => {
+                (adminDefaultMenu.map(({ iconName, className, menuName, route, routes}, index) => {
                   const IconComponent = iconMap[iconName];
+                  const isRoute = routes?.some(e => e === path);
                   return menuName !== 'More' ? (
                     <li
                     key={index}
@@ -100,7 +102,7 @@ const OpenSidebar: React.FC = () => {
                     (
                       <li
                       key={index}
-                      className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${path === route
+                      className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${isRoute
                           ? 'w-[88%] text-primary bg-[#FFD3D3] ml-[25px] pr-[20px] pl-[15px] py-[5px] my-[8px] rounded-[20px]'
                           : 'my-[11px] hover:text-[#FFD3D3] px-[40px]'
                         }`}
@@ -124,22 +126,22 @@ export default OpenSidebar;
 
 const mainMenu: IconOpenConfig[] = [
   { iconName: 'RiDashboard2Fill', route: 'dashboard', menuName: 'Dashboard', className: 'text-[2.8em]' },
-  { iconName: 'BsFillFolderFill', menuName: 'File Manager', className: 'text-[2.8em]' },
-  { iconName: 'RiFormula', menuName: 'Formulations', className: 'text-[2.8em]' },
-  { iconName: 'BiSolidReport', menuName: 'Report Generation', className: 'text-[2.8em]' },
-  { iconName: 'GiMoneyStack', menuName: 'Projected Costing', className: 'text-[2.8em]' },
-  { iconName: 'MdOutlineInventory', menuName: 'Inventory', className: 'text-[2.8em]' },
-  { iconName: 'GoHistory', menuName: 'Audit Log', className: 'text-[2.8em]' },
+  { iconName: 'BsFillFolderFill', route: 'file', menuName: 'File Manager', className: 'text-[2.8em]' },
+  { iconName: 'RiFormula', route: 'formulation', menuName: 'Formulations', className: 'text-[2.8em]' },
+  { iconName: 'BiSolidReport', route: 'report', menuName: 'Report Generation', className: 'text-[2.8em]' },
+  { iconName: 'GiMoneyStack',route: 'costing', menuName: 'Projected Costing', className: 'text-[2.8em]' },
+  { iconName: 'MdOutlineInventory', route: 'inventory', menuName: 'Inventory', className: 'text-[2.8em]' },
+  { iconName: 'GoHistory', route: 'log', menuName: 'Audit Log', className: 'text-[2.8em]' },
 ];
 
 const userDefaultMenu: IconOpenConfig[] = [
-  { iconName: 'FaBell', menuName: 'Notifications', className: 'text-[2.3em]' },
-  { iconName: 'MdOutlineQuestionMark', menuName: 'Help', className: 'text-[2.3em]' },
-  { iconName: 'MdLogout', menuName: 'Log Out', className: 'text-[2.3em] pl-[3px]' },
+  { iconName: 'FaBell', route: 'notification', menuName: 'Notifications', className: 'text-[2.3em]' },
+  { iconName: 'MdOutlineQuestionMark', route: 'help', menuName: 'Help', className: 'text-[2.3em]' },
+  { iconName: 'MdLogout', route: 'logout', menuName: 'Log Out', className: 'text-[2.3em] pl-[3px]' },
 ];
 
 const adminDefaultMenu: IconOpenConfig[] = [
-  { iconName: 'FaBell', menuName: 'Notifications', className: 'text-[2.3em]' },
-  { iconName: 'MdMoreHoriz', menuName: 'More', className: 'text-[2.3em]' },
-  { iconName: 'MdLogout', menuName: 'Log Out', className: 'text-[2.3em]' },
+  { iconName: 'FaBell', route: 'notification', menuName: 'Notifications', className: 'text-[2.3em]' },
+  { iconName: 'MdMoreHoriz', routes: ["help","maintenance","users"], menuName: 'More', className: 'text-[2.3em]' },
+  { iconName: 'MdLogout', route: 'logout', menuName: 'Log Out', className: 'text-[2.3em]' },
 ];
