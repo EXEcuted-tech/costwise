@@ -10,6 +10,7 @@ const config: Config = {
     extend: {
       fontFamily: {
         'poppins': ['Poppins','sans-serif'],
+        'lato': ['Lato', 'sans-serif'],
       },
       colors:{
         primary: '#B22222',
