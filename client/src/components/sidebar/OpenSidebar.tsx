@@ -19,7 +19,7 @@ const OpenSidebar: React.FC = () => {
 
   return (
     <>
-      <div className='flex justify-center bg-primary min-h-screen w-full h-full'>
+      <div className='flex justify-start bg-primary min-h-screen w-full h-full px-[40px]'>
         <div className='relative top-0'>
           {/* Logo */}
           <div className='flex justify-center my-[25px]'>
@@ -37,14 +37,15 @@ const OpenSidebar: React.FC = () => {
 
           {/* Pages */}
           <div className='mx-auto h-auto'>
-            <ul className='flex flex-col justify-center items-center text-white'>
+            <ul className='flex flex-col justify-start text-white'>
               {mainMenu.map(({ iconName, className, menuName, route }, index) => {
                 const IconComponent = iconMap[iconName];
                 return (
-                    <li key={index} className={`hover:animate-shrink-in hover:text-[#FFD3D3] cursor-pointer ${path === route ?
+                    <li key={index} className={`hover:animate-shrink-in hover:text-[#FFD3D3] flex items-center cursor-pointer ${path === route ?
                       'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
                       'my-[15px]'}`}>
                       <IconComponent className={className} />
+                      <p>{menuName}</p>
                     </li>
                 );
               })}
