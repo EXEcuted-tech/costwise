@@ -1,4 +1,4 @@
-import UserLayout from "@/components/layouts/UserLayout";
+import MainLayout from "@/components/layouts/MainLayout";
 import type { Metadata } from "next";
 
 export const metadata: Metadata = {
@@ -13,7 +13,7 @@ export default function DashboardLayout({
 }>) {
   return (
     <div className="flex">
-      <UserLayout/>
+      <MainLayout/>
       <main>
         {children}
       </main>

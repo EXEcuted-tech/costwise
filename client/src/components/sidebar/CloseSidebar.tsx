@@ -15,7 +15,7 @@ interface IconClosedConfig {
 }
 
 const CloseSidebar: React.FC = () => {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true);
   const [isMore, setIsMore] = useState(false);
   const path = usePath();
 
@@ -53,13 +53,13 @@ const CloseSidebar: React.FC = () => {
                       ],
                       content: [
                         "py-2 px-4 shadow-xl",
-                        "font-poppins text-primary text-[20px] font-semibold bg-[#FFD3D3] from-white to-neutral-400",
+                        "font-lato text-primary text-[20px] font-bold bg-[#FFD3D3] from-white to-neutral-400",
                       ],
                     }}
                   >
-                    <li key={index} className={`hover:animate-shrink-in hover:text-[#FFD3D3] cursor-pointer ${path === route ?
+                    <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
                       'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
-                      'my-[15px]'}`}>
+                      'my-[15px] hover:text-[#FFD3D3] '}`}>
                       <IconComponent className={className} />
                     </li>
                   </Tooltip>
@@ -86,13 +86,13 @@ const CloseSidebar: React.FC = () => {
                         ],
                         content: [
                           "py-2 px-4 shadow-xl",
-                          "font-poppins text-primary text-[20px] font-semibold bg-[#FFD3D3] from-white to-neutral-400",
+                          "font-lato text-primary text-[20px] font-bold bg-[#FFD3D3] from-white to-neutral-400",
                         ],
                       }}
                     >
-                      <li key={index} className={`hover:animate-shrink-in hover:text-[#FFD3D3] cursor-pointer ${path === route ?
+                      <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
                         'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
-                        'my-[13px]'}`}>
+                        'my-[13px] hover:text-[#FFD3D3]'}`}>
                         <IconComponent className={className} />
                       </li>
                     </Tooltip>
@@ -112,22 +112,22 @@ const CloseSidebar: React.FC = () => {
                         ],
                         content: [
                           "py-2 px-4 shadow-xl",
-                          "font-poppins text-primary text-[20px] font-semibold bg-[#FFD3D3] from-white to-neutral-400",
+                          "font-lato text-primary text-[20px] font-bold bg-[#FFD3D3] from-white to-neutral-400",
                         ],
                       }}
                     >
-                      <li key={index} className={`hover:animate-shrink-in hover:text-[#FFD3D3] cursor-pointer ${path === route ?
+                      <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
                         'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
-                        'my-[12px]'}`}>
+                        'my-[12px] hover:text-[#FFD3D3]'}`}>
                         <IconComponent className={className} />
                       </li>
                     </Tooltip>
                   )
                     :
                     (
-                      <li key={index} className={`hover:animate-shrink-in hover:text-[#FFD3D3] cursor-pointer ${path === route ?
+                      <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
                         'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
-                        'my-[12px]'}`}
+                        'my-[12px] hover:text-[#FFD3D3]'}`}
                         onMouseEnter={() => setIsMore(true)}>
                         <IconComponent className={className} />
                       </li>

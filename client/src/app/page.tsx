@@ -1,9 +1,8 @@
-import UserLayout from "@/components/layouts/UserLayout";
+import MainLayout from "@/components/layouts/MainLayout";
 
 export default function Home() {
   return (
     <div>
-      <UserLayout/>
     </div>
   );
 }

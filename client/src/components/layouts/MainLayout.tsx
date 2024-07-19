@@ -5,12 +5,12 @@ import Image from 'next/image';
 import hotdog from '@/assets/hotdog.png';
 import OpenSidebar from '../sidebar/OpenSidebar';
 
-function UserLayout() {
+function MainLayout() {
   const [isOpen, setIsOpen] = useState(false);
   return (
     <div className='flex'>
       <div
-        className={`flex transition-all duration-400 ease-in-out ${isOpen ? 'w-[390px]' : 'w-[120px]'} overflow-hidden`}
+        className={`flex transition-all duration-200 ease-in-out ${isOpen ? 'w-[360px]' : 'w-[120px]'} overflow-hidden`}
       >
         {isOpen ? <OpenSidebar /> : <CloseSidebar />}
       </div>
@@ -24,4 +24,4 @@ function UserLayout() {
   )
 }
 
-export default UserLayout
+export default MainLayout
