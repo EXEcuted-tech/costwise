@@ -6,8 +6,8 @@ function LogoutPage() {
       <div className="flex h-[60%] items-center bg-white justify-center rounded-t-3xl">
         <img
           src="images/statsimage.png"
-          alt=""
-          className="sm:w-[100%] md:w-[95%] lg:w-[90%] xl:w-[85%] h-auto"
+          alt="Logout Image"
+          className="sm:w-[100%] md:w-[95%] lg:w-[90%] 2xl:w-[85%] h-auto"
         />
       </div>
 
@@ -24,7 +24,7 @@ function LogoutPage() {
           </p>
         </div>
         <div className="flex items-center justify-center h-[30%] w-[100%] font">
-          <div className="bg-[#FEF200] w-[50%] flex items-center justify-center h-[60%] rounded-3xl">
+          <div className="bg-secondary w-[50%] flex items-center justify-center h-[60%] rounded-3xl">
             <Link href="/login">
               <button className="text-[1.6em] text-[#A60000] font-bold">
                 Return to login Page

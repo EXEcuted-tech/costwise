@@ -11,7 +11,9 @@ export default function LoginLayout({
           style={{ backgroundImage: "url('/images/virginiabg.png')" }}
         >
           <div className="absolute inset-0 bg-[#757575] opacity-[62%]"></div>
-          <div className="relative z-10">{children}</div>
+          <div className="relative z-10 flex-col w-[70%] h-[80%] rounded-3xl bg-white font-poppins drop-shadow-3xl">
+            {children}
+          </div>
         </div>
       </body>
     </html>

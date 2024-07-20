@@ -13,7 +13,8 @@ const config: Config = {
       },
       colors:{
         primary: '#B22222',
-        secondary: '#FEF200'
+        secondary: '#FEF200',
+        tertiary: '#313131'
       },
       screens: {
         'xl': '1024px',
