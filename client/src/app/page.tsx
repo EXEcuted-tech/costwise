@@ -1,7 +1,8 @@
+import AuditLog from "@/pages/auditlog/auditlog";
+
 export default function Home() {
   return (
-    <div>
-      DEFAULT PAGE
-    </div>
+    <><div>
+    </div><AuditLog /></>
   );
 }
