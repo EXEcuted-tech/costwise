@@ -2,6 +2,7 @@ import React from 'react'
 import { IconOpenConfig } from './OpenSidebar';
 import { iconMap } from '@/utils/iconMap';
 import useOutsideClick from '../../hooks/useOutsideClick';
+import Link from 'next/link';
 
 interface MiniSidebarProps {
     setIsMore: React.Dispatch<React.SetStateAction<boolean>>;
@@ -20,13 +21,15 @@ const MiniSidebar: React.FC<MiniSidebarProps>  = ({ setIsMore, isAdmin }) => {
             }, 3000)
         )}>
         <ul className='animate-fade-in flex flex-col justify-start text-primary py-2 px-4'>
-              {miniMenu.map(({ iconName, className, menuName }, index) => {
+              {miniMenu.map(({ iconName, className, menuName, route }, index) => {
                 const IconComponent = iconMap[iconName];
                 return (
+                  <Link href={`/${route}`}>
                     <li key={index} className='flex cursor-pointer hover:text-[#851313] items-center my-[5px]'>
                       <IconComponent className={`${className} mr-2`} />
                         <p className='font-semibold'>{menuName}</p>
                     </li>
+                  </Link>
                 );
               })}
             </ul>
@@ -36,7 +39,7 @@ const MiniSidebar: React.FC<MiniSidebarProps>  = ({ setIsMore, isAdmin }) => {
 export default MiniSidebar
 
 const miniMenu: IconOpenConfig[] = [
-    { iconName: 'ImUsers', menuName: 'Manage Users', className: 'text-[1.5em]' },
-    { iconName: 'HiWrenchScrewdriver', menuName: 'Maintain System', className: 'text-[1.5em]' },
-    { iconName: 'GiBookmarklet', menuName: "User's Manual", className: 'text-[1.5em]' },
+    { iconName: 'ImUsers', route: 'user-management', menuName: 'Manage Users', className: 'text-[1.5em]' },
+    { iconName: 'HiWrenchScrewdriver', route: 'maintenance', menuName: 'Maintain System', className: 'text-[1.5em]' },
+    { iconName: 'GiBookmarklet', route: 'help', menuName: "User's Manual", className: 'text-[1.5em]' },
   ];

@@ -6,6 +6,7 @@ import { iconMap } from '@/utils/iconMap';
 import { Tooltip } from "@nextui-org/react";
 import usePath from '@/hooks/usePath';
 import MiniSidebar from './MiniSidebar';
+import Link from 'next/link';
 
 interface IconClosedConfig {
   iconName: string;
@@ -58,11 +59,13 @@ const CloseSidebar: React.FC = () => {
                       ],
                     }}
                   >
-                    <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
-                      'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
-                      'my-[15px] hover:text-[#FFD3D3] '}`}>
-                      <IconComponent className={className} />
-                    </li>
+                    <Link href={`/${route}`}>
+                      <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
+                        'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
+                        'my-[15px] hover:text-[#FFD3D3] '}`}>
+                        <IconComponent className={className} />
+                      </li>
+                    </Link>
                   </Tooltip>
                 );
               })}
@@ -91,11 +94,13 @@ const CloseSidebar: React.FC = () => {
                         ],
                       }}
                     >
-                      <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
-                        'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
-                        'my-[13px] hover:text-[#FFD3D3]'}`}>
-                        <IconComponent className={className} />
-                      </li>
+                      <Link href={`/${route}`}>
+                        <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
+                          'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
+                          'my-[13px] hover:text-[#FFD3D3]'}`}>
+                          <IconComponent className={className} />
+                        </li>
+                      </Link>
                     </Tooltip>
                   );
                 }))
@@ -118,11 +123,13 @@ const CloseSidebar: React.FC = () => {
                         ],
                       }}
                     >
-                      <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
-                        'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
-                        'my-[12px] hover:text-[#FFD3D3]'}`}>
-                        <IconComponent className={className} />
-                      </li>
+                      <Link href={`/${route}`}>
+                        <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
+                          'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
+                          'my-[12px] hover:text-[#FFD3D3]'}`}>
+                          <IconComponent className={className} />
+                        </li>
+                      </Link>
                     </Tooltip>
                   )
                     :
@@ -149,12 +156,12 @@ export default CloseSidebar;
 
 const mainMenu: IconClosedConfig[] = [
   { iconName: 'RiDashboard2Fill', route: 'dashboard', tooltip: 'Dashboard', className: 'text-[2.8em]' },
-  { iconName: 'BsFillFolderFill', route: 'file', tooltip: 'File Manager', className: 'text-[2.3em]' },
+  { iconName: 'BsFillFolderFill', route: 'file-manager', tooltip: 'File Manager', className: 'text-[2.3em]' },
   { iconName: 'RiFormula', route: 'formulation', tooltip: 'Formulations', className: 'text-[2.3em]' },
-  { iconName: 'BiSolidReport', route: 'report', tooltip: 'Report Generation', className: 'text-[2.8em]' },
-  { iconName: 'GiMoneyStack', route: 'costing', tooltip: 'Projected Costing', className: 'text-[2.8em]' },
+  { iconName: 'BiSolidReport', route: 'report-generation', tooltip: 'Report Generation', className: 'text-[2.8em]' },
+  { iconName: 'GiMoneyStack', route: 'projected-costing', tooltip: 'Projected Costing', className: 'text-[2.8em]' },
   { iconName: 'MdOutlineInventory', route: 'inventory', tooltip: 'Inventory', className: 'text-[2.8em]' },
-  { iconName: 'GoHistory', route: 'log', tooltip: 'Audit Log', className: 'text-[2.8em]' },
+  { iconName: 'GoHistory', route: 'audit-log', tooltip: 'Audit Log', className: 'text-[2.8em]' },
 ];
 
 const userDefaultMenu: IconClosedConfig[] = [
@@ -165,7 +172,7 @@ const userDefaultMenu: IconClosedConfig[] = [
 
 const adminDefaultMenu: IconClosedConfig[] = [
   { iconName: 'FaBell', route: 'notification', tooltip: 'Notifications', className: 'text-[2.3em]' },
-  { iconName: 'MdMoreHoriz', routes: ["help","maintenance","users"], tooltip: 'More', className: 'text-[2.8em]' },
+  { iconName: 'MdMoreHoriz', routes: ["help","maintenance","user-managemenet"], tooltip: 'More', className: 'text-[2.8em]' },
   { iconName: 'MdLogout', route: 'logout',  tooltip: 'Log Out', className: 'text-[2.3em]' },
 ];
 
