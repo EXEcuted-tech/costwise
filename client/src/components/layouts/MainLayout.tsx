@@ -4,9 +4,11 @@ import CloseSidebar from '../sidebar/CloseSidebar'
 import Image from 'next/image';
 import hotdog from '@/assets/hotdog.png';
 import OpenSidebar from '../sidebar/OpenSidebar';
+import { useSidebarContext } from '@/context/SidebarContext';
 
-function MainLayout() {
-  const [isOpen, setIsOpen] = useState(false);
+const MainLayout = () =>{
+  const { isOpen, setIsOpen } = useSidebarContext();
+  
   return (
     <div className='flex !font-lato'>
       <div

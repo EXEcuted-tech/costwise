@@ -1,20 +1,18 @@
-'use client'
+"use client"
 import MainLayout from "@/components/layouts/MainLayout";
+import { useState, cloneElement } from "react";
 import { SidebarProvider } from "@/context/SidebarContext";
-import type { Metadata } from "next";
-import { useState } from "react";
 
-export default function DashboardLayout({
+export default function AuditLogLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>) {
-
+}>){
   return (
     <SidebarProvider>
-      <div className="flex">
+      <div className="flex w-screen">
         <MainLayout/>
-        <main>
+        <main className="w-full">
           {children}
         </main>
       </div>

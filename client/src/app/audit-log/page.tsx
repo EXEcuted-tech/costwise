@@ -1,16 +1,18 @@
 "use client"
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { FaFilter } from "react-icons/fa";
 import { LuArrowDownUp, LuArrowUpDown } from "react-icons/lu";
 import { FaFileExport } from "react-icons/fa6";
+import { LayoutProps } from "@/context/SidebarContext";
+import { useSidebarContext } from "@/context/SidebarContext";
 
-function AuditLog() {
-
+const AuditLogPage = () => {
+const { isOpen } = useSidebarContext();
 const [drawerOpen, setDrawerOpen] = useState(false);
 const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 
 return (
-    <div className='w-full h-full font-lato mt-[50px]'>
+    <div className={`w-full font-lato mt-[50px]`}>
         <div className="flex justify-between w-[80%] m-auto mb-[10px] gap-5">
             <div className="flex gap-5">
                 <input className="p-[10px] border border-[#868686] rounded-full w-[250px]" placeholder="Search here..." />
@@ -108,5 +110,5 @@ return (
   )
 }
 
-export default AuditLog
+export default AuditLogPage
 
