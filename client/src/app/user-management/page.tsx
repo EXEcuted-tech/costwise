@@ -1,7 +1,6 @@
 "use client";
-
 import React, { useState } from 'react';
-// import Header from '@/components/header/Header';
+import Header from '@/components/header/Header';
 import ManageAccounts from './ManageAccounts';
 import PasswordRequests from './PasswordRequests';
 import { RiShieldUserFill } from "react-icons/ri";
@@ -22,10 +21,10 @@ const UserManagement = () => {
 
     return (
         <div className="w-full">
-            {/* <div>
+            <div>
                 <Header icon={RiShieldUserFill} title="User Management"></Header>
-            </div> */}
-            <div className="flex flex-col w-auto h-auto m-8 ml-[6.5rem] mr-[7.5rem] rounded-lg bg-white shadow-md shadow-gray-300">
+            </div>
+            <div className="flex flex-col w-auto h-auto m-8 ml-[6.5rem] mr-[7.5rem] mt-12 rounded-lg bg-white shadow-md shadow-gray-300">
                 
                 {/* Menu Toggle */}
                 <div className="flex w-full h-full text-[1.5em] text-[#676767c1] bg-white font-semibold items-center border-solid border-b-[3px] border-gray-400 rounded-t-lg">

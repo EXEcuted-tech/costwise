@@ -11,7 +11,7 @@ export default function UserManagementLayout({
     <SidebarProvider>
       <div className="flex">
         <MainLayout/>
-        <main className="bg-background">
+        <main className="bg-background w-full">
           {children}
         </main>
       </div>
