@@ -8,7 +8,7 @@ import OpenSidebar from '../sidebar/OpenSidebar';
 function MainLayout() {
   const [isOpen, setIsOpen] = useState(false);
   return (
-    <div className='flex'>
+    <div className='flex !font-lato'>
       <div
         className={`flex transition-all duration-200 ease-in-out ${isOpen ? 'w-[360px]' : 'w-[120px]'} overflow-hidden`}
       >
