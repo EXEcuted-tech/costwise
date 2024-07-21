@@ -1,10 +1,6 @@
+"use client"
 import MainLayout from "@/components/layouts/MainLayout";
-import type { Metadata } from "next";
-
-export const metadata: Metadata = {
-  title: "CostWise | Dashboard",
-  description: "Track performance metrics, products, and its costing to get insights in one place.",
-};
+import { SidebarProvider } from "@/context/SidebarContext";
 
 export default function DashboardLayout({
   children,
@@ -12,11 +8,13 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className="flex">
-      <MainLayout/>
-      <main>
-        {children}
-      </main>
-    </div>
+    <SidebarProvider>
+      <div className="flex">
+        <MainLayout/>
+        <main className='w-full bg-background'>
+          {children}
+        </main>
+      </div>
+    </SidebarProvider>
   );
 }
