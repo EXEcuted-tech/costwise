@@ -107,7 +107,6 @@ const OpenSidebar: React.FC = () => {
                   )
                     :
                     (
-                      <Link href={`/${route}`}>
                         <li
                           key={index}
                           className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${isRoute
@@ -118,7 +117,6 @@ const OpenSidebar: React.FC = () => {
                           <IconComponent className={`${className} justify-center`} />
                           <p className='font-lato ml-[8px] text-[25px]'>{menuName}</p>
                         </li>
-                      </Link>
                     )
                 }))
               }
