@@ -107,16 +107,16 @@ const OpenSidebar: React.FC = () => {
                   )
                     :
                     (
-                        <li
-                          key={index}
-                          className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${isRoute
-                            ? 'w-[88%] text-primary bg-[#FFD3D3] ml-[25px] pr-[20px] pl-[15px] py-[5px] my-[8px] rounded-[20px]'
-                            : 'my-[11px] hover:text-[#FFD3D3] px-[40px]'
-                            }`}
-                          onMouseEnter={() => setIsMore(true)}>
-                          <IconComponent className={`${className} justify-center`} />
-                          <p className='font-lato ml-[8px] text-[25px]'>{menuName}</p>
-                        </li>
+                      <li
+                        key={index}
+                        className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${isRoute
+                          ? 'w-[88%] text-primary bg-[#FFD3D3] ml-[25px] pr-[20px] pl-[15px] py-[5px] my-[8px] rounded-[20px]'
+                          : 'my-[11px] hover:text-[#FFD3D3] px-[40px]'
+                          }`}
+                        onMouseEnter={() => setIsMore(true)}>
+                        <IconComponent className={`${className} justify-center`} />
+                        <p className='font-lato ml-[8px] text-[25px]'>{menuName}</p>
+                      </li>
                     )
                 }))
               }
