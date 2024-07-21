@@ -7,26 +7,30 @@ function LogoutPage() {
         <img
           src="images/statsimage.png"
           alt="Logout Image"
-          className="sm:w-[100%] md:w-[95%] lg:w-[90%] 2xl:w-[85%] h-auto"
+          className="w-[90%] h-auto"
         />
       </div>
 
-      <div className="bg-green h-[40%] w-[100%] flex-row items-center justify-center">
+      <div className="bg-green h-[40%] w-[100%] flex-row items-center justify-center text-white">
         <div className="flex items-center justify-center h-[40%] w-[100%]">
-          <p className="text-[5em]">Logged Out!</p>
+          <p className="text-[4em] md:text-[4.5em] lg:text-[5em] font-semibold">
+            Logged Out!
+          </p>
         </div>
         <div className="flex items-center justify-center h-[10%] w-[100%] font-poppins">
-          <p className="text-[1.6em]">Thank you for using CostWise!</p>
+          <p className="text-[1.2em] md:text-[1.4em] lg:text-[1.6em]">
+            Thank you for using CostWise!
+          </p>
         </div>
         <div className="flex items-center justify-center h-[10%] w-[100%] font-poppins">
-          <p className="text-[1.6em]">
+          <p className="text-[1.2em] md:text-[1.4em] lg:text-[1.6em]">
             To access the page, please log in again.
           </p>
         </div>
         <div className="flex items-center justify-center h-[30%] w-[100%] font">
           <div className="bg-secondary w-[50%] flex items-center justify-center h-[60%] rounded-3xl">
             <Link href="/login">
-              <button className="text-[1.6em] text-[#A60000] font-bold">
+              <button className="text-[1.2em] md:text-[1.4em] lg:text-[1.6em] text-[#A60000] font-bold">
                 Return to login Page
               </button>
             </Link>
