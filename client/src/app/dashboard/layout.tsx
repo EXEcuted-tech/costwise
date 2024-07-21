@@ -1,3 +1,4 @@
+"use client"
 import MainLayout from "@/components/layouts/MainLayout";
 import { SidebarProvider } from "@/context/SidebarContext";
 
