@@ -11,7 +11,7 @@ export default function DashboardLayout({
     <SidebarProvider>
       <div className="flex">
         <MainLayout/>
-        <main className='w-full bg-background'>
+        <main className='w-full bg-background font-lato'>
           {children}
         </main>
       </div>

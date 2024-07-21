@@ -5,6 +5,7 @@ interface TabConfig {
     iconName: string;
     tabName: string;
     tabIndicator: string;
+    className: string;
 }
 
 interface FileProps {
@@ -15,7 +16,7 @@ interface FileProps {
 const FileTabs: React.FC<FileProps> = ({ tab, setTab }) => {
     return (
         <div className='flex'>
-            {fileTabs.map(({ iconName, tabName, tabIndicator }, index) => {
+            {fileTabs.map(({ iconName, tabName, tabIndicator, className}, index) => {
                 const IconComponent = iconMap[iconName];
                 return (
                     <div className={`border-1 rounded-t-[15px] py-[2px] px-[15px] mr-[1px] drop-shadow-md
@@ -25,8 +26,8 @@ const FileTabs: React.FC<FileProps> = ({ tab, setTab }) => {
                         }`}
                         onClick={()=>setTab(tabIndicator)}>
                         <li key={index} className='flex cursor-pointer items-center my-[5px]'>
-                            <IconComponent className={`$mr-2 ${tab === tabIndicator ? 'text-white':'text-[#919191]' }`} />
-                            <p className='font-semibold'>{tabName}</p>
+                            <IconComponent className={`${tab === tabIndicator ? 'text-white':'text-[#919191]'} ${className}`} />
+                            <p className={`${tab === tabIndicator ? 'font-semibold' : 'font-medium'}`}>{tabName}</p>
                         </li>
                     </div>
                 );
@@ -38,7 +39,7 @@ const FileTabs: React.FC<FileProps> = ({ tab, setTab }) => {
 export default FileTabs
 
 const fileTabs: TabConfig[] = [
-    { iconName: 'FaFile', tabName: 'All Files', tabIndicator: 'all' },
-    { iconName: 'BiSolidFile', tabName: 'Master Files', tabIndicator: 'masterfile' },
-    { iconName: 'BiFile', tabName: 'Transactional Files', tabIndicator: 'transactionfile' },
+    { iconName: 'FaFile', tabName: 'All Files', tabIndicator: 'all', className: 'mr-1' },
+    { iconName: 'BiSolidFile', tabName: 'Master Files', tabIndicator: 'masterfile', className: 'text-[21px] mr-0.5' },
+    { iconName: 'BiFile', tabName: 'Transactional Files', tabIndicator: 'transactionfile', className: 'text-[21px] mr-0.5' },
 ];
