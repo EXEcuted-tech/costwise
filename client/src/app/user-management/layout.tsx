@@ -2,7 +2,7 @@
 import MainLayout from "@/components/layouts/MainLayout";
 import { SidebarProvider } from "@/context/SidebarContext";
 
-export default function DashboardLayout({
+export default function UserManagementLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -11,7 +11,7 @@ export default function DashboardLayout({
     <SidebarProvider>
       <div className="flex">
         <MainLayout/>
-        <main>
+        <main className="bg-background">
           {children}
         </main>
       </div>

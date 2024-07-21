@@ -13,7 +13,7 @@ const MiniSidebar: React.FC<MiniSidebarProps>  = ({ setIsMore, isAdmin }) => {
   const ref = useOutsideClick(() => setIsMore(false));
   return (
     
-    <div ref={ref} className={`${isAdmin ? 'left-[360px]' : 'left-[120px]'} font-lato fixed bottom-[60px] animate-expand-width bg-[#FFD3D3] h-[120px] duration-300 ease-in-out rounded-r-lg`}
+    <div ref={ref} className={`${isAdmin ? 'left-[360px]' : 'left-[120px]'} font-lato fixed z-50 bottom-[60px] animate-expand-width bg-[#FFD3D3] h-[120px] duration-300 ease-in-out rounded-r-lg`}
         onMouseEnter={() => setIsMore(true)}
         onMouseLeave={() => (
             setTimeout(() => {
