@@ -17,7 +17,8 @@ const config: Config = {
       colors:{
         primary: '#B22222',
         secondary: '#FEF200',
-        tertiary: '#313131'
+        tertiary: '#313131',
+        background: '#FFFAF8'
       },
       screens: {
         'xl': '1024px',
