@@ -4,7 +4,7 @@ import { TiWarning } from "react-icons/ti";
 
 const ConfirmDelete = () => {
     return (
-        <div className='z-10 w-full h-full fixed top-0 right-0 p-4 overflow-auto bg-[rgba(0,0,0,0.6)] animate-fade-in'>
+        <div className='font-lato z-10 w-full h-full fixed top-0 right-0 p-4 overflow-auto bg-[rgba(0,0,0,0.6)] animate-fade-in'>
             <div className="flex flex-col w-[30rem] h-[25rem] fixed top-[35%] left-[40%] p-4 bg-white shadow-md shadow-gray-800 rounded-lg"> 
                 
                 {/* Close Button */}

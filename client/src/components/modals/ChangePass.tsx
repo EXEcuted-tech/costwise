@@ -9,7 +9,7 @@ interface ModalProps {
 
 const ChangePass: React.FC<ModalProps> = ({username, date, password}) => {
     return (
-        <div className='z-10 w-full h-full fixed top-0 right-0 p-4 overflow-auto bg-[rgba(0,0,0,0.6)] animate-fade-in'>
+        <div className='font-lato z-10 w-full h-full fixed top-0 right-0 p-4 overflow-auto bg-[rgba(0,0,0,0.6)] animate-fade-in'>
             <div className="flex flex-col w-[37rem] h-[21rem] fixed top-[35%] left-[40%] p-6 bg-white shadow-md shadow-gray-800 rounded-lg"> 
                 
                 {/* Title */} 

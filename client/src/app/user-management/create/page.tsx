@@ -5,7 +5,7 @@ import { FcImageFile } from "react-icons/fc";
 
 const AccountCreation = () => {
     return (
-        <div className="w-full h-full flex">
+        <div className="w-full h-full flex font-lato animate-fade-in">
             <div className='flex'>
                 <Image
                     src={background}
@@ -14,7 +14,7 @@ const AccountCreation = () => {
                     height={1000}
                 />
             </div>
-        <div className='w-[70rem] h-full fixed bg-white ml-[38%] shadow-2xl'> 
+        <div className='w-[90rem] h-full fixed bg-white ml-[20.5%] shadow-2xl'> 
             {/* Title */}
             <div className='flex flex-col w-full h-[7.3rem] justify-center items-center'>
                 <div className='text-[2.6em] font-bold'> Account Creation </div>
@@ -24,7 +24,7 @@ const AccountCreation = () => {
 
             {/* Upload Picture */}
             <div className='flex h-[18rem] justify-center items-center border-b-3 border-[#929090] bg-white cursor-pointer '>
-                <div className='flex flex-col w-[50rem] h-[12rem] font-semibold items-center justify-center border-5 border-dashed rounded-xl hover:animate-shrink-in'>
+                <div className='flex flex-col w-[70rem] h-[13rem] font-semibold items-center justify-center border-5 border-dashed rounded-xl hover:animate-shrink-in'>
                     <div className='text-[5.5em]'>
                         <FcImageFile />
                     </div>
@@ -38,7 +38,7 @@ const AccountCreation = () => {
             {/* Form */}
             <div className='flex justify-center mt-9 text-[#5B5353]'>
                 {/* 1st Col */}
-                <div className='flex flex-col mr-24'>
+                <div className='flex flex-col mr-20'>
                     <div className='flex flex-col justify-start text-[1.2em] mb-10'>
                         <p>First Name*</p>
                         <div className="flex flex-col w-full">
@@ -85,7 +85,7 @@ const AccountCreation = () => {
                 </div>
 
                 {/* 2nd Col */}
-                <div className='flex flex-col mr-24'>
+                <div className='flex flex-col mr-20'>
                     <div className='flex flex-col justify-start text-[1.2em] mb-10'>
                         <p>Middle Name*</p>
                         <div className="flex flex-col w-full">
@@ -146,7 +146,7 @@ const AccountCreation = () => {
                     </div>
 
                     <div className='flex flex-col justify-start text-[1.2em] mb-10'>
-                        <p>Suffix*</p>
+                        <p>Suffix</p>
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
@@ -176,9 +176,9 @@ const AccountCreation = () => {
             </div>
 
                 {/* Buttons */}
-                <div className='flex flex-col w-full mt-2 items-center'>
-                    <button className='w-[10rem] h-[3rem] p-1 text-center text-[1.2em] font-semibold bg-white text-[#A60000] border-3 border-[#A60000] mb-4 rounded-xl'> Add Password </button>
-                    <button className='w-[10rem] h-[3rem] p-1 text-center text-[1.2em] font-semibold bg-[#A60000] text-white rounded-xl'> Confirm </button>
+                <div className='flex flex-col w-full mt-1 items-center'>
+                    <button className='w-[10rem] h-[3rem] p-1 text-center text-[1.2em] font-semibold bg-white text-[#A60000] border-3 border-[#A60000] mb-4 rounded-xl hover:bg-[#A60000] hover:border-white hover:text-white'> Add Password </button>
+                    <button className='w-[10rem] h-[3rem] p-1 text-center text-[1.2em] font-semibold bg-[#A60000] text-white rounded-xl hover:bg-[#c01820]'> Confirm </button>
                 </div>
             </div>
         </div>

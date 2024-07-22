@@ -9,7 +9,7 @@ export default function UserManagementLayout({
 }>) {
   return (
     <SidebarProvider>
-      <div className="flex">
+      <div className="flex font-lato">
         <MainLayout/>
         <main className="bg-background w-full">
           {children}

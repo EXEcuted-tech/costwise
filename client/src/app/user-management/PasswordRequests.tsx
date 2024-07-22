@@ -9,7 +9,7 @@ const PasswordRequests = () => {
     return (
         <div className="flex flex-col w-auto h-auto rounded-lg shadow-md shadow-gray-300 animate-fade-in">
             {/* Search Area */}
-            <div className="flex w-full h-[4.5rem] bg-[#F3F3F3] border-solid border-b-[3px] border-gray-300">
+            <div className="flex w-full h-[4.5rem] bg-[#F3F3F3] border-solid border-b-[2px] border-[#868686]">
                 <div className="mt-[0.8em] ml-7 text-gray-600">
                     <div className='flex fixed text-[1.6em] text-gray-400 mt-[0.7rem] ml-2'>
                         <IoIosSearch />
@@ -35,7 +35,7 @@ const PasswordRequests = () => {
             {/* Main Content */}
             <div className="flex flex-col w-full h-[35rem] rounded-lg bg-white">
                 {/* Header */}
-                <div className='flex h-[4rem] text-[#6B6B6B] text-[1.3em] font-medium border-solid border-b-[3px]'>
+                <div className='flex h-[4rem] text-[#6B6B6B] text-[1.3em] font-medium border-solid border-b-[2px] border-[#868686]'>
                     <div className="w-[25rem] pl-10 py-2">Name</div>
                     <div className="w-[15rem] pl-10 py-2">Role</div>
                     <div className="w-[15rem] py-2">Department</div>
@@ -47,7 +47,7 @@ const PasswordRequests = () => {
                 {/* Rows */}
                 <div className="flex flex-col text-[1.3em]">
                     {[...Array(8)].map((_, index) => (
-                        <div key={index} className="flex h-[4rem] border-b hover:bg-gray-50">
+                        <div key={index} className="flex h-[4rem] border-b-[2px] border-[#868686] hover:bg-gray-50">
                             <div className="w-[25rem] pl-10 py-1 flex items-center break-words">Franz Ondiano beeeeeeee bebebeb</div>
                             <div className="w-[15rem] pl-10 py-1 flex items-center break-words">User</div>
                             <div className="w-[15rem] py-1 flex items-center break-words">Accounting</div>
@@ -69,7 +69,7 @@ const PasswordRequests = () => {
             </div>
 
             {/* Footer */}
-            <div className="flex w-full h-[5rem] bg-white border-solid border-t-[3px] border-gray-400"></div>
+            <div className="flex w-full h-[5rem] rounded-b-xl bg-white border-t-[1px] border-[#868686]"></div>
         </div>
     );
 };
