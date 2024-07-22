@@ -31,7 +31,7 @@ function LogoutPage() {
           <div className="bg-secondary w-[50%] flex items-center justify-center h-[60%] rounded-3xl">
             <Link href="/login">
               <button className="text-[1em] sm:text-[1.2em] md:text-[1.4em] lg:text-[1.6em] text-[#A60000] font-bold">
-                Return to login Page
+                Return to Login Page
               </button>
             </Link>
           </div>
