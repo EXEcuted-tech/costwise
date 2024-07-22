@@ -28,9 +28,9 @@ function LogoutPage() {
           </p>
         </div>
         <div className="flex items-center justify-center h-[30%] w-[100%] font">
-          <div className="bg-secondary w-[50%] flex items-center justify-center h-[60%] rounded-3xl">
+          <div className="bg-secondary w-[50%] flex items-center justify-center h-[60%] rounded-3xl cursor-pointer overflow-hidden transition">
             <Link href="/login">
-              <button className="text-[1em] sm:text-[1.2em] md:text-[1.4em] lg:text-[1.6em] text-[#A60000] font-bold">
+              <button className="text-[1em] sm:text-[1.2em] md:text-[1.4em] lg:text-[1.6em] text-[#A60000] font-bold transition-transform transform hover:scale-105">
                 Return to Login Page
               </button>
             </Link>
