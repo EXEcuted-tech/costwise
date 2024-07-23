@@ -29,13 +29,13 @@ const UserManagement = () => {
                 {/* Menu Toggle */}
                 <div className="flex w-full h-full text-[1.5em] text-[#000000] bg-white font-semibold items-center border-solid border-b-[2px] border-[#868686] rounded-t-lg">
                     <div
-                        className={`w-[10rem] h-[4rem] text-center rounded-t-lg cursor-pointer  ${activePage === 'accounts' ? 'bg-[#D9D9D9] text-[#676767]' : 'bg-white'}`}
+                        className={`w-[10rem] h-[4rem] text-center rounded-t-lg cursor-pointer  ${activePage === 'accounts' ? 'bg-[#D9D9D9] text-[#676767] border-r-2 border-[#86868649]' : 'bg-white'}`}
                         onClick={() => setActivePage('accounts')}
                     >
                         <p className='mt-[1rem]'>Accounts</p>
                     </div>
                     <div
-                        className={`w-[15rem] h-[4rem] text-center rounded-t-lg cursor-pointer ${activePage === 'passwordRequests' ? 'bg-[#D9D9D9] text-[#676767]' : 'bg-white'}`}
+                        className={`w-[15rem] h-[4rem] text-center rounded-t-lg cursor-pointer ${activePage === 'passwordRequests' ? 'bg-[#D9D9D9] text-[#676767] border-r-2 border-[#86868649]' : 'bg-white'}`}
                         onClick={() => setActivePage('passwordRequests')}
                     >
                         <p className='mt-[1rem]'>Password Request</p>

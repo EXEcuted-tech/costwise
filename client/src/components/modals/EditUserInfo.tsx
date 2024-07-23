@@ -6,10 +6,15 @@ interface ModalProps {
     role: string;
 }
 
-const EditUserInfo = () => {
+interface EditUserInfoProps {
+    onClose: () => void;
+}
+
+
+const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose }) => {
     return (
-        <div className='font-lato z-10 w-full h-full fixed top-0 right-0 p-4 overflow-auto bg-[rgba(0,0,0,0.6)] animate-fade-in'>
-            <div className="flex flex-col w-[55rem] h-[41rem] fixed top-[23%] left-[35%] p-6 bg-white shadow-md shadow-gray-800 rounded-lg"> 
+        <div className='font-lato z-10 w-full h-full fixed top-0 right-0 p-4 overflow-auto bg-[rgba(0,0,0,0.6)] animate-fade-in '>
+            <div className="flex flex-col w-[55rem] h-[41rem] fixed top-[20%] left-[30%] p-6 bg-white shadow-md shadow-gray-800 rounded-lg max-4xl:scale-90 max-3xl:scale-85 max-2xl:scale-80 max-xl:scale-75 max-xl:left-[15%] max-2xl:left-[20%] max-3xl:left-[25%]"> 
                 
                 {/* Title */} 
                 <div className='flex justify-center mt-1 mb-2 border-b-2 border-[#A0A0A0]'>
@@ -18,7 +23,7 @@ const EditUserInfo = () => {
                     </div>
         
                     <div className="h-[2rem] text-[2em] text-[#CECECE] ml-auto">
-                        <button className="">
+                        <button onClick={onClose}>
                             <IoClose />
                         </button>
                     </div>
