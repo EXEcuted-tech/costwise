@@ -12,7 +12,7 @@ export interface FileTableProps {
     addedBy: string;
 }
 
-const FileContainer: React.FC<{ tab: string }> = ({ tab }) => {  
+const FileContainer: React.FC<{ tab: string, isOpen: boolean }> = ({ tab, isOpen }) => {  
 
     return (
         <div className='!font-lato bg-white w-full rounded-lg drop-shadow-lg'>

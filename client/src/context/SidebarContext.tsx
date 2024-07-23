@@ -4,7 +4,7 @@ const SidebarContext = createContext<LayoutProps | undefined>(undefined);
 
 export interface LayoutProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  isOpen?: boolean;
+  isOpen: boolean;
 }
 
 export const useSidebarContext = () => {

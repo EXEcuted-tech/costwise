@@ -2,7 +2,7 @@
 import MainLayout from "@/components/layouts/MainLayout";
 import { SidebarProvider } from "@/context/SidebarContext";
 
-export default function DashboardLayout({
+export default function FileManagerLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
