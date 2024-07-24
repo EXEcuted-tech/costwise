@@ -12,7 +12,7 @@ const MainLayout = () => {
   return (
     <div className='flex !font-lato'>
       <div
-        className={`flex transition-all duration-200 ease-in-out ${isOpen ? 'w-[360px]' : 'w-[120px]'} overflow-hidden`}
+        className={`flex transition-all duration-200 ease-in-out ${isOpen ? 'w-[280px] 2xl:w-[360px]' : 'w-[120px]'} overflow-hidden`}
       >
         {isOpen ? <OpenSidebar /> : <CloseSidebar />}
       </div>
