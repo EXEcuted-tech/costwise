@@ -7,9 +7,10 @@ import { TiExport } from "react-icons/ti";
 import { IoTrash } from "react-icons/io5";
 interface FileTableComponentProps {
     fileData: FileTableProps[];
+    isOpen: boolean;
 }
 
-const FileTable: React.FC<FileTableComponentProps> = ({ fileData }) => {
+const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const handlePageChange = (event: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
@@ -41,7 +42,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData }) => {
                                 <td>{fileType}</td>
                                 <td>{dateAdded}</td>
                                 <td>{addedBy}</td>
-                                <td className='pr-[46px] w-[20%] 2xl:w-[15%]'>
+                                <td className={`${isOpen ? 'w-[20%] 3xl:w-[15%]' : 'w-[20%] 2xl:w-[15%]'}  pr-[46px]`}>
                                     <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
                                                 cursor-pointer hover:bg-[#f7f7f7]'>

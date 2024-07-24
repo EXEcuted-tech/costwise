@@ -17,7 +17,7 @@ const FileManagerPage = () => {
   return (
     <>
       <Header icon={BsFolderFill} title={"File Manager"} />
-      <div className='ml-[45px] mt-[35px] px-[50px]'>
+      <div className={`${isOpen ? 'ml-[10px] 2xl:ml-[45px]' : 'ml-[45px]'} mt-[35px] px-[50px]`}>
         <div className='flex'>
           <div className={`${isOpen ? 'w-[95%] 4xl:w-[75%]' : 'w-[95%] 2xl:w-[80%] 3xl:w-[65%] 4xl:w-[60%]' } ml-[10px]`}>
             <FileTabs tab={tab} setTab={setTab} isOpen={isOpen}/>

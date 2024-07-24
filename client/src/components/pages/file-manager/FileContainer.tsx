@@ -40,7 +40,7 @@ const FileContainer: React.FC<{ tab: string, isOpen: boolean }> = ({ tab, isOpen
             </div>
             {/* Table */}
             <div>
-                <FileTable fileData={tab === 'all' ? fakeFileAllData : tab === 'masterfile' ? fakeFileMasterData : fakeFileTransactionData}/>
+                <FileTable fileData={tab === 'all' ? fakeFileAllData : tab === 'masterfile' ? fakeFileMasterData : fakeFileTransactionData} isOpen={isOpen}/>
             </div>
         </div>
     )
