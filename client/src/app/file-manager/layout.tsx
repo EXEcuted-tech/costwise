@@ -1,6 +1,6 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
-import { SidebarProvider } from "@/context/SidebarContext";
+import { SidebarProvider, useSidebarContext } from "@/context/SidebarContext";
 
 export default function FileManagerLayout({
   children,
@@ -9,12 +9,22 @@ export default function FileManagerLayout({
 }>) {
   return (
     <SidebarProvider>
-      <div className="flex">
-        <MainLayout/>
-        <main className='w-full bg-background font-lato'>
-          {children}
-        </main>
-      </div>
+      <FileManagerContent>
+        {children}
+      </FileManagerContent>
     </SidebarProvider>
+  );
+}
+
+function FileManagerContent({ children }: { children: React.ReactNode }) {
+  const { isOpen } = useSidebarContext();
+
+  return (
+    <div className="flex">
+      <MainLayout />
+      <main className={`${isOpen ? 'w-[calc(100%-280px)] 2xl:w-full' : 'w-full'} bg-background font-lato`}>
+        {children}
+      </main>
+    </div>
   );
 }

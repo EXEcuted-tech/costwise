@@ -30,7 +30,7 @@ const FileTabs: React.FC<FileProps> = ({ tab, setTab, isOpen }) => {
                         <li key={index} className='flex cursor-pointer items-center my-[5px]'>
                             <IconComponent className={`${tab === tabIndicator ? 'text-white':'text-[#919191]'} ${className}`} />
                             <p className={`
-                                ${isOpen && 'text-[12px] 3xl:text-[16px]'} 
+                                ${isOpen && 'text-[9.5px] 2xl:text-[12px] 3xl:text-[16px]'} 
                                 ${tab === tabIndicator ? 'font-semibold' : 'font-medium'}`
                             }>{tabName}</p>
                         </li>

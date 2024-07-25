@@ -15,14 +15,14 @@ export interface FileTableProps {
 const FileContainer: React.FC<{ tab: string, isOpen: boolean }> = ({ tab, isOpen }) => {  
 
     return (
-        <div className='!font-lato bg-white w-full rounded-lg drop-shadow-lg'>
+        <div className={`!font-lato bg-white w-full rounded-lg drop-shadow-lg`}>
             {/* Title */}
-            <h1 className='font-bold text-[32px] ml-[46px] py-[2px]'>
+            <h1 className={`${isOpen ? 'ml-[20px] 2xl:ml-[46px] text-[28px] 2xl:text-[32px]' : 'text-[32px] ml-[46px]'} font-bold py-[2px]`}>
                 {tab === 'all' ? 'All Files' : tab === 'masterfile' ? 'Master Files' : 'Transactional Files'}
             </h1>
             <div className=' flex items-center h-[50px] bg-[#F3F3F3] border-y-[0.8px] border-[#868686] px-[46px]'>
                 {/* Search Component */}
-                <div className="relative w-[75%] 3xl:w-[84.5%] mr-[1%]">
+                <div className={`${isOpen ? 'w-[75%] 3xl:w-[80%]' : 'w-[75%] 3xl:w-[84.5%]' } relative mr-[1%]`}>
                     <div className="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
                         <AiOutlineSearch className="text-[#B0B0B0] text-[22px]" />
                     </div>
@@ -34,7 +34,7 @@ const FileContainer: React.FC<{ tab: string, isOpen: boolean }> = ({ tab, isOpen
                     />
                 </div>
                 {/* Date Picker */}
-                <div className="relative w-[25%] 3xl:w-[15.5%]">
+                <div className={`${isOpen ? 'w-[25%] 3xl:w-[20%]' : 'w-[25%] 3xl:w-[15.5%]' } relative`}>
                     <CustomDatePicker/>
                 </div>
             </div>

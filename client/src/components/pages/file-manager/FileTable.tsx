@@ -22,27 +22,27 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen }) => {
     return (
         <div className=''>
             <table className='w-full'>
-                <thead className='text-left font-bold text-[#868686] border-b-[0.6px] border-[#868686]'>
+                <thead className={` ${isOpen && 'text-[14px] 2xl:text-[16px]'} text-left font-bold text-[#868686] border-b-[0.6px] border-[#868686]`}>
                     <tr className=''>
-                        <th className='pl-[46px] py-[5px]'>Title/Name</th>
+                        <th className={`${isOpen ? 'pl-[20px] 2xl:pl-[46px]' : 'pl-[46px]'} py-[5px]`}>Title/Name</th>
                         <th className=''>File Type</th>
                         <th className=''>Date Added</th>
                         <th className=''>Added By</th>
-                        <th className='pr-[46px]'>Manage</th>
+                        <th className={`${isOpen ? 'pr-[20px] 2xl:pr-[46px]' : 'pr-[46px]'}`}>Manage</th>
                     </tr>
                 </thead>
                 <tbody>
                     {currentListPage.length > 0
                         ? (currentListPage.map(({ fileLabel, fileName, fileType, dateAdded, addedBy }, index) => (
                             <tr key={index} className='border-b-[0.3px] border-[#d9d9d9]'>
-                                <td className='py-2 pl-[46px]'>
-                                    <p className='text-primary text-[18px] cursor-pointer hover:underline'>{fileLabel}</p>
-                                    <p className='italic text-[#868686]'>{fileName}</p>
+                                <td className={`${isOpen ? 'pl-[20px] 2xl:pl-[46px]' : 'pl-[46px]'} py-2`}>
+                                    <p className={`${isOpen ? 'text-[16px] 2xl:text-[18px]' : 'text-[18px]'} text-primary cursor-pointer hover:underline`}>{fileLabel}</p>
+                                    <p className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}italic text-[#868686]`}>{fileName}</p>
                                 </td>
-                                <td>{fileType}</td>
-                                <td>{dateAdded}</td>
-                                <td>{addedBy}</td>
-                                <td className={`${isOpen ? 'w-[20%] 3xl:w-[15%]' : 'w-[20%] 2xl:w-[15%]'}  pr-[46px]`}>
+                                <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{fileType}</td>
+                                <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{dateAdded}</td>
+                                <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{addedBy}</td>
+                                <td className={`${isOpen ? 'w-[20%] 3xl:w-[15%] pr-[20px] 2xl:pr-[46px]' : 'w-[20%] 2xl:w-[15%] pr-[46px]'}`}>
                                     <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
                                                 cursor-pointer hover:bg-[#f7f7f7]'>
