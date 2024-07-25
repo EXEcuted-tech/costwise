@@ -1,8 +1,10 @@
-import { FaAt, FaMobileButton } from "react-icons/fa6";
+import { FaAt } from "react-icons/fa6";
 import { FaAddressCard } from "react-icons/fa";
 import { GoArrowLeft } from "react-icons/go";
 import { MdLock, MdEmail } from "react-icons/md";
 import Link from "next/link";
+import { GiSmartphone } from "react-icons/gi";
+
 function ForgotPassPage() {
   return (
     <div className="flex-row lg:flex items-center justify-center h-full z-1 bg-primary rounded-3xl">
@@ -15,25 +17,25 @@ function ForgotPassPage() {
             className="w-[70%] sm:w-[60%] xl:w-[70%]  h-auto "
           />
         </div>
-        <div className="bg-primary items-center flex w-[100%] justify-center text-[1.2em]  font-medium border-y-2 border-white h-[20%] lg:h-[15%] xl:text-[1.4em] 2xl:text-[1.6em]">
-          <div className="flex h-[50%] items-center justify-center pt-[2%]">
+        <div className="bg-primary items-center flex w-[100%] justify-center text-[1.2em]  font-medium border-y-2 border-white h-[20%] lg:h-[15%] xl:text-[1.6em]">
+          <div className="flex h-[50%] items-center justify-center font-bold">
             <p>Forgot Password</p>
           </div>
         </div>
-        <div className=" h-[15%] items-center flex-row justify-center w-[100%] text-[1em] xl:text-[16px] 2xl:text-[1.3em] font-light">
-          <div className=" h-[70%] items-center flex justify-center w-[100%] lg:text-[1.2em] font-normal">
+        <div className=" h-[15%] items-center flex-row justify-center w-[100%] text-[1em] xl:text-[1.2em] font-light">
+          <div className=" h-[70%] items-center flex justify-center w-[100%] xl:text-[1.2em] ">
             <p>Enter pertinent details and</p>
           </div>
-          <div className=" h-[30%] items-center flex justify-center w-[100%] lg:text-[1.2em] font-normal">
+          <div className=" h-[30%] items-center flex justify-center w-[100%] xl:text-[1.2em]">
             <p>retrieve your account.</p>
           </div>
         </div>
-        <div className=" h-[35%] items-center flex-row w-[100%] justify-center text-[1em] 2xl:text-[1.3em] 2xl:h-[40%]">
-          <div className="flex items-end justify-center h-[60%]">
+        <div className="h-[35%] items-center flex-row w-[100%] justify-center text-[1em] xl:text-[1.3em] 2xl:h-[25%]">
+          <div className="flex items-end justify-center h-[65%]">
             <p className="font-bold">Have Any Concerns?</p>
           </div>
           <div className="flex items-center justify-center h-[15%]">
-            <FaMobileButton className="mr-[1%]" />
+            <GiSmartphone className="mr-[1%]" />
             <p>09551957592</p>
           </div>
           <div className="flex items-center justify-center h-[15%]">
@@ -47,7 +49,7 @@ function ForgotPassPage() {
         <div className=" h-[5%] items-center flex justify-start w-[100%]">
           <Link href="/login">
             <button>
-              <GoArrowLeft className="text-[#6D6D6D] text-[3em] xl:text-[4em]" />
+              <GoArrowLeft className="text-[#6D6D6D] text-[3em] xl:text-[4em] xl:ml-[50%] 2xl:ml-0  hover:xl:text-[4.5em] transition" />
             </button>
           </Link>
         </div>
@@ -61,37 +63,33 @@ function ForgotPassPage() {
         </div>
         <div className="h-[10%] flex-row items-center justify-center">
           <div className="flex h-[50%] items-center justify-center">
-            <p className="text-[1em] xl:text-[1.1em] 2xl:text-[1.2em]">
+            <p className="text-[1em] xl:text-[1.2em]">
               No worries! Enter your email, and an
             </p>
           </div>
           <div className="flex h-[50%] items-center justify-center">
-            <p className="text-[1em] xl:text-[1.1em] 2xl:text-[1.2em]">
+            <p className="text-[1em] xl:text-[1.2em]">
               administrator will reach out to you.
             </p>
           </div>
         </div>
         <div className=" h-[10%] items-end flex justify-start w-[100%] pb-[1%] px-[10%]">
-          <MdEmail className="mx-[1%] lg:text-[1.6em] text-[1.3em]" />
-          <p className="text-[1em] xl:text-[1.1em] 2xl:text-[1.2em]">
-            Email Address
-          </p>
+          <MdEmail className="mx-[1%] lg:text-[1.6em] text-[1.3em] xl:mb-[1%]" />
+          <p className="text-[1em] xl:text-[24px]">Email Address</p>
         </div>
         <div className=" h-[10%] flex w-[100%] px-[10%]">
-          <input className="text-[1.2em] font-semibold w-[100%] rounded-xl bg-[#f3f3f3] border-2 border-[#d9d9d9]"></input>
+          <input className="text-[1.2em] font-semibold w-[100%] rounded-xl bg-[#f3f3f3] border-2 border-[#d9d9d9] pr-[5%] text-tertiary px-[5%]"></input>
         </div>
         <div className=" h-[10%] items-end flex justify-start w-[100%] pb-[1%] px-[10%]">
-          <FaAddressCard className="mx-[1%] lg:text-[1.6em] text-[1.3em]" />
-          <p className="text-[1em] xl:text-[1.1em] 2xl:text-[1.2em]">
-            Employee Number
-          </p>
+          <FaAddressCard className="mx-[1%] lg:text-[1.6em] text-[1.3em] xl:mb-[1%]" />
+          <p className="text-[1em] xl:text-[24px]">Employee Number</p>
         </div>
         <div className=" h-[10%] flex w-[100%] px-[10%]">
-          <input className="text-[1.2em] font-semibold w-[100%] rounded-xl bg-[#f3f3f3] border-2 border-[#d9d9d9]"></input>
+          <input className="text-[1.2em] font-semibold w-[100%] rounded-xl bg-[#f3f3f3] border-2 border-[#d9d9d9] pr-[5%] text-tertiary px-[5%]"></input>
         </div>
         <div className=" h-[20%] items-center flex justify-end w-[100%] pr-[10%] pb-[2%]">
-          <div className="bg-primary text-white flex items-center justify-center rounded-2xl h-[50%] xl:h-[30%] 2xl:h-[35%] w-[50%] sm:w-[40%]">
-            <button className="text-[1em] xl:text-[1.1em] 2xl:text-[1.3em]">
+          <div className="bg-primary text-white flex items-center justify-center rounded-3xl h-[50%] xl:h-[40%] w-[50%] sm:w-[40%] transition hover:bg-white hover:border-2 hover:border-primary hover:text-primary cursor-pointer font-extrabold">
+            <button className="text-[1em] xl:text-[1.3em]">
               Reset Password
             </button>
           </div>
