@@ -47,7 +47,7 @@ function ForgotPassPage() {
       {/* Right Div */}
       <div className="lg:w-[60%] flex-row lg:h-full bg-white p-[5%] 2xl:py-[5%] px-[5%] xl:px-0 text-tertiary rounded-b-3xl lg:rounded-e-3xl lg:rounded-none drop-shadow-3xl h-[50%] w-full 2xl:p-[5%]">
         <div className=" h-[5%] items-center flex justify-start w-[100%]">
-          <Link href="/login" className="">
+          <Link href="/" className="">
             <GoArrowLeft className="text-[#6D6D6D] text-[3em] xl:text-[4em] xl:ml-[50%] 2xl:ml-0 hover:opacity-75 hover:animate-shrink-in transition ease-in-out duration-200" />
           </Link>
         </div>
