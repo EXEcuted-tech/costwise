@@ -6,6 +6,9 @@ import { FaFileExport } from "react-icons/fa6";
 import { BiSearchAlt } from "react-icons/bi";
 import { LayoutProps } from "@/context/SidebarContext";
 import { useSidebarContext } from "@/context/SidebarContext";
+import Header from "@/components/header/Header";
+import { IconBaseProps } from "react-icons";
+import AuditDrawer from "@/components/drawer/audit-drawer";
 
 const AuditLogPage = () => {
 const { isOpen } = useSidebarContext();
@@ -14,6 +17,7 @@ const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 
 return (
     <div className={`w-full font-lato mt-[50px]`}>
+        { drawerOpen ? <AuditDrawer /> : "" }
         <div className="flex justify-between w-[80%] m-auto mb-[10px] gap-5">
             <div className="flex gap-5">
                 <div className="relative">
@@ -112,6 +116,7 @@ return (
                 </div>
             </div>
         </div>
+        
     </div>
   )
 }

@@ -1,4 +1,4 @@
-'use client'
+"use client"
 import MainLayout from "@/components/layouts/MainLayout";
 import { SidebarProvider } from "@/context/SidebarContext";
 
@@ -12,7 +12,7 @@ export default function DashboardLayout({
     <SidebarProvider>
       <div className="flex">
         <MainLayout/>
-        <main>
+        <main className="w-full">
           {children}
         </main>
       </div>

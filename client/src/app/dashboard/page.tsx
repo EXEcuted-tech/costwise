@@ -1,9 +1,11 @@
+import Header from '@/components/header/Header'
 import React from 'react'
+import { AiFillAccountBook } from "react-icons/ai";
 
 const DashboardPage = () => {
   return (
     <div>
-        INSERT DASHBOARD CONTENT
+      THIS IS DASHBOARD PAGE
     </div>
   )
 }
