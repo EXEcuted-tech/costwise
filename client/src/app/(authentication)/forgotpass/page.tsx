@@ -47,14 +47,12 @@ function ForgotPassPage() {
       {/* Right Div */}
       <div className="lg:w-[60%] flex-row lg:h-full bg-white p-[5%] 2xl:py-[5%] px-[5%] xl:px-0 text-tertiary rounded-b-3xl lg:rounded-e-3xl lg:rounded-none drop-shadow-3xl h-[50%] w-full 2xl:p-[5%]">
         <div className=" h-[5%] items-center flex justify-start w-[100%]">
-          <Link href="/login">
-            <button>
-              <GoArrowLeft className="text-[#6D6D6D] text-[3em] xl:text-[4em] xl:ml-[50%] 2xl:ml-0  hover:xl:text-[4.5em] transition" />
-            </button>
+          <Link href="/login" className="">
+            <GoArrowLeft className="text-[#6D6D6D] text-[3em] xl:text-[4em] xl:ml-[50%] 2xl:ml-0 hover:opacity-75 hover:animate-shrink-in transition ease-in-out duration-200" />
           </Link>
         </div>
         <div className="h-[15%] 2xl:h-[20%] flex items-center justify-center ">
-          <MdLock className="text-[3.5em] sm:text-[4em] xl:text-[7em] 2xl:text-[8em] text-tertiary" />
+          <MdLock className="text-[3.5em] sm:text-[4em] xl:text-[6em] 2xl:text-[7em] text-tertiary" />
         </div>
         <div className="h-[12%] xl:h-[10%] flex items-center justify-center">
           <p className=" lg:text-[2.7em] 2xl:text-[3em] font-semibold text-[1.6em]">
@@ -63,34 +61,39 @@ function ForgotPassPage() {
         </div>
         <div className="h-[10%] flex-row items-center justify-center">
           <div className="flex h-[50%] items-center justify-center">
-            <p className="text-[1em] xl:text-[1.2em]">
+            <p className="text-[1em] xl:text-[1.1em]">
               No worries! Enter your email, and an
             </p>
           </div>
           <div className="flex h-[50%] items-center justify-center">
-            <p className="text-[1em] xl:text-[1.2em]">
+            <p className="text-[1em] xl:text-[1.1em]">
               administrator will reach out to you.
             </p>
           </div>
         </div>
         <div className=" h-[10%] items-end flex justify-start w-[100%] pb-[1%] px-[10%]">
-          <MdEmail className="mx-[1%] lg:text-[1.6em] text-[1.3em] xl:mb-[1%]" />
-          <p className="text-[1em] xl:text-[24px]">Email Address</p>
+          <div className="flex items-center w-full">
+            <MdEmail className="mx-[1%]  text-[1.3em] lg:text-[1.6em]" />
+            <p className="text-[1em] xl:text-[20px] mb-[1px]">Email Address</p>
+          </div>
         </div>
         <div className=" h-[10%] flex w-[100%] px-[10%]">
           <input className="text-[1.2em] font-semibold w-[100%] rounded-xl bg-[#f3f3f3] border-2 border-[#d9d9d9] pr-[5%] text-tertiary px-[5%]"></input>
         </div>
         <div className=" h-[10%] items-end flex justify-start w-[100%] pb-[1%] px-[10%]">
-          <FaAddressCard className="mx-[1%] lg:text-[1.6em] text-[1.3em] xl:mb-[1%]" />
-          <p className="text-[1em] xl:text-[24px]">Employee Number</p>
+          <div className="flex items-center w-full">
+            <FaAddressCard className="mx-[1%] text-[1.3em] lg:text-[1.6em]" />
+            <p className="text-[1em] xl:text-[20px] mb-[1px]">Employee Number</p>
+          </div>
         </div>
         <div className=" h-[10%] flex w-[100%] px-[10%]">
           <input className="text-[1.2em] font-semibold w-[100%] rounded-xl bg-[#f3f3f3] border-2 border-[#d9d9d9] pr-[5%] text-tertiary px-[5%]"></input>
         </div>
-        <div className=" h-[20%] items-center flex justify-end w-[100%] pr-[10%] pb-[2%]">
-          <div className="bg-primary text-white flex items-center justify-center rounded-3xl h-[50%] xl:h-[40%] w-[50%] sm:w-[40%] transition hover:bg-white hover:border-2 hover:border-primary hover:text-primary cursor-pointer font-extrabold">
-            <button className="text-[1em] xl:text-[1.3em]">
-              Reset Password
+        <div className=" h-[21%] items-center flex justify-end w-[100%] pr-[10%] pb-[5%]">
+          <div className="relative inline-flex bg-primary overflow-hidden text-white w-[50%] sm:w-[40%] flex items-center justify-center rounded-[30px] h-[50%] xl:h-[40%] cursor-pointer transition-all rounded hover:border-1 hover:border-primary hover:!text-primary group">
+            <button className="text-[1em] xl:text-[1.2em] 2xl:text-[1.4em] font-black">
+              <span className="w-full h-48 rounded bg-white absolute bottom-0 left-0 translate-x-full ease-out duration-500 transition-all translate-y-full mb-9 ml-9 group-hover:ml-0 group-hover:mb-32 group-hover:translate-x-0"></span>
+              <span className="relative w-full text-left text-white transition-colors duration-300 ease-in-out group-hover:text-primary">Reset Password</span>
             </button>
           </div>
         </div>
