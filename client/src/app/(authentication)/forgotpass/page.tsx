@@ -22,15 +22,15 @@ function ForgotPassPage() {
             <p>Forgot Password</p>
           </div>
         </div>
-        <div className=" h-[15%] items-center flex-row justify-center w-[100%] text-[1em] xl:text-[1.2em] font-light">
-          <div className=" h-[70%] items-center flex justify-center w-[100%] xl:text-[1.2em] ">
+        <div className=" h-[10%] items-center flex flex-col justify-center w-[100%] text-[1em] xl:text-[19px] 2xl:text-[24px] font-light gap-[0px]">
+          <div className=" h-[50%] items-center flex justify-center w-[100%] pt-[5%]">
             <p>Enter pertinent details and</p>
           </div>
-          <div className=" h-[30%] items-center flex justify-center w-[100%] xl:text-[1.2em]">
+          <div className=" h-[50%] items-center flex justify-center w-[100%]">
             <p>retrieve your account.</p>
           </div>
         </div>
-        <div className="h-[35%] items-center flex-row w-[100%] justify-center text-[1em] xl:text-[1.3em] 2xl:h-[25%]">
+        <div className="bg-primary h-[35%] items-center flex flex-col w-[100%] justify-center text-[1em] xl:text-[1.3em] 2xl:h-[25%] gap-[5px]">
           <div className="flex items-end justify-center h-[65%]">
             <p className="font-bold">Have Any Concerns?</p>
           </div>

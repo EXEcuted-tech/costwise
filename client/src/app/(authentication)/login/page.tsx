@@ -30,7 +30,7 @@ function LoginPage() {
             <p className="flex items-center justify-center">Log In Now!</p>
           </div>
         </div>
-        <div className="bg-white h-[35%] items-center flex-row w-[100%] justify-center text-[1em] xl:text-[1.3em] 2xl:h-[25%]">
+        <div className="bg-white h-[35%] items-center flex flex-col w-[100%] justify-center text-[1em] xl:text-[1.3em] 2xl:h-[25%] gap-[5px]">
           <div className="flex items-end justify-center h-[60%]">
             <p className="font-bold">Have Any Concerns?</p>
           </div>
