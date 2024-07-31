@@ -10,7 +10,7 @@ const AuditDrawer = () => {
 
     return (
     <div 
-        className="fixed w-screen z-10 h-full bg-transparent-black bg-opacity-50 backdrop-blur-sm flex justify-end" 
+        className="fixed w-screen z-10 h-full bg-black bg-opacity-50 backdrop-blur-[2px] flex justify-end" 
         onClick={toggleDrawer}
     >
         <div className={`bg-white w-[70%] 4xl:w-[35%] h-full p-10 pt-[20px] pr-[150px] drop-shadow-4xl ${isOpen ? 'w-[69%] 2xl:w-[59%] 4xl:w-[49%] pr-[320px] 2xl:pr-[400px]' : ''}`}>
