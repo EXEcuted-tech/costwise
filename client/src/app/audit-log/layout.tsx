@@ -2,8 +2,8 @@
 import MainLayout from "@/components/layouts/MainLayout";
 import { useState, cloneElement } from "react";
 import { SidebarProvider } from "@/context/SidebarContext";
-import Header from "@/components/header/Header";
 import { BiSearchAlt } from "react-icons/bi";
+import type { SVGProps } from 'react';
 
 export default function AuditLogLayout({
   children,
@@ -15,7 +15,6 @@ export default function AuditLogLayout({
       <div className="flex w-screen">
         <MainLayout/>
         <main className="w-full">
-          <Header icon={BiSearchAlt} title={"Audit Log"} />
           {children}
         </main>
       </div>

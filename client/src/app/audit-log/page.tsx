@@ -17,6 +17,7 @@ const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 return (
     <div className={`w-full h-full font-lato`}>
         { drawerOpen ? <AuditDrawer /> : "" }
+        <Header icon={BiSearchAlt} title={"Audit Log"} />
         <div className="flex justify-between w-[80%] m-auto mb-[10px] gap-5 pt-[50px]">
             <div className="flex gap-5">
                 <div className="relative">
