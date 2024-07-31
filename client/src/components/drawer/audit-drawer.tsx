@@ -1,18 +1,33 @@
 "use client"
 import { useSidebarContext } from "@/context/SidebarContext";
+import Link from "next/link";
 import { useState } from "react";
 import { MdClose } from "react-icons/md";
 
 const AuditDrawer = () => {
-    const { isOpen } = useSidebarContext();
-    const [drawerOpen, setDrawerOpen] = useState(false);
+    const { isOpen, drawerOpen, setDrawerOpen } = useSidebarContext();
+    const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 
     return (
-    <div className="fixed w-screen z-10 h-screen bg-transparent flex justify-end">
-        <div className={`bg-white w-[70%] 4xl:w-[35%] h-full p-10 pr-[150px] ${isOpen ? 'w-[69%] 2xl:w-[59%] 4xl:w-[49%] pr-[320px] 2xl:pr-[400px]' : ''}`}>
-            <MdClose />
+    <div 
+        className="fixed w-screen z-10 h-full bg-transparent-black bg-opacity-50 backdrop-blur-sm flex justify-end" 
+        onClick={toggleDrawer}
+    >
+        <div className={`bg-white w-[70%] 4xl:w-[35%] h-full p-10 pt-[20px] pr-[150px] drop-shadow-4xl ${isOpen ? 'w-[69%] 2xl:w-[59%] 4xl:w-[49%] pr-[320px] 2xl:pr-[400px]' : ''}`}>
+            <div className="flex justify-end">
+                <div 
+                    className="border-2 p-1 rounded-[5px] cursor-pointer" 
+                    onClick={toggleDrawer}
+                >
+                    <MdClose 
+                         
+                        className="text-[24px]"
+                    />
+                </div>
+                
+            </div>
             <div className="flex flex-col gap-[5px] pb-[5px] font-bold">
-                <p className="text-[24px]">Audit Log Details</p>
+                <p className="text-[24px] font-black">Audit Log Details</p>
                 <p className="text-[18px] text-[#9B9B9B]">Kathea Mari Mayol • January 13, 2024</p>
             </div>
             <div className="flex flex-col border-2 text-[17px] p-5 rounded-[10px]">

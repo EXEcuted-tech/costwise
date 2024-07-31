@@ -11,14 +11,13 @@ import { IconBaseProps } from "react-icons";
 import AuditDrawer from "@/components/drawer/audit-drawer";
 
 const AuditLogPage = () => {
-const { isOpen } = useSidebarContext();
-const [drawerOpen, setDrawerOpen] = useState(false);
+const { isOpen, drawerOpen, setDrawerOpen } = useSidebarContext();
 const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 
 return (
-    <div className={`w-full font-lato mt-[50px]`}>
+    <div className={`w-full h-full font-lato`}>
         { drawerOpen ? <AuditDrawer /> : "" }
-        <div className="flex justify-between w-[80%] m-auto mb-[10px] gap-5">
+        <div className="flex justify-between w-[80%] m-auto mb-[10px] gap-5 pt-[50px]">
             <div className="flex gap-5">
                 <div className="relative">
                     <BiSearchAlt className="absolute left-3 top-[20px] 4xl:top-[28px] text-[20px] 4xl:text-[23px] transform -translate-y-1/2 text-gray-600"/>
