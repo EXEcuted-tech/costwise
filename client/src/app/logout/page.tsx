@@ -13,17 +13,17 @@ function LogoutPage() {
 
       <div className="bg-green h-[40%] w-[100%] flex-row items-center justify-center text-white">
         <div className="flex items-center justify-center h-[40%] w-[100%] max-h-[80%]">
-          <p className="text-[6vh] md:text-[7vh] lg:text-[8vh] font-semibold">
+          <p className="text-[4.5vh] md:text-[5.5vh] xl:text-[6vh] 2xl:text-[7.5vh] font-semibold">
             Logged Out!
           </p>
         </div>
-        <div className="flex items-center justify-center h-[10%] w-[100%] font-poppins">
-          <p className="text-10 sm:text-[1.2rem] md:text-[1.4em] lg:text-[1.6em]">
+        <div className="flex pb-[1%] items-center justify-center h-[10%] w-[100%] font-poppins">
+          <p className="text-10 sm:text-[1.1em] md:text-[1.3em] 2xl:text-[1.5em]">
             Thank you for using CostWise!
           </p>
         </div>
         <div className="flex items-center justify-center h-[10%] w-[100%] font-poppins">
-          <p className="text-10 sm:text-[1.2em] md:text-[1.4em] lg:text-[1.6em]">
+          <p className="text-10 sm:text-[1.1em] md:text-[1.3em] 2xl:text-[1.5em]">
             To access the page, please log in again.
           </p>
         </div>
