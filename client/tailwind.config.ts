@@ -33,6 +33,9 @@ const config: Config = {
             '0 45px 65px rgba(0, 0, 0, 0.35)'
         ]
       },
+      boxShadow: {
+        'bottom': '0 4px 6px rgba(256, 256, 256, 1)',
+      },
       keyframes: {
         'shrink-in': {
           '0%': { transform: 'scale(1)' },
