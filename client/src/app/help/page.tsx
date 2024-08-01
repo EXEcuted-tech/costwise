@@ -34,16 +34,21 @@ const UserManualPage = () => {
                 
               </div>
               {/* Bottom Div */}
-              <div className='flex h-[45%] w-[100%] bg-[#FFFAF8]'>
-                Bottom Div
-                <div>
-
+              <div className='flex flex-row h-[45%] w-[100%] bg-[#FFFAF8] items-center justify-center px-5'>
+                <div className='flex items-start justify-end bg-yellow-200 w-[33.33%] h-[150%]'>
+                <div className='h-[65%] bg-white w-[80%] rounded-xl z-[4] px-5 py-10'>
+                1st Div 
                 </div>
-                <div>
-
                 </div>
-                <div>
-                  
+                <div className='flex bg-green-200 w-[33.33%] h-[150%] items-start justify-center px-5'>
+<div className='h-[65%] bg-white w-[80%] rounded-xl z-[4] px-5 py-10'>
+2nd Div
+                </div>
+                </div>
+                <div className='flex bg-red-300 w-[33.33%] h-[150%]'>
+                <div className='h-[65%] bg-white w-[80%] rounded-xl z-[4] items-start justify-start px-5'>
+3rd Div
+                </div>
                 </div>
               </div>
             </div>
