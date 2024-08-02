@@ -1,4 +1,4 @@
-import {nextui} from '@nextui-org/theme';
+import { nextui } from '@nextui-org/theme';
 import type { Config } from "tailwindcss";
 
 const config: Config = {
@@ -11,10 +11,10 @@ const config: Config = {
   theme: {
     extend: {
       fontFamily: {
-        'poppins': ['Poppins','sans-serif'],
+        'poppins': ['Poppins', 'sans-serif'],
         'lato': ['Lato', 'sans-serif'],
       },
-      colors:{
+      colors: {
         primary: '#B22222',
         secondary: '#FEF200',
         tertiary: '#313131',
@@ -29,12 +29,15 @@ const config: Config = {
       dropShadow: {
         '3xl': '0 35px 35px rgba(0, 0, 0, 0.45)',
         '4xl': [
-            '0 35px 35px rgba(0, 0, 0, 0.45)',
-            '0 45px 65px rgba(0, 0, 0, 0.35)'
+          '0 35px 35px rgba(0, 0, 0, 0.45)',
+          '0 45px 65px rgba(0, 0, 0, 0.35)'
         ]
       },
       boxShadow: {
-        'bottom': '0 4px 6px rgba(256, 256, 256, 1)',
+        'inner-sm': 'inset 1px 1px 2px rgba(0, 0, 0, 0.1)',
+        'inner-md': 'inset 2px 2px 4px rgba(0, 0, 0, 0.2)',
+        'inner-lg': 'inset 4px 4px 8px rgba(0, 0, 0, 0.3)',
+        'inner-xl': 'inset 8px 8px 16px rgba(0, 0, 0, 0.4)',
       },
       keyframes: {
         'shrink-in': {
