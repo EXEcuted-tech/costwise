@@ -9,7 +9,7 @@ const PasswordRequests = () => {
             {/* Search Area */}
             <div className="flex w-full h-[4.5rem] bg-[#F3F3F3] border-solid border-b-[2px] border-[#868686]">
                 <div className="mt-[0.8em] ml-7 text-gray-600">
-                    <div className='flex fixed text-[1.6em] text-gray-400 mt-[0.7rem] ml-2'>
+                    <div className='flex absolute text-[1.6em] text-gray-400 mt-[0.7rem] ml-2'>
                         <IoIosSearch />
                     </div>
                     <input
@@ -22,7 +22,7 @@ const PasswordRequests = () => {
 
                 <div className="mt-[0.8em] ml-7 text-gray-600">
                     <input
-                        className="bg-white h-12 w-[15rem] px-5 pr-6 text-[1.2em] border-2 border-gray-400  rounded-lg focus:outline-none"
+                        className="bg-white h-12 w-[15rem] px-5 pr-2 text-[1.2em] border-2 border-gray-400  rounded-lg focus:outline-none"
                         name="date"
                         type="date"
                     >
