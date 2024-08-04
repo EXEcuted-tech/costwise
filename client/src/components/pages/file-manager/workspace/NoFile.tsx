@@ -1,4 +1,4 @@
-import ChooseFileDialog from '@/components/dialog/ChooseFileDialog';
+import ChooseFileDialog from '@/components/modal/ChooseFileDialog';
 import React, { useState } from 'react'
 import { CiFileOff } from "react-icons/ci";
 import { FaFile } from "react-icons/fa6";
@@ -18,7 +18,7 @@ const NoFile = () => {
                     <p className='font-semibold text-[24px]'>Choose File</p>
                 </button>
             </div>
-            {dialog && <ChooseFileDialog />}
+            {dialog && <ChooseFileDialog dialogType={0} setDialog={setDialog}/>}
         </>
     )
 }

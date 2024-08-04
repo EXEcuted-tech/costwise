@@ -1,6 +1,6 @@
 import React, { useRef, useState } from 'react'
 import { AiOutlineSearch } from "react-icons/ai";
-import CustomDatePicker from '@/components/datepicker/CustomDatePicker';
+import CustomDatePicker from '@/components/form-controls/CustomDatePicker';
 import FileTable from './FileTable';
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 
@@ -20,9 +20,9 @@ const FileContainer: React.FC<{ tab: string, isOpen: boolean }> = ({ tab, isOpen
             <h1 className={`${isOpen ? 'ml-[20px] 2xl:ml-[46px] text-[28px] 2xl:text-[32px]' : 'text-[32px] ml-[46px]'} font-bold py-[2px]`}>
                 {tab === 'all' ? 'All Files' : tab === 'masterfile' ? 'Master Files' : 'Transactional Files'}
             </h1>
-            <div className=' flex items-center h-[50px] bg-[#F3F3F3] border-y-[0.8px] border-[#868686] px-[46px]'>
+            <div className={`${isOpen ? 'px-[20px] 2xl:px-[46px]' : 'px-[46px]'} flex items-center h-[50px] bg-[#F3F3F3] border-y-[0.8px] border-[#868686]`}>
                 {/* Search Component */}
-                <div className={`${isOpen ? 'w-[75%] 3xl:w-[80%]' : 'w-[75%] 3xl:w-[84.5%]' } relative mr-[1%]`}>
+                <div className={`${isOpen ? 'w-[74%] 2xl:w-[75%] 3xl:w-[80%]' : 'w-[75%] 3xl:w-[84.5%]' } relative mr-[1%]`}>
                     <div className="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
                         <AiOutlineSearch className="text-[#B0B0B0] text-[22px]" />
                     </div>
@@ -34,7 +34,7 @@ const FileContainer: React.FC<{ tab: string, isOpen: boolean }> = ({ tab, isOpen
                     />
                 </div>
                 {/* Date Picker */}
-                <div className={`${isOpen ? 'w-[25%] 3xl:w-[20%]' : 'w-[25%] 3xl:w-[15.5%]' } relative`}>
+                <div className={`${isOpen ? 'w-[26%] 2xl:w-[25%] 3xl:w-[20%]' : 'w-[25%] 3xl:w-[15.5%]' } relative`}>
                     <CustomDatePicker/>
                 </div>
             </div>

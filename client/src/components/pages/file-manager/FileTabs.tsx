@@ -8,7 +8,7 @@ interface TabConfig {
     className: string;
 }
 
-export interface FileProps {
+interface FileProps {
     setTab: React.Dispatch<React.SetStateAction<string>>;
     tab?: string;
     isOpen: boolean;
@@ -26,14 +26,14 @@ const FileTabs: React.FC<FileProps> = ({ tab, setTab, isOpen }) => {
             {fileTabs.map(({ iconName, tabName, tabIndicator, className}, index) => {
                 const IconComponent = iconMap[iconName];
                 return (
-                    <div className={`border-1 rounded-t-[15px] py-[2px] px-[15px] mr-[1px] drop-shadow-md 
+                    <div key={index} className={`border-1 rounded-t-[15px] py-[2px] px-[15px] mr-[1px] drop-shadow-md 
                             ${isOpen ? 'text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]' } 
                             ${tab === tabIndicator
                             ? 'bg-primary border-primary text-white hover:bg-gradient-to-r hover:from-primary hover:to-[#d42020]'
                             : 'bg-[#EFEFEF] border-[#D4D4D4] text-[#747474] hover:bg-gradient-to-r hover:from-[#EFEFEF] hover:to-[#D4D4D4]'
                         }`}
                         onClick={()=>handleTabChange(tabIndicator)}>
-                        <li key={index} className='flex cursor-pointer items-center my-[5px]'>
+                        <li className='flex cursor-pointer items-center my-[5px]'>
                             <IconComponent className={`${tab === tabIndicator ? 'text-white':'text-[#919191]'} ${className}`} />
                             <p className={`
                                 ${isOpen && 'text-[10.1px] 2xl:text-[12px] 3xl:text-[16px]'} 

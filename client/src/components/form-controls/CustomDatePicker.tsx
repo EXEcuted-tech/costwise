@@ -42,7 +42,7 @@ const CustomDatePicker = () => {
           onClick={openDatePicker}
           className="absolute inset-y-0 right-0 flex items-center pr-3 cursor-pointer"
         >
-          <AiOutlineDown className="text-[#868686] text-[22px]" />
+          <AiOutlineDown className="text-[#868686] text-[15px]" />
         </div>
       </div>
     </div>

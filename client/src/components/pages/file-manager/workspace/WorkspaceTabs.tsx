@@ -1,24 +1,42 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { iconMap } from '@/utils/iconMap';
-import { FileProps } from '../FileTabs';
+import ConfirmDialog from '@/components/modal/ConfirmDialog';
 
-const WorkspaceTabs: React.FC<FileProps> = ({ tab, setTab, isOpen }) => {
+interface WkspTabProps {
+    setTab: React.Dispatch<React.SetStateAction<string>>;
+    setFileType: React.Dispatch<React.SetStateAction<number>>;
+    setIsEmpty: React.Dispatch<React.SetStateAction<boolean>>;
+    tab?: string;
+    isOpen: boolean;
+    isEmpty: boolean;
+}
 
-    const handleTabChange = (tab:string) =>{
-        setTab(tab);
-        localStorage.setItem("wkspTab",tab);
+const WorkspaceTabs: React.FC<WkspTabProps> = ({ tab, setTab, isOpen, isEmpty, setFileType, setIsEmpty }) => {
+    const [confirm, setConfirmDialog] = useState(false);
+
+    const handleTabChange = (tabValue: string) => {
+        if (isEmpty) {
+            setTab(tabValue);
+            localStorage.setItem("wkspTab", tabValue);
+        } else {
+            var currentTab = localStorage.getItem("wkspTab");
+            console.log("Current Tab: ", currentTab, tabValue);
+            if (currentTab != tabValue) {
+                setConfirmDialog(true);
+            }
+        }
     }
 
     return (
         <div className='flex w-full'>
             {workspaceTabs.map((value, index) => (
                 <div key={index} className={`cursor-pointer rounded-b-[20px] drop-shadow-lg w-[50%] flex justify-center text-[20px] py-[10px]
-                        ${isOpen ? '' : '' } 
+                        ${isOpen ? '' : ''} 
                         ${tab === value
                         ? 'bg-primary text-white hover:bg-gradient-to-r hover:from-primary hover:to-[#d42020]'
                         : 'bg-[#F3F3F3] text-[#8F8F8F] hover:bg-gradient-to-r hover:from-[#EFEFEF] hover:to-[#D4D4D4]'
                     }`}
-                    onClick={()=>handleTabChange(value)}>
+                    onClick={() => handleTabChange(value)}>
                     <li className='flex cursor-pointer items-center'>
                         <p className={`${isOpen && ''} uppercase tracking-widest`}>
                             {value}
@@ -26,10 +44,19 @@ const WorkspaceTabs: React.FC<FileProps> = ({ tab, setTab, isOpen }) => {
                     </li>
                 </div>
             ))}
+            {confirm && 
+                <ConfirmDialog 
+                    tab={tab} 
+                    setConfirmDialog={setConfirmDialog} 
+                    setTab={setTab}
+                    setFileType={setFileType}
+                    setIsEmpty={setIsEmpty}
+                />
+            }
         </div>
     )
 }
 
 export default WorkspaceTabs
 
-const workspaceTabs: string[] = ["master files","transactions"];
+const workspaceTabs: string[] = ["master files", "transactions"];
