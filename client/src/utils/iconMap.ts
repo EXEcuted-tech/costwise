@@ -1,4 +1,3 @@
-// iconMap.ts
 import { IconType } from 'react-icons';
 import { RiDashboard2Fill, RiFormula } from 'react-icons/ri';
 import { BsFillFolderFill } from 'react-icons/bs';
@@ -9,6 +8,9 @@ import { GoHistory } from 'react-icons/go';
 import { FaBell } from "react-icons/fa";
 import { ImUsers } from "react-icons/im";
 import { HiWrenchScrewdriver } from "react-icons/hi2";
+import { FaFile } from "react-icons/fa";
+import { BiSolidFile } from "react-icons/bi";
+import { BiFile } from "react-icons/bi";
 
 interface IconMap {
   [key: string]: IconType;
@@ -28,5 +30,8 @@ export const iconMap: IconMap = {
   MdMoreHoriz,
   ImUsers,
   HiWrenchScrewdriver,
-  GiBookmarklet
+  GiBookmarklet,
+  FaFile,
+  BiSolidFile,
+  BiFile
 };

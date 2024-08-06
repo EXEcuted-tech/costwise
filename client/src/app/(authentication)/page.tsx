@@ -8,14 +8,14 @@ function LoginPage() {
     <div className="flex-row lg:flex items-center justify-center h-full z-1">
       {/* Left Div */}
       <div className="lg:w-[40%] lg:h-full flex-row  text-primary lg:px-[5%] p-[10%] 2xl:p-[5%] w-full h-[50%]">
-        <div className="bg-white h-[30%] items-end flex justify-center w-[100%] pb-[3%]">
+        <div className="bg-white h-[30%] items-end flex justify-center w-[100%] 2xl:mt-[3%]">
           <img
             src="images/virginialogo.png"
             alt=""
             className="w-[70%] sm:w-[60%] xl:w-[70%]  h-auto "
           />
         </div>
-        <div className="bg-white items-center flex w-[100%] justify-center text-[1.4em]  font-medium border-y-2 border-primary h-[20%] lg:h-[15%] 2xl:text-[1.6em]">
+        <div className="bg-white items-center flex w-[100%] justify-center text-[1.4em] mt-[3%] font-medium border-y-2 border-primary h-[20%] lg:h-[15%] 2xl:text-[1.6em]">
           <p className="flex-col justify-center">
             Welcome to <strong>CostWise</strong>
           </p>

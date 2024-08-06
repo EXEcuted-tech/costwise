@@ -4,13 +4,13 @@ const SidebarContext = createContext<LayoutProps | undefined>(undefined);
 
 export interface LayoutProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  isOpen?: boolean;
+  isOpen: boolean;
 }
 
 export const useSidebarContext = () => {
   const context = useContext(SidebarContext);
   if (!context) {
-    throw new Error('useAuditLogContext must be used within an AuditLogProvider');
+    throw new Error('useSidebarContext must be used within an SidebarProvider');
   }
   return context;
 };
