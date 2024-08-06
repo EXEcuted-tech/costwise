@@ -1,11 +1,13 @@
 "use client"
 import { useSidebarContext } from "@/context/SidebarContext";
+import { useDrawerContext } from "@/context/DrawerContext";
 import Link from "next/link";
 import { useState } from "react";
 import { MdClose } from "react-icons/md";
 
 const AuditDrawer = () => {
-    const { isOpen, drawerOpen, setDrawerOpen } = useSidebarContext();
+    const { isOpen } = useSidebarContext();
+    const { drawerOpen, setDrawerOpen } = useDrawerContext();
     const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 
     return (

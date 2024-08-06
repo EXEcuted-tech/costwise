@@ -4,6 +4,7 @@ import { useState, cloneElement } from "react";
 import { SidebarProvider } from "@/context/SidebarContext";
 import { BiSearchAlt } from "react-icons/bi";
 import type { SVGProps } from 'react';
+import { DrawerProvider } from "@/context/DrawerContext";
 
 export default function AuditLogLayout({
   children,
@@ -12,12 +13,14 @@ export default function AuditLogLayout({
 }>){
   return (
     <SidebarProvider>
-      <div className="flex w-screen">
-        <MainLayout/>
-        <main className="w-full">
-          {children}
-        </main>
-      </div>
+      <DrawerProvider>
+        <div className="flex w-screen">
+          <MainLayout/>
+          <main className="w-full">
+            {children}
+          </main>
+        </div>
+      </DrawerProvider>
     </SidebarProvider>
   );
 }

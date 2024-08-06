@@ -5,9 +5,6 @@ const SidebarContext = createContext<LayoutProps | undefined>(undefined);
 export interface LayoutProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isOpen?: boolean;
-
-  setDrawerOpen: React.Dispatch<React.SetStateAction<boolean>>;
-  drawerOpen?: boolean;
 }
 
 export const useSidebarContext = () => {
@@ -21,9 +18,8 @@ export const useSidebarContext = () => {
 export const SidebarProvider = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
 
-  const [drawerOpen, setDrawerOpen] = useState(false);
   return (
-    <SidebarContext.Provider value={{ isOpen, setIsOpen, drawerOpen, setDrawerOpen}}>
+    <SidebarContext.Provider value={{ isOpen, setIsOpen }}>
       {children}
     </SidebarContext.Provider>
   );

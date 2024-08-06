@@ -4,20 +4,20 @@ import { FaFilter } from "react-icons/fa";
 import { LuArrowDownUp, LuArrowUpDown } from "react-icons/lu";
 import { FaFileExport } from "react-icons/fa6";
 import { BiSearchAlt } from "react-icons/bi";
-import { LayoutProps } from "@/context/SidebarContext";
-import { useSidebarContext } from "@/context/SidebarContext";
+import { GoHistory } from "react-icons/go";
+import { useDrawerContext } from "@/context/DrawerContext";
 import Header from "@/components/header/Header";
-import { IconBaseProps } from "react-icons";
 import AuditDrawer from "@/components/drawer/audit-drawer";
 
 const AuditLogPage = () => {
-const { isOpen, drawerOpen, setDrawerOpen } = useSidebarContext();
+const { drawerOpen, setDrawerOpen } = useDrawerContext();
 const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 
 return (
     <div className={`w-full h-full font-lato`}>
         { drawerOpen ? <AuditDrawer /> : "" }
-        <Header icon={BiSearchAlt} title={"Audit Log"} />
+        <Header icon={GoHistory} title={"Audit Log"} />
+        
         <div className="flex justify-between w-[80%] m-auto mb-[10px] gap-5 pt-[50px]">
             <div className="flex gap-5">
                 <div className="relative">
