@@ -1,10 +1,13 @@
-import React from 'react'
+import React, { useState } from 'react'
 import FileLabel from './FileLabel'
 import { FileTableProps } from '../FileContainer'
 import { FaPencilAlt } from "react-icons/fa";
+import { TbProgress } from "react-icons/tb";
 import WorkspaceTable from './WorkspaceTable';
 
 const MasterFileContainer = (data: FileTableProps) => {
+  const [isEditA,setIsEditA] = useState(false);
+  const [isEditB,setIsEditB] = useState(false);
 
   return (
     <div className='w-full bg-white rounded-[10px] drop-shadow mb-[35px]'>
@@ -13,10 +16,15 @@ const MasterFileContainer = (data: FileTableProps) => {
         {/* Summary of Product Costing */}
         <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
           <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>SUMMARY OF PRODUCT COSTING</h1>
-          <FaPencilAlt className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'/>
+          { isEditA ?
+            <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin'/>
+          :
+            <FaPencilAlt className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
+            onClick={()=>{setIsEditA(true)}}/>
+          }
         </div>
         <div className='px-[40px] py-[30px]'>
-          <WorkspaceTable data={dummyData} />
+          <WorkspaceTable data={dummyData} isEdit={isEditA} setIsEdit={setIsEditA}/>
         </div>
 
         {/* FODL Costing */}
@@ -25,7 +33,7 @@ const MasterFileContainer = (data: FileTableProps) => {
           <FaPencilAlt className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'/>
         </div>
         <div className='px-[40px] py-[30px]'>
-          <WorkspaceTable data={fodlData} />
+          <WorkspaceTable data={fodlData} isEdit={isEditB} setIsEdit={setIsEditB}/>
         </div>
       </div>
     </div>

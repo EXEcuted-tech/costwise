@@ -1,22 +1,24 @@
 import React from 'react'
 import { RiFileWarningFill } from "react-icons/ri";
 import { IoIosClose } from "react-icons/io";
+import { useFileType } from '@/context/FileTypeContext';
 
 interface ConfirmDialogProps { 
   setConfirmDialog: React.Dispatch<React.SetStateAction<boolean>>;
   setTab: React.Dispatch<React.SetStateAction<string>>;
-  setFileType: React.Dispatch<React.SetStateAction<number>>;
   setIsEmpty: React.Dispatch<React.SetStateAction<boolean>>;
   tab?: string;
 }
 
-const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ tab, setConfirmDialog, setTab, setFileType, setIsEmpty }) => {
-
+const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ tab, setConfirmDialog, setTab, setIsEmpty }) => {
+  const { setFileType } = useFileType();
+  
   const handleTabChange = () => {
       if(tab){
         var changedTab = tab == "master files" ? "transactions" : "master files";
-        setTab(changedTab);
         localStorage.setItem("wkspTab",changedTab);
+
+        setTab(changedTab);
         setFileType(0);
         setIsEmpty(true);
         setConfirmDialog(false);

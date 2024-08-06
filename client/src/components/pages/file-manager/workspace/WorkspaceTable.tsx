@@ -1,6 +1,8 @@
 import React from 'react'
 
 interface WorkspaceTableProps {
+    setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
+    isEdit: boolean;
     data: Record<string, unknown>[]
 }
 

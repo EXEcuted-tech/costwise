@@ -4,14 +4,13 @@ import ConfirmDialog from '@/components/modal/ConfirmDialog';
 
 interface WkspTabProps {
     setTab: React.Dispatch<React.SetStateAction<string>>;
-    setFileType: React.Dispatch<React.SetStateAction<number>>;
     setIsEmpty: React.Dispatch<React.SetStateAction<boolean>>;
     tab?: string;
     isOpen: boolean;
     isEmpty: boolean;
 }
 
-const WorkspaceTabs: React.FC<WkspTabProps> = ({ tab, setTab, isOpen, isEmpty, setFileType, setIsEmpty }) => {
+const WorkspaceTabs: React.FC<WkspTabProps> = ({ tab, setTab, isOpen, isEmpty, setIsEmpty }) => {
     const [confirm, setConfirmDialog] = useState(false);
 
     const handleTabChange = (tabValue: string) => {
@@ -49,7 +48,6 @@ const WorkspaceTabs: React.FC<WkspTabProps> = ({ tab, setTab, isOpen, isEmpty, s
                     tab={tab} 
                     setConfirmDialog={setConfirmDialog} 
                     setTab={setTab}
-                    setFileType={setFileType}
                     setIsEmpty={setIsEmpty}
                 />
             }

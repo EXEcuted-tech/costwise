@@ -1,29 +1,32 @@
-import React from 'react'
+import React, { useState } from 'react'
 import FileLabel from './FileLabel'
 import { FileTableProps } from '../FileContainer'
 import WorkspaceTable from './WorkspaceTable'
 import { FaPencilAlt } from 'react-icons/fa'
 
-const TransactionFileContainer = (data:FileTableProps) => {
+const TransactionFileContainer = (data: FileTableProps) => {
+  const [isEdit,setIsEdit] = useState(false);
 
   return (
-    <div className='w-full bg-white rounded-[10px] drop-shadow mb-[35px]'>
+    <div className='bg-white rounded-[10px] drop-shadow mb-[35px] overflow-hidden'>
       <FileLabel {...data} />
-      <div className='overflow-auto'>
+      <div className=''>
         {/* Summary of Product Costing */}
         <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
           <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>PRODUCTION TRANSACTIONS</h1>
-          <FaPencilAlt className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'/>
+          <FaPencilAlt className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer' />
         </div>
-        <div className='px-[40px] py-[30px]'>
-          <WorkspaceTable data={dummyData} />
+        <div className='p-[20px] overflow-x-auto'>
+          <WorkspaceTable data={dummyData} isEdit={isEdit} setIsEdit={setIsEdit} />
         </div>
       </div>
     </div>
   )
 }
 
+
 export default TransactionFileContainer;
+
 
 const dummyData = [
   {

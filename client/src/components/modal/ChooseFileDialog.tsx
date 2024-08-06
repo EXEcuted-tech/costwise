@@ -57,13 +57,13 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
             </div>
 
             {dialogType == 0 &&
-              <div className={`w-[20%] relative mr-[1%]`}>
+              <div className={`w-[23%] 2xl:w-[20%] relative mr-[1%]`}>
                 <CustomSelect
                   setSelectedOption={setSelectedOption}
                   selectedOption={selectedOption} />
               </div>
             }
-            <div className={`w-[18%] relative`}>
+            <div className={`w-[20%] 2xl:w-[18%] relative`}>
               <CustomDatePicker />
             </div>
           </div>

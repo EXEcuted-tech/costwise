@@ -10,10 +10,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FileTableProps } from '@/components/pages/file-manager/FileContainer';
 import MasterFileContainer from '@/components/pages/file-manager/workspace/MasterFileContainer';
 import TransactionFileContainer from '@/components/pages/file-manager/workspace/TransactionFileContainer';
+import { useFileType } from '@/context/FileTypeContext';
 
 const WorkspacePage = () => {
     const [tab, setTab] = useState('master files');
-    const [fileType, setFileType] = useState(0); //0 is none, 1 is master file, 2 is transactions
+    const { fileType, setFileType } = useFileType(); //0 is none, 1 is master file, 2 is transactions
     const [fileData, setFileData] = useState<FileTableProps | null>(null);
     const [isEmpty, setIsEmpty] = useState(true);
 
@@ -28,9 +29,11 @@ const WorkspacePage = () => {
                 //Will change this as soon as we get to back end
                 const decodedData = JSON.parse(decodeURIComponent(data)) as FileTableProps;
                 const tabType = decodedData.fileType=='Master File' ? 'master files' : 'transactions';
+                const fileNumber = decodedData.fileType=='Master File' ? 1 : 2;
                 localStorage.setItem("wkspTab",tabType);
+                // localStorage.setItem("type", JSON.stringify(fileNumber));
 
-                setFileType(decodedData.fileType=='Master File' ? 1 : 2);
+                setFileType(fileNumber);
                 setTab(tabType);
                 setIsEmpty(false);
                 setFileData(decodedData);
@@ -43,12 +46,13 @@ const WorkspacePage = () => {
     const redirectBack = () =>{
         //add ug confirm dialog if wala pa na save ang mga changes if naa na backend
         setIsEmpty(true);
-        router.back();
+        setFileType(0);
+        router.push('/file-manager');
     }
 
     return (
-        <div>
-            <Header icon={BsFolderFill} title={"File Manager"} />
+        <div className=''>
+            <Header icon={BsFolderFill} title={"File Manager"} style={''}/>
             <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px] mt-[75px] 2xl:mt-[40px]' : 'px-[50px] mt-[40px]'} ml-[45px]`}>
                 <div className='bg-white flex items-center px-[20px] py-[10px] rounded-t-[10px] drop-shadow'>
                     <IoIosArrowRoundBack className='text-primary text-[40px] mr-[15px] hover:text-[#D13131] cursor-pointer' 
@@ -61,7 +65,6 @@ const WorkspacePage = () => {
                         setTab={setTab} 
                         isOpen={isOpen} 
                         isEmpty={isEmpty}
-                        setFileType={setFileType}
                         setIsEmpty={setIsEmpty}/>
                 </div>
             </div>
