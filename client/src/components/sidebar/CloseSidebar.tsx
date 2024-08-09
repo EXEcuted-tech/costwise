@@ -23,7 +23,7 @@ const CloseSidebar: React.FC = () => {
 
   return (
     <>
-      <div className='flex justify-center bg-primary w-full min-h-screen h-full'>
+      <div className='flex justify-center w-full bg-primary min-h-screen'>
         <div className='relative top-0'>
           {/* Logo */}
           <div className='flex justify-center my-[25px]'>
