@@ -28,7 +28,9 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen }) => {
     }
 
     const handleEdit = (data:FileTableProps) => {
-
+        const encodedData = encodeURIComponent(JSON.stringify(data));
+        localStorage.setItem("edit","true");
+        router.push(`/file-manager/workspace?data=${encodedData}`); //change to number later
     }
 
     const handleExport = (data:FileTableProps) => {

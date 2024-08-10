@@ -1,12 +1,19 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import FileLabel from './FileLabel'
 import { FileTableProps } from '../FileContainer'
 import WorkspaceTable from './WorkspaceTable'
 import { FaPencilAlt } from 'react-icons/fa'
+import { TbProgress } from 'react-icons/tb'
 
 const TransactionFileContainer = (data: FileTableProps) => {
   const [isEdit,setIsEdit] = useState(false);
 
+  useEffect (()=>{
+    if(localStorage.getItem("edit") === "true"){
+      setIsEdit(true);
+    }
+  },[])
+  
   return (
     <div className='bg-white rounded-[10px] drop-shadow mb-[35px] overflow-hidden'>
       <FileLabel {...data} />
@@ -14,10 +21,15 @@ const TransactionFileContainer = (data: FileTableProps) => {
         {/* Summary of Product Costing */}
         <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
           <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>PRODUCTION TRANSACTIONS</h1>
-          <FaPencilAlt className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer' />
+          { isEdit ?
+            <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin'/>
+          :
+            <FaPencilAlt className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
+            onClick={()=>{setIsEdit(true)}}/>
+          }
         </div>
         <div className='p-[20px] overflow-x-auto'>
-          <WorkspaceTable data={dummyData} isEdit={isEdit} setIsEdit={setIsEdit} />
+          <WorkspaceTable data={dummyData} isEdit={isEdit} setIsEdit={setIsEdit} isTransaction={true}/>
         </div>
       </div>
     </div>

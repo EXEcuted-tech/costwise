@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import FileLabel from './FileLabel'
 import { FileTableProps } from '../FileContainer'
 import { FaPencilAlt } from "react-icons/fa";
@@ -8,6 +8,12 @@ import WorkspaceTable from './WorkspaceTable';
 const MasterFileContainer = (data: FileTableProps) => {
   const [isEditA,setIsEditA] = useState(false);
   const [isEditB,setIsEditB] = useState(false);
+
+  useEffect (()=>{
+    if(localStorage.getItem("edit") === "true"){
+      setIsEditA(true);
+    }
+  },[])
 
   return (
     <div className='w-full bg-white rounded-[10px] drop-shadow mb-[35px]'>
@@ -23,17 +29,22 @@ const MasterFileContainer = (data: FileTableProps) => {
             onClick={()=>{setIsEditA(true)}}/>
           }
         </div>
-        <div className='px-[40px] py-[30px]'>
-          <WorkspaceTable data={dummyData} isEdit={isEditA} setIsEdit={setIsEditA}/>
+        <div className={`${isEditA ? 'pb-[30px] pt-[15px]': 'py-[30px]'} px-[40px]`}>
+          <WorkspaceTable data={dummyData} isEdit={isEditA} setIsEdit={setIsEditA} isTransaction={false}/>
         </div>
 
         {/* FODL Costing */}
         <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
           <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>FODL COSTING</h1>
-          <FaPencilAlt className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'/>
+          { isEditB ?
+            <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin'/>
+          :
+            <FaPencilAlt className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
+            onClick={()=>{setIsEditB(true)}}/>
+          }
         </div>
-        <div className='px-[40px] py-[30px]'>
-          <WorkspaceTable data={fodlData} isEdit={isEditB} setIsEdit={setIsEditB}/>
+        <div className={`${isEditA ? 'pb-[30px] pt-[15px]': 'py-[30px]'} px-[40px]`}>
+          <WorkspaceTable data={fodlData} isEdit={isEditB} setIsEdit={setIsEditB} isTransaction={false}/>
         </div>
       </div>
     </div>

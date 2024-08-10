@@ -23,6 +23,10 @@ const WorkspacePage = () => {
     const searchParams = useSearchParams();
 
     useEffect(() => {
+        localStorage.setItem("wkspBool","true");
+    },[])
+
+    useEffect(() => {
         const data = searchParams.get('data');
         if (data) {
             try {
@@ -47,13 +51,15 @@ const WorkspacePage = () => {
         //add ug confirm dialog if wala pa na save ang mga changes if naa na backend
         setIsEmpty(true);
         setFileType(0);
+        localStorage.removeItem("wkspBool");
+        localStorage.removeItem("edit");
         router.push('/file-manager');
     }
 
     return (
         <div className=''>
             <Header icon={BsFolderFill} title={"File Manager"} style={''}/>
-            <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px] mt-[75px] 2xl:mt-[40px]' : 'px-[50px] mt-[40px]'} ml-[45px]`}>
+            <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[40px] ml-[45px]`}>
                 <div className='bg-white flex items-center px-[20px] py-[10px] rounded-t-[10px] drop-shadow'>
                     <IoIosArrowRoundBack className='text-primary text-[40px] mr-[15px] hover:text-[#D13131] cursor-pointer' 
                     onClick={redirectBack}/>
@@ -68,7 +74,7 @@ const WorkspacePage = () => {
                         setIsEmpty={setIsEmpty}/>
                 </div>
             </div>
-            <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px] mt-[75px] 2xl:mt-[40px]' : 'px-[50px] mt-[25px]'} ml-[45px]`}>
+            <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
                 {fileType == 0 && <NoFile />}
                 {fileType == 1 && fileData && <MasterFileContainer {...fileData}/>}
                 {fileType == 2 && fileData && <TransactionFileContainer {...fileData}/>}
