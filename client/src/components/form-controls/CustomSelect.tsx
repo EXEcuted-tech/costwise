@@ -29,7 +29,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ setSelectedOption, selected
     return (
         <div ref={ref} className="relative w-full">
             <div
-                className="w-full rounded-[5px] border border-[#868686] pl-[30px] pr-[30px] py-[2.5px] bg-white text-[#5C5C5C] dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 cursor-pointer"
+                className="w-full rounded-[5px] border border-[#868686] pl-[30px] pr-[30px] py-[2.5px] bg-white text-[#5C5C5C] cursor-pointer"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
                 <span className={selectedOption ? "" : "text-[#B0B0B0]"}>
@@ -43,13 +43,13 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ setSelectedOption, selected
                 </div>
             </div>
             {isDropdownOpen && (
-                <div className="animate-pull-down absolute w-full mt-1 rounded-[5px] border border-[#868686] bg-white dark:bg-gray-700 dark:border-gray-600 z-10">
+                <div className="animate-pull-down absolute w-full mt-1 rounded-[5px] border border-[#868686] bg-white z-10">
                     {options.map((option, index) => (
                         <div
                             key={option.value}
                             onClick={() => handleOptionClick(option)}
                             className={`
-                                text-[#5C5C5C] px-4 py-[8px] hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer
+                                text-[#5C5C5C] px-4 py-[8px] hover:bg-gray-100 cursor-pointer
                                 ${index !== options.length - 1 && 'border-b-1 border-[#B0B0B0]'}
                                 `}
                         >
