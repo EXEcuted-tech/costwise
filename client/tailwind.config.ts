@@ -50,6 +50,11 @@ const config: Config = {
           '0%': { opacity: '0', clipPath: 'inset(0 100% 0 0)' },
           '100%': { opacity: '1', clipPath: 'inset(0 0 0 0)' },
         },
+        'pop-out': {
+          '0%': { transform: 'scale(0.9)'},
+          '50%': { transform: 'scale(1.05)'},
+          '100%': { transform: 'scale(1)'},
+        },
       },
       animation: {
         'shrink-in': 'shrink-in 0.5s ease-in-out forwards',
@@ -57,7 +62,12 @@ const config: Config = {
         'fade-in': 'fade-in 2s ease-in-out forwards',
         'fade-in2': 'fade-in 1s ease-in-out forwards',
         'crop-left-to-right': 'crop-left-to-right 0.6s ease-in-out forwards',
+        'pop-out': 'pop-out 0.2s ease-out forwards',
       },
+      backgroundImage: {
+        'virginia-mascot': "url('/images/virginia-mascot-bg.png')",
+        
+      }
     },
   },
   plugins: [nextui()],

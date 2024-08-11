@@ -1,24 +1,31 @@
+"use client";
+
 import React from 'react'
 import Image from 'next/image';
 import background from '@/assets/virginia-mascot-bg.png';
 import { FcImageFile } from "react-icons/fc";
+import { useSidebarContext } from '@/context/SidebarContext';
+
+
 
 const AccountCreation = () => {
+    const { isOpen } = useSidebarContext();
+    
     return (
         <div className="w-full h-full flex font-lato animate-fade-in">
-            <div className='flex z-0'>
+            <div className='flex z-0 w-full h-full'>
                 <Image
                     src={background}
                     alt={'Virginia Mascot BG'}
                     width={2000}
                     height={1000}
                 />
-            </div>
-        <div className='w-[90rem] h-full fixed bg-white ml-[21%] shadow-2xl max-4xl:w-[70rem] max-3xl:w-[65rem] max-3xl:ml-[20%] max-2xl:w-[55rem] max-xl:w-[45rem]'> 
+     
+        <div className={` ${isOpen ? 'w-[78rem] ml-[17%]' : '' } w-[93rem] h-full fixed bg-white ml-[21%] shadow-2xl max-4xl:w-[70rem] max-3xl:w-[65rem] max-3xl:ml-[20%] max-2xl:w-[55rem] max-xl:w-[45rem]`}> 
             {/* Title */}
             <div className='flex flex-col w-full h-[7.3rem] justify-center items-center'>
-                <div className='text-[2.6em] font-bold max-3xl:text-[2.2em] max-xl:text-[1.9em]'> Account Creation </div>
-                <div className='text-[1.3em] mb-2 max-xl:text-[1.1em]'> Create an employee account </div>
+                <div className='text-[2.6em] font-black max-3xl:text-[2.2em] max-xl:text-[1.9em]'> Account Creation </div>
+                <div className='text-[1.4em] mb-2 max-xl:text-[1.1em]'> Create an employee account </div>
                 <div className='w-full h-full bg-[#B22222]'></div>
             </div>
 
@@ -38,13 +45,13 @@ const AccountCreation = () => {
             {/* Form */}
             <div className='flex justify-center mt-9 text-[#5B5353] text-[1.2em] max-3xl:text-[1.1em]'>
                 {/* 1st Col */}
-                <div className='flex flex-col mr-20 max-4xl:mr-12 max-3xl:mr-10 max-xl:mr-6'>
+                <div className={` ${isOpen ? '' : '' } flex flex-col mr-9 max-4xl:mr-12 max-3xl:mr-10 max-xl:mr-6`}>
                     <div className='flex flex-col justify-start mb-10'>
                         <p>First Name*</p>
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[15rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className={` ${isOpen ? '' : '' } bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]`}
                                     type="fname"
                                     name="fname"
                                     placeholder=""
@@ -58,7 +65,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[15rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
                                     type="email"
                                     name="email"
                                     placeholder=""
@@ -72,7 +79,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <select
-                                    className="bg-white h-12 w-[15rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
                                     name="dept"
                                     defaultValue=""
                                 >
@@ -85,13 +92,13 @@ const AccountCreation = () => {
                 </div>
 
                 {/* 2nd Col */}
-                <div className='flex flex-col mr-20 max-4xl:mr-12 max-3xl:mr-10 max-xl:mr-6'>
+                <div className='flex flex-col mr-9 max-4xl:mr-12 max-3xl:mr-10 max-xl:mr-6'>
                     <div className='flex flex-col justify-start mb-10'>
                         <p>Middle Name*</p>
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[15rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
                                     type="mname"
                                     name="mname"
                                     placeholder=""
@@ -105,7 +112,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[15rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
                                     type="enum"
                                     name="enum"
                                     placeholder=""
@@ -119,7 +126,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[15rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
                                     type="contactnum"
                                     name="contactnum"
                                     placeholder=""
@@ -130,13 +137,13 @@ const AccountCreation = () => {
                 </div>
 
                 {/* 3rd Col */}
-                <div className='flex flex-col mr-6'>
+                <div className='flex flex-col'>
                     <div className='flex flex-col justify-start mb-10'>
                         <p>Last Name*</p>
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[15rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
                                     type="lname"
                                     name="lname"
                                     placeholder=""
@@ -150,7 +157,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[15rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
                                     type="suffix"
                                     name="suffix"
                                     placeholder=""
@@ -164,7 +171,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[15rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
                                     type="role"
                                     name="role"
                                     placeholder=""
@@ -182,6 +189,7 @@ const AccountCreation = () => {
                     <button className='w-[10rem] h-[3rem] p-1 text-center font-semibold bg-[#A60000] text-white rounded-xl cursor-pointer max-4xl:h-[2.5em] hover:bg-[#c01820]'> 
                         Confirm </button>
                 </div>
+            </div>
             </div>
         </div>
     )

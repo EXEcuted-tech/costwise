@@ -7,8 +7,8 @@ interface ModalProps {
 
 const AddPass: React.FC<ModalProps> = ({title}) => {
     return (
-        <div className='font-lato z-10 w-full h-full fixed top-0 right-0 p-4 overflow-auto bg-[rgba(0,0,0,0.6)] animate-fade-in'>
-            <div className="flex flex-col w-[37rem] h-[24rem] fixed top-[35%] left-[40%] p-6 bg-white shadow-md shadow-gray-800 rounded-lg"> 
+        <div className='flex justify-center items-center z-[1000] w-full h-full fixed top-0 right-0 p-4 overflow-auto bg-[rgba(0,0,0,0.5)]'>
+            <div className="flex flex-col w-[37rem] h-[24rem] fixed top-[35%] left-[40%] p-6 bg-white shadow-md shadow-gray-800 rounded-lg animate-pop-out"> 
                 
                 {/* Title */} 
                 <div className='flex justify-center text-center mt-2 mb-2'>
