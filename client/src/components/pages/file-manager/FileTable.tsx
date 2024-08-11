@@ -67,7 +67,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen }) => {
                                 <td className={`${isOpen ? 'w-[20%] 3xl:w-[15%] pr-[20px] 2xl:pr-[46px]' : 'w-[20%] 2xl:w-[15%] pr-[46px]'}`}>
                                     <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
-                                                cursor-pointer hover:bg-[#f7f7f7]'
+                                                cursor-pointer hover:bg-[#f7f7f7] hover:rounded-l-[5px]'
                                             onClick={()=>handleView(data)}>
                                             <FaEye />
                                         </div>
@@ -82,7 +82,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen }) => {
                                             <TiExport />
                                         </div>
                                         <div className='flex justify-center items-center h-full
-                                        cursor-pointer hover:bg-primary hover:text-white'
+                                        cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px]'
                                             onClick={()=>handleDelete(data)}>
                                             <IoTrash />
                                         </div>
