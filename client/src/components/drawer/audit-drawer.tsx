@@ -12,10 +12,10 @@ const AuditDrawer = () => {
 
     return (
     <div 
-        className="fixed w-screen z-10 h-full bg-black bg-opacity-50 backdrop-blur-[2px] flex justify-end" 
+        className="fixed w-screen z-[1000] h-full bg-black bg-opacity-50 backdrop-brightness-50 flex justify-end" 
         onClick={toggleDrawer}
     >
-        <div className={`bg-white w-[70%] 4xl:w-[35%] h-full p-10 pt-[20px] pr-[150px] drop-shadow-4xl ${isOpen ? 'w-[69%] 2xl:w-[59%] 4xl:w-[49%] pr-[320px] 2xl:pr-[400px]' : ''}`}>
+        <div className={`bg-white w-[70%] 4xl:w-[35%] h-full p-10 pt-[20px] pr-[150px] drop-shadow-2xl ${isOpen ? 'w-[69%] 2xl:w-[59%] 4xl:w-[49%] pr-[320px] 2xl:pr-[400px]' : ''}`}>
             <div className="flex justify-end">
                 <div 
                     className="border-2 p-1 rounded-[5px] cursor-pointer" 

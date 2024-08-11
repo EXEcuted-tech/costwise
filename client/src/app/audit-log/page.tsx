@@ -6,11 +6,13 @@ import { FaFileExport } from "react-icons/fa6";
 import { BiSearchAlt } from "react-icons/bi";
 import { GoHistory } from "react-icons/go";
 import { useDrawerContext } from "@/context/DrawerContext";
+import { useSidebarContext } from "@/context/SidebarContext";
 import Header from "@/components/header/Header";
 import AuditDrawer from "@/components/drawer/audit-drawer";
 
 const AuditLogPage = () => {
 const { drawerOpen, setDrawerOpen } = useDrawerContext();
+const { isOpen, setIsOpen } = useSidebarContext();
 const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 
 return (
