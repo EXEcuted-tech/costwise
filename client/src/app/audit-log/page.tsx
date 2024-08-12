@@ -9,6 +9,7 @@ import { useDrawerContext } from "@/context/DrawerContext";
 import { useSidebarContext } from "@/context/SidebarContext";
 import Header from "@/components/header/Header";
 import AuditDrawer from "@/components/drawer/audit-drawer";
+import PrimaryPagination from "@/components/pagination/PrimaryPagination";
 
 const AuditLogPage = () => {
 const { drawerOpen, setDrawerOpen } = useDrawerContext();
@@ -16,25 +17,25 @@ const { isOpen, setIsOpen } = useSidebarContext();
 const toggleDrawer = () => setDrawerOpen(!drawerOpen);
 
 return (
-    <div className={`w-full h-full font-lato`}>
+    <div className={`w-full h-screen font-lato bg-background`}>
         { drawerOpen ? <AuditDrawer /> : "" }
         <Header icon={GoHistory} title={"Audit Log"} />
         
         <div className="flex justify-between w-[80%] m-auto mb-[10px] gap-5 pt-[50px]">
             <div className="flex gap-5">
                 <div className="relative">
-                    <BiSearchAlt className="absolute left-3 top-[20px] 4xl:top-[28px] text-[20px] 4xl:text-[23px] transform -translate-y-1/2 text-gray-600"/>
-                    <input className="p-[6px] 4xl:p-[10px] text-[16px] 4xl:text-[20px] pl-[35px] 4xl:pl-[40px] border border-[#868686] rounded-full w-[200px] 4xl:w-[250px]" placeholder="Search here..." />
+                    <BiSearchAlt className="absolute left-3 top-[20px] 4xl:top-[24px] text-[20px] 4xl:text-[23px] transform -translate-y-1/2 text-gray-600"/>
+                    <input className="p-[6px] 4xl:p-[7px] text-[16px] 4xl:text-[20px] pl-[35px] 4xl:pl-[40px] border border-[#868686] rounded-full w-[400px]" placeholder="Search here..." />
                 </div>
-                <button className="flex justify-center items-center 4xl:p-[10px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[52px] w-[50px] 4xl:w-[60px]">
+                <button className="flex justify-center items-center bg-white 4xl:p-[6px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]">
                     <LuArrowDownUp className="text-[20px] 4xl:text-[25px] text-[#414141]" />
                 </button>
-                <button className="flex justify-center items-center 4xl:p-[10px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[52px] w-[50px] 4xl:w-[60px]">
+                <button className="flex justify-center items-center bg-white 4xl:p-[10px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]">
                     <FaFilter className="text-[20px] 4xl:text-[25px] text-[#414141]" />
                 </button>
             </div>
-            <button className="flex text-[16px] 4xl:text-[20px] p-[6px] 4xl:p-[10px] h-[40px] 4xl:h-[52px] border border-[#868686] rounded-[10px] justify-end gap-2">
-                <FaFileExport className="text-[25px] 4xl:text-[30px] text-[#414141]" />
+            <button className="flex bg-white text-[16px] 4xl:text-[20px] p-[6px] h-[40px] 4xl:h-[46px] border border-[#868686] rounded-[10px] justify-end gap-2">
+                <FaFileExport className="text-[25px] text-[#414141] m-auto" />
                 Export
             </button>
         </div>
@@ -118,7 +119,14 @@ return (
                 </div>
             </div>
         </div>
-        
+        {/* <div className='relative py-[1%]'>
+            <PrimaryPagination
+                data={fileData}
+                itemsPerPage={8}
+                handlePageChange={handlePageChange}
+                currentPage={currentPage}
+            />
+        </div> */}
     </div>
   )
 }
