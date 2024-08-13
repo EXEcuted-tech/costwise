@@ -1,6 +1,6 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
-import { SidebarProvider } from "@/context/SidebarContext";
+import { SidebarProvider, useSidebarContext } from "@/context/SidebarContext";
 
 export default function DashboardLayout({
   children,
@@ -9,12 +9,21 @@ export default function DashboardLayout({
 }>) {
   return (
     <SidebarProvider>
-      <div className="flex font-lato">
-        <MainLayout/>
-        <main className="w-full bg-background -z-10">
-          {children}
-        </main>
-      </div>
+      <UserManualContent>
+        {children}
+      </UserManualContent>
     </SidebarProvider>
+  );
+}
+
+function UserManualContent({ children }: { children: React.ReactNode }) {
+  const { isOpen } = useSidebarContext();
+  return (
+    <div className="flex font-lato w-full">
+      <MainLayout />
+      <main className={`${isOpen ? 'w-[calc(100%-280px)] 2xl:w-[calc(100%-360px)] ml-[280px] 2xl:ml-[360px]' : isOpen ? 'w-[calc(100%-280px)] 2xl:w-full ml-[280px] 2xl:ml-[360px]' : 'w-full ml-[120px]'} min-h-screen font-lato bg-background transition-all duration-400 ease-in-out`}>
+        {children}
+      </main>
+    </div>
   );
 }
