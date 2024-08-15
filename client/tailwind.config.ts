@@ -61,9 +61,9 @@ const config: Config = {
           '100%': { transform: 'translateY(0)', opacity: '1' },
         },
         'pop-out': {
-          '0%': { transform: 'scale(0.9)'},
-          '50%': { transform: 'scale(1.05)'},
-          '100%': { transform: 'scale(1)'},
+          '0%': { transform: 'scale(0.9)' },
+          '50%': { transform: 'scale(1.05)' },
+          '100%': { transform: 'scale(1)' },
         },
         'shake-tilt': {
           '0%, 100%': { transform: 'rotate(0deg)' },
