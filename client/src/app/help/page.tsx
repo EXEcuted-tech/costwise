@@ -3,6 +3,7 @@ import { PiBookOpenText } from "react-icons/pi";
 import { FaCompass } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { GrHelpBook } from "react-icons/gr";
+import Link from 'next/link';
 
 const UserManualPage = () => {
 
@@ -64,11 +65,11 @@ const UserManualPage = () => {
                   </ul>
                 </div>
                 <div className='flex h-full justify-start items-end z-50'>
-                  <div className='flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer'>
+                  <Link className='flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href=' /help/getting-started'>
                     <button>
                       <p>View Articles &gt;</p>
                     </button>
-                  </div>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -95,11 +96,11 @@ const UserManualPage = () => {
                   </ul>
                 </div>
                 <div className='flex h-full justify-start items-end'>
-                  <div className='flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer'>
+                  <Link className='flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href='/help/essentials'>
                     <button>
                       <p>View Articles &gt;</p>
                     </button>
-                  </div>
+                  </Link>
                 </div>
               </div>
             </div>
@@ -126,11 +127,11 @@ const UserManualPage = () => {
                   </ul>
                 </div>
                 <div className='flex h-full justify-start items-end'>
-                  <div className='flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer'>
+                  <Link className='flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href='/help/manage-account'>
                     <button>
                       <p>View Articles &gt;</p>
                     </button>
-                  </div>
+                  </Link>
                 </div>
               </div>
             </div>
