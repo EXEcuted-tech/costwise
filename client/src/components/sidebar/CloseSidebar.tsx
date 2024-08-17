@@ -51,7 +51,7 @@ const CloseSidebar: React.FC = () => {
                     placement={"right"}
                     classNames={{
                       base: [
-                        "before:bg-[#FFD3D3] dark:before:bg-white",
+                        "before:bg-[#FFD3D3]",
                       ],
                       content: [
                         "py-2 px-4 shadow-xl",
@@ -86,7 +86,7 @@ const CloseSidebar: React.FC = () => {
                       placement={"right"}
                       classNames={{
                         base: [
-                          "before:bg-[#FFD3D3] dark:before:bg-white",
+                          "before:bg-[#FFD3D3]",
                         ],
                         content: [
                           "py-2 px-4 shadow-xl",
@@ -115,7 +115,7 @@ const CloseSidebar: React.FC = () => {
                       placement={"right"}
                       classNames={{
                         base: [
-                          "before:bg-[#FFD3D3] dark:before:bg-white",
+                          "before:bg-[#FFD3D3]",
                         ],
                         content: [
                           "py-2 px-4 shadow-xl",
