@@ -26,7 +26,6 @@ const UserManagement = () => {
     const [activePage, setActivePage] = useState('accounts');
     
     const { isOpen } = useSidebarContext();
-    console.log("sidebar: ", isOpen);
 
     const renderPage = () => {
         switch (activePage) {
@@ -44,21 +43,23 @@ const UserManagement = () => {
             <div>
                 <Header icon={RiShieldUserFill} title="User Management"></Header>
             </div>
-            <div className={`${isOpen ? 'w-auto' : '' } flex flex-col max-w-[105rem] h-auto mr-8 ml-[4rem] mt-12 rounded-xl bg-white shadow-md shadow-gray-300`}>
+            <div className={`${isOpen ? '' : '' } flex flex-col w-auto mr-[1rem] h-auto ml-[4rem] mt-12 rounded-xl bg-white shadow-md shadow-gray-300`}>
                 
                 {/* Menu Toggle */}
-                <div className="flex w-full h-full text-[1.5em] text-[#000000] bg-white font-semibold items-center border-solid border-b border-[#868686] rounded-t-lg">
+                <div className={`${isOpen ? 'text-[1.3em]' : 'text-[1.5em] max-2xl:text-[1.3em]' } flex w-full h-full  text-[#000000] bg-white font-semibold items-center border-solid border-b border-[#868686] rounded-t-lg `}>
                     <div
-                        className={`w-[10rem] h-[4rem] text-center rounded-t-lg cursor-pointer  ${activePage === 'accounts' ? 'bg-[#D9D9D9] text-[#676767] border-r-2 border-[#86868649]' : 'bg-white'}`}
-                        onClick={() => setActivePage('accounts')}
+                        className={`${isOpen ? '' : '' } w-[10rem] h-[4rem] text-center rounded-t-lg cursor-pointer max-2xl:h-[3rem] 
+                            ${activePage === 'accounts' ? 'bg-[#D9D9D9] text-[#676767] border-r-2 border-[#86868649]' : 'bg-white'}`}
+                                onClick={() => setActivePage('accounts')}
                     >
-                        <p className='mt-[1rem]'>Accounts</p>
+                        <p className={`${isOpen ? '' : '' } mt-[1rem] max-2xl:mt-[10px] `}>Accounts</p>
                     </div>
                     <div
-                        className={`w-[15rem] h-[4rem] text-center rounded-t-lg cursor-pointer ${activePage === 'passwordRequests' ? 'bg-[#D9D9D9] text-[#676767] border-r-2 border-[#86868649]' : 'bg-white'}`}
-                        onClick={() => setActivePage('passwordRequests')}
+                        className={`${isOpen ? '' : '' } w-[15rem] h-[4rem] text-center rounded-t-lg cursor-pointer max-2xl:h-[3rem] 
+                            ${activePage === 'passwordRequests' ? 'bg-[#D9D9D9] text-[#676767] border-r-2 border-[#86868649]' : 'bg-white'}`}
+                                onClick={() => setActivePage('passwordRequests')}
                     >
-                        <p className='mt-[1rem]'>Password Request</p>
+                        <p className={`${isOpen ? '' : '' } mt-[1rem] max-2xl:mt-[10px] `}>Password Request</p>
                     </div>
                 </div>
                 {renderPage()}
@@ -89,7 +90,7 @@ const fakeAccountsData: ManageAccountsProps[] = [
     {
         userName: 'Kathea Mari C. Mayol',
         userRole: 'Administrator',
-        userEmail: 'katheamarimayol@gmail.com',
+        userEmail: 'katheamayol@gmail.com',
         contactNumber: '+63 12321232',
         department: 'Accounting'
     },
@@ -97,7 +98,7 @@ const fakeAccountsData: ManageAccountsProps[] = [
     {
         userName: 'Hannah Angelica Galve',
         userRole: 'Admin',
-        userEmail: 'hannahangelicagalve@gmail.com',
+        userEmail: 'hannahgalve@gmail.com',
         contactNumber: '+63 12321232',
         department: 'Production'
     },

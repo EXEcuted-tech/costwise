@@ -21,9 +21,10 @@ const AccountCreation = () => {
                     height={1000}
                 />
      
-        <div className={` ${isOpen ? 'w-[78rem] ml-[17%]' : '' } w-[93rem] h-full fixed bg-white ml-[21%] shadow-2xl max-4xl:w-[70rem] max-3xl:w-[65rem] max-3xl:ml-[20%] max-2xl:w-[55rem] max-xl:w-[45rem]`}> 
+        <div className={` ${isOpen ? 'w-[78rem] ml-[17%]' : ' max-4xl:w-[70rem] max-3xl:w-[65rem] max-3xl:ml-[20%] max-2xl:w-[55rem] max-xl:w-[45rem]' } 
+            w-[93rem] h-full fixed bg-white ml-[21%] shadow-2xl`}> 
             {/* Title */}
-            <div className='flex flex-col w-full h-[7.3rem] justify-center items-center'>
+            <div className={`${isOpen ? '' : 'max-3xl:pt-2 max-xl:pt-5' } flex flex-col w-full h-[7.3rem] justify-center items-center`}>
                 <div className='text-[2.6em] font-black max-3xl:text-[2.2em] max-xl:text-[1.9em]'> Account Creation </div>
                 <div className='text-[1.4em] mb-2 max-xl:text-[1.1em]'> Create an employee account </div>
                 <div className='w-full h-full bg-[#B22222]'></div>
@@ -43,15 +44,15 @@ const AccountCreation = () => {
             </div>
 
             {/* Form */}
-            <div className='flex justify-center mt-9 text-[#5B5353] text-[1.2em] max-3xl:text-[1.1em]'>
+            <div className={`${isOpen ? '' : 'max-3xl:mt-14 max-3xl:text-[1.1em]' } flex justify-center mt-9 text-[#5B5353] text-[1.2em] `}>
                 {/* 1st Col */}
-                <div className={` ${isOpen ? '' : '' } flex flex-col mr-9 max-4xl:mr-12 max-3xl:mr-10 max-xl:mr-6`}>
+                <div className={` ${isOpen ? '' : 'max-4xl:mr-12 max-3xl:mr-10 max-xl:mr-6' } flex flex-col mr-9 `}>
                     <div className='flex flex-col justify-start mb-10'>
                         <p>First Name*</p>
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className={` ${isOpen ? '' : '' } bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]`}
+                                    className={` ${isOpen ? '' : 'max-4xl:w-[18rem] max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]' } bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline `}
                                     type="fname"
                                     name="fname"
                                     placeholder=""
@@ -65,7 +66,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className={`${isOpen ? '' : 'max-4xl:w-[18rem] max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]' } bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline `}
                                     type="email"
                                     name="email"
                                     placeholder=""
@@ -79,7 +80,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <select
-                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className={`${isOpen ? '' : 'max-4xl:w-[18rem] max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]' } bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline `}
                                     name="dept"
                                     defaultValue=""
                                 >
@@ -98,7 +99,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className={`${isOpen ? '' : 'max-4xl:w-[18rem] max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]' } bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline `}
                                     type="mname"
                                     name="mname"
                                     placeholder=""
@@ -112,7 +113,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className={`${isOpen ? '' : 'max-4xl:w-[18rem] max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]' } bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline `}
                                     type="enum"
                                     name="enum"
                                     placeholder=""
@@ -126,7 +127,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className={`${isOpen ? '' : 'max-4xl:w-[18rem] max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]' } bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline `}
                                     type="contactnum"
                                     name="contactnum"
                                     placeholder=""
@@ -143,7 +144,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className={`${isOpen ? '' : 'max-4xl:w-[18rem] max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]' } bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline `}
                                     type="lname"
                                     name="lname"
                                     placeholder=""
@@ -157,7 +158,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className={`${isOpen ? '' : 'max-4xl:w-[18rem] max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]' } bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline `}
                                     type="suffix"
                                     name="suffix"
                                     placeholder=""
@@ -171,7 +172,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                             <div className="mt-2 text-gray-600">
                                 <input
-                                    className="bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]"
+                                    className={`${isOpen ? '' : 'max-4xl:w-[18rem] max-3xl:h-10 max-2xl:w-[13rem] max-xl:w-[11rem]' } bg-white h-12 w-[22rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline `}
                                     type="role"
                                     name="role"
                                     placeholder=""
@@ -183,7 +184,7 @@ const AccountCreation = () => {
             </div>
 
                 {/* Buttons */}
-                <div className='flex flex-col w-full mt-1 text-[1.2em] items-center max-4xl:text-[1.1em]'>
+                <div className={`${isOpen ? '' : 'max-4xl:text-[1.1em] max-3xl:mt-8' } flex flex-col w-full mt-1 text-[1.2em] items-center `}>
                     <button className='w-[10rem] h-[3rem] p-1 text-center font-semibold bg-white text-[#A60000] border-3 border-[#A60000] mb-4 rounded-xl  cursor-pointer max-4xl:h-[2.5em] hover:bg-[#A60000] hover:border-white hover:text-white'> 
                         Add Password </button>
                     <button className='w-[10rem] h-[3rem] p-1 text-center font-semibold bg-[#A60000] text-white rounded-xl cursor-pointer max-4xl:h-[2.5em] hover:bg-[#c01820]'> 
