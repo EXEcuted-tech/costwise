@@ -21,35 +21,35 @@ const FormulationPage = () => {
                 {/* Search and Buttons Section */}
                 <div className='flex'>
                     {/* Search Component */}
-                    <div className={`relative mr-[1%] w-[50%]`}>
+                    <div className={`relative mr-[1%] w-[45%] 2xl:w-[50%] 3xl:w-[60%]`}>
                         <div className="absolute inset-y-0 left-0 flex items-center pl-1 pointer-events-none">
-                            <AiOutlineSearch className="text-[#575757] text-[22px]" />
+                            <AiOutlineSearch className="text-[#575757] text-[19px] 2xl:text-[22px]" />
                         </div>
                         <input
                             type="text"
-                            className="focus:outline-none w-[40%] pl-[35px] pr-[5px] py-[10px] bg-background border-b border-[#868686] placeholder-text-[#777777] text-[#5C5C5C] text-[21px]"
+                            className="focus:outline-none w-[60%] 3xl:w-[50%] pl-[35px] pr-[5px] py-[10px] bg-background border-b border-[#868686] placeholder-text-[#777777] text-[#5C5C5C] text-[18px] 2xl:text-[21px]"
                             placeholder="Search Formulation"
                             required
                         />
                     </div>
-                    <div className='flex items-end justify-end w-[50%]'>
-                        <button className='mr-[10px] bg-white px-[15px] py-[5px] text-[18px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7]'>
+                    <div className='flex items-end justify-end w-[55%] 2xl:w-[50%] 3xl:w-[40%]'>
+                        <button className='mr-[10px] bg-white px-[15px] py-[5px] text-[15px] 2xl:text-[18px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7]'>
                             <MdCompare className='mr-[5px]' />
                             <span className='font-bold'>Compare</span>
                         </button>
-                        <button className='mr-[10px] bg-white px-[15px] py-[5px] text-[18px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7]'>
+                        <button className='mr-[10px] bg-white px-[15px] py-[5px] text-[15px] 2xl:text-[18px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7]'>
                             <IoList className='text-[22px] mr-[5px]' />
                             <span className='font-bold'>BOM List</span>
                         </button>
                         <div ref={ref}>
-                            <button className='bg-primary text-white px-[15px] py-[5px] text-[18px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c]'
+                            <button className='bg-primary text-white px-[15px] py-[5px] text-[15px] 2xl:text-[18px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c]'
                                 onClick={()=>setAddFormula(!addFormula)}>
                                 <span className='font-bold border-r-[2px] border-r-[#580000] pr-[10px] mr-[10px]'>Add Formula</span>
                                 <span className=''><AiOutlineDown /></span>
                             </button>
                             {addFormula &&
-                                <div className='absolute animate-pull-down bg-[#FFD3D3] z-50 w-[165px] ml-[5px]'>
-                                    <ul className='text-primary text-[17px]'>
+                                <div className='absolute animate-pull-down bg-[#FFD3D3] z-50 w-[145px] 2xl:w-[165px] ml-[5px]'>
+                                    <ul className='text-primary text-[14px] 2xl:text-[17px]'>
                                         <li className='pl-[15px] flex items-center justify-left py-[5px] cursor-pointer hover:text-[#851313]'>
                                             <IoMdAdd className='text-[20px] mr-[5px]'/>
                                             <p>Add Manually</p>
@@ -67,7 +67,7 @@ const FormulationPage = () => {
                     </div>
                 </div>
                 {/* File Container */}
-                <div>
+                <div className='w-full'>
                     <FormulationContainer />
                 </div>
             </div>

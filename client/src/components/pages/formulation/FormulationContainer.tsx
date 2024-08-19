@@ -3,6 +3,7 @@ import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import { FaEye } from "react-icons/fa";
 import { FaPencilAlt } from "react-icons/fa";
 import { IoTrash } from "react-icons/io5";
+import { TiExport } from "react-icons/ti";
 import { useRouter } from 'next/navigation';
 
 export interface FormulationContainerProps {
@@ -25,32 +26,32 @@ const FormulationContainer = () => {
     const currentListPage = fakeFormulaData.slice(indexOfFirstItem, indexOfLastItem);
     const router = useRouter();
 
-    const handleView = (data:FormulationContainerProps) => {
+    const handleView = (data: FormulationContainerProps) => {
         const encodedData = encodeURIComponent(JSON.stringify(data));
         router.push(`/file-manager/workspace?data=${encodedData}`); //change to number later
     }
 
-    const handleEdit = (data:FormulationContainerProps) => {
+    const handleEdit = (data: FormulationContainerProps) => {
         const encodedData = encodeURIComponent(JSON.stringify(data));
-        localStorage.setItem("edit","true");
+        localStorage.setItem("edit", "true");
         router.push(`/file-manager/workspace?data=${encodedData}`); //change to number later
     }
 
-    const handleExport = (data:FormulationContainerProps) => {
+    const handleExport = (data: FormulationContainerProps) => {
 
     }
 
-    const handleDelete = (data:FormulationContainerProps) => {
+    const handleDelete = (data: FormulationContainerProps) => {
 
     }
 
 
     return (
-        <div className='font-lato bg-white mt-[20px]'>
-            <table className='w-full'>
-                <thead className=' py-[15px]'>
+        <div className='w-full font-lato bg-white mt-[20px] px-[20px] rounded-lg drop-shadow-lg'>
+            <table className='w-full '>
+                <thead className='border-b border-b-[#c4c4c4]'>
                     <tr className='text-[#777777] font-bold text-[18px]'>
-                        <th>NO.</th>
+                        <th className='py-[10px]'>NO.</th>
                         <th>ITEM CODE</th>
                         <th>DESCRIPTION</th>
                         <th>BATCH QTY</th>
@@ -59,12 +60,11 @@ const FormulationContainer = () => {
                         <th>MANAGE</th>
                     </tr>
                 </thead>
-                <hr className='w-full bg-[#868686]' />
                 <tbody>
                     {currentListPage.length > 0
                         ? (currentListPage.map((data, index) => (
-                            <tr key={index} className={`${index%2 == 1 && 'bg-[#FCF7F7]'}`}>
-                                <td>{data.number}</td>
+                            <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'} text-center`}>
+                                <td className='py-[15px]'>{data.number}</td>
                                 <td>{data.itemCode}</td>
                                 <td>{data.description}</td>
                                 <td>{data.batchQty}</td>
@@ -81,6 +81,11 @@ const FormulationContainer = () => {
                                         cursor-pointer hover:bg-[#f7f7f7]'
                                             onClick={() => handleEdit(data)}>
                                             <FaPencilAlt />
+                                        </div>
+                                        <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
+                                        cursor-pointer hover:bg-[#f7f7f7]'
+                                            onClick={() => handleExport(data)}>
+                                            <TiExport />
                                         </div>
                                         <div className='flex justify-center items-center h-full
                                         cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px]'
