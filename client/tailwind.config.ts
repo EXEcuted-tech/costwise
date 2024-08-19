@@ -92,10 +92,6 @@ const config: Config = {
         'zoomIn': 'zoomIn 0.4s ease-in-out',
         zoomOut: 'zoomOut 0.4s ease-in-out',
       },
-      backgroundImage: {
-        'virginia-mascot': "url('/images/virginia-mascot-bg.png')",
-        
-      }
     },
   },
   plugins: [nextui()],

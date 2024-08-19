@@ -39,7 +39,7 @@ const UserManagement = () => {
     };
 
     return (
-        <div className="w-full animate-fade-in">
+        <div className="w-full">
             <div>
                 <Header icon={RiShieldUserFill} title="User Management"></Header>
             </div>

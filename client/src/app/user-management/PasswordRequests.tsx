@@ -22,7 +22,7 @@ const PasswordRequests: React.FC<PasswordRequestPageProps> = ({ fileData, isOpen
     const currentListPage = fileData.slice(indexOfFirstItem, indexOfLastItem);
     
     return (
-        <div className="flex flex-col w-auto h-auto rounded-lg shadow-md shadow-gray-300 animate-fade-in">
+        <div className="flex flex-col w-auto h-auto rounded-lg shadow-md shadow-gray-300">
             {/* Search Area */}
             <div className="flex w-full h-[3.5rem] bg-[#F3F3F3] border-solid border-b border-[#868686]">
                 <div className="mt-[0.8em] ml-7 text-gray-600">
