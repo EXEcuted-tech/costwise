@@ -8,6 +8,7 @@ import { IoList } from "react-icons/io5";
 import { BiSolidFile } from 'react-icons/bi';
 import { IoMdAdd } from "react-icons/io";
 import useOutsideClick from '@/hooks/useOutsideClick';
+import FormulationContainer from '@/components/pages/formulation/FormulationContainer';
 
 const FormulationPage = () => {
     const [addFormula, setAddFormula] = useState(false);
@@ -17,6 +18,7 @@ const FormulationPage = () => {
         <>
             <Header icon={HiClipboardList} title={"Formulations"} />
             <div className='px-[50px] mt-[25px] ml-[45px]'>
+                {/* Search and Buttons Section */}
                 <div className='flex'>
                     {/* Search Component */}
                     <div className={`relative mr-[1%] w-[50%]`}>
@@ -64,8 +66,9 @@ const FormulationPage = () => {
 
                     </div>
                 </div>
+                {/* File Container */}
                 <div>
-
+                    <FormulationContainer />
                 </div>
             </div>
         </>
