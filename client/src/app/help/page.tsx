@@ -44,7 +44,7 @@ const UserManualPage = () => {
         {/* Bottom Div */}
         <div className='flex flex-row h-[40%] w-[105%] items-center justify-center px-5 overflow-b-hidden'>
           <div className='flex  w-[33.33%] h-[120%] items-start justify-end mb-10'>
-            <div className='flex flex-row h-[350px] bg-white w-[80%] rounded-xl  px-5 py-10 ' style={divShadows}>
+            <div className='flex flex-row h-[350px] bg-white w-[80%] rounded-xl px-4 py-8 2xl:px-5 2xl:py-10 ' style={divShadows}>
               <div className='flex w-[20%] 2xl:w-[15%] items-start justify-center'>
                 <FaCompass className='text-[30px] 2xl:text-[40px] 3xl:text-[50px]' />
               </div>
@@ -65,7 +65,7 @@ const UserManualPage = () => {
                   </ul>
                 </div>
                 <div className='flex h-full justify-start items-end z-50'>
-                  <Link className='flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href=' /help/getting-started'>
+                  <Link className='text-[12px] xl:[14px] 2xl:text-[16px] flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href=' /help/getting-started'>
                     <button>
                       <p>View Articles &gt;</p>
                     </button>
@@ -75,7 +75,7 @@ const UserManualPage = () => {
             </div>
           </div>
           <div className='flex  w-[33.33%] h-[120%] items-start justify-center mb-10'>
-            <div className='flex flex-row h-[350px] bg-white w-[80%] rounded-xl  px-5 py-10 z-10' style={divShadows}>
+            <div className='flex flex-row h-[350px] bg-white w-[80%] rounded-xl  px-4 py-8 2xl:px-5 2xl:py-10 z-10' style={divShadows}>
               <div className='flex w-[20%] 2xl:w-[15%] items-start justify-center'>
                 <CgProfile className='text-[30px] 2xl:text-[40px] 3xl:text-[50px]' />
               </div>
@@ -96,7 +96,7 @@ const UserManualPage = () => {
                   </ul>
                 </div>
                 <div className='flex h-full justify-start items-end'>
-                  <Link className='flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href='/help/essentials'>
+                  <Link className='text-[12px] xl:[14px] 2xl:text-[16px] flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href='/help/essentials'>
                     <button>
                       <p>View Articles &gt;</p>
                     </button>
@@ -106,7 +106,7 @@ const UserManualPage = () => {
             </div>
           </div>
           <div className='flex w-[33.33%] h-[120%] mb-10'>
-            <div className='flex flex-row h-[350px] bg-white w-[80%] rounded-xl px-5 py-10 ' style={divShadows}>
+            <div className='flex flex-row h-[350px] bg-white w-[80%] rounded-xl px-4 py-8 2xl:px-5 2xl:py-10 z-10' style={divShadows}>
               <div className='flex w-[20%] 2xl:w-[15%] items-start justify-center '>
                 <GrHelpBook className='text-[30px] 2xl:text-[40px] 3xl:text-[50px]' />
               </div>
@@ -127,7 +127,7 @@ const UserManualPage = () => {
                   </ul>
                 </div>
                 <div className='flex h-full justify-start items-end'>
-                  <Link className='flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href='/help/manage-account'>
+                  <Link className='text-[12px] xl:[14px] 2xl:text-[16px] flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href='/help/manage-account'>
                     <button>
                       <p>View Articles &gt;</p>
                     </button>
