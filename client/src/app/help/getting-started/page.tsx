@@ -6,12 +6,12 @@ import { PiBookOpenText } from "react-icons/pi";
 const GettingStartedPage = () => {
 
     return (
-        <div className='bg-cover bg-center items-center justify-center bg-[#FFFAF8] w-[93.5vw] h-[100vh] overflow-hidden '>
+        <div className='bg-cover bg-center items-center justify-center bg-[#FFFAF8] h-[100vh] overflow-hidden '>
             <div>
                 <Header icon={PiBookOpenText} title="User's Management"></Header>
             </div>
             <div className='flex h-[90%] w-[98%] pl-[90px]  pt-[45px]'>
-                <div className='flex flex-col bg-white w-full rounded-xl p-10 drop-shadow-lg -z-[0]'>
+                <div className='flex flex-col bg-white w-full rounded-xl p-10 drop-shadow-lg -z-[0] mr-[30px]'>
                     <div className='flex flex-row w-full items-center justify-start border-b-2 border-[#ACACAC]'>
                         <Link href="/help" className="">
                             <GoArrowLeft className="text-primary text-[1em] xl:text-[2em] xl:ml-[50%] 2xl:ml-0 hover:opacity-75 hover:animate-shrink-in transition ease-in-out duration-200" />

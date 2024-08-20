@@ -6,7 +6,7 @@ import { PiBookOpenText } from "react-icons/pi";
 const GettingStartedPage = () => {
 
     return (
-        <div className='bg-cover bg-center items-center justify-center bg-[#FFFAF8] bg-opacity-20 w-[93.5vw] h-[100vh] overflow-hidden'>
+        <div className='bg-cover bg-center items-center justify-center bg-[#FFFAF8] bg-opacity-20 h-[100vh] overflow-hidden'>
             <div>
                 <Header icon={PiBookOpenText} title="User's Management"></Header>
             </div>
