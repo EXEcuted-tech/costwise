@@ -13,7 +13,7 @@ const AccountCreation = () => {
 
     return (
         <div className="w-full h-full flex font-lato">
-                <div className='flex w-full h-full bg-cover bg-center w-[500px]' style={{ backgroundImage: `url(${background.src})` }}/>
+                <div className='flex h-full bg-cover bg-center w-[500px]' style={{ backgroundImage: `url(${background.src})` }}/>
                 {/* Wait lang butngan panig margin */}
                 <div className={` ${isOpen ? 'w-full' : 'w-full'} 
                     h-full bg-white shadow-2xl`}>
@@ -26,7 +26,7 @@ const AccountCreation = () => {
 
                     {/* Upload Picture */}
                     <div className='flex h-[18rem] justify-center items-center border-b-3 border-[#929090] bg-white cursor-pointer max-4xl:h-[15rem] '>
-                        <div className='flex flex-col w-[70rem] h-[13rem] font-semibold items-center justify-center border-5 border-dashed rounded-xl max-4xl:w-[55rem] max-4xl:h-[11rem] max-3xl:w-[45rem] max-2xl:w-[40rem] max-xl:w-[30rem] hover:animate-shrink-in'>
+                        <div className='hover:animate-shrink-in2 flex flex-col w-[70rem] h-[13rem] font-semibold items-center justify-center border-2 border-dashed rounded-xl max-4xl:w-[55rem] max-4xl:h-[11rem] max-3xl:w-[45rem] max-2xl:w-[40rem] max-xl:w-[30rem] hover:bg-[#FFD3D3] hover:border-primary transition-colors delay-50 duration-[100] ease-in'>
                             <div className='text-[5.5em] max-4xl:text-[5em]'>
                                 <FcImageFile />
                             </div>
@@ -38,7 +38,7 @@ const AccountCreation = () => {
                     </div>
 
                     {/* Form */}
-                    <div className={`${isOpen ? '' : 'max-3xl:mt-14 max-3xl:text-[1.1em]'} flex justify-center mt-9 text-[#5B5353] text-[1.2em] `}>
+                    <div className={`${isOpen ? '' : 'max-3xl:mt-14 max-3xl:text-[1.1em]'} flex justify-center mt-9 text-[#5B5353] text-[1.2em] mx-[50px] `}>
                         {/* 1st Col */}
                         <div className={` ${isOpen ? '' : 'max-4xl:mr-12 max-3xl:mr-10 max-xl:mr-6'} flex flex-col mr-9 `}>
                             <div className='flex flex-col justify-start mb-10'>
@@ -178,10 +178,10 @@ const AccountCreation = () => {
                     </div>
 
                     {/* Buttons */}
-                    <div className={`${isOpen ? '' : 'max-4xl:text-[1.1em] max-3xl:mt-8'} flex flex-col w-full mt-1 text-[1.2em] items-center `}>
-                        <button className='w-[10rem] h-[3rem] p-1 text-center font-semibold bg-white text-[#A60000] border-3 border-[#A60000] mb-4 rounded-xl  cursor-pointer max-4xl:h-[2.5em] hover:bg-[#A60000] hover:border-white hover:text-white'>
+                    <div className={`${isOpen ? '' : 'max-4xl:text-[1.1em]'} flex flex-col w-full text-[1.2em] items-center `}>
+                        <button className='w-[240px] h-[3rem] p-1 text-center font-semibold bg-white text-[#A60000] border-2 border-[#A60000] mb-4 rounded-xl  cursor-pointer max-4xl:h-[2.5em] hover:bg-[#A60000] hover:border-white hover:text-white transition-colors delay-50 duration-[1000] ease-in'>
                             Add Password </button>
-                        <button className='w-[10rem] h-[3rem] p-1 text-center font-semibold bg-[#A60000] text-white rounded-xl cursor-pointer max-4xl:h-[2.5em] hover:bg-[#c01820]'>
+                        <button className='w-[240px] h-[3rem] p-1 text-center font-semibold bg-[#A60000] text-white rounded-xl cursor-pointer max-4xl:h-[2.5em] hover:bg-[#c01820]'>
                             Confirm </button>
                     </div>
                 </div>

@@ -61,14 +61,14 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
             {isEdit &&
                 <div className={`h-[40px] animate-zoomIn fixed flex items-center ${isTransaction ? 'left-[20px]' : 'left-[40px]'}`}>
                     <div className='flex justify-end my-[10px] mr-[10px]'>
-                        <button className='hover:bg-[#961e1e] h-[35px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-primary'
+                        <button className='hover:bg-[#961e1e] h-[35px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-primary transition-colors delay-50 duration-[1000] ease-in'
                             onClick={addRow}>
                             <HiOutlinePlus className='mr-[5px]' />
                             Add Row
                         </button>
                     </div>
                     <div className='flex justify-end'>
-                        <button className='hover:bg-[#00780c] h-[35px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F]'
+                        <button className='hover:bg-[#00780c] h-[35px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F] transition-colors delay-50 duration-[1000] ease-in'
                             onClick={() => { setIsEdit(false) }}>
                             <IoIosSave className='mr-[5px]' />
                             Save

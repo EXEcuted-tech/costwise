@@ -61,7 +61,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
                 </div> 
 
                 <Link href="/user-management/create" className='ml-auto'>
-                <div className='flex w-[7rem] h-9 mt-[0.8em]  mr-4 p-2 bg-[#008000] text-white text-center items-center font-semibold rounded-md hover:cursor-pointer hover:bg-[#127312] transition-colors delay-150 duration-[1000] ease-in'>
+                <div className='flex w-[7rem] h-9 mt-[0.8em]  mr-4 p-2 bg-[#008000] text-white text-center items-center font-semibold rounded-[5px] hover:cursor-pointer hover:bg-[#006900] transition-colors delay-50 duration-[1000] ease-in'>
                     <HiMiniPlus className="text-[1.4em]"/> <p className="text-[1em]">Add User</p>
                 </div>
                 </Link>
@@ -81,7 +81,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
                         Contact Number</div>
                     <div className={`${isOpen ? 'w-[20rem] max-3xl:pl-[2rem] max-2xl:pl-[1rem]' : 'w-[25rem] pl-[2rem] max-4xl:mr-6 max-3xl:w-[15rem] max-3xl:mr-4 max-2xl:mr-2' }  py-2`}>
                         Department</div>
-                    <div className={`${isOpen ? 'w-[15rem] pl-[1rem] max-2xl:w-[10rem] max-2xl:pl-[0rem]' : 'w-[15rem] pl-[3rem] max-3xl:pl-[2rem]' }   py-2 max-4xl:pl-0 max-3xl:pl-[2rem]`}>
+                    <div className={`${isOpen ? 'w-[15rem] pl-[1rem] max-2xl:w-[10rem] max-2xl:pl-[0rem]' : 'w-[15rem] pl-[3rem] max-3xl:pl-[2rem]' }  py-2 max-4xl:pl-0 max-3xl:pl-[2rem]`}>
                         Manage</div>
                 </div>
 
