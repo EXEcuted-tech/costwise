@@ -62,8 +62,8 @@ return (
                         Regular User
                     </p>
                 </div>
-                <div className="flex w-[34.5%] 4xl:w-[37.5%] text-[12px] 4xl:text-[16px] items-center">
-                    <p>Record changed: BOM_V1_Cost.csv</p>
+                <div className="flex w-[34.5%] 4xl:w-[37.5%] text-[12px] 4xl:text-[16px] items-center break-words">
+                    <p className="break-words">Record changed: BOM_V1_Costsdafasd.csvusdfuhsuasfhusdauifhasduifasduifashui</p>
                 </div>
                 <div className="flex items-center">
                     <p 
