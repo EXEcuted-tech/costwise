@@ -4,11 +4,12 @@ import { CgRemoveR } from "react-icons/cg";
 type SpecificFGProps = {
     id: number;
     removeSheet: (id: number) => void;
+    isOpen?: boolean;
 };
 
-const SpecificFG: React.FC<SpecificFGProps> = ({ id, removeSheet }) => {
+const SpecificFG: React.FC<SpecificFGProps> = ({ id, removeSheet, isOpen }) => {
     return (
-        <div className='relative w-auto h-[35rem] mx-[5rem] mb-10 rounded-2xl border-1 border-[#656565] shadow-md animate-fade-in2'>
+        <div className={`${isOpen ? 'xl:mx-[2rem]' : '' } relative w-auto h-[35rem] mx-[5rem] mb-10 bg-white rounded-2xl border-1 border-[#656565] shadow-md animate-fade-in2`}>
             <div className='flex h-14 rounded-t-2xl bg-[#B22222] text-white text-[26px] font-bold py-2 pl-7 group'>
                 <select 
                     className='w-auto pr-2 bg-transparent uppercase cursor-pointer'
