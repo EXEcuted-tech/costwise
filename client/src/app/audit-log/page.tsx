@@ -1,5 +1,5 @@
 "use client"
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaFilter } from "react-icons/fa";
 import { LuArrowDownUp, LuArrowUpDown } from "react-icons/lu";
 import { FaFileExport } from "react-icons/fa6";
@@ -11,10 +11,23 @@ import Header from "@/components/header/Header";
 import AuditDrawer from "@/components/drawer/audit-drawer";
 import PrimaryPagination from "@/components/pagination/PrimaryPagination";
 
-const AuditLogPage = () => {
+export interface AuditTableProps {
+    dateTimeAdded: string;
+    employeeNo: string;
+    userType: string;
+    actionEvent: string;
+}
+
+interface AuditLogPageProps {
+    fileData: AuditTableProps[];
+}
+
+const AuditLogPage: React.FC<AuditLogPageProps> = ({fileData}) => {
 const { drawerOpen, setDrawerOpen } = useDrawerContext();
 const { isOpen, setIsOpen } = useSidebarContext();
 const toggleDrawer = () => setDrawerOpen(!drawerOpen);
+const [ data, setData ] = useState<AuditTableProps[]>(fakeAuditAllData);
+console.log(fileData);
 
 return (
     <div className={`w-full h-screen font-lato bg-background`}>
@@ -40,85 +53,32 @@ return (
             </button>
         </div>
         <div className="w-[80%] m-auto">
-            <div className="flex text-[18px] 4xl:text-[22px] p-[15px] 4xl:p-[20px] bg-primary text-white font-bold rounded-t-[20px]">
-                <p className="w-[28%]">Timestamp</p>
-                <p className="w-[28%]">
-                    Employee No.
-                    </p>
-                <p className="w-[31.5%] 4xl:w-[34%]">
-                    Action/Event
-                </p>
-                <p>
-                    Action
-                </p>
+                <div className="flex text-[18px] 4xl:text-[22px] p-[15px] 4xl:p-[20px] bg-primary text-white font-bold rounded-t-[20px]">
+                    <p className="w-[28%]">Timestamp</p>
+                    <p className="w-[28%]">Employee No.</p>
+                    <p className="w-[31.5%] 4xl:w-[34%]">Action/Event</p>
+                    <p>Action</p>
+                </div>
+                {data && data.map((data, index) => (
+                    <div key={index} className={`flex w-full text-[14px] 4xl:text-[18px] pl-[15px] 4xl:pl-[20px] py-[7px] 4xl:py-[10px] border border-black border-opacity-[50%]`}>
+                        <div className="w-[27.5%]">
+                            <p>{data.dateTimeAdded}</p>
+                        </div>
+                        <div className="w-[23.5%]">
+                            <p>{data.employeeNo}</p>
+                            <p className="text-[12px] opacity-[50%]">{data.userType}</p>
+                        </div>
+                        <div className="flex w-[34.5%] 4xl:w-[37.5%] text-[12px] 4xl:text-[16px] items-center">
+                            <p>{data.actionEvent}</p>
+                        </div>
+                        <div className="flex items-center">
+                            <p onClick={() => {}} className="cursor-pointer font-bold text-primary">
+                                Show More
+                            </p>
+                        </div>
+                    </div>
+                ))}
             </div>
-            <div className="flex w-full text-[14px] 4xl:text-[18px] pl-[15px] 4xl:pl-[20px] py-[7px] 4xl:py-[10px] border border-black border-opacity-[50%] border-t-0">
-                <div className="w-[27.5%]">
-                    <p>January 12, 2024 12:50:22</p>
-                </div>
-                <div className="w-[23.5%]">
-                    <p>#112391</p>
-                    <p className="text-[12px] opacity-[50%]">
-                        Regular User
-                    </p>
-                </div>
-                <div className="flex w-[34.5%] 4xl:w-[37.5%] text-[12px] 4xl:text-[16px] items-center break-words">
-                    <p className="break-words">Record changed: BOM_V1_Costsdafasd.csvusdfuhsuasfhusdauifhasduifasduifashui</p>
-                </div>
-                <div className="flex items-center">
-                    <p 
-                        onClick={toggleDrawer} 
-                        className="cursor-pointer font-bold text-primary"
-                    >
-                        Show More
-                    </p>
-                </div>
-            </div>
-            <div className="flex w-full text-[14px] 4xl:text-[18px] pl-[15px] 4xl:pl-[20px] py-[7px] 4xl:py-[10px] border border-black border-opacity-[50%] border-t-0">
-                <div className="w-[27.5%]">
-                    <p>January 12, 2024 12:50:22</p>
-                </div>
-                <div className="w-[23.5%]">
-                    <p>#112391</p>
-                    <p className="text-[12px] opacity-[50%]">
-                        Regular User
-                    </p>
-                </div>
-                <div className="flex w-[34.5%] 4xl:w-[37.5%] text-[12px] 4xl:text-[16px] items-center">
-                    <p>Record changed: BOM_V1_Cost.csv</p>
-                </div>
-                <div className="flex items-center">
-                    <p 
-                        onClick={toggleDrawer} 
-                        className="cursor-pointer font-bold text-primary"
-                    >
-                        Show More
-                    </p>
-                </div>
-            </div>
-            <div className="flex w-full text-[14px] 4xl:text-[18px] pl-[15px] 4xl:pl-[20px] py-[7px] 4xl:py-[10px] border border-black border-opacity-[50%] border-t-0 rounded-b-[20px]">
-                <div className="w-[27.5%]">
-                    <p>January 12, 2024 12:50:22</p>
-                </div>
-                <div className="w-[23.5%]">
-                    <p>#112391</p>
-                    <p className="text-[12px] opacity-[50%]">
-                        Regular User
-                    </p>
-                </div>
-                <div className="flex w-[34.5%] 4xl:w-[37.5%] text-[12px] 4xl:text-[16px] items-center">
-                    <p>Record changed: BOM_V1_Cost.csv</p>
-                </div>
-                <div className="flex items-center">
-                    <p 
-                        onClick={toggleDrawer} 
-                        className="cursor-pointer font-bold text-primary"
-                    >
-                        Show More
-                    </p>
-                </div>
-            </div>
-        </div>
         {/* <div className='relative py-[1%]'>
             <PrimaryPagination
                 data={fileData}
@@ -133,3 +93,35 @@ return (
 
 export default AuditLogPage
 
+const fakeAuditAllData: AuditTableProps[] = [
+    {
+        dateTimeAdded: 'January 12, 2024 12:50:22',
+        employeeNo: '#112391',
+        userType: 'Regular User',
+        actionEvent: 'Record changed: BOM_V1_Cost.csv'
+    },
+    {
+        dateTimeAdded: 'January 13, 2024 12:50:22',
+        employeeNo: '#123531',
+        userType: 'Regular User',
+        actionEvent: 'Record changed: BOM_V3_Cost.csv'
+    },
+    {
+        dateTimeAdded: 'January 14, 2024 12:50:22',
+        employeeNo: '#125131',
+        userType: 'Regular User',
+        actionEvent: 'Record changed: BOM_V5_Cost.csv'
+    },
+    {
+        dateTimeAdded: 'January 15, 2024 12:50:22',
+        employeeNo: '#199999',
+        userType: 'Regular User',
+        actionEvent: 'Record changed: BOM_V7_Cost.csv'
+    },
+    {
+        dateTimeAdded: 'January 17, 2024 12:50:22',
+        employeeNo: '#188888',
+        userType: 'Regular User',
+        actionEvent: 'Record changed: BOM_V9_Cost.csv'
+    },
+];
