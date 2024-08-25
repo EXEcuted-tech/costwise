@@ -71,7 +71,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
                 <table className="w-full h-full text-left">
                     <thead className="bg-[#F3F3F3] border-b border-[#868686]">
                         <tr className={`${isOpen ? 'h-[2.5rem] text-[1.1em] 3xl:text-[1em] 2xl:text-[1em] xl:text-[0.9em]' : 'h-[3rem] text-[1.3em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[1em]'} text-[#6B6B6B]`}>
-                            <th className={`${isOpen ? 'pl-[2rem] 4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[14rem] xl:w-[8rem] xl:pl-[1rem]' : 'pl-8 w-[20rem] 4xl:w-[20rem] 3xl:w-[15rem] 2xl:w-[14rem] xl:pl-6'} py-2`}
+                            <th className={`${isOpen ? '4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[14rem] w-[8rem] pl-[1rem] pr-[5rem]' : 'pl-8 w-[20rem] 4xl:w-[20rem] 3xl:w-[15rem] 2xl:w-[14rem] xl:pl-6'} py-2`}
                                 >Name</th>
                             <th className={`${isOpen ? 'w-[10rem] 4xl:w-[10rem] 3xl:w-[7rem] 2xl:w-[8rem] xl:w-[6rem]' : 'w-[15rem] 4xl:w-[10rem] 3xl:w-[10rem] 2xl:w-[8rem] xl:w-[7rem]' } py-2 `}
                                 >Role</th>
@@ -81,14 +81,13 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
                                 Contact Number</th>
                             <th className={`${isOpen ? '4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[9rem] xl:w-[5rem]' : ' 4xl:w-[15rem] 3xl:w-[15rem] 2xl:w-[13rem] xl:w-[5rem]' } w-[15rem] py-2`}>
                                 Department</th>
-                            <th className={`${isOpen ? 'pl-[1rem]' : 'pl-[3rem] xl:pl-[2rem]'} py-2`}
-                            >Manage</th>
+                            <th className={`${isOpen ? 'pl-[1rem]' : 'pl-[3rem] xl:pl-[2rem]'} py-2 w-[12%]`}>Manage</th>
                         </tr>
                     </thead>
                     <tbody>
                         {currentListPage.length > 0 ? (
                             currentListPage.map((data, index) => (
-                                <tr key={index} className={`${isOpen ? 'text-[1.1em] 4xl:text-[1.1em] 3xl:text-[0.9em] 2xl:text-[0.8em] xl:text-[0.7em]' : 'text-[1.2em] 4xl:text-[1.2em] 3xl:text-[1.1em] 2xl:text-[1em] xl:text-[0.9em]' } border-b border-[#868686] hover:bg-gray-50`}>
+                                <tr key={index} className={`${isOpen ? 'text-[0.8em] 2xl:text-[0.8em] 3xl:text-[0.9em] 4xl:text-[1.1em]' : 'text-[1.2em] 4xl:text-[1.2em] 3xl:text-[1.1em] 2xl:text-[1em] xl:text-[0.9em]' } border-b border-[#868686] hover:bg-gray-50`}>
                                     <td className={`${isOpen ? 'pl-[2rem] xl:pl-[1rem]' : 'pl-8 xl:pl-6'} py-2 break-words`}>{data.userName}</td>
                                     <td className="py-2 break-words">{data.userRole}</td>
                                     <td className="py-2 break-words">{data.userEmail}</td>
@@ -98,12 +97,12 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
                                         <div className="flex">
                                             <button
                                                 onClick={openEditModal}
-                                                className={`${isOpen ? '4xl:w-[3rem] 4xl:px-3 3xl:w-[2rem] 3xl:px-2 2xl:w-[2rem] 2xl:px-[10px] xl:w-[2rem] xl:px-[10px]' : ' 4xl:w-[3rem] 4xl:px-3 3xl:w-[3rem] 3xl:px-4 xl:w-[2rem] xl:px-2' } w-[3rem] h-[2rem] px-3  text-[1.2em]  bg-[#FF7A00] text-white mr-2 rounded-lg hover:bg-[#de7e24] transition-colors duration-1000 ease-in`}>
+                                                className={`${isOpen ? '4xl:w-[3rem] 4xl:px-3 3xl:w-[2rem] 3xl:px-2 2xl:w-[2rem] 2xl:px-[10px] xl:w-[2rem] xl:px-[10px]' : ' 4xl:w-[3rem] 4xl:px-3 3xl:w-[3rem] 3xl:px-4 xl:w-[2rem] xl:px-2' } flex justify-center items-center px-3 py-2 text-[1.2em]  bg-[#FF7A00] text-white mr-2 rounded-lg hover:bg-[#de7e24] transition-colors duration-1000 ease-in`}>
                                                 <MdModeEdit />
                                             </button>
                                             <button
                                                 onClick={openDeleteModal}
-                                                className={`${isOpen ? '4xl:w-[3rem] 4xl:px-[18px] 3xl:w-[2rem] 3xl:px-[10px] 2xl:w-[2rem] 2xl:px-[10px] xl:w-[2rem] xl:px-[10px]' : ' 4xl:w-[3rem] 4xl:px-[18px] 3xl:w-[3rem] 3xl:px-[18px] xl:w-[2rem] xl:px-[10px]' } w-[3rem] h-[2rem] px-[17px]  text-[0.9em]  bg-[#B22222] text-white rounded-lg hover:bg-[#971c1c] transition-colors duration-1000 ease-in`}>
+                                                className={`${isOpen ? '4xl:w-[3rem] 4xl:px-[18px] 3xl:w-[2rem] 3xl:px-[10px] 2xl:w-[2rem] 2xl:px-[10px] xl:w-[2rem] xl:px-[10px]' : ' 4xl:w-[3rem] 4xl:px-[18px] 3xl:w-[3rem] 3xl:px-[18px] xl:w-[2rem] xl:px-[10px]' } flex justify-center items-center px-[17px] text-[0.9em] bg-[#B22222] text-white rounded-lg hover:bg-[#971c1c] transition-colors duration-1000 ease-in`}>
                                                 <FaTrashAlt />
                                             </button>
                                         </div>
