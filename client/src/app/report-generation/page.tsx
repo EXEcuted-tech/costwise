@@ -30,10 +30,9 @@ const ReportGeneration = () => {
                 <Header icon={BiSolidReport} title="Cost Calculation" />
             </div>
 
-            <div className='flex '>
+            <div className='flex ml-[80px] mr-[35px]'>
                 {/* Date Range */}
-                <div className='w-[87rem] p-8 ml-[3.5rem]'>
-                    <div className='w-[9rem] text-[24px] mb-4'>Date Range</div>
+                <div className='w-[87rem] pt-14 pb-8'>
                     <div className='flex mb-4'>
                         <div className='text-[19px] mr-5 pt-2'>From</div>
                         <div className=''>
@@ -64,7 +63,7 @@ const ReportGeneration = () => {
                     </div>
                 </div>
 
-                <div className="flex-col mt-[85px] mr-[5rem]">
+                <div className="flex flex-col pt-14 pb-8">
                     {/* FG Selector */}
                     <div className='flex mb-4'>
                         <div 
@@ -84,10 +83,10 @@ const ReportGeneration = () => {
                     </div>
 
                     {/* Export Button */}
-                    <div className='flex gap-4'>
-                        <div className='flex'>
+                    <div className={`${selectedFG === 'Specific-FG' && 'gap-2'} flex`}>
+                        <div className={`${selectedFG !== 'Specific-FG' && 'w-full'} flex`}>
                             <select 
-                                className='w-[90px] h-[45px] text-[21px] pl-[10px] text-[#000000] bg-white border-1 border-[#929090] rounded-l-md drop-shadow-md cursor-pointer'
+                                className={`${selectedFG === 'Specific-FG' ? 'w-[95px]' : 'w-full'} h-[45px] text-[21px] pl-[10px] text-[#000000] bg-white border-1 border-[#929090] rounded-l-md drop-shadow-md cursor-pointer`}
                                 name="fromDate"
                                 defaultValue=""
                             >
@@ -103,7 +102,7 @@ const ReportGeneration = () => {
                         {selectedFG === 'Specific-FG' && (
                             <div 
                                 onClick={handleAddSheet} 
-                                className='flex items-center w-[131px] h-[45px] text-white bg-[#B22222] px-[5px] rounded-md cursor-pointer'>
+                                className='flex items-center w-full h-[45px] text-white bg-[#B22222] px-[5px] rounded-md cursor-pointer'>
                                 <IoMdAdd className='text-[24px] mr-1' /> <p className='text-[21px] font-bold'>FG Sheet</p>
                             </div>
                         )}
