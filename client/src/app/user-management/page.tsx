@@ -39,7 +39,7 @@ const UserManagement = () => {
     };
 
     return (
-        <div className="w-full">
+        <div className="w-full animate-fade-in">
             <div>
                 <Header icon={RiShieldUserFill} title="User Management"></Header>
             </div>
@@ -103,9 +103,74 @@ const fakeAccountsData: ManageAccountsProps[] = [
         department: 'Production'
     },
 
+    {
+        userName: 'Franz Ondiano',
+        userRole: 'Employee',
+        userEmail: 'franzondiano@gmail.com',
+        contactNumber: '+63 12321232',
+        department: 'Marketing'
+    },
+
+    {
+        userName: 'Tyrone Ybanez',
+        userRole: 'Employee',
+        userEmail: 'tyroneybanez@gmail.com',
+        contactNumber: '+63 12321232',
+        department: 'Research and Development'
+    },
+
+    {
+        userName: 'Kathea Mari C. Mayol',
+        userRole: 'Administrator',
+        userEmail: 'katheamayol@gmail.com',
+        contactNumber: '+63 12321232',
+        department: 'Accounting'
+    },
+
+    {
+        userName: 'Hannah Angelica Galve',
+        userRole: 'Admin',
+        userEmail: 'hannahgalve@gmail.com',
+        contactNumber: '+63 12321232',
+        department: 'Production'
+    },
+
+
 ]
 
 const fakePasswordReqsData: PasswordRequestProps[] = [
+    {
+        userName: 'Franz Ondiano',
+        userRole: 'Employee',
+        department: 'Accounting',
+        status: 'Pending',
+        requestDate: '01/01/2024'
+    },
+
+    {
+        userName: 'Tyrone Ybanez',
+        userRole: 'Employee',
+        department: 'Research and Development',
+        status: 'Expired',
+        requestDate: '12/12/2024'
+    },
+
+    {
+        userName: 'Kathea Mari C. Mayol',
+        userRole: 'Administrator',
+        department: 'Marketing',
+        status: 'Expired',
+        requestDate: '01/01/2024'
+    },
+
+    {
+        userName: 'Hannah Angelica Galve',
+        userRole: 'Admin',
+        department: 'Accounting',
+        status: 'Pending',
+        requestDate: '01/01/2024'
+    },
+
     {
         userName: 'Franz Ondiano',
         userRole: 'Employee',
