@@ -16,8 +16,7 @@ const UserManualPage = () => {
       <div>
         <Header icon={PiBookOpenText} title="User's Management"></Header>
       </div>
-      <div className='w-full h-[90vh] flex flex-col items-end justify-center ml-[45px] pr-[45px]
-            '>
+      <div className='w-full h-[90vh] flex flex-col items-end justify-center ml-[45px] pr-[45px]'>
         {/* Top Div */}
         <div className='flex flex-col h-[55%] w-full items-center justify-center'>
           <div className='flex h-[40%] w-full items-end justify-center'>
