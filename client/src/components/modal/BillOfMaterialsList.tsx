@@ -3,16 +3,19 @@ import { IoClose } from 'react-icons/io5'
 import { MdCompare } from 'react-icons/md'
 import { TbPointFilled } from "react-icons/tb";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { FiArchive } from "react-icons/fi";
 import useOutsideClick from '@/hooks/useOutsideClick';
+import BOMListContainer from '../pages/formulation/BOMListContainer';
+import { useFormulationContext } from '@/context/FormulationContext';
 
 const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateAction<boolean>> }> = ({ setBOM }) => {
     const [inputValue, setInputValue] = useState('');
     const [miniMenu, setMiniMenu] = useState<number | null>(null);
     const [menuPosition, setMenuPosition] = useState<number>(0);
+    const { viewBOM, setViewBOM } = useFormulationContext();
     const ref = useOutsideClick(() => setMiniMenu(null));
     const scrollRef = useRef<HTMLDivElement>(null);
-
-    const options = [
+    const [bomData, setBomData] = useState<{ bomName: string; formulation: string }[]>([
         { bomName: 'BOM LIST 1', formulation: 'HOTDOG1K' },
         { bomName: 'BOM LIST 2', formulation: 'HOTDOG1K' },
         { bomName: 'BOM LIST 3', formulation: 'HOTDOG1K' },
@@ -21,18 +24,20 @@ const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateActio
         { bomName: 'BOM LIST 6', formulation: 'BEEF LOAF 100g' },
         { bomName: 'BOM LIST 7', formulation: 'BEEF LOAF 100g' },
         { bomName: 'BOM LIST 8', formulation: 'BEEF LOAF 100g' },
-    ];
+    ]);
 
-    const filteredOptions = options.filter(
+    const handleDelete = (index: number) => {
+        setBomData((prevData) => prevData.filter((_, i) => i !== index));
+        setMiniMenu(null);
+    };
+
+    const filteredOptions = bomData.filter(
         (option) =>
             option.formulation.toLowerCase().includes(inputValue.toLowerCase()) ||
             option.bomName.toLowerCase().includes(inputValue.toLowerCase())
     );
 
     const handleMenuClick = (index: number, event: React.MouseEvent) => {
-        // const rect = (event.target as HTMLElement).getBoundingClientRect();
-        // setMenuPosition({ top: rect.bottom - 290, left: rect.right - 85 });
-
         const rect = (event.target as HTMLElement).getBoundingClientRect();
         const top = (rect.bottom + window.scrollY) - 290;
         setMenuPosition(top);
@@ -55,9 +60,10 @@ const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateActio
             }
         };
     }, []);
-    
+
     return (
         <div className={`flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]`}>
+            {viewBOM && <BOMListContainer />}
             <div className='px-[35px] mx-[50px] 2xl:mx-0 animate-pop-out bg-white w-[860px] mt-[-50px] rounded-[10px]'>
                 <div className='flex justify-between pt-[10px]'>
                     <div className='flex items-center'>
@@ -79,25 +85,32 @@ const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateActio
                         />
                     </div>
                     <div id="scroll-style" ref={scrollRef} className='h-[210px] my-[10px] overflow-y-auto'>
-                    {filteredOptions.map((options, index) =>
-                        <div className='w-full flex items-center py-[5px]'>
-                            <div className='flex items-center w-[95%]'>
-                                <TbPointFilled className='text-[20px]'/>
-                                <p className='text-[20px]'>{options.bomName} <span className='italic text-[#737373]'>({options.formulation})</span></p>
+                        {filteredOptions.map((options, index) =>
+                            <div className='w-full flex items-center py-[5px]'>
+                                <div className='flex items-center w-[95%]'>
+                                    <TbPointFilled className='text-[20px]' />
+                                    <p className='text-[20px]'>{options.bomName} <span className='italic text-[#737373]'>({options.formulation})</span></p>
+                                </div>
+                                <div className='w-[5%] flex justify-end relative'>
+                                    <BsThreeDotsVertical className='text-[18px] text-[#818181] cursor-pointer hover:brightness-50'
+                                        onClick={(e) => handleMenuClick(index, e)} />
+                                    {miniMenu === index && (
+                                        <div ref={ref} className='fixed bg-white shadow-lg rounded-md border z-[5000] right-[55px]'
+                                            style={{ top: menuPosition }}>
+                                            <p className='px-4 py-2 cursor-pointer border-b border-bg-gray-200 hover:bg-gray-200'
+                                                onClick={() => {
+                                                    setBOM(false);
+                                                    setViewBOM(true);
+                                                }}>View</p>
+                                            <p className='px-4 py-2 cursor-pointer hover:bg-primary hover:bg-primary hover:text-white hover:rounded-b-md'
+                                                onClick={() => {
+                                                    handleDelete(index);
+                                                }}>Delete</p>
+                                        </div>
+                                    )}
+                                </div>
                             </div>
-                            <div ref={ref} className='w-[5%] flex justify-end relative'>
-                                <BsThreeDotsVertical className='text-[18px] text-[#818181] cursor-pointer hover:brightness-50'
-                                onClick={(e) => handleMenuClick(index, e)}/>
-                                {miniMenu === index && (
-                                    <div className='fixed bg-white shadow-lg rounded-md border z-[5000] right-[55px]'
-                                    style={{ top: menuPosition}}>
-                                        <p className='px-4 py-2 cursor-pointer hover:bg-gray-200'>View</p>
-                                        <p className='px-4 py-2 cursor-pointer hover:bg-primary hover:bg-primary hover:text-white hover:rounded-b-md'>Delete</p>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    )}
+                        )}
                     </div>
                 </div>
             </div>

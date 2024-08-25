@@ -7,6 +7,8 @@ import { TiExport } from "react-icons/ti";
 import { useRouter } from 'next/navigation';
 import FormulationTable from './FormulationTable';
 import { useFormulationContext } from '@/context/FormulationContext';
+import CompareFormulaContainer from './CompareFormulaContainer';
+import BOMListContainer from './BOMListContainer';
 
 export interface FormulationContainerProps {
     number: string;
@@ -32,7 +34,8 @@ export interface FormulationProps {
 
 const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const { edit, setEdit } = useFormulationContext();
+    const { edit, setEdit, viewFormulas, viewBOM } = useFormulationContext();
+
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
     };
@@ -68,69 +71,71 @@ const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => 
     return (
         <>
             {(view || edit) ? <FormulationTable view={view} setView={setView} /> :
-                <div className='w-full font-lato bg-white mt-[20px] px-[20px] rounded-lg drop-shadow-lg'>
-                    <table className='w-full '>
-                        <thead className='border-b border-b-[#c4c4c4]'>
-                            <tr className='text-[#777777] font-bold text-[18px]'>
-                                <th className='py-[10px]'>NO.</th>
-                                <th>ITEM CODE</th>
-                                <th>DESCRIPTION</th>
-                                <th>BATCH QTY</th>
-                                <th>UNIT</th>
-                                <th>COST</th>
-                                <th>MANAGE</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {currentListPage.length > 0
-                                ? (currentListPage.map((data, index) => (
-                                    <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'} text-center`}>
-                                        <td className='py-[15px]'>{data.number}</td>
-                                        <td>{data.itemCode}</td>
-                                        <td>{data.description}</td>
-                                        <td>{data.batchQty}</td>
-                                        <td>{data.unit}</td>
-                                        <td>{data.cost}</td>
-                                        <td>
-                                            <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
-                                                <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
-                                                cursor-pointer hover:bg-[#f7f7f7] hover:rounded-l-[5px]'
-                                                    onClick={() => handleView(data)}>
-                                                    <FaEye />
-                                                </div>
-                                                <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
-                                        cursor-pointer hover:bg-[#f7f7f7]'
-                                                    onClick={() => handleEdit(data)}>
-                                                    <FaPencilAlt />
-                                                </div>
-                                                <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
-                                        cursor-pointer hover:bg-[#f7f7f7]'
-                                                    onClick={() => handleExport(data)}>
-                                                    <TiExport />
-                                                </div>
-                                                <div className='flex justify-center items-center h-full
-                                        cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px]'
-                                                    onClick={() => handleDelete(data)}>
-                                                    <IoTrash />
-                                                </div>
-                                            </div>
-                                        </td>
+                viewFormulas ? <CompareFormulaContainer /> :
+                    viewBOM ? <BOMListContainer /> :
+                        <div className='w-full font-lato bg-white mt-[20px] px-[20px] rounded-lg drop-shadow-lg'>
+                            <table className='w-full '>
+                                <thead className='border-b border-b-[#c4c4c4]'>
+                                    <tr className='text-[#777777] font-bold text-[18px]'>
+                                        <th className='py-[10px]'>NO.</th>
+                                        <th>ITEM CODE</th>
+                                        <th>DESCRIPTION</th>
+                                        <th>BATCH QTY</th>
+                                        <th>UNIT</th>
+                                        <th>COST</th>
+                                        <th>MANAGE</th>
                                     </tr>
-                                )))
-                                : (
-                                    <p>No File.</p>
-                                )}
-                        </tbody>
-                    </table>
-                    <div className='relative py-[1%]'>
-                        <PrimaryPagination
-                            data={fakeFormulaData}
-                            itemsPerPage={8}
-                            handlePageChange={handlePageChange}
-                            currentPage={currentPage}
-                        />
-                    </div>
-                </div>
+                                </thead>
+                                <tbody>
+                                    {currentListPage.length > 0
+                                        ? (currentListPage.map((data, index) => (
+                                            <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'} text-center`}>
+                                                <td className='py-[15px]'>{data.number}</td>
+                                                <td>{data.itemCode}</td>
+                                                <td>{data.description}</td>
+                                                <td>{data.batchQty}</td>
+                                                <td>{data.unit}</td>
+                                                <td>{data.cost}</td>
+                                                <td>
+                                                    <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
+                                                        <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
+                                                cursor-pointer hover:bg-[#f7f7f7] hover:rounded-l-[5px]'
+                                                            onClick={() => handleView(data)}>
+                                                            <FaEye />
+                                                        </div>
+                                                        <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
+                                        cursor-pointer hover:bg-[#f7f7f7]'
+                                                            onClick={() => handleEdit(data)}>
+                                                            <FaPencilAlt />
+                                                        </div>
+                                                        <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
+                                        cursor-pointer hover:bg-[#f7f7f7]'
+                                                            onClick={() => handleExport(data)}>
+                                                            <TiExport />
+                                                        </div>
+                                                        <div className='flex justify-center items-center h-full
+                                        cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px]'
+                                                            onClick={() => handleDelete(data)}>
+                                                            <IoTrash />
+                                                        </div>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        )))
+                                        : (
+                                            <p>No File.</p>
+                                        )}
+                                </tbody>
+                            </table>
+                            <div className='relative py-[1%]'>
+                                <PrimaryPagination
+                                    data={fakeFormulaData}
+                                    itemsPerPage={8}
+                                    handlePageChange={handlePageChange}
+                                    currentPage={currentPage}
+                                />
+                            </div>
+                        </div>
             }
         </>
     )

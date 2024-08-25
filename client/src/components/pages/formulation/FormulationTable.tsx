@@ -98,7 +98,7 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
     };
 
     return (
-        <div className='bg-white rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[25px]'>
+        <div className='bg-white rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[25px] mb-[20px]'>
             {/* header */}
             <div className='flex items-center py-[10px]'>
                 <IoIosArrowRoundBack className='text-primary text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] cursor-pointer'

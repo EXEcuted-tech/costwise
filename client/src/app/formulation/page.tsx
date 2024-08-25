@@ -15,15 +15,18 @@ import { useFormulationContext } from '@/context/FormulationContext';
 import { useRouter } from 'next/navigation';
 import ChooseFileDialog from '@/components/modal/ChooseFileDialog';
 import BillOfMaterialsList from '@/components/modal/BillOfMaterialsList';
+import CompareFormulaContainer from '@/components/pages/formulation/CompareFormulaContainer';
 
 const FormulationPage = () => {
     const { isOpen } = useSidebarContext();
-    const { edit, setEdit } = useFormulationContext();
+    const { edit, setEdit, viewFormulas, viewBOM } = useFormulationContext();
+
     const [addFormula, setAddFormula] = useState(false);
     const [compareFormula, setCompareFormula] = useState(false);
     const [bomList, setBomList] = useState(false);
     const [view, setView] = useState(false);
     const [dialog, setDialog] = useState(false);
+
     const ref = useOutsideClick(() => setAddFormula(false));
     const router = useRouter();
 
@@ -34,7 +37,7 @@ const FormulationPage = () => {
             {dialog && <ChooseFileDialog dialogType={1} setDialog={setDialog} />}
             {bomList && <BillOfMaterialsList setBOM={setBomList} />}
             <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
-                {(!view && !edit) &&
+                {(!view && !edit && !viewFormulas && !viewBOM) &&
                     <div className='flex'>
                         {/* Search Component */}
                         <div className={`${isOpen ? 'w-[45%] 4xl:w-[50%]' : 'w-[45%] 2xl:w-[50%] 3xl:w-[60%]'} relative mr-[1%]`}>
