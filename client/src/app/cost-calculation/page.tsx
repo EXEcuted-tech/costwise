@@ -8,7 +8,17 @@ import { IoMdAdd } from "react-icons/io";
 import SpecificFG from '@/components/pages/cost-calculation/SpecificFG';
 import AllFG from '@/components/pages/cost-calculation/AllFG';
 
-const ReportGeneration = () => {
+export interface ReportGenerationProps {
+    no: Number;
+    itemCode: String;
+    description: String;
+    weight: Number;
+    unit: String;
+    stdQty: Number;
+    actQty: Number;
+};
+
+const ReportGeneration:React.FC<ReportGenerationProps> =({}) => {
     const [selectedFG, setSelectedFG] = useState('Specific-FG');
     const [specificFGSheets, setSpecificFGSheets] = useState([{ id: 0 }]);
 
@@ -123,3 +133,54 @@ const ReportGeneration = () => {
 }
 
 export default ReportGeneration;
+
+const FGSheetFakeData = [
+    {
+        no: '1',
+        itemCode: '4800088288330',
+        description: 'BIG SHOT Hotdog Classic Super Jumbo 1k',
+        weight: '3,164.00',
+        unit: 'pack',
+        stdQty: '79,663.000',
+        actQty: '2,741.000'
+    },
+
+    {
+        no: '1',
+        itemCode: '4800088288330',
+        description: 'BIG SHOT Hotdog Classic King Size 1k',
+        weight: '3,164.00',
+        unit: 'pack',
+        stdQty: '79,663.000',
+        actQty: '2,741.000'
+    },
+
+    {
+        no: '',
+        itemCode: 'SA-MP-GR-CH-BA-0001',
+        description: 'SA 132',
+        weight: '0.00',
+        unit: 'kg',
+        stdQty: '26,709.000',
+        actQty: '104,449.500'
+    },
+
+    {
+        no: '',
+        itemCode: 'SA-MP-GR-CH-SK-0001',
+        description: 'SA 142',
+        weight: '0.00',
+        unit: 'kg',
+        stdQty: '6,100.000',
+        actQty: '24,705.000 '
+    },
+    {
+        no: '',
+        itemCode: 'SA-MP-GR-MD-ME-0001A',
+        description: 'SA 144',
+        weight: '0.00',
+        unit: 'kg',
+        stdQty: '6,100.000',
+        actQty: '44,752.500'
+    },
+]
