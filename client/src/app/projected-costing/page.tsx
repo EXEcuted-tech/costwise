@@ -3,6 +3,9 @@ import Header from "@/components/header/Header";
 import { useState } from "react";
 import { MdOutlineAnalytics } from "react-icons/md";
 import { IoCalendarSharp } from "react-icons/io5";
+import { IoIosInformationCircle } from "react-icons/io";
+import { Chart as ChartJS } from "chart.js/auto";
+import LineChart from "@/components/charts/LineChart";
 
 const ProjectedCostPage = () => {
   const [isActiveStart, setIsActiveStart] = useState(false);
@@ -40,6 +43,58 @@ const ProjectedCostPage = () => {
     },
   ]);
 
+  const [priceData, setPriceData] = useState([
+    {
+      id: 1,
+      price: 15.0,
+      year: 2023,
+      month: "January",
+    },
+    {
+      id: 2,
+      price: 25.0,
+      year: 2023,
+      month: "Febuary",
+    },
+    {
+      id: 3,
+      price: 20.0,
+      year: 2023,
+      month: "March",
+    },
+    {
+      id: 4,
+      price: 14.0,
+      year: 2023,
+      month: "April",
+    },
+    {
+      id: 5,
+      price: 12.0,
+      year: 2023,
+      month: "May",
+    },
+    {
+      id: 6,
+      price: 11.0,
+      year: 2023,
+      month: "June",
+    },
+  ]);
+  const [data] = useState({
+    labels: priceData.map((date) => date.month), // Use month instead of year for labels
+    datasets: [
+      {
+        label: "Price",
+        data: priceData.map((prices) => prices.price),
+        backgroundColor: "rgba(75,192,192,0.2)",
+        borderColor: "rgba(75,192,192,1)",
+        borderWidth: 1,
+        fill: false,
+      },
+    ],
+  });
+
   return (
     <div
       className="overflow-hidden bg-cover bg-center items-center justify-center bg-[#FFFAF8] bg-opacity-20"
@@ -48,12 +103,9 @@ const ProjectedCostPage = () => {
       <div>
         <Header icon={MdOutlineAnalytics} title={"Projected Costing"} />
       </div>
-      <div
-        className="w-full ml-[45px] pr-[45px] h-[90vh] flex flex-col items-start justify-start pt-[15px] py-[15px]
-            "
-      >
+      <div className="w-full ml-[60px] pr-[45px] h-[90vh] flex flex-col items-start justify-start pt-[15px] py-[15px]">
         <p className="text-[30px] text-tertiary">Equipment Costs</p>
-        <div className="flex flex-row h-[5%] w-[100%] items-start justify-start flex-wrap">
+        <div className="flex flex-row h-[10%] w-[100%] items-start justify-start flex-wrap">
           {/* Dropdown List Start*/}
           <div className="min-w-[200px] relative mt-[15px] text-[16px]">
             <div
@@ -74,7 +126,7 @@ const ProjectedCostPage = () => {
             </div>
             <ul
               className={`list-none px-[1px] absolute border border-gray-300 rounded-lg top-[2.7em] left-50% w-full translate-[-50%] transition z-1 overflow-hidden bg-white shadow-md ${
-                !isActiveStart ? "opacity-100" : "opacity-0"
+                !isActiveStart ? "block opacity-100" : "opacity-0"
               } ${monthList.length < 6 ? " " : "overflow-y-scroll h-[175px]"}`}
             >
               {monthList.map((date) => (
@@ -132,6 +184,21 @@ const ProjectedCostPage = () => {
               ))}
             </ul>
           </div>
+        </div>
+        <div className="flex flex-row w-[97%] h-[100%] gap-[2%]">
+          {/* Left Div */}
+          <div className="flex flex-col w-[65%] h-full rounded-lg shadow-xl">
+            <div className="flex text-[30px] text-[#585858] font-bold h-[10%] bg-white items-center justify-start  border-b-2 pl-10">
+              <p className="w-[95%]">GRAPHS</p>
+              <IoIosInformationCircle className="text-[35px] text-[#625F5F]" />
+            </div>
+            <div>
+              <LineChart chartData={data} />
+            </div>
+            <div className="h-[45%] bg-green-300">{/* <Camera /> */}</div>
+          </div>
+          {/* Right Div */}
+          <div className="w-[45%] h-full bg-yellow-300"></div>
         </div>
       </div>
     </div>
