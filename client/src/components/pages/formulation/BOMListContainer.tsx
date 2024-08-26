@@ -97,7 +97,7 @@ const BOMListContainer = () => {
           The following formulas are being compared:
         </p>
       </div>
-      <div className='flex items-center w-full'>
+      <div className='flex flex-wrap items-center w-full'>
         {data.map((info, index) =>
           <p className='italic font-semibold text-[18px]'>{info.description} ({info.number}){index != data.length - 1 && ',\u00A0'}</p>
         )}

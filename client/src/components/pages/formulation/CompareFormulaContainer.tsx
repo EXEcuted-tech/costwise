@@ -5,6 +5,7 @@ import { IoIosArrowRoundBack } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
 import { formatHeader } from '@/utils/costwiseUtils';
 import { useFormulationContext } from '@/context/FormulationContext';
+import { useSidebarContext } from '@/context/SidebarContext';
 
 export interface CompareFormulaProps {
     number: string;
@@ -28,6 +29,7 @@ export interface CompareFormulaProps {
 
 const CompareFormulaContainer = () => {
     const router = useRouter();
+    const { isOpen } = useSidebarContext();
     const { setViewFormulas } = useFormulationContext();
     const [data, setData] = useState<CompareFormulaProps[]>([
         {
@@ -112,14 +114,14 @@ const CompareFormulaContainer = () => {
                     The following formulas are being compared:
                 </p>
             </div>
-            <div className='flex items-center'>
-                <div className='flex w-[80%] 4xl:w-[85%]'>
+            <div className='flex flex-col 3xl:flex-row 3xl:items-center'>
+                <div className='flex flex-wrap 3xl:w-[80%] 4xl:w-[85%]'>
                     {data.map((info, index) =>
                         <p className='italic font-semibold text-[18px]'>{info.description} ({info.number}){index != data.length - 1 && ',\u00A0'}</p>
                     )}
                 </div>
-                <div className='flex justify-end w-[20%] 4xl:w-[15%]'>
-                    <button className='hover:brightness-95 text-white text-[19px] font-semibold bg-primary px-[15px] py-[5px] rounded-[5px]'>Save to BOM List</button>
+                <div className='flex mt-[20px] 3xl:mt-0 justify-start 3xl:justify-end w-full 3xl:w-[20%] 4xl:w-[15%]'>
+                    <button className={`${isOpen ? 'text-[17px]' : 'text-[19px]' } hover:brightness-95 text-white font-semibold bg-primary px-[15px] py-[5px] rounded-[5px]`}>Save to BOM List</button>
                 </div>
             </div>
             <div className='rounded-[5px] border border-[#656565] overflow-x-auto mt-[10px]'>
