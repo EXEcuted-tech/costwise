@@ -5,6 +5,8 @@ const FormulationContext = createContext<FormulationContextProps | undefined>(un
 interface FormulationContextProps {
   setEdit: React.Dispatch<React.SetStateAction<boolean>>;
   edit: boolean;
+  setAdd: React.Dispatch<React.SetStateAction<boolean>>;
+  add: boolean;
   setViewFormulas: React.Dispatch<React.SetStateAction<boolean>>;
   viewFormulas: boolean;
   setViewBOM: React.Dispatch<React.SetStateAction<boolean>>;
@@ -21,11 +23,12 @@ export const useFormulationContext = () => {
 
 export const FormulationProvider = ({ children }: { children: ReactNode }) => {
   const [edit, setEdit] = useState(false);
+  const [add, setAdd] = useState(false);
   const [viewFormulas, setViewFormulas] = useState(false);
   const [viewBOM, setViewBOM] = useState(false);
 
   return (
-    <FormulationContext.Provider value={{ edit, setEdit, viewFormulas, setViewFormulas, setViewBOM, viewBOM }}>
+    <FormulationContext.Provider value={{ edit, setEdit, add, setAdd, viewFormulas, setViewFormulas, setViewBOM, viewBOM }}>
       {children}
     </FormulationContext.Provider>
   );

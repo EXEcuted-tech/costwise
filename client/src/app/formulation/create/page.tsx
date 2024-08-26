@@ -27,7 +27,7 @@ const AddFormulationPage = () => {
         }
     );
     const { isOpen } = useSidebarContext();
-    const { setEdit } = useFormulationContext();
+    const { setAdd } = useFormulationContext();
     const router = useRouter();
 
     useEffect(() => {
@@ -35,7 +35,7 @@ const AddFormulationPage = () => {
     }, []);
 
     const handleBack = () => {
-        setEdit(false);
+        setAdd(false);
         router.back();
     }
 
@@ -119,7 +119,7 @@ const AddFormulationPage = () => {
                             <div className='flex justify-end my-[10px]'>
                                 <button className={`text-[18px] hover:bg-[#00780c] h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F]`}
                                     onClick={() => {
-                                        setEdit(false);
+                                        setAdd(false);
                                     }}>
                                     <IoIosSave className='mr-[5px]' />
                                     Save

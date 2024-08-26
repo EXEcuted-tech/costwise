@@ -19,7 +19,7 @@ import CompareFormulaContainer from '@/components/pages/formulation/CompareFormu
 
 const FormulationPage = () => {
     const { isOpen } = useSidebarContext();
-    const { edit, setEdit, viewFormulas, viewBOM } = useFormulationContext();
+    const { edit, setEdit, add, setAdd, viewFormulas, viewBOM } = useFormulationContext();
 
     const [addFormula, setAddFormula] = useState(false);
     const [compareFormula, setCompareFormula] = useState(false);
@@ -69,18 +69,18 @@ const FormulationPage = () => {
                                     <span className=''><AiOutlineDown /></span>
                                 </button>
                                 {addFormula &&
-                                    <div className='absolute animate-pull-down bg-[#FFD3D3] z-50 w-[145px] 2xl:w-[165px] ml-[5px]'>
+                                    <div className={`${isOpen ? 'w-[125px] 2xl:w-[145px] 3xl:w-[165px]' : 'w-[145px] 2xl:w-[165px]'} ml-[5px] absolute animate-pull-down bg-[#FFD3D3] z-50`}>
                                         <ul className='text-primary text-[14px] 2xl:text-[17px]'>
-                                            <li className='pl-[15px] flex items-center justify-left py-[5px] cursor-pointer hover:text-[#851313]'
+                                            <li className={`${isOpen ? 'pl-[6px] 3xl:pl-[15px]' : 'pl-[15px]'} flex items-center justify-left py-[5px] cursor-pointer hover:text-[#851313]`}
                                                 onClick={() => {
-                                                    setEdit(true);
+                                                    setAdd(true);
                                                     router.push('/formulation/create');
                                                 }}>
                                                 <IoMdAdd className='text-[20px] mr-[5px]' />
                                                 <p>Add Manually</p>
                                             </li>
                                             <hr className='h-[2px] bg-primary opacity-50' />
-                                            <li className='pl-[15px] flex items-center justify-left py-[5px] cursor-pointer hover:text-[#851313]'
+                                            <li className={`${isOpen ? 'pl-[6px] 3xl:pl-[15px]' : 'pl-[15px]'} flex items-center justify-left py-[5px] cursor-pointer hover:text-[#851313]`}
                                                 onClick={() => setDialog(true)}>
                                                 <BiSolidFile className='text-[20px] mr-[5px]' />
                                                 <p>Choose File</p>
