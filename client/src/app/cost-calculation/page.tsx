@@ -7,18 +7,23 @@ import { MdDownloadForOffline } from "react-icons/md";
 import { IoMdAdd } from "react-icons/io";
 import SpecificFG from '@/components/pages/cost-calculation/SpecificFG';
 import AllFG from '@/components/pages/cost-calculation/AllFG';
+import { useSidebarContext } from '@/context/SidebarContext';
 
-export interface ReportGenerationProps {
-    no: Number;
+export interface ReportProps {
+    no: String;
     itemCode: String;
     description: String;
-    weight: Number;
+    weight: String;
     unit: String;
-    stdQty: Number;
-    actQty: Number;
+    stdQty: String;
+    actQty: String;
+    itemType: number; // 1-(Main) 2-(Meat Materials) 3-(Food Additive) 4-(Packaging Materials)
 };
 
-const ReportGeneration:React.FC<ReportGenerationProps> =({}) => {
+
+const CostCalculation =() => {
+    const { isOpen } = useSidebarContext();
+
     const [selectedFG, setSelectedFG] = useState('Specific-FG');
     const [specificFGSheets, setSpecificFGSheets] = useState([{ id: 0 }]);
 
@@ -123,16 +128,18 @@ const ReportGeneration:React.FC<ReportGenerationProps> =({}) => {
             <div>
                 {selectedFG === 'Specific-FG' && 
                     specificFGSheets.map(sheet => (
-                        <SpecificFG key={sheet.id} id={sheet.id} removeSheet={handleRemoveSheet} />
+                        <SpecificFG key={sheet.id} id={sheet.id} removeSheet={handleRemoveSheet} isOpen={isOpen} sheetData={FGSheetFakeData} finishedGoods={FinishedGoodsList} />
                     ))
                 }
-                {selectedFG === 'All-FG' && <AllFG />}
+                {selectedFG === 'All-FG' && <AllFG title={FakeProdReportTitle} sheetData={FGSheetFakeData} />}
             </div>
         </div>
     )
 }
 
-export default ReportGeneration;
+export default CostCalculation;
+
+const FinishedGoodsList = ["BIG SHOT Hotdog Classic Super Jumbo 1k", "BIG SHOT Hotdog with Cheese Super Jumbo 1k", "BIG SHOT Hotdog Sweet Style "];
 
 const FGSheetFakeData = [
     {
@@ -142,9 +149,9 @@ const FGSheetFakeData = [
         weight: '3,164.00',
         unit: 'pack',
         stdQty: '79,663.000',
-        actQty: '2,741.000'
+        actQty: '2,741.000',
+        itemType: 1
     },
-
     {
         no: '1',
         itemCode: '4800088288330',
@@ -152,9 +159,9 @@ const FGSheetFakeData = [
         weight: '3,164.00',
         unit: 'pack',
         stdQty: '79,663.000',
-        actQty: '2,741.000'
+        actQty: '2,741.000',
+        itemType: 1
     },
-
     {
         no: '',
         itemCode: 'SA-MP-GR-CH-BA-0001',
@@ -162,9 +169,9 @@ const FGSheetFakeData = [
         weight: '0.00',
         unit: 'kg',
         stdQty: '26,709.000',
-        actQty: '104,449.500'
+        actQty: '104,449.500',
+        itemType: 2
     },
-
     {
         no: '',
         itemCode: 'SA-MP-GR-CH-SK-0001',
@@ -172,7 +179,8 @@ const FGSheetFakeData = [
         weight: '0.00',
         unit: 'kg',
         stdQty: '6,100.000',
-        actQty: '24,705.000 '
+        actQty: '24,705.000 ',
+        itemType: 2
     },
     {
         no: '',
@@ -181,6 +189,70 @@ const FGSheetFakeData = [
         weight: '0.00',
         unit: 'kg',
         stdQty: '6,100.000',
-        actQty: '44,752.500'
+        actQty: '44,752.500',
+        itemType: 2
     },
+    {
+        no: '',
+        itemCode: 'RM-NM-FI-FC-01-0001',
+        description: 'FOOD COLOR 01',
+        weight: '0.00',
+        unit: 'kg',
+        stdQty: '14.500',
+        actQty: '31.500',
+        itemType: 3
+    },
+    {
+        no: '',
+        itemCode: 'RM-NM-FI-LF-03-0002',
+        description: 'LIQUID FLAVOR 02',
+        weight: '0.00',
+        unit: 'liter',
+        stdQty: '3,596.000',
+        actQty: '7,812.000',
+        itemType: 3
+    },
+    {
+        no: '',
+        itemCode: 'RM-NM-FI-PH-03-0001',
+        description: 'PHOSPHATE 01',
+        weight: '0.00',
+        unit: 'kg',
+        stdQty: '203.000',
+        actQty: '7,812.000',
+        itemType: 3
+    },
+    {
+        no: '',
+        itemCode: 'RM-NM-PK-LP-VF-TO01',
+        description: 'LAMINATED PLASTIC 113',
+        weight: '0.00',
+        unit: 'pc',
+        stdQty: '379,030.000',
+        actQty: '501,607.000',
+        itemType: 4
+    },
+    {
+        no: '',
+        itemCode: 'RM-NM-PK-LP-VF-TO02',
+        description: 'LAMINATED PLASTIC 114',
+        weight: '0.00',
+        unit: 'pc',
+        stdQty: '84,942.000',
+        actQty: '41,129.000',
+        itemType: 4
+    },
+    {
+        no: '',
+        itemCode: 'RM-NM-PK-PO-05-1003',
+        description: 'POLYBAG 10',
+        weight: '0.00',
+        unit: 'pc',
+        stdQty: '13,068.000',
+        actQty: '0.000',
+        itemType: 4
+    },    
+    
 ]
+
+const FakeProdReportTitle = "Cost of Production Report as of January 2024";
