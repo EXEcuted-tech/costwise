@@ -10,6 +10,7 @@ interface AuditDrawerProps {
         dateTimeAdded: string;
         employeeNo: string;
         userType: string;
+        userEmail: string;
         actionEvent: string;
     } | null;
 }
@@ -69,7 +70,7 @@ const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
                 <hr className="border-t-[1px] border-[#989898]" />
                 <div className="flex py-[10px]">
                     <p className="w-[50%]">Email</p>
-                    <p className="w-[50%] break-words leading-[20px] items-center">katheamari@gmail.com</p>
+                    <p className="w-[50%] break-words leading-[20px] items-center">{data.userEmail}</p>
                 </div>
                 <hr className="border-t-[1px] border-[#989898]" />
                 <div className="flex py-[10px]">
