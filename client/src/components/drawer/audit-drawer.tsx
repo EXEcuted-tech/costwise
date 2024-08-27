@@ -5,10 +5,33 @@ import Link from "next/link";
 import { useState } from "react";
 import { MdClose } from "react-icons/md";
 
-const AuditDrawer = () => {
+interface AuditDrawerProps {
+    data: {
+        dateTimeAdded: string;
+        employeeNo: string;
+        userType: string;
+        actionEvent: string;
+    } | null;
+}
+
+const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
     const { isOpen } = useSidebarContext();
     const { drawerOpen, setDrawerOpen } = useDrawerContext();
     const toggleDrawer = () => setDrawerOpen(!drawerOpen);
+
+    if (!data) return null;
+
+    const formatDate = (dateTime: string) => {
+        const date = new Date(dateTime);
+        const options: Intl.DateTimeFormatOptions = { month: 'long', day: 'numeric', year: 'numeric' };
+        return date.toLocaleDateString(undefined, options);
+    };
+
+    const formatTime = (dateTime: string) => {
+        const date = new Date(dateTime);
+        const options: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+        return date.toLocaleTimeString(undefined, options);
+    };
 
     return (
     <div 
@@ -29,9 +52,9 @@ const AuditDrawer = () => {
                 </div>
                 
             </div>
-            <div className="flex flex-col gap-[5px] pb-[5px] font-bold">
+            <div className="flex flex-col gap-[5px] pb-[10px] font-bold">
                 <p className="text-[24px] font-black">Audit Log Details</p>
-                <p className="text-[18px] text-[#9B9B9B]">Kathea Mari Mayol • January 13, 2024</p>
+                <p className="text-[18px] text-[#9B9B9B]">Employee: {data.employeeNo} • {formatDate(data.dateTimeAdded)}</p>
             </div>
             <div className="flex flex-col border-2 text-[17px] p-5 rounded-[10px]">
                 <div className="flex text-[20px] font-bold items-center pb-[10px]">
@@ -41,7 +64,7 @@ const AuditDrawer = () => {
                 <hr className="border-t-[1px] border-[#989898] w-full mx-auto" />
                 <div className="flex py-[10px]">
                     <p className="w-[50%]">Employee No.</p>
-                    <p className="w-[50%] break-words leading-[20px] items-center">#112391</p>
+                    <p className="w-[50%] break-words leading-[20px] items-center">{data.employeeNo}</p>
                 </div>
                 <hr className="border-t-[1px] border-[#989898]" />
                 <div className="flex py-[10px]">
@@ -51,17 +74,17 @@ const AuditDrawer = () => {
                 <hr className="border-t-[1px] border-[#989898]" />
                 <div className="flex py-[10px]">
                     <p className="w-[50%]">User Type</p>
-                    <p className="w-[50%] break-words leading-[20px] items-center">Regular User</p>
+                    <p className="w-[50%] break-words leading-[20px] items-center">{data.userType}</p>
                 </div>
                 <hr className="border-t-[1px] border-[#989898]" />
                 <div className="flex py-[10px]">
                     <p className="w-[50%]">Action/Event</p>
-                    <p className="w-[50%] break-words leading-[20px] items-center">Record changed under Summary of Product Costing: BOM_V1_Cost.csv</p>
+                    <p className="w-[50%] break-words leading-[20px] items-center">{data.actionEvent}</p>
                 </div>
                 <hr className="border-t-[1px] border-[#989898]" />
                 <div className="flex py-[10px] items-center">
                     <p className="w-[50%]">Time</p>
-                    <p className="w-[50%] break-words leading-[20px] items-center">12:50:22 AM</p>
+                    <p className="w-[50%] break-words leading-[20px] items-center">{formatTime(data.dateTimeAdded)}</p>
                 </div>
             </div>
         </div>
