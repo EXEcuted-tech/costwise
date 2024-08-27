@@ -7,22 +7,21 @@ export default function DashboardLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-
   return (
     <SidebarProvider>
-      <DashboardContent>
+      <UserManualContent>
         {children}
-      </DashboardContent>
+      </UserManualContent>
     </SidebarProvider>
   );
 }
 
-function DashboardContent({ children }: { children: React.ReactNode }) {
+function UserManualContent({ children }: { children: React.ReactNode }) {
   const { isOpen } = useSidebarContext();
   return (
-    <div className="flex">
+    <div className="flex font-lato w-full">
       <MainLayout />
-      <main className={`${isOpen ? 'ml-[280px] 2xl:ml-[360px]' : 'ml-[120px]'} w-full transition-all duration-400 ease-in-out`}>
+      <main className={`${isOpen ? 'w-[calc(100%-280px)] 2xl:w-full ml-[280px] 2xl:ml-[360px]' : 'w-full ml-[120px]'} min-h-screen font-lato bg-background transition-all duration-400 ease-in-out`}>
         {children}
       </main>
     </div>
