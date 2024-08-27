@@ -3,7 +3,7 @@ import { IoIosSearch } from "react-icons/io";
 import { IoClose } from "react-icons/io5";
 import { FaCheck } from "react-icons/fa";
 import CustomDatePicker from '@/components/form-controls/CustomDatePicker';
-import { PasswordRequestProps } from './page';
+import { PasswordRequestProps } from '@/app/user-management/page';
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 
 interface PasswordRequestPageProps {

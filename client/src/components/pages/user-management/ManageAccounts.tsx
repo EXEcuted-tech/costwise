@@ -7,7 +7,7 @@ import { FaTrashAlt } from "react-icons/fa";
 import EditUserInfo from '@/components/modals/EditUserInfo';
 import ConfirmDelete from '@/components/modals/ConfirmDelete';
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
-import { ManageAccountsProps } from './page';
+import { ManageAccountsProps } from '@/app/user-management/page';
 
 interface ManageAccountsPageProps {
     fileData: ManageAccountsProps[];
