@@ -38,7 +38,20 @@ type ChartDataProps = {
 };
 
 const LineChart = ({ chartData }: ChartDataProps) => {
-  return <Line data={chartData} />;
+  const options = {
+    responive: true,
+    plugins: {
+      legend: {
+        position: "bottom",
+      },
+      title: {
+        display: true,
+        text: "Monthly cost per FG",
+      },
+    },
+  };
+
+  return <Line data={chartData} className="w-[50px]" options={options} />;
 };
 
 export default LineChart;
