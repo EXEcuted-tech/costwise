@@ -85,6 +85,32 @@ const config: Config = {
           '0%': { transform: 'scale(1)', opacity: '1' },
           '100%': { transform: 'scale(0.95)', opacity: '0' },
         },
+        'zoom-in': {
+          '0%': { transform: 'scale(0.5)'},
+          '100%': { transform: 'scale(1)'},
+        },
+        'border-pulse': {
+          '0%': { borderColor: '#B22222' },
+          '50%': { borderColor: 'transparent' },
+          '100%': { borderColor: '#B22222' },
+        },
+        'border-pulse2': {
+          '0%': { borderColor: 'white' },
+          '50%': { borderColor: 'transparent' },
+          '100%': { borderColor: 'white' },
+        },
+        colorPulse: {
+          '0%': { color: '#414141' },
+          '50%': { color: '#2e2e2e' },
+          '100%': { color: '#414141' },
+        },
+        colorPulse2: {
+          '0%': { color: '#414141' },
+          '25%': { color: '#2e2e2e' },
+          '50%': { color: '#B22222' },
+          '75%': { color: '#B22222' },
+          '100%': { color: '#414141' },
+        },
       },
       animation: {
         'shrink-in': 'shrink-in 0.5s ease-in-out forwards',
@@ -96,11 +122,15 @@ const config: Config = {
         'pop-out': 'pop-out 0.2s ease-out forwards',
         'shake-tilt': 'shake-tilt 1s ease-in-out',
         'zoomIn': 'zoomIn 0.4s ease-in-out',
-        zoomOut: 'zoomOut 0.4s ease-in-out',
+        'zoomOut': 'zoomOut 0.4s ease-in-out',
+        'zoom-in': 'zoom-in 0.4s ease-in-out',
+        'border-pulse': 'border-pulse 3s infinite',
+        'border-pulse2': 'border-pulse2 3s infinite',
+        'color-pulse': 'colorPulse 5s ease-in-out infinite',
+        'color-pulse2': 'colorPulse2 10s ease-in-out infinite',
       },
       backgroundImage: {
         'virginia-mascot': "url('/images/virginia-mascot-bg.png')",
-        
       }
     },
   },
