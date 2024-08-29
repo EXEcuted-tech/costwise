@@ -1,6 +1,7 @@
 "use client"
 import React, { useEffect, useState } from "react";
-import background from '@/assets/account-profile-bg.png';
+import Image from 'next/image';
+import virginialogo from '@/assets/virginia-logo.png';
 import { useSidebarContext } from "@/context/SidebarContext";
 import Header from "@/components/header/Header";
 
@@ -20,11 +21,13 @@ const AccountProfilePage = () => {
 const { isOpen, setIsOpen } = useSidebarContext();
 
 return (
-        <div className='w-full h-screen'>
-            <div className="w-full h-[200px]">
-                <div className='w-full h-[50%] bg-primary border-[5px] border-[#A60000] rounded-b-[100px]'></div>
+        <div className='w-full h-screen flex flex-col items-center'>
+            <div className="relative w-full h-[200px]">
+                <div className="absolute w-full h-[50%] bg-[#FF0000] border-[5px] border-[#A60000] rounded-b-[100px]"></div>
+                <div className="absolute flex justify-center items-center w-[15%] h-[70%] top-[30px] left-1/2 -translate-x-1/2 bg-[#FF0000] border-[10px] border-[#A60000] rounded-[50%]">
+                    <Image src={virginialogo} alt={'Hotdog Logo'} className='flex w-[160px] cursor-pointer' />
+                </div>
             </div>
-            <p>hello</p>
         </div>
     );
 }
