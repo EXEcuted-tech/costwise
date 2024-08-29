@@ -7,6 +7,7 @@ import { MdDarkMode } from 'react-icons/md';
 import { GiFactory, GiMoneyStack } from "react-icons/gi";
 import { FaCircleArrowDown, FaCircleArrowUp, FaArrowTrendUp } from "react-icons/fa6";
 import { PiPackageFill } from "react-icons/pi";
+import LineChart from '@/components/pages/dashboard/LineChart';
 
 const DashboardPage = () => {
   const { isOpen, isAdmin } = useSidebarContext();
@@ -42,11 +43,11 @@ const DashboardPage = () => {
             <div className='my-[30px] 3xl:my-[20px] flex justify-between'>
               <div className='w-[20%] flex flex-col items-center'>
                 <div className='animate-border-pulse w-24 h-24 flex p-4 justify-center items-center rounded-full border border-primary bg-white drop-shadow-lg relative'>
-                  <GiFactory className='text-primary text-[68px]' />
+                  <GiFactory className='text-primary text-[68px] hover:animate-shake-tilt' />
                 </div>
                 <div>
                   <div className='flex items-center mr-[-20px] justify-end'>
-                    <FaCircleArrowDown className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#CD3939] mr-[5px]' />
+                    <FaCircleArrowDown className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#CD3939] mr-[5px] ' />
                     <p className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#CD3939] font-semibold'>-40%</p>
                   </div>
                   <div className='flex flex-col items-center'>
@@ -57,7 +58,7 @@ const DashboardPage = () => {
               </div>
               <div className='w-[20%] flex flex-col items-center'>
                 <div className='animate-border-pulse w-24 h-24 flex p-4 justify-center items-center rounded-full border border-primary bg-white drop-shadow-lg relative'>
-                  <PiPackageFill className='text-primary text-[68px]' />
+                  <PiPackageFill className='text-primary text-[68px] hover:animate-shake-tilt' />
                 </div>
                 <div>
                   <div className='flex items-center mr-[-20px] justify-end'>
@@ -72,7 +73,7 @@ const DashboardPage = () => {
               </div>
               <div className='w-[20%] flex flex-col items-center'>
                 <div className='animate-border-pulse2 w-24 h-24 flex p-4 justify-center items-center rounded-full border-2 border-white bg-primary drop-shadow-lg relative'>
-                  <FaArrowTrendUp className='text-white text-[68px]' />
+                  <FaArrowTrendUp className='text-white text-[68px] hover:animate-shake-tilt' />
                 </div>
                 <div>
                   <div className='flex items-center mr-[-20px] justify-end'>
@@ -87,7 +88,7 @@ const DashboardPage = () => {
               </div>
               <div className='w-[20%] flex flex-col items-center'>
                 <div className='animate-border-pulse2 w-24 h-24 flex p-4 justify-center items-center rounded-full border-2 border-white bg-primary drop-shadow-lg relative'>
-                  <GiMoneyStack className='text-white text-[68px]' />
+                  <GiMoneyStack className='text-white text-[68px] hover:animate-shake-tilt' />
                 </div>
                 <div>
                   <div className='flex items-center mr-[-20px] justify-end'>
@@ -108,22 +109,35 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      {/* <div className='my-[30px] flex justify-between gap-8'>
-        <div className='w-[70%]'>
+      <div className='my-[30px] flex justify-between gap-8'>
+        <div className={`${isAdmin ? 'w-[70%]' : 'w-full'}`}>
           <CardHeader cardName='Projected Costing' />
-          <div className='bg-white h-[300px] rounded-b-[10px] drop-shadow-lg'>
-
+          <div className='bg-white min-h-[347px] rounded-b-[10px] drop-shadow-lg'>
+            <LineChart />
           </div>
         </div>
         {isAdmin &&
           <div className='w-[30%]'>
             <CardHeader cardName='User Activity' />
-            <div className='bg-white h-[300px] rounded-b-[10px] drop-shadow-lg'>
-
+            <div className='bg-white min-h-[347px] rounded-b-[10px] drop-shadow-lg overflow-y-auto'>
+              <div className='flex items-center'>
+                <div>
+                  <img
+                    src="https://i.imgur.com/AZOtzD7.jpg"
+                    alt={'Profile Picture'}
+                    className='flex object-cover size-[50px] rounded-full'
+                  />
+                </div>
+                <div>
+                  <h1>Kathea Mari Mayol</h1>
+                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
+                  <p>2 minutes ago</p>
+                </div>
+              </div>
             </div>
           </div>
         }
-      </div> */}
+      </div>
     </div>
   )
 }
