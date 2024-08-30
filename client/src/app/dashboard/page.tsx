@@ -8,6 +8,8 @@ import { GiFactory, GiMoneyStack } from "react-icons/gi";
 import { FaCircleArrowDown, FaCircleArrowUp, FaArrowTrendUp } from "react-icons/fa6";
 import { PiPackageFill } from "react-icons/pi";
 import LineChart from '@/components/pages/dashboard/LineChart';
+import UserActivity, { UserActivityProps } from '@/components/pages/dashboard/UserActivity';
+import CostTable from '@/components/pages/dashboard/CostTable';
 
 const DashboardPage = () => {
   const { isOpen, isAdmin } = useSidebarContext();
@@ -109,31 +111,25 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      <div className='my-[30px] flex justify-between gap-8'>
-        <div className={`${isAdmin ? 'w-[70%]' : 'w-full'}`}>
+      <div className='my-[30px] flex flex-col 3xl:flex-row justify-between gap-8'>
+        <div className={`${isAdmin ? 'w-full 3xl:w-[70%]' : 'w-full'}`}>
           <CardHeader cardName='Projected Costing' />
-          <div className='bg-white min-h-[347px] rounded-b-[10px] drop-shadow-lg'>
-            <LineChart />
+          <div className='flex bg-white min-h-[347px] rounded-b-[10px] drop-shadow-lg px-[20px]'>
+              <LineChart className='w-full h-[347px]' />
+              <div className='flex justify-center mt-[30px] pr-[20px] w-full'>
+                <CostTable className='h-[280px] w-full'/>
+              </div>
           </div>
         </div>
         {isAdmin &&
-          <div className='w-[30%]'>
+          <div className='w-full 3xl:w-[30%]'>
             <CardHeader cardName='User Activity' />
-            <div className='bg-white min-h-[347px] rounded-b-[10px] drop-shadow-lg overflow-y-auto'>
-              <div className='flex items-center'>
-                <div>
-                  <img
-                    src="https://i.imgur.com/AZOtzD7.jpg"
-                    alt={'Profile Picture'}
-                    className='flex object-cover size-[50px] rounded-full'
-                  />
+            <div className='bg-white h-[347px] rounded-b-[10px] drop-shadow-lg overflow-y-auto py-[15px]'>
+              {fakeData.map((data, index) => (
+                <div key={index}>
+                  <UserActivity url={data.url} name={data.name} activity={data.activity} time={data.time} />
                 </div>
-                <div>
-                  <h1>Kathea Mari Mayol</h1>
-                  <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit.</p>
-                  <p>2 minutes ago</p>
-                </div>
-              </div>
+              ))}
             </div>
           </div>
         }
@@ -143,3 +139,12 @@ const DashboardPage = () => {
 }
 
 export default DashboardPage
+
+const fakeData: UserActivityProps[] = [
+  { url: 'https://i.imgur.com/AZOtzD7.jpg', name: "Kathea Mari Mayol", activity: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.", time: "2 minutes ago" },
+  { url: 'https://i.imgur.com/SeymIUb.jpg', name: "John Doe", activity: "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.", time: "5 minutes ago" },
+  { url: 'https://i.imgur.com/dm51tBF.jpg', name: "Jane Smith", activity: "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.", time: "10 minutes ago" },
+  { url: 'https://i.imgur.com/AN69p1a.jpg', name: "Michael Johnson", activity: "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.", time: "15 minutes ago" },
+  { url: 'https://i.imgur.com/zb1h8kj.jpg', name: "Emily Davis", activity: "Excepteur sint occaecat cupidatat non proident, sunt in culpa.", time: "20 minutes ago" },
+  { url: 'https://i.imgur.com/nzcwr8x.jpg', name: "Chris Lee", activity: "Mollit anim id est laborum.", time: "25 minutes ago" }
+];

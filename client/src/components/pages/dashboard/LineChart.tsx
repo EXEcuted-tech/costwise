@@ -3,7 +3,11 @@
 import React, { useEffect, useRef } from 'react';
 import Chart from 'chart.js/auto';
 
-const LineChart: React.FC = () => {
+interface LineChartProps {
+  className?: string;
+}
+
+const LineChart: React.FC<LineChartProps> = ({className}) => {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
 
@@ -80,8 +84,8 @@ const LineChart: React.FC = () => {
   }, []);
 
   return (
-    <div className='px-2 py-4'>
-      <canvas ref={chartRef} height={80} />
+    <div className={`relative px-2 py-4 ${className}`}>
+      <canvas ref={chartRef} />
     </div>
   );
 };

@@ -42,7 +42,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
     return (
         <div className={`bg-white rounded-lg shadow-lg overflow-hidden ${className}`}>
             <div className="bg-primary text-center p-[10px] flex justify-between items-center">
-                <span className={`${isOpen ? 'text-[12px] 2xl:text-[15px] 3xl:text-[22px]' : 'text-[16px] 2xl:text-[28px]' } flex items-center ml-[15px] text-white font-bold`}>
+                <span className={`${isOpen ? 'text-[12px] 2xl:text-[15px] 3xl:text-[22px]' : 'text-[16px] 2xl:text-[22px] 3xl:text-[28px]' } flex items-center ml-[15px] text-white font-bold`}>
                     <BsCalendarDateFill className='text-white mr-[6px]' />
                     {monthNames[currentMonth]} {currentYear}
                 </span>
