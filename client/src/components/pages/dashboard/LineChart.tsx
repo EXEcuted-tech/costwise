@@ -84,7 +84,7 @@ const LineChart: React.FC<LineChartProps> = ({className}) => {
   }, []);
 
   return (
-    <div className={`relative px-2 py-4 ${className}`}>
+    <div className={`relative flex justify-center items-center px-0 2xl:px-2 py-4 ${className}`}>
       <canvas ref={chartRef} />
     </div>
   );

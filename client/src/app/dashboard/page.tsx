@@ -114,7 +114,7 @@ const DashboardPage = () => {
       <div className='my-[30px] flex flex-col 3xl:flex-row justify-between gap-8'>
         <div className={`${isAdmin ? 'w-full 3xl:w-[70%]' : 'w-full'}`}>
           <CardHeader cardName='Projected Costing' />
-          <div className='flex bg-white min-h-[347px] rounded-b-[10px] drop-shadow-lg px-[20px]'>
+          <div className='flex bg-white min-h-[347px] rounded-b-[10px] drop-shadow-lg px-[5px] 2xl:px-[20px]'>
               <LineChart className='w-full h-[347px]' />
               <div className='flex justify-center mt-[30px] pr-[20px] w-full'>
                 <CostTable className='h-[280px] w-full'/>
