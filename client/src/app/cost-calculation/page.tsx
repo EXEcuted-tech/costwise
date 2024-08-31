@@ -131,7 +131,7 @@ const CostCalculation =() => {
                         <SpecificFG key={sheet.id} id={sheet.id} removeSheet={handleRemoveSheet} isOpen={isOpen} sheetData={FGSheetFakeData} finishedGoods={FinishedGoodsList} />
                     ))
                 }
-                {selectedFG === 'All-FG' && <AllFG title={FakeProdReportTitle} sheetData={FGSheetFakeData} />}
+                {selectedFG === 'All-FG' && <AllFG title={FakeProdReportTitle} isOpen={isOpen} sheetData={FGSheetFakeData} />}
             </div>
         </div>
     )
