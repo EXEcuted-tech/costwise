@@ -20,7 +20,6 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ setSelectedOption, selected
     ];
 
     const handleOptionClick = (option: { value: string; label: any; }) => {
-        console.log("CHANGED!", option.value);
         setSelectedOption(option.value);
         setShowLabel(option.label);
         setIsDropdownOpen(false);
