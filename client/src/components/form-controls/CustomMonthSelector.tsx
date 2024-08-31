@@ -19,7 +19,7 @@ const CustomMonthSelector:React.FC<CustomMonthSelectorProps> = ({months, onMonth
                     <select
                         onChange={handleMonthChange}
                         className='min-w-[150px] flex-grow outline-none focus:ring-0 border-none pr-4 pl-1'>
-                            <option selected disabled className="bg-gray-200">Choose month...</option>
+                            <option selected value="" disabled hidden>Choose month...</option>
                             {months.map((data, index) => (
                                 <option key={index} value={data} className=''>{data}</option>
                             ))}

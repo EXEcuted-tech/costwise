@@ -123,7 +123,7 @@ const Inventory = () => {
                             <select
                                 className={`${isOpen ? '4xl:w-[20rem] 3xl:w-[20rem] 2xl:w-[15rem] xl:w-[10rem]' : ''} bg-white h-8 w-[20rem] pl-3 text-[1.1em] mr-4 border border-gray-400 rounded-lg focus:outline-none`}
                             >
-                                <option selected disabled>Item</option>
+                                <option selected value="" disabled hidden>Item</option>
                                 <option value="all">All</option>
                                 <option value="meat-materials">Meat Materials</option>
                                 <option value="food-additives">Food Additives & Meat Extenders</option>
@@ -134,7 +134,7 @@ const Inventory = () => {
                             <select
                                 className='bg-white h-8 w-[8rem] pl-3 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none'
                             >
-                                <option selected disabled>Status</option>
+                                <option selected value="" disabled hidden>Status</option>
                                 <option value="all">All</option>
                                 <option value="in-stock">In Stock</option>
                                 <option value="low-stock">Low Stock</option>
@@ -160,17 +160,19 @@ const Inventory = () => {
                                         <tr key={index} className={`${isOpen ? '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[18px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[20px] 2xl:text-[20px] xl:text-[16px]'} text-[20px] text-black text-center border-b border-[#ACACAC] hover:bg-gray-50`}>
                                             <td className='w-[10rem] py-4'>{data.itemCode}</td>
                                             <td className='break-words'>{data.description}</td>
-                                            <td className=''>{data.unit}</td>
-                                            <td className=''>{data.unit}</td>
-                                            <td className='w-[10%]'>
-                                                <p
-                                                    className={`${data.status === 'In Stock'
-                                                        ? 'text-[#00930F] bg-[#9EE29E]'
-                                                        : 'text-[#317AFA] bg-[#B6CDFF]'
-                                                        } rounded-2xl w-[9rem]`}
-                                                >
-                                                    {data.status}
-                                                </p>
+                                            <td>{data.unit}</td>
+                                            <td>{data.unit}</td>
+                                            <td>
+                                                <div className='flex justify-center'>
+                                                    <p
+                                                        className={`${data.status === 'In Stock'
+                                                            ? 'text-[#00930F] bg-[#9EE29E]'
+                                                            : 'text-[#317AFA] bg-[#B6CDFF]'
+                                                            } rounded-2xl w-[9rem]`}
+                                                    >
+                                                        {data.status}
+                                                    </p>
+                                                </div>
                                             </td>
                                             <td className='w-[10%]'>{data.inStock}</td>
                                             <td className=''>{data.qty}</td>
@@ -277,5 +279,13 @@ const InventoryFakeData = [
         inStock: "10 pcs",
         qty: "30 pcs",
     },
-
+    {
+        itemCode: "FG-08",
+        description: "SEASONING 3",
+        unit: "pcs",
+        cost: "295.11",
+        status: "Low Stock",
+        inStock: "10 pcs",
+        qty: "30 pcs",
+    },
 ]
