@@ -131,7 +131,15 @@ const ProjectedCostPage = () => {
         id: 5,
         material: "Lorem ipsum rororor",
         cost: 12.15
-    },])
+    }, {
+        id: 6,
+        material: "Lorem ipsum rorororeee",
+        cost: 10.11
+    }, {
+        id: 7,
+        material: "Lorem ipsum rorororeee",
+        cost: 10.11
+    }])
 
     const [doughnutData] = useState({
         labels: costData.map((product) => product.product),
@@ -251,7 +259,7 @@ const ProjectedCostPage = () => {
                         </ul>
                     </div>
                 </div>
-                <div className="flex flex-row w-[97%] h-[100%] gap-[2%]">
+                <div className="flex flex-row w-[97%] h-[100%] gap-[2%] rounded-xl">
                     {/* Left Div */}
                     <div className="flex flex-col w-[65%] h-full rounded-lg shadow-xl">
                         <div className="flex text-[30px] text-[#585858] font-bold h-[10%] bg-white items-center justify-start  border-b-2 pl-10">
@@ -296,7 +304,7 @@ const ProjectedCostPage = () => {
                                 <div className="flex items-center justify-center w-[50%]">
                                     <p className="text-[24px]">Worst Case</p>
                                 </div>
-                                <IoIosInformationCircle className="text-[35px] text-[#625F5F] absolute right-[55px]" />
+                                <IoIosInformationCircle className="text-[35px] text-[#625F5F] absolute right-[3%]" />
                             </div>
                             <div className="flex flex-row w-full h-full items-center justify-center">
                                 <div className="flex flex-row w-full items-center justify-center font-bold">
@@ -347,26 +355,32 @@ const ProjectedCostPage = () => {
                                 </p>
                                 <IoIosInformationCircle className="text-[35px] text-[#625F5F]" />
                             </div>
-                            <table>
-                                <tr className="border-b-1 border-[#D9D9D9] overflow-scroll">
-                                    <th className="flex items-start px-10 py-2">
-                                        <p>Material</p>
-                                    </th>
-                                    <th>
-                                        <p>Cost</p>
-                                    </th>
-                                </tr>
-                                {pProductCost.map((product) => (
-                                    <tr className={`text-[#383838] ${product.id % 2 === 0 ? "bg-[#F6EBEB]" : ' '}`}>
-                                        <th className={`flex items-start px-10 py-2`}>
-                                            <p>{product.material}</p>
-                                        </th>
-                                        <th>
-                                            <p>{product.cost}</p>
-                                        </th>
-                                    </tr>
-                                ))}
-                            </table>
+                            <div className="table-container overflow-x-auto">
+                                <table className="table-auto w-full">
+                                    <thead className="sticky top-0 bg-white z-10 border-b border-[#D99D9]">
+                                        <tr>
+                                            <th className="px-10 py-2 text-left">
+                                                <p>Material</p>
+                                            </th>
+                                            <th className="px-10 py-2 text-left">
+                                                <p>Cost</p>
+                                            </th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="overflow-y-auto max-h-96 w-full">
+                                        {pProductCost.map((product) => (
+                                            <tr key={product.id} className={`text-[#383838] ${product.id % 2 === 0 ? "bg-[#F6EBEB]" : ' '} w-full`}>
+                                                <td className="px-10 py-2">
+                                                    <p>{product.material}</p>
+                                                </td>
+                                                <td className="px-10 py-2">
+                                                    <p>{product.cost}</p>
+                                                </td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
                         </div>
                     </div>
                 </div>

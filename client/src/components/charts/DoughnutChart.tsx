@@ -8,6 +8,7 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { height, width } from "@mui/system";
 
 // Register the required components
 ChartJS.register(ArcElement, DoughnutController, Title, Tooltip, Legend);
@@ -30,28 +31,19 @@ const DoughnutChart = ({ doughnutData }: DoughnutDataProps) => {
     responsive: true,
     plugins: {
       legend: {
-        position: "bottom",
+        position: "right",
       },
       title: {
         display: true,
         text: "Monthly cost per FG",
+        width: 10,
+        height: 10
       },
-    },
-  };
-  const textCenter = {
-    id: "textCenter",
-    beforeDatasetsDraw(chart, args, pluginOptions) {
-      const { ctx, data } = chart;
-
-      ctx.save();
-      ctx.font = "bolder 30px sans-serif";
-      (ctx.fillStyle = "red"),
-        ctx.fillText("text", chart.getDatasetMeta(0).data[0].x, y);
     },
   };
 
   return (
-    <Doughnut data={doughnutData} options={options} plugins={textCenter} />
+    <Doughnut data={doughnutData} options={options} />
   );
 };
 
