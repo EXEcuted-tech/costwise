@@ -175,7 +175,6 @@ const ProjectedCostPage = () => {
     return (
         <div
             className="overflow-hidden bg-cover bg-center items-center justify-center bg-[#FFFAF8] bg-opacity-20"
-            style={{ backgroundImage: "url('/images/usermanbg.png')" }}
         >
             <div>
                 <Header icon={MdOutlineAnalytics} title={"Projected Costing"} />
@@ -349,7 +348,7 @@ const ProjectedCostPage = () => {
                         </div>
                         {/* Projected Product Cost Case Section */}
                         <div className="flex flex-col bg-white p-[10px] m-1 h-[50%] rounded-lg shadow-lg">
-                            <div className="border-b-1 border-[#D9D9D9] flex flex-row p-[5px]">
+                            <div className="flex flex-row p-[5px]">
                                 <p className="text-[24px] font-bold w-[95%]">
                                     Projected Product Cost
                                 </p>
@@ -357,8 +356,8 @@ const ProjectedCostPage = () => {
                             </div>
                             <div className="table-container overflow-x-auto">
                                 <table className="table-auto w-full">
-                                    <thead className="sticky top-0 bg-white z-10 border-b border-[#D99D9]">
-                                        <tr>
+                                    <thead className="sticky top-0 bg-white z-10 border-y-1 border-[#D9D9D9]">
+                                        <tr className="border-y-1 border-[#D9D9D9]">
                                             <th className="px-10 py-2 text-left">
                                                 <p>Material</p>
                                             </th>
