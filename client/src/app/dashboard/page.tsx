@@ -15,7 +15,7 @@ const DashboardPage = () => {
   const { isOpen, isAdmin } = useSidebarContext();
 
   return (
-    <div className='bg-background px-[25px] mt-[30px] ml-[45px]'>
+    <div className={`${isOpen ? 'px-[10px] 2xl:px-[25px]' : 'px-[25px]'} bg-background mt-[30px] ml-[45px]`}>
       <div className='flex justify-between'>
         <div className='flex flex-col flex-wrap w-[72%] 4xl:w-[75%]'>
           <h1 className={`${isOpen ? 'text-[34px] 2xl:text-[42px] 3xl:text-[52px] 4xl:text-[58px]' : 'text-[40px] 2xl:text-[55px] 3xl:text-[68px]'} truncate text-ellipsis text-[#414141] font-bold animate-color-pulse`}>
@@ -111,7 +111,7 @@ const DashboardPage = () => {
         </div>
       </div>
 
-      <div className="flex-col 3xl:flex-row flex my-[30px] justify-between gap-8">
+      <div className={`${isOpen ? 'gap-3' : 'gap-8'} flex-col 3xl:flex-row flex my-[30px] justify-between`}>
         <div className={`${isAdmin ? 'w-full 3xl:w-[70%]' : 'w-full'}`}>
           <CardHeader cardName='Projected Costing' />
           <div className='flex bg-white min-h-[347px] rounded-b-[10px] drop-shadow-lg px-[5px] 2xl:px-[20px]'>
@@ -124,7 +124,7 @@ const DashboardPage = () => {
         {isAdmin &&
           <div className='w-full 3xl:w-[30%]'>
             <CardHeader cardName='User Activity' />
-            <div className='bg-white h-[347px] rounded-b-[10px] drop-shadow-lg overflow-y-auto py-[15px]'>
+            <div id="scroll-style" className='bg-white h-[347px] rounded-b-[10px] drop-shadow-lg overflow-y-auto py-[15px]'>
               {fakeData.map((data, index) => (
                 <div key={index}>
                   <UserActivity url={data.url} name={data.name} activity={data.activity} time={data.time} />

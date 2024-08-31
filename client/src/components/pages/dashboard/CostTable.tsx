@@ -6,7 +6,7 @@ const CostTable:React.FC<{className:string;}> = ({className}) => {
     
     return (
         <div>
-            <div className={`relative overflow-y-auto ${className}`}>
+            <div id="scroll-style" className={`relative overflow-y-auto ${className}`}>
                 <table className="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
                     <thead className={`${isOpen ? 'text-[10px] 2xl:text-[13px]' : 'text-[10px] 2xl:text-[13px]'} sticky top-0 z-10 text-gray-500 uppercase bg-gray-100 dark:bg-gray-700 dark:text-gray-400`}>
                         <tr>
