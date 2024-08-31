@@ -4,6 +4,7 @@ import { useDrawerContext } from "@/context/DrawerContext";
 import Link from "next/link";
 import { useState } from "react";
 import { MdClose } from "react-icons/md";
+import useOutsideClick from '@/hooks/useOutsideClick';
 
 interface AuditDrawerProps {
     data: {
@@ -19,6 +20,7 @@ const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
     const { isOpen } = useSidebarContext();
     const { drawerOpen, setDrawerOpen } = useDrawerContext();
     const toggleDrawer = () => setDrawerOpen(!drawerOpen);
+    const ref = useOutsideClick(() => setDrawerOpen(false));
 
     if (!data) return null;
 
@@ -35,12 +37,8 @@ const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
     };
 
     return (
-    <div 
-        className="fixed w-screen z-[1000] h-full bg-black bg-opacity-50 backdrop-brightness-50 flex justify-end left-0"
-        
-        onClick={toggleDrawer}
-    >
-        <div className={`bg-white w-[50%] 2xl:w-[40%] 4xl:w-[30%] h-full p-10 pt-[20px] drop-shadow-2xl`}>
+    <div className="fixed w-screen z-[1000] h-full backdrop-brightness-50 flex justify-end left-0">
+        <div ref={ref} className={`bg-white w-[50%] 2xl:w-[40%] 4xl:w-[30%] h-full p-10 pt-[20px] drop-shadow-2xl`}>
             <div className="flex justify-end">
                 <div 
                     className="border-2 p-1 rounded-[5px] cursor-pointer" 
@@ -48,14 +46,14 @@ const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
                 >
                     <MdClose 
                          
-                        className="text-[24px]"
+                        className="text-[30px]"
                     />
                 </div>
                 
             </div>
-            <div className="flex flex-col gap-[5px] pb-[10px] font-bold">
-                <p className="text-[24px] font-black">Audit Log Details</p>
-                <p className="text-[18px] text-[#9B9B9B]">Employee: {data.employeeNo} • {formatDate(data.dateTimeAdded)}</p>
+            <div className="flex flex-col gap-[3px] pb-[10px] font-bold">
+                <p className="text-[26px] font-black">Audit Log Details</p>
+                <p className="text-[18px] text-[#9B9B9B]">Employee: {data.employeeNo} ‎ • ‎  {formatDate(data.dateTimeAdded)}</p>
             </div>
             <div className="flex flex-col border-2 text-[17px] p-5 rounded-[10px]">
                 <div className="flex text-[20px] font-bold items-center pb-[10px]">
