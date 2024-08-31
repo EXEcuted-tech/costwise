@@ -1,3 +1,4 @@
+import { formatHeader } from '@/utils/costwiseUtils';
 import React, { useState } from 'react'
 import { HiOutlinePlus } from "react-icons/hi";
 import { IoIosSave } from "react-icons/io";
@@ -12,25 +13,6 @@ interface WorkspaceTableProps {
 
 const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit, isTransaction }) => {
     const [tableData, setTableData] = useState(data);
-
-    const formatHeader = (key: string): string => {
-        const knownAcronyms = ['rm', 'total'];
-
-        const words = key.split(/(?=[A-Z])|\s|_/).filter(word => word.length > 0);
-
-        const formattedWords = words.map(word => {
-            const lowerWord = word.toLowerCase();
-
-            if (knownAcronyms.includes(lowerWord)) {
-                return lowerWord.toUpperCase();
-            }
-
-            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-        });
-
-        return formattedWords.join(' ').trim();
-    };
-
 
     const handleInputChange = (rowIndex: number, key: string, value: string) => {
         const updatedData = tableData.map((row, i) => {
@@ -96,12 +78,12 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                                 ?
                                 <th key={key} className={`animate-zoomIn ${key == 'itemCode' || key == 'total' ? 'text-center' : (key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
                                                         whitespace-nowrap font-medium text-[20px] py-2 px-6 border-b border-gray-300`}>
-                                    {formatHeader(key)}
+                                    {formatHeader(key,['rm', 'total'])}
                                 </th>
                                 :
                                 <th key={key} className={`animate-zoomIn ${key == 'itemCode' || key == 'total' ? 'text-center' : (key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
                                                         whitespace-nowrap font-medium text-[20px] py-2 px-6 border-b border-gray-300`}>
-                                    {formatHeader(key)}
+                                    {formatHeader(key,['rm', 'total'])}
                                 </th>
                             );
                         })}
@@ -170,24 +152,6 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                     }
                 </tbody>
             </table>
-            {/* {isEdit && !isTransaction &&
-                <div className='animate-zoomIn fixed flex flex-col right-[40px] justify-end'>
-                    <div className={`flex justify-end mt-[25px] mb-[5px]`}>
-                        <button className='hover:bg-[#961e1e] h-[30px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-primary'
-                            onClick={addRow}>
-                            <HiOutlinePlus className='mr-[5px]' />
-                            Add Row
-                        </button>
-                    </div>
-                    <div className='flex justify-end'>
-                        <button className='hover:bg-[#00780c] h-[30px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F]'
-                            onClick={() => { setIsEdit(false) }}>
-                            <IoIosSave className='mr-[5px]' />
-                            Save
-                        </button>
-                    </div>
-                </div>
-            } */}
         </div>
     );
 }
