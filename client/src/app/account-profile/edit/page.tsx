@@ -57,7 +57,7 @@ return (
                 </div>
 
                 {/* Form */}
-                <div className='flex justify-center text-[18px] 2xl:text-[22px] 3xl:text-[24px] mt-[3%] mx-[3%] 2xl:mx-[5%]'>
+                <div className='flex justify-center text-[18px] 2xl:text-[22px] 3xl:text-[24px] mt-[50px] mx-[3%] 2xl:mx-[5%]'>
                     <div className='flex text-[1.3em] mt-[0.3rem] ml-3'>
                         <IoIosArrowRoundBack className='text-[#6D6D6D] text-[40px] mr-[15px] hover:text-[#D13131] cursor-pointer'/>
                     </div>
@@ -201,7 +201,7 @@ return (
                 </div>
 
                 {/* Buttons */}
-                <div className='flex flex-col w-full mt-[3%] 2xl:mt-[2%] justify-center items-center'>
+                <div className='flex flex-col w-full mt-[37px] justify-center items-center'>
                     <button className='w-[25%] 2xl:w-[20%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] bg-primary text-white rounded-xl hover:bg-[#9c1c1c]'> Update Profile </button>
                     <div className="text-[#8F8F8F] text-[14px] 3xl:text-[19px] underline underline-offset-[7px] cursor-pointer hover:text-[#5B5353]">
                         Request Password Reset
