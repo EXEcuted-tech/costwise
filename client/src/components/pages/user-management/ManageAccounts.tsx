@@ -71,7 +71,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
                 <table className="w-full h-full text-left">
                     <thead className="bg-[#F3F3F3] border-b border-[#868686]">
                         <tr className={`${isOpen ? 'text-[1.1em] 3xl:text-[1em] 2xl:text-[1em] xl:text-[0.9em]' : 'text-[1.3em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[1em]'} text-[#6B6B6B]`}>
-                            <th className={`${isOpen ? 'pl-[2rem] 4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[14rem] xl:w-[8rem] xl:pl-[1rem]' : 'pl-8 w-[20rem] 4xl:w-[20rem] 3xl:w-[15rem] 2xl:w-[14rem] xl:pl-6'} py-2`}
+                            <th className={`${isOpen ? 'pl-[2rem] 4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[14rem] xl:w-[8rem]' : 'pl-8 w-[20rem] 4xl:w-[20rem] 3xl:w-[15rem] 2xl:w-[14rem] xl:pl-6'} py-2`}
                                 >Name</th>
                             <th className={`${isOpen ? 'w-[10rem] 4xl:w-[10rem] 3xl:w-[7rem] 2xl:w-[8rem] xl:w-[6rem]' : 'w-[15rem] 4xl:w-[10rem] 3xl:w-[10rem] 2xl:w-[8rem] xl:w-[7rem]' } py-2 `}
                                 >Role</th>
@@ -89,7 +89,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
                         {currentListPage.length > 0 ? (
                             currentListPage.map((data, index) => (
                                 <tr key={index} className={`${isOpen ? 'text-[1.1em] 4xl:text-[1.1em] 3xl:text-[0.9em] 2xl:text-[0.8em] xl:text-[0.7em]' : 'text-[1.2em] 4xl:text-[1.2em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[1em]' } border-b border-[#868686] hover:bg-gray-50`}>
-                                    <td className={`${isOpen ? 'pl-[2rem] xl:pl-[1rem]' : 'pl-8 xl:pl-6'} py-2 break-words`}>{data.userName}</td>
+                                    <td className={`${isOpen ? 'pl-[2rem]' : 'pl-8 xl:pl-6'} py-2 break-words`}>{data.userName}</td>
                                     <td className="py-2 break-words">{data.userRole}</td>
                                     <td className="py-2 break-words">{data.userEmail}</td>
                                     <td className="py-2 break-words">{data.contactNumber}</td>

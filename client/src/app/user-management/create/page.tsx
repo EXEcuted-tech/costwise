@@ -37,7 +37,7 @@ const AccountCreation = () => {
                     </div>
 
                     {/* Form */}
-                    <div className={`${isOpen ? '' : ''} flex justify-center mt-9 text-[#5B5353] text-[1em] 2xl:text-[1.2em] mx-[30px] 2xl:mx-[50px] mb-12 2xl:mb-9 justify-between`}>
+                    <div className={`${isOpen ? '' : ''} flex justify-center mt-9 text-[#5B5353] text-[0.8em] 2xl:text-[1.2em] mx-[30px] 2xl:mx-[50px] mb-12 2xl:mb-9 justify-between`}>
                         {/* 1st Col */}
                         <div className={` ${isOpen ? '' : ''} flex flex-col flex-1 mr-5 2xl:mr-9 gap-10`}>
                             <div className='flex flex-col justify-start'>
@@ -73,7 +73,7 @@ const AccountCreation = () => {
                                 <div className="flex flex-col w-full">
                                     <div className="mt-2 text-gray-600">
                                         <select
-                                            className={` ${isOpen ? '' : ''} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline text-[13px] 2xl:text-base `}
+                                            className={` ${isOpen ? 'text-[10px] text-ellipsis' : ''} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline text-[13px] 2xl:text-base `}
                                             defaultValue=""
                                         >
                                             <option value="" disabled>Choose department</option>
