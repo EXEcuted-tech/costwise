@@ -1,8 +1,8 @@
 "use client";
 import React, { useState } from 'react';
 import Header from '@/components/header/Header';
-import ManageAccounts from './ManageAccounts';
-import PasswordRequests from './PasswordRequests';
+import ManageAccounts from '@/components/pages/user-management/ManageAccounts';
+import PasswordRequests from '@/components/pages/user-management/PasswordRequests';
 import { RiShieldUserFill } from "react-icons/ri";
 import { useSidebarContext } from '@/context/SidebarContext';
 

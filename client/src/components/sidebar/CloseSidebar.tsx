@@ -7,6 +7,7 @@ import { Tooltip } from "@nextui-org/react";
 import usePath from '@/hooks/usePath';
 import MiniSidebar from './MiniSidebar';
 import Link from 'next/link';
+import { useSidebarContext } from '@/context/SidebarContext';
 
 interface IconClosedConfig {
   iconName: string;
@@ -17,7 +18,7 @@ interface IconClosedConfig {
 }
 
 const CloseSidebar: React.FC = () => {
-  const [isAdmin, setIsAdmin] = useState(true);
+  const { isAdmin } = useSidebarContext();
   const [isMore, setIsMore] = useState(false);
   const path = usePath();
 
@@ -105,7 +106,7 @@ const CloseSidebar: React.FC = () => {
                   );
                 }))
                 :
-                (adminDefaultMenu.map(({ iconName, className, tooltip, route, routes}, index) => {
+                (adminDefaultMenu.map(({ iconName, className, tooltip, route, routes }, index) => {
                   const IconComponent = iconMap[iconName];
                   const isRoute = routes?.some(e => e === path);
                   return tooltip !== 'More' ? (
@@ -147,7 +148,7 @@ const CloseSidebar: React.FC = () => {
           </div>
         </div>
       </div>
-      {isMore && <MiniSidebar setIsMore={setIsMore}/>}
+      {isMore && <MiniSidebar setIsMore={setIsMore} />}
     </>
   );
 };
@@ -172,7 +173,7 @@ const userDefaultMenu: IconClosedConfig[] = [
 
 const adminDefaultMenu: IconClosedConfig[] = [
   { iconName: 'FaBell', route: 'notification', tooltip: 'Notifications', className: 'text-[2.3em]' },
-  { iconName: 'MdMoreHoriz', routes: ["help","maintenance","user-managemenet"], tooltip: 'More', className: 'text-[2.8em]' },
-  { iconName: 'MdLogout', route: 'logout',  tooltip: 'Log Out', className: 'text-[2.3em]' },
+  { iconName: 'MdMoreHoriz', routes: ["help", "maintenance", "user-managemenet"], tooltip: 'More', className: 'text-[2.8em]' },
+  { iconName: 'MdLogout', route: 'logout', tooltip: 'Log Out', className: 'text-[2.3em]' },
 ];
 
