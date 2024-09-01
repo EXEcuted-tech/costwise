@@ -17,7 +17,7 @@ interface PrimaryPaginationProps {
   currentPage: number;
 }
 
-const PrimaryPagination:React.FC<PrimaryPaginationProps> = ({ data, itemsPerPage, handlePageChange, currentPage }) => {
+const PrimaryPagination:React.FC<PrimaryPaginationProps> = ({ data = [], itemsPerPage, handlePageChange, currentPage }) => {
   return (
     <div className='flex flex-col justify-center items-center'>
       <ThemeProvider theme={theme}>

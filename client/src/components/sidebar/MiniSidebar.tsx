@@ -7,10 +7,10 @@ import { useSidebarContext } from '@/context/SidebarContext';
 
 interface MiniSidebarProps {
   setIsMore: React.Dispatch<React.SetStateAction<boolean>>;
-  isAdmin?: boolean;
 }
 
-const MiniSidebar: React.FC<MiniSidebarProps> = ({ setIsMore, isAdmin }) => {
+const MiniSidebar: React.FC<MiniSidebarProps> = ({ setIsMore }) => {
+  const { isAdmin } = useSidebarContext();
   const ref = useOutsideClick(() => setIsMore(false));
   const { isOpen } = useSidebarContext();
 
@@ -27,8 +27,8 @@ const MiniSidebar: React.FC<MiniSidebarProps> = ({ setIsMore, isAdmin }) => {
         {miniMenu.map(({ iconName, className, menuName, route }, index) => {
           const IconComponent = iconMap[iconName];
           return (
-            <Link href={`/${route}`}>
-              <li key={index} className='flex cursor-pointer hover:text-[#851313] items-center my-[5px]'>
+            <Link href={`/${route}`} key={index}>
+              <li className='flex cursor-pointer hover:text-[#851313] items-center my-[5px]'>
                 <IconComponent className={`${className} mr-2`} />
                 <p className='font-semibold'>{menuName}</p>
               </li>
