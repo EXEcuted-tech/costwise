@@ -7,6 +7,7 @@ import usePath from '@/hooks/usePath';
 import MiniSidebar from './MiniSidebar';
 import Link from 'next/link';
 import { useSidebarContext } from '@/context/SidebarContext';
+import { useRouter } from 'next/navigation';
 
 export interface IconOpenConfig {
   iconName: string;
@@ -19,6 +20,7 @@ const OpenSidebar: React.FC = () => {
   const { isAdmin } = useSidebarContext();
   const [isMore, setIsMore] = useState(false);
   const path = usePath();
+  const router = useRouter();
 
   return (
     <>
@@ -36,10 +38,12 @@ const OpenSidebar: React.FC = () => {
               src="https://i.imgur.com/AZOtzD7.jpg"
               alt={'Profile Picture'}
               className='flex object-cover size-[70px] 2xl:size-[80px] rounded-full border cursor-pointer'
+              onClick={()=>{router.push('/profile')}}
             />
             <div className='text-white ml-[15px] mt-[-8px]'>
               <h1 className='font-extrabold text-[24px] 2xl:text-[28px]'>Kathea Mari</h1>
-              <p className='font-light text-[16px] 2xl:text-[20px] mt-[-8px] cursor-pointer hover:text-[#dbdbdb]'>My Account</p>
+              <p className='font-light text-[16px] 2xl:text-[20px] mt-[-8px] cursor-pointer hover:text-[#dbdbdb]'
+                onClick={()=>{router.push('/profile')}}>My Account</p>
             </div>
           </div>
 

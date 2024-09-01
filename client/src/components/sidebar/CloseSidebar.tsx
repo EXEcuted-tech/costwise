@@ -8,6 +8,7 @@ import usePath from '@/hooks/usePath';
 import MiniSidebar from './MiniSidebar';
 import Link from 'next/link';
 import { useSidebarContext } from '@/context/SidebarContext';
+import { useRouter } from 'next/navigation';
 
 interface IconClosedConfig {
   iconName: string;
@@ -21,6 +22,7 @@ const CloseSidebar: React.FC = () => {
   const { isAdmin } = useSidebarContext();
   const [isMore, setIsMore] = useState(false);
   const path = usePath();
+  const router = useRouter();
 
   return (
     <>
@@ -37,6 +39,7 @@ const CloseSidebar: React.FC = () => {
               src="https://i.imgur.com/AZOtzD7.jpg"
               alt={'Profile Picture'}
               className='flex object-cover w-[80px] h-[80px] rounded-full border cursor-pointer'
+              onClick={()=>{router.push('/profile')}}
             />
           </div>
 
