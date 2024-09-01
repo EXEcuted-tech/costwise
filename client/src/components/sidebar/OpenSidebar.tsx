@@ -134,7 +134,7 @@ const mainMenu: IconOpenConfig[] = [
   { iconName: 'RiDashboard2Fill', route: 'dashboard', menuName: 'Dashboard', className: 'text-[2.4em] 2xl:text-[2.8em]' },
   { iconName: 'BsFillFolderFill', route: 'file-manager', menuName: 'File Manager', className: 'text-[2.4em] 2xl:text-[2.8em]' },
   { iconName: 'RiFormula', route: 'formulation', menuName: 'Formulations', className: 'text-[2.4em] 2xl:text-[2.8em]' },
-  { iconName: 'BiSolidReport', route: 'report-generation', menuName: 'Report Generation', className: 'text-[2.4em] 2xl:text-[2.8em]' },
+  { iconName: 'BiSolidReport', route: 'cost-calculation', menuName: 'Cost Calculation', className: 'text-[2.4em] 2xl:text-[2.8em]' },
   { iconName: 'GiMoneyStack', route: 'projected-costing', menuName: 'Projected Costing', className: 'text-[2.4em] 2xl:text-[2.8em]' },
   { iconName: 'MdOutlineInventory', route: 'inventory', menuName: 'Inventory', className: 'text-[2.4em] 2xl:text-[2.8em]' },
   { iconName: 'GoHistory', route: 'audit-log', menuName: 'Audit Log', className: 'text-[2.4em] 2xl:text-[2.8em]' },

@@ -27,12 +27,12 @@ const CloseSidebar: React.FC = () => {
       <div className='flex justify-center w-full bg-primary min-h-screen'>
         <div className='relative top-0'>
           {/* Logo */}
-          <div className='flex justify-center my-[25px]'>
+          <div className={`${path=='profile' ? 'mt-[25px] mb-[5px]' : 'my-[25px]'} flex justify-center`}>
             <Image src={logo} alt={'Virginia Logo'} className='w-[90px] h-auto' />
           </div>
 
           {/* Account Profile */}
-          <div className='flex justify-center mb-[10px]'>
+          <div className={`${path=='profile' && 'bg-[#CD3939] w-[128px] h-[100px] items-center mb-0'} flex justify-center mb-[10px]`}>
             <img
               src="https://i.imgur.com/AZOtzD7.jpg"
               alt={'Profile Picture'}
@@ -47,7 +47,6 @@ const CloseSidebar: React.FC = () => {
                 const IconComponent = iconMap[iconName];
                 return (
                   <Tooltip
-                    key="#FFD3D3"
                     content={tooltip}
                     placement={"right"}
                     classNames={{
@@ -82,7 +81,6 @@ const CloseSidebar: React.FC = () => {
                   const IconComponent = iconMap[iconName];
                   return (
                     <Tooltip
-                      key="#FFD3D3"
                       content={tooltip}
                       placement={"right"}
                       classNames={{
@@ -108,10 +106,12 @@ const CloseSidebar: React.FC = () => {
                 :
                 (adminDefaultMenu.map(({ iconName, className, tooltip, route, routes }, index) => {
                   const IconComponent = iconMap[iconName];
+                  console.log(routes);
+                  console.log("PATH: ",path);
                   const isRoute = routes?.some(e => e === path);
+                  console.log("Is ROUTE: ",isRoute);
                   return tooltip !== 'More' ? (
                     <Tooltip
-                      key="#FFD3D3"
                       content={tooltip}
                       placement={"right"}
                       classNames={{
@@ -159,7 +159,7 @@ const mainMenu: IconClosedConfig[] = [
   { iconName: 'RiDashboard2Fill', route: 'dashboard', tooltip: 'Dashboard', className: 'text-[2.8em]' },
   { iconName: 'BsFillFolderFill', route: 'file-manager', tooltip: 'File Manager', className: 'text-[2.3em]' },
   { iconName: 'RiFormula', route: 'formulation', tooltip: 'Formulations', className: 'text-[2.3em]' },
-  { iconName: 'BiSolidReport', route: 'report-generation', tooltip: 'Report Generation', className: 'text-[2.8em]' },
+  { iconName: 'BiSolidReport', route: 'cost-calculation', tooltip: 'Cost Calculation', className: 'text-[2.8em]' },
   { iconName: 'GiMoneyStack', route: 'projected-costing', tooltip: 'Projected Costing', className: 'text-[2.8em]' },
   { iconName: 'MdOutlineInventory', route: 'inventory', tooltip: 'Inventory', className: 'text-[2.8em]' },
   { iconName: 'GoHistory', route: 'audit-log', tooltip: 'Audit Log', className: 'text-[2.8em]' },
@@ -173,7 +173,7 @@ const userDefaultMenu: IconClosedConfig[] = [
 
 const adminDefaultMenu: IconClosedConfig[] = [
   { iconName: 'FaBell', route: 'notification', tooltip: 'Notifications', className: 'text-[2.3em]' },
-  { iconName: 'MdMoreHoriz', routes: ["help", "maintenance", "user-managemenet"], tooltip: 'More', className: 'text-[2.8em]' },
+  { iconName: 'MdMoreHoriz', routes: ["help", "maintenance", "user-management"], tooltip: 'More', className: 'text-[2.8em]' },
   { iconName: 'MdLogout', route: 'logout', tooltip: 'Log Out', className: 'text-[2.3em]' },
 ];
 
