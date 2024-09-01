@@ -19,8 +19,10 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
   const [fileData, setFileData] = useState<FileTableProps[]>([]);
 
   useEffect(() => {
-    const file = selectedOption === 'all' ? fakeFileAllData : selectedOption === 'masterfile' ? fakeFileMasterData : fakeFileTransactionData;
-    console.log(file);
+    let file = selectedOption === 'all' ? fakeFileAllData : selectedOption === 'masterfile' ? fakeFileMasterData : fakeFileTransactionData;
+    if(dialogType==1){
+      file = fakeFileMasterData;
+    }
     setFileData(file);
   }, [selectedOption])
 
