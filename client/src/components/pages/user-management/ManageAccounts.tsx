@@ -81,7 +81,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
                                 Contact Number</th>
                             <th className={`${isOpen ? '4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[9rem] xl:w-[5rem]' : ' 4xl:w-[15rem] 3xl:w-[15rem] 2xl:w-[13rem] xl:w-[5rem]' } w-[15rem] py-2`}>
                                 Department</th>
-                            <th className={`${isOpen ? 'pl-[1rem]' : 'pl-[3rem] xl:pl-[2rem] w-[12%]'} py-2`}
+                            <th className={`${isOpen ? 'pl-[1rem]' : 'pl-[3rem] xl:pl-[2rem] '} py-2 w-[12%]`}
                             >Manage</th>
                         </tr>
                     </thead>
