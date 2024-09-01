@@ -3,10 +3,9 @@ import React, { useEffect, useState } from "react";
 import Image from 'next/image';
 import virginialogo from '@/assets/virginia-logo.png';
 import { useSidebarContext } from "@/context/SidebarContext";
-import Header from "@/components/header/Header";
 import { IoCamera, IoClose } from "react-icons/io5";
-import { MdModeEdit } from "react-icons/md";
 import { IoIosArrowRoundBack, IoIosSearch } from "react-icons/io";
+import PasswordChangeDialog from '@/components/modal/PasswordChangeDialog';
 
 export interface AuditTableProps {
     dateTimeAdded: string;
@@ -22,9 +21,15 @@ interface AuditLogPageProps {
 
 const EditProfilePage = () => {
 const { isOpen, setIsOpen } = useSidebarContext();
+const [dialog, setDialog] = useState(false);
 
 return (
         <div className='w-full h-screen flex flex-col items-center'>
+            {dialog && 
+                <PasswordChangeDialog 
+                setDialog={setDialog}
+                />
+            }
             <div className="relative w-full h-[170px]">
                 <div className="absolute w-full h-[50%] bg-[#FF0000] border-[5px] border-[#A60000] rounded-b-[100px]"></div>
                 <div className="absolute flex justify-center items-center w-[20%] 2xl:w-[16%] 4xl:w-[13%] h-[70%] top-[20px] left-1/2 -translate-x-1/2 bg-[#FF0000] border-[10px] border-[#A60000] rounded-[50%]">
@@ -203,7 +208,8 @@ return (
                 {/* Buttons */}
                 <div className='flex flex-col w-full mt-[37px] justify-center items-center'>
                     <button className='w-[25%] 2xl:w-[20%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] bg-primary text-white rounded-xl hover:bg-[#9c1c1c]'> Update Profile </button>
-                    <div className="text-[#8F8F8F] text-[14px] 3xl:text-[19px] underline underline-offset-[7px] cursor-pointer hover:text-[#5B5353]">
+                    <div className="text-[#8F8F8F] text-[14px] 3xl:text-[19px] underline underline-offset-[7px] cursor-pointer hover:text-[#5B5353]"
+                        onClick={() => setDialog(true)}>
                         Request Password Reset
                     </div>
 
