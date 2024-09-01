@@ -176,7 +176,7 @@ const AccountCreation = () => {
                     </div>
 
                     {/* Buttons */}
-                    <div className={`${isOpen ? '' : 'flex flex-col w-full text-[1.1em] 2xl:text-[1.2em] items-center'}`}>
+                    <div className='flex flex-col w-full text-[1.1em] 2xl:text-[1.2em] items-center'>
                         <button className='w-[240px] h-[2.5em] 4xl:h-[3rem] p-1 text-center font-semibold bg-white text-[#A60000] border-2 border-[#A60000] mb-4 rounded-xl  cursor-pointer hover:bg-[#A60000] hover:border-white hover:text-white transition-colors delay-50 duration-[1000] ease-in'>
                             Add Password </button>
                         <button className='w-[240px] h-[2.5em] 4xl:h-[3rem] p-1 text-center font-semibold bg-[#A60000] text-white rounded-xl cursor-pointer hover:bg-[#c01820]'>
