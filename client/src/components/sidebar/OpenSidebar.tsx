@@ -6,6 +6,7 @@ import { iconMap } from '@/utils/iconMap';
 import usePath from '@/hooks/usePath';
 import MiniSidebar from './MiniSidebar';
 import Link from 'next/link';
+import { useSidebarContext } from '@/context/SidebarContext';
 
 export interface IconOpenConfig {
   iconName: string;
@@ -15,7 +16,7 @@ export interface IconOpenConfig {
   routes?: string[];
 }
 const OpenSidebar: React.FC = () => {
-  const [isAdmin, setIsAdmin] = useState(true);
+  const { isAdmin } = useSidebarContext();
   const [isMore, setIsMore] = useState(false);
   const path = usePath();
 
@@ -48,9 +49,8 @@ const OpenSidebar: React.FC = () => {
               {mainMenu.map(({ iconName, className, menuName, route }, index) => {
                 const IconComponent = iconMap[iconName];
                 return (
-                  <Link href={`/${route}`}>
+                  <Link href={`/${route}`} key={index}>
                     <li
-                      key={index}
                       className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${path === route
                         ? 'w-[88%] 2xl:w-[86%] text-primary bg-[#FFD3D3] ml-[17px] 2xl:ml-[25px] pr-[20px] pl-[10px] 2xl:pl-[15px] py-[5px] my-[8px] rounded-[20px]'
                         : 'my-[15px] 2xl:my-[12px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
@@ -73,9 +73,8 @@ const OpenSidebar: React.FC = () => {
                 (userDefaultMenu.map(({ iconName, className, menuName, route }, index) => {
                   const IconComponent = iconMap[iconName];
                   return (
-                    <Link href={`/${route}`}>
+                    <Link href={`/${route}`} key={index}>
                       <li
-                        key={index}
                         className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${path === route
                           ? 'w-[90%] 2xl:w-[88%] text-primary bg-[#FFD3D3] ml-[17px] 2xl:ml-[25px] pr-[20px] pl-[10px] 2xl:pl-[15px] py-[5px] my-[8px] rounded-[20px]'
                           : 'my-[14px] 2xl:my-[11px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
@@ -124,7 +123,7 @@ const OpenSidebar: React.FC = () => {
           </div>
         </div>
       </div>
-      {isMore && <MiniSidebar setIsMore={setIsMore} isAdmin={isAdmin} />}
+      {isMore && <MiniSidebar setIsMore={setIsMore} />}
     </>
   );
 };

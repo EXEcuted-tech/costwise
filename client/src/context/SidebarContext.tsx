@@ -5,6 +5,8 @@ const SidebarContext = createContext<LayoutProps | undefined>(undefined);
 export interface LayoutProps {
   setIsOpen: React.Dispatch<React.SetStateAction<boolean>>;
   isOpen: boolean;
+  setIsAdmin: React.Dispatch<React.SetStateAction<boolean>>;
+  isAdmin: boolean;
 }
 
 export const useSidebarContext = () => {
@@ -17,9 +19,10 @@ export const useSidebarContext = () => {
 
 export const SidebarProvider = ({ children }: { children: ReactNode }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(true);
 
   return (
-    <SidebarContext.Provider value={{ isOpen, setIsOpen }}>
+    <SidebarContext.Provider value={{ isOpen, setIsOpen, isAdmin, setIsAdmin }}>
       {children}
     </SidebarContext.Provider>
   );
