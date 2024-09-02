@@ -84,14 +84,14 @@ const CostCalculation =() => {
                         <div 
                             onClick={() => handleFGClick('Specific-FG')}
                             className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-l-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                ${selectedFG === 'Specific-FG' ? 'bg-[#B22222] text-white' : 'bg-white text-black'}`}
+                                ${selectedFG === 'Specific-FG' ? 'bg-[#B22222] text-white' : 'bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out'}`}
                         >
                             Specific-FG
                         </div>
                         <div 
                             onClick={() => handleFGClick('All-FG')}
                             className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-r-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                ${selectedFG === 'All-FG' ? 'bg-[#B22222] text-white' : 'bg-white text-black'}`}
+                                ${selectedFG === 'All-FG' ? 'bg-[#B22222] text-white' : 'bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out'}`}
                         >
                             All-FG
                         </div>
@@ -109,15 +109,15 @@ const CostCalculation =() => {
                                 <option value="CSV">CSV</option>
                             </select>
                             
-                            <button className='w-[40px] h-[45px] bg-[#B22222] px-[5px] rounded-r-md cursor-pointer'>
-                                <MdDownloadForOffline className='text-white text-[30px]' />
+                            <button className='w-[40px] h-[45px] bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out px-[5px] rounded-r-md cursor-pointer'>
+                                <MdDownloadForOffline className='text-white text-[30px] hover:animate-shake-tilt' />
                             </button>
                         </div>
 
                         {selectedFG === 'Specific-FG' && (
                             <div 
                                 onClick={handleAddSheet} 
-                                className='flex items-center w-full h-[45px] text-white bg-[#B22222] px-[5px] rounded-md cursor-pointer'>
+                                className='flex items-center w-full h-[45px] text-white bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out px-[5px] rounded-md cursor-pointer'>
                                 <IoMdAdd className='text-[24px] mr-1' /> <p className='text-[21px] font-bold'>FG Sheet</p>
                             </div>
                         )}

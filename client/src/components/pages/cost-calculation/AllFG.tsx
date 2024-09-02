@@ -27,7 +27,7 @@ const AllFG: React.FC<AllFGrops> = ({ isOpen, title, sheetData }) => {
     }as { [key: number]: string };
 
     return (       
-        <div className={`${isOpen ? 'xl:ml-[4rem]' : '' } relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white rounded-2xl border-1 border-[#656565] shadow-md animate-fade-in2`}>
+        <div className={`${isOpen ? 'xl:ml-[4rem]' : '' } relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white rounded-2xl border-1 border-[#656565] shadow-md animate-pull-down`}>
             {/* Header */}
             <div className={`${isOpen ? 'xl:py-3 xl:text-[21px] 2xl:text-[23px] 3xl:text-[26px] 4xl:text-[26px]' : 'xl:py-3 xl:text-[21px] 2xl:text-[26px] 3xl:text-[26px] 4xl:text-[26px] text-[26px]' } h-14 rounded-t-2xl bg-[#B22222] text-white font-bold py-2 pl-7 uppercase drop-shadow-xl`}>
                 <p>{title}</p>

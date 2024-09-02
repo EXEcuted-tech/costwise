@@ -38,18 +38,9 @@ const SpecificFG: React.FC<SpecificFGProps> = ({ id, removeSheet, isOpen, sheetD
 
       
     return (
-        <div className={`${isOpen ? '' : ''} relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white rounded-2xl border-1 border-[#656565] shadow-md animate-fade-in2`}>
+        <div className={`${isOpen ? '' : ''} relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white rounded-2xl border-1 border-[#656565] shadow-md animate-pull-down`}>
             {/* Header */}
             <div className='flex h-14 rounded-t-2xl bg-[#B22222] text-white text-[26px] font-bold py-2 pl-7 drop-shadow-xl'>
-                {/* <select 
-                    className={`${isOpen ? 'xl:w-[34rem] xl:text-[21px] 2xl:text-[26px] 3xl:text-[26px] 4xl:text-[26px]' : ''} w-auto pr-2 bg-transparent uppercase cursor-pointer outline-[#8a1515]`}
-                    name="sheetValue"
-                >
-                    <option selected disabled>Choose Finished Good</option>
-                    {finishedGoods.map((fg, index) => (
-                        <option key={index} value={fg} className='text-[#ACACAC]'> {fg} </option>
-                    ))}
-                </select> */}
                 <CustomGoodsSelect
                     options={finishedGoods}
                     placeholder="Choose Finished Good"
