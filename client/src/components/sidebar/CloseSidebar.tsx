@@ -109,10 +109,7 @@ const CloseSidebar: React.FC = () => {
                 :
                 (adminDefaultMenu.map(({ iconName, className, tooltip, route, routes }, index) => {
                   const IconComponent = iconMap[iconName];
-                  console.log(routes);
-                  console.log("PATH: ",path);
                   const isRoute = routes?.some(e => e === path);
-                  console.log("Is ROUTE: ",isRoute);
                   return tooltip !== 'More' ? (
                     <Tooltip
                       content={tooltip}

@@ -10,11 +10,11 @@ import { IoMdAdd } from "react-icons/io";
 import useOutsideClick from '@/hooks/useOutsideClick';
 import FormulationContainer from '@/components/pages/formulation/FormulationContainer';
 import { useSidebarContext } from '@/context/SidebarContext';
-import CompareFormulaDialog from '@/components/modal/CompareFormulaDialog';
+import CompareFormulaDialog from '@/components/modals/CompareFormulaDialog';
 import { useFormulationContext } from '@/context/FormulationContext';
 import { useRouter } from 'next/navigation';
-import ChooseFileDialog from '@/components/modal/ChooseFileDialog';
-import BillOfMaterialsList from '@/components/modal/BillOfMaterialsList';
+import ChooseFileDialog from '@/components/modals/ChooseFileDialog';
+import BillOfMaterialsList from '@/components/modals/BillOfMaterialsList';
 import CompareFormulaContainer from '@/components/pages/formulation/CompareFormulaContainer';
 
 const FormulationPage = () => {
@@ -52,18 +52,18 @@ const FormulationPage = () => {
                             />
                         </div>
                         <div className={`${isOpen ? 'w-[60%] 4xl:w-[50%]' : 'w-[55%] 2xl:w-[50%] 3xl:w-[40%]'} flex flex-grow items-end justify-end`}>
-                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} mr-[10px] bg-white px-[15px] py-[5px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7]`}
+                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} mr-[10px] bg-white px-[15px] py-[5px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out`}
                                 onClick={() => setCompareFormula(true)}>
                                 <MdCompare className='mr-[5px]' />
                                 <span className='font-bold'>Compare</span>
                             </button>
-                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} mr-[10px] bg-white px-[15px] py-[5px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7]`}
+                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} mr-[10px] bg-white px-[15px] py-[5px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out`}
                                 onClick={() => setBomList(true)}>
                                 <IoList className={`${isOpen ? 'text-[15px] 2xl:text-[22px]' : 'text-[22px]'} mr-[5px]`} />
                                 <span className='font-bold'>BOM List</span>
                             </button>
                             <div ref={ref}>
-                                <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} px-[15px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c]`}
+                                <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} px-[15px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
                                     onClick={() => setAddFormula(!addFormula)}>
                                     <span className='font-bold border-r-[2px] border-r-[#920000] pr-[10px] mr-[10px]'>Add Formula</span>
                                     <span><AiOutlineDown /></span>

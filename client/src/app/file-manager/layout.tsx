@@ -1,6 +1,6 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
-import { FileTypeProvider, useFileType } from "@/context/FileTypeContext";
+import { FileManagerProvider } from '@/context/FileManagerContext';
 import { SidebarProvider, useSidebarContext } from "@/context/SidebarContext";
 import { useEffect, useState } from "react";
 
@@ -11,11 +11,11 @@ export default function FileManagerLayout({
 }>) {
   return (
     <SidebarProvider>
-      <FileTypeProvider>
+      <FileManagerProvider>
         <FileManagerContent>
           {children}
         </FileManagerContent>
-      </FileTypeProvider>
+      </FileManagerProvider>
     </SidebarProvider>
   );
 }

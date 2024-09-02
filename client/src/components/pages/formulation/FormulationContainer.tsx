@@ -9,6 +9,8 @@ import FormulationTable from './FormulationTable';
 import { useFormulationContext } from '@/context/FormulationContext';
 import CompareFormulaContainer from './CompareFormulaContainer';
 import BOMListContainer from './BOMListContainer';
+import { FaFileCircleXmark } from "react-icons/fa6";
+import ConfirmDelete from '@/components/modals/ConfirmDelete';
 
 export interface FormulationContainerProps {
     number: string;
@@ -35,6 +37,7 @@ export interface FormulationProps {
 const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const { edit, setEdit, viewFormulas, viewBOM } = useFormulationContext();
+    const [ deleteModal, setDeleteModal ] = useState(false);
 
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
@@ -64,12 +67,13 @@ const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => 
     }
 
     const handleDelete = (data: FormulationContainerProps) => {
-
+        setDeleteModal(true);
     }
 
 
     return (
         <>
+            {deleteModal && <ConfirmDelete onClose={()=>setDeleteModal(false)}/>}
             {(view || edit) ? <FormulationTable view={view} setView={setView} /> :
                 viewFormulas ? <CompareFormulaContainer /> :
                     viewBOM ? <BOMListContainer /> :
@@ -87,8 +91,8 @@ const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => 
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {currentListPage.length > 0
-                                        ? (currentListPage.map((data, index) => (
+                                    {currentListPage.length > 0 &&
+                                        (currentListPage.map((data, index) => (
                                             <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'} text-center`}>
                                                 <td className='py-[15px]'>{data.number}</td>
                                                 <td>{data.itemCode}</td>
@@ -99,42 +103,47 @@ const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => 
                                                 <td>
                                                     <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
                                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
-                                                cursor-pointer hover:bg-[#f7f7f7] hover:rounded-l-[5px]'
+                                                                cursor-pointer hover:bg-[#f7f7f7] rounded-l-[5px] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleView(data)}>
                                                             <FaEye />
                                                         </div>
                                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
-                                        cursor-pointer hover:bg-[#f7f7f7]'
+                                                                cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleEdit(data)}>
                                                             <FaPencilAlt />
                                                         </div>
                                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
-                                        cursor-pointer hover:bg-[#f7f7f7]'
+                                                                cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleExport(data)}>
                                                             <TiExport />
                                                         </div>
                                                         <div className='flex justify-center items-center h-full
-                                        cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px]'
+                                                                cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleDelete(data)}>
                                                             <IoTrash />
                                                         </div>
                                                     </div>
                                                 </td>
                                             </tr>
-                                        )))
-                                        : (
-                                            <p>No File.</p>
-                                        )}
+                                        )))}
                                 </tbody>
                             </table>
-                            <div className='relative py-[1%]'>
-                                <PrimaryPagination
-                                    data={fakeFormulaData}
-                                    itemsPerPage={8}
-                                    handlePageChange={handlePageChange}
-                                    currentPage={currentPage}
-                                />
-                            </div>
+                            {currentListPage.length > 0
+                                ?
+                                <div className='relative py-[1%]'>
+                                    <PrimaryPagination
+                                        data={fakeFormulaData}
+                                        itemsPerPage={8}
+                                        handlePageChange={handlePageChange}
+                                        currentPage={currentPage}
+                                    />
+                                </div>
+                                :
+                                <div className='min-h-[350px] flex flex-col justify-center items-center p-12 font-semibold text-[#9F9F9F]'>
+                                    <FaFileCircleXmark className='text-[75px]' />
+                                    <p className='text-[30px]'>No File Found.</p>
+                                </div>
+                            }
                         </div>
             }
         </>

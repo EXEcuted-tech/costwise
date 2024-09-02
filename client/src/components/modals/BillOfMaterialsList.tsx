@@ -3,7 +3,6 @@ import { IoClose } from 'react-icons/io5'
 import { MdCompare } from 'react-icons/md'
 import { TbPointFilled } from "react-icons/tb";
 import { BsThreeDotsVertical } from "react-icons/bs";
-import { FiArchive } from "react-icons/fi";
 import useOutsideClick from '@/hooks/useOutsideClick';
 import BOMListContainer from '../pages/formulation/BOMListContainer';
 import { useFormulationContext } from '@/context/FormulationContext';
@@ -46,7 +45,7 @@ const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateActio
 
     useEffect(() => {
         const handleScroll = () => {
-            setMiniMenu(null); // Close the miniMenu when the container scrolls
+            setMiniMenu(null);
         };
 
         const scrollElement = scrollRef.current;
@@ -70,7 +69,7 @@ const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateActio
                         <MdCompare className='mr-[5px] text-[35px]' />
                         <h1 className='text-[35px] font-black'>Bill of Materials List</h1>
                     </div>
-                    <IoClose className='text-[60px] text-[#CECECE] cursor-pointer hover:brightness-90 p-0'
+                    <IoClose className='text-[60px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 p-0'
                         onClick={() => setBOM(false)} />
                 </div>
                 <hr />
@@ -95,14 +94,14 @@ const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateActio
                                     <BsThreeDotsVertical className='text-[18px] text-[#818181] cursor-pointer hover:brightness-50'
                                         onClick={(e) => handleMenuClick(index, e)} />
                                     {miniMenu === index && (
-                                        <div ref={ref} className='fixed bg-white shadow-lg rounded-md border z-[5000] right-[55px]'
+                                        <div ref={ref} className='animate-pop-out fixed bg-white shadow-lg rounded-md border z-[5000] right-[55px]'
                                             style={{ top: menuPosition }}>
-                                            <p className='px-4 py-2 cursor-pointer border-b border-bg-gray-200 hover:bg-gray-200'
+                                            <p className='px-4 py-2 cursor-pointer border-b border-bg-gray-200 hover:bg-gray-200 transition-colors duration-250 ease-in-out'
                                                 onClick={() => {
                                                     setBOM(false);
                                                     setViewBOM(true);
                                                 }}>View</p>
-                                            <p className='px-4 py-2 cursor-pointer hover:bg-primary hover:bg-primary hover:text-white hover:rounded-b-md'
+                                            <p className='px-4 py-2 cursor-pointer hover:bg-primary hover:bg-primary hover:text-white rounded-b-md transition-colors duration-250 ease-in-out'
                                                 onClick={() => {
                                                     handleDelete(index);
                                                 }}>Delete</p>

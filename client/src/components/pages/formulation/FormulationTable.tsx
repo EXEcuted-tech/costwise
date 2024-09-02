@@ -101,7 +101,7 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
         <div className='bg-white rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[25px] mb-[20px]'>
             {/* header */}
             <div className='flex items-center py-[10px]'>
-                <IoIosArrowRoundBack className='text-primary text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] cursor-pointer'
+                <IoIosArrowRoundBack className='text-primary text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] transition-colors duration-200 ease-in-out cursor-pointer'
                     onClick={handleBack} />
                 <h1 className='font-bold text-[28px] text-primary'>
                     {view ? 'View Formulation' : 'Edit Formulation'}
@@ -115,14 +115,14 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                 {edit &&
                     <div className={`${isOpen ? 'flex-col 3xl:flex-row w-[20%] 3xl:w-[50%] ' : 'flex-col 2xl:flex-row w-[20%] 2xl:w-[50%]'} flex justify-end`}>
                         <div className={`${isOpen ? 'mt-[10px] 3xl:mr-[10px]' : 'mt-[10px] 2xl:my-[10px] 2xl:mr-[10px]'} flex justify-end`}>
-                            <button className={`${isOpen ? 'text-[15px] 2xl:text-[18px]': 'text-[18px]'} hover:bg-[#961e1e] h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-primary`}
+                            <button className={`${isOpen ? 'text-[15px] 2xl:text-[18px]': 'text-[18px]'} hover:bg-[#961e1e] transition-colors duration-250 ease-in-out h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-primary`}
                                 onClick={addRow}>
                                 <HiOutlinePlus className='mr-[5px]' />
                                 Add Row
                             </button>
                         </div>
                         <div className='flex justify-end mt-[5px] mb-[10px] 2xl:my-[10px]'>
-                            <button className={`${isOpen ? 'text-[15px] 2xl:text-[18px]': 'text-[18px]'} hover:bg-[#00780c] h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F]`}
+                            <button className={`${isOpen ? 'text-[15px] 2xl:text-[18px]': 'text-[18px]'} hover:bg-[#00780c] transition-colors duration-250 ease-in-out h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F]`}
                                 onClick={() => { 
                                     setEdit(false); 
                                     setView(true);
@@ -217,7 +217,7 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                                         {fileData.formulations?.map((formulation, index) => (
                                             <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'} animate-zoomIn text-center font-medium text-[#6B6B6B] text-[18px]`}>
                                                 <td className='flex justify-center items-center py-[15px]'>
-                                                    <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700"
+                                                    <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-300 ease-in-out"
                                                         onClick={() => removeRow(index)} />
                                                 </td>
                                                 <td className='py-[10px]'>

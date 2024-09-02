@@ -6,7 +6,7 @@ import { LuCircle } from "react-icons/lu";
 import { MdTrolley, MdCalendarToday } from "react-icons/md";
 import { IoIosArrowBack, IoIosArrowForward, IoIosSearch } from "react-icons/io";
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
-import MonthSelector from '@/components/modal/MonthSelector';
+import MonthSelector from '@/components/modals/MonthSelector';
 
 export interface InventoryProps {
     itemCode: String;
