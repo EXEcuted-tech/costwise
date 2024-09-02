@@ -20,6 +20,7 @@
     "@nextui-org/theme": "^2.2.6",
     "@nextui-org/tooltip": "^2.0.36",
     "chart.js": "^4.4.4",
+    "classnames": "^2.5.1",
     "framer-motion": "^11.3.4",
     "next": "14.2.4",
     "react": "^18",
