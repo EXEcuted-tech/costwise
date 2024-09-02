@@ -18,7 +18,7 @@ const GettingStartedPage = () => {
                         </Link>
                         <p className='flex items-center justify-start text-primary text-[40px] font-bold pl-[15px]'>Essential features</p>
                     </div>
-                    <div className='overflow-y-scroll'>
+                    <div id='scroll-style' className='overflow-y-scroll'>
                         <div className='flex flex-col pt-[50px] text-[30px] text-tertiary'>
                             Heading 1
                             <div className='flex flex-col text-[24px] pt-[10px] text-tertiary'>

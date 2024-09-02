@@ -64,8 +64,8 @@ const UserManualPage = () => {
                   </ul>
                 </div>
                 <div className='flex h-full justify-start items-end z-50'>
-                  <Link className='text-[12px] xl:[14px] 2xl:text-[16px] flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href=' /help/getting-started'>
-                    <button>
+                  <Link className='text-[12px] xl:[14px] 2xl:text-[16px] hover:bg-[#8c1515] transition-colors duration-200 ease-in-out flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href=' /help/getting-started'>
+                    <button className='font-bold'>
                       <p>View Articles &gt;</p>
                     </button>
                   </Link>
@@ -95,8 +95,8 @@ const UserManualPage = () => {
                   </ul>
                 </div>
                 <div className='flex h-full justify-start items-end'>
-                  <Link className='text-[12px] xl:[14px] 2xl:text-[16px] flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href='/help/essentials'>
-                    <button>
+                  <Link className='text-[12px] xl:[14px] 2xl:text-[16px] hover:bg-[#8c1515] transition-colors duration-200 ease-in-out flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href='/help/essentials'>
+                    <button className='font-bold'>
                       <p>View Articles &gt;</p>
                     </button>
                   </Link>
@@ -126,8 +126,8 @@ const UserManualPage = () => {
                   </ul>
                 </div>
                 <div className='flex h-full justify-start items-end'>
-                  <Link className='text-[12px] xl:[14px] 2xl:text-[16px] flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href='/help/manage-account'>
-                    <button>
+                  <Link className='text-[12px] xl:[14px] 2xl:text-[16px] hover:bg-[#8c1515] transition-colors duration-200 ease-in-out flex bg-primary px-[10%] py-[5%] 2xl:px-[5%] 2xl:py-[3%] text-white rounded-lg drop-shadow-xl cursor-pointer' href='/help/manage-account'>
+                    <button className='font-bold'>
                       <p>View Articles &gt;</p>
                     </button>
                   </Link>

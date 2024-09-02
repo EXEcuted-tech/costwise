@@ -179,10 +179,6 @@ const AccountCreation = () => {
 
                 {/* Buttons */}
                 <div className='flex flex-col w-full text-[1.1em] 2xl:text-[1.2em] items-center gap-[10px]'>
-                    {/* <button className='w-[240px] h-[2.5em] 4xl:h-[3rem] p-1 text-center font-semibold bg-white text-[#A60000] border-2 border-[#A60000] mb-4 rounded-xl  cursor-pointer hover:bg-[#A60000] hover:border-white hover:text-white transition-colors delay-50 duration-[1000] ease-in'>
-                        Add Password </button> */}
-                    {/* <button className='w-[240px] h-[2.5em] 4xl:h-[3rem] p-1 text-center font-semibold bg-[#A60000] text-white rounded-xl cursor-pointer hover:bg-[#c01820]'>
-                            Confirm </button> */}
                     <div className="relative inline-flex bg-white border border-primary overflow-hidden text-primary w-[240px] h-[2.5em] 4xl:h-[3rem] flex items-center justify-center rounded-[10px] cursor-pointer transition-all rounded hover:border-1 hover:border-primary group">
                         <button className="font-black">
                             <span className="w-full h-48 rounded bg-primary absolute bottom-0 left-0 translate-x-full ease-out duration-500 transition-all translate-y-full mb-9 ml-9 group-hover:ml-0 group-hover:mb-32 group-hover:translate-x-0"></span>
