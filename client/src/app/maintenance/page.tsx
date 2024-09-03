@@ -32,16 +32,17 @@ const SystemMaintenance = () => {
     const currentListPage = ReleaseNotesFakeData.slice(indexOfFirstItem, indexOfLastItem);
 
     return (
-        <div className='w-full h-screen bg-yellow-50'>
+        <div className='w-full h-screen bg-background'>
             <div>
                 <Header icon={GrSystem} title="System Maintenance" />
             </div>
 
-            <div className=''>
+            <div className='ml-[45px]'>
                 {/* Info Tiles */}
                 <div className='flex mx-16 mt-12 mb-9 gap-[5rem] justify-center'>
                     {/* Database Storage */}
-                    <div className='flex flex-col p-4 w-[32%] h-[17rem] bg-white rounded-lg drop-shadow-lg'>
+                    
+                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]' } flex flex-col p-4 h-[17rem] bg-white rounded-lg drop-shadow-lg`}>
                         <div className='flex flex-col mb-8'>
                             <div className='flex'>
                                 <span className='text-[38px] mr-2'>128</span>
@@ -62,7 +63,7 @@ const SystemMaintenance = () => {
                     </div>
 
                     {/* Files */}
-                    <div className='flex flex-col p-4 w-[32%] h-[17rem] bg-white rounded-lg drop-shadow-lg'>
+                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]' } flex flex-col p-4 h-[17rem] bg-white rounded-lg drop-shadow-lg`}>
                         <div className='flex flex-col mb-8'>
                             <div className='flex'>
                                 <span className='text-[38px] mr-2'>50</span>
@@ -97,12 +98,12 @@ const SystemMaintenance = () => {
                 </div>
 
                 {/* Release Notes */}
-                <div className='flex flex-col h-[31rem] mx-16 bg-white rounded-lg drop-shadow-md'>
+                <div className={`${isOpen ? 'mx-9 2xl:mx-16' : 'mx-16' } flex flex-col h-[31rem] bg-white rounded-lg drop-shadow-md`}>
                     {/* Header */}
                     <div className='flex w-full h-[4rem] px-4 py-3 font-medium bg-white border border-[#9290906c] drop-shadow-md rounded-t-lg'>
                         <IoGitNetworkOutline className='text-[32px] text-gray-500 mt-1 mr-3' />
                         <span className='text-[28px] text-[#5B5353]'>Release Notes</span>
-                        <button className='w-[2rem] h-[2rem] text-[25px] ml-5 mt-1 px-[3px] text-gray-500 border border-[#9290905b] bg-white drop-shadow-md rounded-lg'><IoMdAdd /></button>
+                        <button className={`${isOpen ? 'ml-2 2xl:ml-5' : 'ml-5' } w-[2rem] h-[2rem] text-[25px] mt-1 px-[3px] text-gray-500 border border-[#9290905b] bg-white drop-shadow-md rounded-lg`}><IoMdAdd /></button>
                         <div className="mt-[3px] ml-auto text-gray-600">
                             <div className='flex absolute text-[1.3em] text-gray-400 mt-[0.3rem] ml-3'>
                                 <IoIosSearch />
@@ -118,7 +119,7 @@ const SystemMaintenance = () => {
                     </div>
 
                     {/* Main Content Area */}
-                    <div className='w-full h-[21rem] mt-6 px-16'>
+                    <div className={`${isOpen ? 'px-10' : 'px-16' } w-full h-[21rem] mt-6`}>
                         {currentListPage.map((note, index) => (
                             <ReleaseNoteTile 
                                 key={index}
