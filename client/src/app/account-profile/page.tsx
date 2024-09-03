@@ -59,8 +59,8 @@ return (
                         </div>
                     </div>
                     <div>
-                        <div className='text-[25px] 2xl:text-[30px] font-semibold'> Kathea Mari Mayol </div>
-                        <div className='text-[22px] 2xl:text-[24px]'> Administrator </div>
+                        <div className='text-[25px] 2xl:text-[30px] font-semibold'> {fakeAccData[0].firstName} {fakeAccData[0].lastName}</div>
+                        <div className='text-[22px] 2xl:text-[24px]'> {fakeAccData[0].role} </div>
                         <Link href="/logout">
                             <button className="text-[22px] 2xl:text-[24px] text-primary cursor-pointer hover:opacity-65">
                                 Logout
@@ -87,6 +87,6 @@ const fakeAccData: AccountDataProps[] = [
         suffix: 'N/A',
         department: 'Cost Accounting',
         employeeNumber: '#12934',
-        role: 'Admin'
+        role: 'Administrator'
     },
 ];

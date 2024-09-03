@@ -18,7 +18,6 @@ const UserInformation: React.FC<{isOpen: boolean, fakeAccData: any}> = ( {isOpen
         {props ? 
         <EditInformation setProps={setProps} setDialog={setDialog} isOpen={isOpen} fakeAccData={fakeAccData}/>
         :
-        
         <div className="mx-8 2xl:mx-12">
             <div className={`${isOpen ? 'text-[24px] 2xl:text-[32px]' : 'text-[28px] 2xl:text-[32px]'} flex text-[#8E8E8E] font-semibold mt-3 mb-2`}>
                 User Information
