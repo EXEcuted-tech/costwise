@@ -212,7 +212,6 @@ return (
                         onClick={() => setDialog(true)}>
                         Request Password Reset
                     </div>
-
                 </div>
             </div>  
         </div>

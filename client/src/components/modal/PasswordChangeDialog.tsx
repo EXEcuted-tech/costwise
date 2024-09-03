@@ -11,32 +11,33 @@ const PasswordChangeDialog: React.FC<PasswordChangeDialogProps> = ({ setDialog }
 
   return (
     <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]'>
-      <div className='animate-pop-out bg-white w-[460px] h-[380px] rounded-[20px] px-[10px]'>
+      <div className='flex flex-col animate-pop-out bg-white w-[550px] h-[310px] rounded-[20px] px-[10px] gap-5'>
         <div className='flex justify-end'>
-            <h1 className='font-black text-[30px]'>Are You Sure?</h1>
-          <IoIosClose className='mt-[2px] text-[70px] text-[#CECECE] cursor-pointer hover:brightness-90' onClick={() => setDialog(false)}/>
+            <h1 className='font-black text-[30px] mt-[20px] mr-[65px]'>Password Change</h1>
+            <IoIosClose className='mt-[2px] text-[70px] text-[#CECECE] cursor-pointer hover:brightness-90' onClick={() => setDialog(false)}/>
         </div>
-        <div className='flex justify-center'>
-          <RiFileWarningFill className='text-[95px] text-[#FFCC00]' />
+
+        <div className='flex flex-col w-full px-5 gap-5'>
+          <input
+              className="bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border border-[#B3B3B3] rounded-lg focus:outline"
+              type="fname"
+              name="fname"
+              placeholder="New Password"
+          />
+          <input
+              className="bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border border-[#B3B3B3] rounded-lg focus:outline"
+              type="fname"
+              name="fname"
+              placeholder="Confirm Password"
+          />
         </div>
-        <div className='flex flex-col justify-center items-center pb-[20px]'>
-          <h1 className='font-black text-[30px]'>Are You Sure?</h1>
-          <p className='text-center text-[#9D9D9D] text-[19px] px-[30px]'>
-            Switching tabs will temporarily close your current file. Do you want to proceed?
-          </p>
+
+        <div className='flex w-full justify-center'>
+          <button className='w-[50%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] bg-primary text-white rounded-xl hover:bg-[#9c1c1c]'> 
+            Update Profile 
+          </button>
         </div>
-        <div className='my-[2px] px-[50px] grid grid-cols-2 gap-4'>
-          <div className="relative inline-flex bg-white border-1 border-primary overflow-hidden text-primary flex items-center justify-center rounded-[30px] cursor-pointer transition-all rounded group">
-            <button className="text-[19px] font-black before:ease relative h-12 w-40 overflow-hidden bg-primary text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-primary hover:before:-translate-x-40">
-              <span className="relative z-10">Proceed</span>
-            </button>
-          </div>
-          <div className="relative inline-flex bg-white border-1 border-primary overflow-hidden text-primary flex items-center justify-center rounded-[30px] cursor-pointer transition-all rounded group">
-            <button className="text-[19px] font-black before:ease relative h-12 w-40 overflow-hidden bg-white text-primary shadow-2xl transition-all hover:bg-[#FFD3D3] before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-white hover:before:-translate-x-40">
-              <span className="relative z-10" onClick={() => setDialog(false)}>Cancel</span>
-            </button>
-          </div>
-        </div>
+
       </div>
     </div>
   )
