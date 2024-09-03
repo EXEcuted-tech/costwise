@@ -100,7 +100,6 @@ const config: Config = {
       },
       backgroundImage: {
         'virginia-mascot': "url('/images/virginia-mascot-bg.png')",
-        'virginia-pattern': "url('/assets/account-profile-bg.png')"
       }
     },
   },
