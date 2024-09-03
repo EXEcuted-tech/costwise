@@ -39,9 +39,9 @@ const SystemMaintenance = () => {
 
             <div className=''>
                 {/* Info Tiles */}
-                <div className='flex mx-16 mt-12 mb-9 px-[15rem] '>
+                <div className='flex mx-16 mt-12 mb-9 gap-[5rem] justify-center'>
                     {/* Database Storage */}
-                    <div className='flex flex-col p-4 w-[30rem] h-[17rem] mr-[5rem] bg-white rounded-lg drop-shadow-lg'>
+                    <div className='flex flex-col p-4 w-[32%] h-[17rem] bg-white rounded-lg drop-shadow-lg'>
                         <div className='flex flex-col mb-8'>
                             <div className='flex'>
                                 <span className='text-[38px] mr-2'>128</span>
@@ -62,7 +62,7 @@ const SystemMaintenance = () => {
                     </div>
 
                     {/* Files */}
-                    <div className='flex flex-col p-4 w-[30rem] h-[17rem] bg-white rounded-lg drop-shadow-lg'>
+                    <div className='flex flex-col p-4 w-[32%] h-[17rem] bg-white rounded-lg drop-shadow-lg'>
                         <div className='flex flex-col mb-8'>
                             <div className='flex'>
                                 <span className='text-[38px] mr-2'>50</span>
@@ -97,7 +97,7 @@ const SystemMaintenance = () => {
                 </div>
 
                 {/* Release Notes */}
-                <div className='flex flex-col h-[30rem] mx-16 bg-white rounded-lg drop-shadow-md'>
+                <div className='flex flex-col h-[31rem] mx-16 bg-white rounded-lg drop-shadow-md'>
                     {/* Header */}
                     <div className='flex w-full h-[4rem] px-4 py-3 font-medium bg-white border border-[#9290906c] drop-shadow-md rounded-t-lg'>
                         <IoGitNetworkOutline className='text-[32px] text-gray-500 mt-1 mr-3' />
@@ -118,7 +118,7 @@ const SystemMaintenance = () => {
                     </div>
 
                     {/* Main Content Area */}
-                    <div className='w-full h-[23rem] mt-6 px-16'>
+                    <div className='w-full h-[21rem] mt-6 px-16'>
                         {currentListPage.map((note, index) => (
                             <ReleaseNoteTile 
                                 key={index}
