@@ -179,9 +179,9 @@ const ProjectedCostPage = () => {
             <div>
                 <Header icon={MdOutlineAnalytics} title={"Projected Costing"} />
             </div>
-            <div className="w-full ml-[60px] pr-[45px] h-[90vh] flex flex-col items-start justify-start pt-[15px] py-[15px]">
+            <div className="w-full ml-[60px] pr-[45px] h-full 2xl:h-[90vh] flex flex-col items-start justify-start pt-[15px] py-[15px]">
                 <p className="text-[30px] text-tertiary">Equipment Costs</p>
-                <div className="flex flex-row h-[10%] w-[100%] items-start justify-start flex-wrap">
+                <div className="flex flex-row h-[10%] w-full items-start justify-start flex-wrap">
                     {/* Dropdown List Start*/}
                     <div className="min-w-[200px] relative mt-[15px] text-[16px]">
                         <div
@@ -258,9 +258,9 @@ const ProjectedCostPage = () => {
                         </ul>
                     </div>
                 </div>
-                <div className="flex flex-row w-[97%] h-[100%] gap-[2%] rounded-xl">
+                <div className="flex flex-col 2xl:flex-row w-[97%] h-full gap-[2%] rounded-xl mt-[10px] 2xl:mt-0">
                     {/* Left Div */}
-                    <div className="flex flex-col w-[65%] h-full rounded-lg shadow-xl">
+                    <div className="flex flex-col w-full 2xl:w-[65%] h-full rounded-lg shadow-xl">
                         <div className="flex text-[30px] text-[#585858] font-bold h-[10%] bg-white items-center justify-start  border-b-2 pl-10">
                             <p className="w-[95%]">GRAPHS</p>
                             <IoIosInformationCircle className="text-[35px] text-[#625F5F]" />
@@ -276,78 +276,80 @@ const ProjectedCostPage = () => {
                         </div>
                     </div>
                     {/* Right Div */}
-                    <div className="flex flex-col gap-[15px] h-full w-[45%]">
-                        {/* Predictions Section */}
-                        <div className="flex flex-col bg-white p-[10px] m-1 h-[25%] border-l-[15px] border-blue-500 rounded-e-lg shadow-lg">
-                            <div className="border-b-1 border-[#D9D9D9] flex flex-row">
-                                <p className="text-[24px] font-bold w-[95%]">Prediction</p>
-                                <IoIosInformationCircle className="text-[35px] text-[#625F5F]" />
-                            </div>
-                            <div className="flex flex-row w-full h-full items-center justify-center">
-                                <div className="flex flex-col w-full items-center justify-center text-[#005898] font-bold">
-                                    <p className="text-[32px]">22.9%</p>{" "}
-                                    <p className="text-[1em]">Growth Rate (Surge)</p>
+                    <div className="flex flex-col gap-[10px] h-full w-full 2xl:w-[45%] mt-[10px] 2xl:mt-0">
+                        <div className="flex flex-row 2xl:flex-col gap-[20px] w-full">
+                            {/* Predictions Section */}
+                            <div className="flex flex-col bg-white p-[10px] m-1 h-[50%] w-full border-l-[15px] border-blue-500 rounded-e-lg shadow-lg">
+                                <div className="border-b-1 border-[#D9D9D9] flex flex-row">
+                                    <p className="text-[24px] font-bold w-[95%]">Prediction</p>
+                                    <IoIosInformationCircle className="text-[35px] text-[#625F5F]" />
                                 </div>
-                                <div className="flex flex-col w-full items-center justify-center text-primary font-bold">
-                                    <p className="text-[32px]">77.1%</p>{" "}
-                                    <p className="text-[1em]">Drop Rate (Recline)</p>
-                                </div>
-                            </div>
-                        </div>
-                        {/* Best & Worst Case Section */}
-                        <div className="flex flex-col bg-white p-[10px] m-1 h-[25%] border-l-[15px] border-[#C7DCE1] rounded-e-lg shadow-lg">
-                            <div className="flex flex-row border-b-1 border-[#D9D9D9] items-center justify-center w-full pl-[20px]">
-                                <div className="flex items-center justify-center w-[50%]">
-                                    <p className="text-[24px] flex">Best Case</p>
-                                </div>
-                                <div className="flex items-center justify-center w-[50%]">
-                                    <p className="text-[24px]">Worst Case</p>
-                                </div>
-                                <IoIosInformationCircle className="text-[35px] text-[#625F5F] absolute right-[3%]" />
-                            </div>
-                            <div className="flex flex-row w-full h-full items-center justify-center">
-                                <div className="flex flex-row w-full items-center justify-center font-bold">
-                                    {/* Left Case Prediction Stat */}
-                                    <div className="flex flex-col w-full justify-center items-center text-[#005898]">
-                                        <div className="flex flex-col h-fit items-center justify-center">
-                                            <p className="text-[32px]">65%</p>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <p className="text-[16px]">Surge</p>
-                                        </div>
+                                <div className="flex flex-row w-full h-full items-center justify-center">
+                                    <div className="flex flex-col w-full items-center justify-center text-[#005898] font-bold">
+                                        <p className="text-[32px]">22.9%</p>{" "}
+                                        <p className="text-[1em]">Growth Rate (Surge)</p>
                                     </div>
-                                    <div className="flex flex-col w-full justify-center items-center text-primary">
-                                        <div className="flex flex-col h-fit items-center justify-center">
-                                            <p className="text-[32px]">35%</p>
-                                        </div>
-                                        <div className="flex flex-col">
-                                            <p className="text-[16px]">Recline</p>
-                                        </div>
+                                    <div className="flex flex-col w-full items-center justify-center text-primary font-bold">
+                                        <p className="text-[32px]">77.1%</p>{" "}
+                                        <p className="text-[1em]">Drop Rate (Recline)</p>
                                     </div>
                                 </div>
-                                <div className="flex flex-row w-full items-center justify-center font-bold border-l-2">
-                                    {/* Right Case Prediction Stat */}
-                                    <div className="flex flex-col w-full justify-center items-center text-[#005898]">
-                                        <div className="flex flex-col h-fit items-center justify-center">
-                                            <p className="text-[32px]">10%</p>
+                            </div>
+                            {/* Best & Worst Case Section */}
+                            <div className="flex flex-col bg-white p-[10px] m-1 h-[50%] w-full border-l-[15px] border-[#C7DCE1] rounded-e-lg shadow-lg">
+                                <div className="flex flex-row border-b-1 border-[#D9D9D9] items-center justify-center w-full pl-[20px]">
+                                    <div className="flex items-center justify-center w-[50%]">
+                                        <p className="text-[24px] flex">Best Case</p>
+                                    </div>
+                                    <div className="flex items-center justify-center w-[50%]">
+                                        <p className="text-[24px]">Worst Case</p>
+                                    </div>
+                                    <IoIosInformationCircle className="text-[35px] text-[#625F5F]" />
+                                </div>
+                                <div className="flex flex-row w-full h-full items-center justify-center">
+                                    <div className="flex flex-row w-full items-center justify-center font-bold">
+                                        {/* Left Case Prediction Stat */}
+                                        <div className="flex flex-col w-full justify-center items-center text-[#005898]">
+                                            <div className="flex flex-col h-fit items-center justify-center">
+                                                <p className="text-[32px]">65%</p>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <p className="text-[16px]">Surge</p>
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <p className="text-[16px]">Surge</p>
+                                        <div className="flex flex-col w-full justify-center items-center text-primary">
+                                            <div className="flex flex-col h-fit items-center justify-center">
+                                                <p className="text-[32px]">35%</p>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <p className="text-[16px]">Recline</p>
+                                            </div>
                                         </div>
                                     </div>
-                                    <div className="flex flex-col w-full justify-center items-center text-primary">
-                                        <div className="flex flex-col h-fit items-center justify-center">
-                                            <p className="text-[32px]">90%</p>
+                                    <div className="flex flex-row w-full items-center justify-center font-bold border-l-2">
+                                        {/* Right Case Prediction Stat */}
+                                        <div className="flex flex-col w-full justify-center items-center text-[#005898]">
+                                            <div className="flex flex-col h-fit items-center justify-center">
+                                                <p className="text-[32px]">10%</p>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <p className="text-[16px]">Surge</p>
+                                            </div>
                                         </div>
-                                        <div className="flex flex-col">
-                                            <p className="text-[16px]">Recline</p>
+                                        <div className="flex flex-col w-full justify-center items-center text-primary">
+                                            <div className="flex flex-col h-fit items-center justify-center">
+                                                <p className="text-[32px]">90%</p>
+                                            </div>
+                                            <div className="flex flex-col">
+                                                <p className="text-[16px]">Recline</p>
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         {/* Projected Product Cost Case Section */}
-                        <div className="flex flex-col bg-white p-[10px] m-1 h-[50%] rounded-lg shadow-lg">
+                        <div className="flex flex-col bg-white p-[10px] m-1 h-[60%] rounded-lg shadow-lg">
                             <div className="flex flex-row p-[5px]">
                                 <p className="text-[24px] font-bold w-[95%]">
                                     Projected Product Cost
