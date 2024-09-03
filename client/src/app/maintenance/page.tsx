@@ -8,12 +8,14 @@ import { AiFillDatabase } from "react-icons/ai";
 import { PiFilesFill } from "react-icons/pi";
 import { IoGitNetworkOutline } from "react-icons/io5";
 import { IoMdAdd, IoIosSearch } from "react-icons/io";
-import { TfiMoreAlt } from "react-icons/tfi";
+import ReleaseNoteTile from '@/components/pages/system-maintenance/ReleaseNoteTile';
+
 
 export interface SystemMaintenanceProps {
     date: String;
     title: String;
-    autor: String;
+    author: String;
+    //contents, idk how to structure it rn
 };
 
 const SystemMaintenance = () => {
@@ -25,9 +27,9 @@ const SystemMaintenance = () => {
     };
 
 
-    // const indexOfLastItem = currentPage * 8;
-    // const indexOfFirstItem = indexOfLastItem - 8;
-    // const currentListPage = fileData.slice(indexOfFirstItem, indexOfLastItem);
+    const indexOfLastItem = currentPage * 4;
+    const indexOfFirstItem = indexOfLastItem - 4;
+    const currentListPage = ReleaseNotesFakeData.slice(indexOfFirstItem, indexOfLastItem);
 
     return (
         <div className='w-full'>
@@ -35,7 +37,7 @@ const SystemMaintenance = () => {
                 <Header icon={GrSystem} title="System Maintenance" />
             </div>
 
-            <div className='bg-yellow-50'>
+            <div className=''>
                 {/* Info Tiles */}
                 <div className='flex mx-16 mt-12 mb-9 px-[15rem] '>
                     {/* Database Storage */}
@@ -51,9 +53,9 @@ const SystemMaintenance = () => {
 
                         <div className='flex flex-col'>
                             <div className='w-full h-[1.5rem] bg-gray-100 rounded-full'>
-                                <div className='w-[50%] h-[1.5rem] bg-[#DD8383] rounded-full'></div>
+                                <div className='w-[20%] h-[1.5rem] bg-[#DD8383] rounded-full'></div>
                             </div>
-                            <span className='text-[17px] pt-1 pl-1 font-light'>300mb used</span>
+                            <span className='text-[17px] pt-1 pl-1 font-light'>20gb used</span>
                         </div>
 
                         <button className='w-[9rem] text-[16px] mt-6 border border-[#9290905b] font-light bg-white shadow-lg rounded-lg'>View Database</button>
@@ -107,7 +109,7 @@ const SystemMaintenance = () => {
                             </div>
                             <input
                             
-                                className={`${isOpen ? 'w-[20rem] 2xl:w-[25rem] 3xl:w-[30rem]' : 'w-[20rem]'} bg-white h-8 px-5 pl-9 text-[1.1em] border border-[#9290906c] rounded-lg focus:outline-none`}
+                                className={`${isOpen ? 'w-[20rem]' : 'w-[20rem]'} bg-white h-8 px-5 pl-9 text-[1.1em] border border-[#9290906c] rounded-lg focus:outline-none`}
                                 type="search"
                                 name="search"
                                 placeholder="Search here..."
@@ -116,27 +118,26 @@ const SystemMaintenance = () => {
                     </div>
 
                     {/* Main Content Area */}
-                    <div className='w-full h-[23rem] p-6 px-16 bg-blue-50'>
-                        <div className='flex w-full h-[5rem] items-center bg-white drop-shadow-lg rounded-lg'>
-                            <div className='flex w-[8rem] h-full px-10 font-semibold text-[20px] text-[#5B5353] text-center items-center border-r-2 border-[#92909041] bg-[#f1f1f1a1] '>
-                                <span className=''>15 Jan</span>
-                            </div>
-                            <span className='px-10 text-[23px] text-[#5B5353]'>Automated reports</span>
-                            <span className='mr-3 text-[21px] text-[#5B5353] font-light'>by: </span>
-                            <span className='text-[21px] text-[#5B5353] font-light'>Michael Huang</span>
-                            <button className='w-[4rem] h-[2rem] text-[30px] text-[#5B5353] px-4 py-[3px] ml-auto mr-10 bg-white border border-[#9290905b] rounded-full shadow-lg'><TfiMoreAlt/></button>
-                        </div>
+                    <div className='w-full h-[23rem] mt-6 px-16'>
+                        {currentListPage.map((note, index) => (
+                            <ReleaseNoteTile 
+                                key={index}
+                                date={note.date}
+                                title={note.title}
+                                author={note.author}
+                            />
+                        ))}
                     </div>
 
-                    {/* Footer
+                    {/* Footer */}
                     <div className="flex w-full justify-center h-[86px] rounded-b-xl border-[#868686]">
                         <PrimaryPagination
-                            data={InventoryFakeData} //change to data
-                            itemsPerPage={8}
+                            data={ReleaseNotesFakeData} //change to data
+                            itemsPerPage={4}
                             handlePageChange={handlePageChange}
                             currentPage={currentPage}
                         />
-                    </div> */}
+                    </div>
                 </div>
             </div>
         </div>
@@ -144,3 +145,66 @@ const SystemMaintenance = () => {
 }
 
 export default SystemMaintenance;
+
+const ReleaseNotesFakeData = [
+    {
+        date: "January 12, 2024",
+        title: "Projected costing algorithm",
+        author: "Michael Huang"
+    },
+    
+    {
+        date: "December 3, 2023",
+        title: "Calculation fix for recipe formulation",
+        author: "Franz Ondiano"
+    },
+
+    {
+        date: "July 1, 2023",
+        title: "User interface fixes",
+        author: "Franz Ondiano"
+    },
+
+    {
+        date: "June 3, 2023",
+        title: "Database cleanup",
+        author: "Tyrone Ybanez"
+    },
+
+    {
+        date: "March 3, 2023",
+        title: "Responsivenes fixes",
+        author: "Hannah Angelica Galve"
+    },
+
+    {
+        date: "January 12, 2023",
+        title: "Projected costing algorithm",
+        author: "Michael Huang"
+    },
+    
+    {
+        date: "November 3, 2022",
+        title: "Calculation fix for recipe formulation",
+        author: "Franz Ondiano"
+    },
+
+    {
+        date: "October 1, 2022",
+        title: "User interface fixes",
+        author: "Franz Ondiano"
+    },
+
+    {
+        date: "June 3, 2022",
+        title: "Database cleanup",
+        author: "Tyrone Ybanez"
+    },
+
+    {
+        date: "April 3, 2022",
+        title: "Responsivenes fixes",
+        author: "Hannah Angelica Galve"
+    },
+    
+]
