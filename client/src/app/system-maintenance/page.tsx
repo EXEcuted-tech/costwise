@@ -30,12 +30,12 @@ const SystemMaintenance = () => {
     // const currentListPage = fileData.slice(indexOfFirstItem, indexOfLastItem);
 
     return (
-        <div className='w-full'>
+        <div className='w-full h-screen bg-yellow-50'>
             <div>
                 <Header icon={GrSystem} title="System Maintenance" />
             </div>
 
-            <div className='bg-yellow-50'>
+            <div className=''>
                 {/* Info Tiles */}
                 <div className='flex mx-16 mt-12 mb-9 px-[15rem] '>
                     {/* Database Storage */}
