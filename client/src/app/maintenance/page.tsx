@@ -32,7 +32,7 @@ const SystemMaintenance = () => {
     const currentListPage = ReleaseNotesFakeData.slice(indexOfFirstItem, indexOfLastItem);
 
     return (
-        <div className='w-full'>
+        <div className='w-full h-screen bg-yellow-50'>
             <div>
                 <Header icon={GrSystem} title="System Maintenance" />
             </div>
