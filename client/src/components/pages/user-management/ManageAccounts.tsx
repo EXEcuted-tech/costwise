@@ -67,7 +67,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
             </div>
 
             {/* Main Content */}
-            <div className="flex flex-col w-auto h-[35rem]">
+            <div className="animate-fade-in3 flex flex-col w-auto h-[35rem]">
                 <table className="w-full h-full text-left">
                     <thead className="bg-[#F3F3F3] border-b border-[#868686]">
                         <tr className={`${isOpen ? 'text-[1.1em] 3xl:text-[1em] 2xl:text-[1em] xl:text-[0.9em]' : 'text-[1.3em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[1em]'} text-[#6B6B6B]`}>
@@ -98,12 +98,12 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
                                         <div className="flex">
                                             <button
                                                 onClick={openEditModal}
-                                                className={`${isOpen ? '4xl:w-[3rem] 4xl:px-3 3xl:w-[2rem] 3xl:px-2 2xl:w-[2rem] 2xl:px-[10px] xl:w-[2rem] xl:px-[10px]' : ' 4xl:w-[3rem] 4xl:px-3 3xl:w-[3rem] 3xl:px-4 xl:w-[2rem] xl:px-2' } w-[3rem] h-[2rem] px-3  text-[1.2em]  bg-[#FF7A00] text-white mr-2 rounded-lg hover:bg-[#de7e24] transition-colors duration-1000 ease-in`}>
+                                                className={`${isOpen ? '4xl:w-[3rem] 4xl:px-3 3xl:w-[2rem] 3xl:px-2 2xl:w-[2rem] 2xl:px-[10px] xl:w-[2rem] xl:px-[10px]' : ' 4xl:w-[3rem] 4xl:px-3 3xl:w-[3rem] 3xl:px-4 xl:w-[2rem] xl:px-2' } w-[3rem] h-[2rem] px-3 text-[1.1em] bg-[#FF7A00] text-white mr-2 rounded-lg flex justify-center items-center hover:bg-[#de7e24] transition-colors duration-300 ease-in-out`}>
                                                 <MdModeEdit />
                                             </button>
                                             <button
                                                 onClick={openDeleteModal}
-                                                className={`${isOpen ? '4xl:w-[3rem] 4xl:px-[18px] 3xl:w-[2rem] 3xl:px-[10px] 2xl:w-[2rem] 2xl:px-[10px] xl:w-[2rem] xl:px-[10px]' : ' 4xl:w-[3rem] 4xl:px-[18px] 3xl:w-[3rem] 3xl:px-[18px] xl:w-[2rem] xl:px-[10px]' } w-[3rem] h-[2rem] px-[17px]  text-[0.9em]  bg-[#B22222] text-white rounded-lg hover:bg-[#971c1c] transition-colors duration-1000 ease-in`}>
+                                                className={`${isOpen ? '4xl:w-[3rem] 4xl:px-[18px] 3xl:w-[2rem] 3xl:px-[10px] 2xl:w-[2rem] 2xl:px-[10px] xl:w-[2rem] xl:px-[10px]' : ' 4xl:w-[3rem] 4xl:px-[18px] 3xl:w-[3rem] 3xl:px-[18px] xl:w-[2rem] xl:px-[10px]' } w-[3rem] h-[2rem] px-[17px] text-[0.9em] bg-[#B22222] text-white flex justify-center items-center rounded-lg hover:bg-[#971c1c] transition-colors duration-300 ease-in-out`}>
                                                 <FaTrashAlt />
                                             </button>
                                         </div>

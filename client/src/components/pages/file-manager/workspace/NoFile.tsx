@@ -1,4 +1,4 @@
-import ChooseFileDialog from '@/components/modal/ChooseFileDialog';
+import ChooseFileDialog from '@/components/modals/ChooseFileDialog';
 import React, { useState } from 'react'
 import { CiFileOff } from "react-icons/ci";
 import { FaFile } from "react-icons/fa6";

@@ -44,7 +44,7 @@ const PasswordRequests: React.FC<PasswordRequestPageProps> = ({ fileData, isOpen
             </div>
 
             {/* Main Content */}
-            <div className="flex flex-col w-auto h-[35rem]">
+            <div className="animate-fade-in3 flex flex-col w-auto h-[35rem]">
                 <table className="w-full h-full text-left">
                     <thead className="bg-[#F3F3F3] border-b border-[#868686]">
                         <tr className={`${isOpen ? 'text-[1.2em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[0.9em]' : 'text-[1.3em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[1em]'} text-[#6B6B6B]`}>
@@ -68,11 +68,11 @@ const PasswordRequests: React.FC<PasswordRequestPageProps> = ({ fileData, isOpen
                                     <td className={`${isOpen ? 'pl-[1rem] ' : 'pl-[3rem]'} 3xl:pr-2 xl:pr-3 py-2`}>
                                         <div className="flex">
                                             <button
-                                                className={`${isOpen ? '4xl:w-[3rem] 4xl:px-3.5 xl:w-[2rem] xl:px-[0.55rem]' : '4xl:w-[3rem] 4xl:px-4 2xl:w-[2rem] 2xl:px-2 2xl:text-[1em] xl:w-[2rem] xl:px-2 xl:text-[1em]' } h-[2rem] text-[1.2em] bg-[#00930F] text-white mr-2 rounded-lg hover:bg-[#178622] transition-colors duration-1000 ease-in`}>
+                                                className={`${isOpen ? '4xl:w-[3rem] 4xl:px-3.5 xl:w-[2rem] xl:px-[0.55rem]' : '4xl:w-[3rem] 4xl:px-4 2xl:w-[2rem] 2xl:px-2 2xl:text-[1em] xl:w-[2rem] xl:px-2 xl:text-[1em]' } h-[2rem] text-[1.2em] bg-[#00930F] text-white mr-2 rounded-lg hover:bg-[#178622] transition-colors duration-300 ease-in-out`}>
                                                 <FaCheck />
                                             </button>
                                             <button
-                                                className={`${isOpen ? '4xl:w-[3rem] 4xl:px-[10px] xl:w-[2rem] xl:px-[7px]' : '4xl:w-[3rem] 4xl:px-[11px] 2xl:w-[2rem] 2xl:px-[4px] 2xl:text-[1.5em] xl:w-[2rem] xl:px-[4px] xl:text-[1.5em]' } h-[2rem] text-[1.6em] bg-[#B22222] text-white rounded-lg hover:bg-[#971c1c] transition-colors duration-1000 ease-in`}>
+                                                className={`${isOpen ? '4xl:w-[3rem] 4xl:px-[10px] xl:w-[2rem] xl:px-[7px]' : '4xl:w-[3rem] 4xl:px-[11px] 2xl:w-[2rem] 2xl:px-[4px] 2xl:text-[1.5em] xl:w-[2rem] xl:px-[4px] xl:text-[1.5em]' } h-[2rem] text-[1.6em] bg-[#B22222] text-white rounded-lg hover:bg-[#971c1c] transition-colors duration-300 ease-in-out`}>
                                                 <IoClose />
                                             </button>
                                         </div>

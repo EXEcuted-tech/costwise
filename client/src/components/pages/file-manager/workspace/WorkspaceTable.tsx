@@ -62,29 +62,29 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                 <thead className='bg-primary text-white'>
                     <tr>
                         {isEdit && <th className="w-[10px]"></th>}
-                        
+
                         {Object.keys(data[0]).map((key) => {
                             let textAlignClass = 'text-left';
                             if (key === 'itemDescription') {
                                 textAlignClass = 'text-left';
                             } else if (key === 'itemCode' || key === 'total') {
-                                textAlignClass =  'text-center';
+                                textAlignClass = 'text-center';
                             } else if (key === 'amount') {
                                 textAlignClass = 'text-right';
                             }
 
-                            return(
-                            isEdit
-                                ?
-                                <th key={key} className={`animate-zoomIn ${key == 'itemCode' || key == 'total' ? 'text-center' : (key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
+                            return (
+                                isEdit
+                                    ?
+                                    <th key={key} className={`animate-zoomIn ${key == 'itemCode' || key == 'total' ? 'text-center' : (key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
                                                         whitespace-nowrap font-medium text-[20px] py-2 px-6 border-b border-gray-300`}>
-                                    {formatHeader(key,['rm', 'total'])}
-                                </th>
-                                :
-                                <th key={key} className={`animate-zoomIn ${key == 'itemCode' || key == 'total' ? 'text-center' : (key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
+                                        {formatHeader(key, ['rm', 'total'])}
+                                    </th>
+                                    :
+                                    <th key={key} className={`animate-zoomIn ${key == 'itemCode' || key == 'total' ? 'text-center' : (key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
                                                         whitespace-nowrap font-medium text-[20px] py-2 px-6 border-b border-gray-300`}>
-                                    {formatHeader(key,['rm', 'total'])}
-                                </th>
+                                        {formatHeader(key, ['rm', 'total'])}
+                                    </th>
                             );
                         })}
                     </tr>
@@ -93,10 +93,10 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                     {isEdit
                         ?
                         tableData.map((row, rowIndex) => (
-                            <tr key={rowIndex} className="">
+                            <tr key={rowIndex} className="animate-pull-down">
                                 <td className="text-center border-t border-b border-gray-300">
-                                    <IoTrash className="ml-[5px] text-[#717171] text-[25px] cursor-pointer hover:text-red-700" 
-                                    onClick={()=>removeRow(rowIndex)}/>
+                                    <IoTrash className="ml-[5px] text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-250 ease-in-out"
+                                        onClick={() => removeRow(rowIndex)} />
                                 </td>
                                 {Object.entries(row).map(([key, value], colIndex) => {
                                     let textAlignClass = 'text-left';
@@ -104,13 +104,13 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                                     if (key === 'itemCode' || key === 'total') textAlignClass = 'text-center';
                                     return (
                                         <td
-                                            key={key}
-                                            className={`
-                                        py-2 px-6 
-                                        border-t border-b border-gray-300
-                                        ${colIndex === 0 ? 'border-l-0' : ''}
-                                        ${colIndex === Object.keys(row).length - 1 ? 'border-r-0' : ''}
-                                    `}
+                                          key={key}
+                                          className={`
+                                            py-2 px-6 
+                                            border-t border-b border-gray-300
+                                            ${colIndex === 0 ? 'border-l-0' : ''}
+                                            ${colIndex === Object.keys(row).length - 1 ? 'border-r-0' : ''}
+                                          `}
                                         >
                                             <input
                                                 type="text"

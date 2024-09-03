@@ -100,7 +100,7 @@ const AddFormulationPage = () => {
             <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
                     <div className='bg-white rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[25px]'>
                     <div className='flex items-center py-[10px]'>
-                        <IoIosArrowRoundBack className='text-primary text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] cursor-pointer'
+                        <IoIosArrowRoundBack className='text-primary text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] transition-colors duration-300 ease-in-out cursor-pointer'
                             onClick={handleBack} />
                         <h1 className='font-bold text-[28px] text-primary'>
                             Add Formulation
@@ -110,14 +110,14 @@ const AddFormulationPage = () => {
                     <div className='flex w-full items-center'>
                         <div className='w-full flex justify-end'>
                             <div className='my-[10px] mr-[10px] flex justify-end'>
-                                <button className={`text-[18px] hover:bg-[#961e1e] h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-primary`}
+                                <button className={`text-[18px] hover:bg-[#961e1e] transition-colors duration-250 ease-in-out h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-primary`}
                                     onClick={addRow}>
                                     <HiOutlinePlus className='mr-[5px]' />
                                     Add Row
                                 </button>
                             </div>
                             <div className='flex justify-end my-[10px]'>
-                                <button className={`text-[18px] hover:bg-[#00780c] h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F]`}
+                                <button className={`text-[18px] hover:bg-[#00780c] transition-colors duration-250 ease-in-out h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F]`}
                                     onClick={() => {
                                         setAdd(false);
                                     }}>
@@ -182,7 +182,7 @@ const AddFormulationPage = () => {
                                         {fileData.formulations?.map((formulation, index) => (
                                             <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'} animate-zoomIn text-center font-medium text-[#6B6B6B] text-[18px]`}>
                                                 <td className='flex justify-center items-center py-[15px]'>
-                                                    <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700"
+                                                    <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-250 ease-in-out"
                                                         onClick={() => removeRow(index)} />
                                                 </td>
                                                 <td className='py-[10px]'>

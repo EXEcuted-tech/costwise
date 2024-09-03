@@ -39,7 +39,7 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
               <h1 className='text-[#383838] font-bold text-[35px]'>{dialogType == 0 ? 'File List' : 'Master File List'}</h1>
             </div>
             <div className='ml-auto'>
-              <IoClose className='text-[60px] text-[#CECECE] cursor-pointer hover:brightness-90 p-0'
+              <IoClose className='text-[60px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out p-0'
                 onClick={() => setDialog(false)} />
             </div>
           </div>

@@ -48,15 +48,15 @@ const UserManagement = () => {
                 {/* Menu Toggle */}
                 <div className={`${isOpen ? 'text-[1.3em]' : 'text-[1.5em] max-2xl:text-[1.3em]' } flex w-full h-full  text-[#000000] bg-white font-semibold items-center border-solid border-b border-[#868686] rounded-t-lg `}>
                     <div
-                        className={`${isOpen ? '' : '' } w-[10rem] h-[4rem] text-center rounded-t-lg cursor-pointer max-2xl:h-[3rem] 
-                            ${activePage === 'accounts' ? 'bg-[#D9D9D9] text-[#676767] border-r-2 border-[#86868649]' : 'bg-white'}`}
+                        className={`${isOpen ? '' : '' } w-[10rem] h-[4rem] text-center rounded-t-lg cursor-pointer max-2xl:h-[3rem] transition-all duration-300 ease-in-out
+                            ${activePage === 'accounts' ? 'bg-[#D9D9D9] text-[#676767] border-r-2 border-[#86868649]' : 'bg-white hover:brightness-95'}`}
                                 onClick={() => setActivePage('accounts')}
                     >
                         <p className={`${isOpen ? '' : '' } mt-[1rem] max-2xl:mt-[10px] `}>Accounts</p>
                     </div>
                     <div
-                        className={`${isOpen ? '' : '' } w-[15rem] h-[4rem] text-center rounded-t-lg cursor-pointer max-2xl:h-[3rem] 
-                            ${activePage === 'passwordRequests' ? 'bg-[#D9D9D9] text-[#676767] border-r-2 border-[#86868649]' : 'bg-white'}`}
+                        className={`${isOpen ? '' : '' } w-[15rem] h-[4rem] text-center rounded-t-lg cursor-pointer max-2xl:h-[3rem] transition-all duration-300 ease-in-out
+                            ${activePage === 'passwordRequests' ? 'bg-[#D9D9D9] text-[#676767] border-r-2 border-[#86868649]' : 'bg-white hover:brightness-95'}`}
                                 onClick={() => setActivePage('passwordRequests')}
                     >
                         <p className={`${isOpen ? '' : '' } mt-[1rem] max-2xl:mt-[10px] `}>Password Request</p>

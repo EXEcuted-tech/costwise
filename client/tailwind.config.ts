@@ -122,6 +122,7 @@ const config: Config = {
         'expand-width': 'expand-width 300ms ease-in-out forwards',
         'fade-in': 'fade-in 2s ease-in-out forwards',
         'fade-in2': 'fade-in 1s ease-in-out forwards',
+        'fade-in3': 'fade-in 0.5s ease-in-out forwards',
         'crop-left-to-right': 'crop-left-to-right 0.6s ease-in-out forwards',
         'pull-down': 'pull-down 0.3s ease-in-out forwards',
         'pop-out': 'pop-out 0.2s ease-out forwards',
