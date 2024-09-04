@@ -176,7 +176,7 @@ const ProjectedCostPage = () => {
 
     return (
         <div
-            className="overflow-hidden bg-cover bg-center items-center justify-center bg-[#FFFAF8] bg-opacity-20"
+            className="overflow-auto overflow-x-hidden bg-cover bg-center items-center justify-center bg-[#FFFAF8] bg-opacity-20"
         >
             <div>
                 <Header icon={MdOutlineAnalytics} title={"Projected Costing"} />
@@ -187,8 +187,7 @@ const ProjectedCostPage = () => {
                     {/* Dropdown List Start*/}
                     <div className="min-w-[200px] relative mt-[15px] text-[16px]">
                         <div
-                            className={`text-tertiary flex justify-between border border-[#D9D9D9] rounded-xl p-[5px] cursor-pointer transition items-start ${isActiveStart ? " " : " border-3"
-                                } hover:border-primary hover:text-primary`}
+                            className='text-tertiary flex justify-between border border-[#D9D9D9] rounded-xl p-[5px] cursor-pointer transition items-start hover:border-primary hover:text-primary'
                             onClick={() => {
                                 setIsActiveStart(!isActiveStart);
                             }}
@@ -226,8 +225,7 @@ const ProjectedCostPage = () => {
                     {/* Dropdown List End*/}
                     <div className="min-w-[200px] relative ml-[50px] mt-[15px] text-[16px]">
                         <div
-                            className={`text-tertiary flex justify-between border border-[#D9D9D9] rounded-xl p-[5px] cursor-pointer transition items-start ${isActiveEnd ? " " : " border-3"
-                                } hover:border-primary hover:text-primary`}
+                            className='text-tertiary flex justify-between border border-[#D9D9D9] rounded-xl p-[5px] cursor-pointer transition items-start hover:border-primary hover:text-primary'
                             onClick={() => {
                                 setIsActiveEnd(!isActiveEnd);
                             }}
@@ -281,7 +279,7 @@ const ProjectedCostPage = () => {
                     <div className={`${isOpen ? 'w-full 4xl:w-[45%]' : 'w-full 2xl:w-[45%]' } flex flex-col gap-[10px] h-full mt-[10px] 2xl:mt-0`}>
                         <div className={`${isOpen ? 'flex flex-col 2xl:flex-row 4xl:flex-col' : 'flex flex-row 2xl:flex-col' } gap-[20px] w-full`}>
                             {/* Predictions Section */}
-                            <div className="flex flex-col bg-white p-[10px] m-1 h-[50%] w-full border-l-[15px] border-blue-500 rounded-e-lg shadow-lg">
+                            <div className={`${isOpen ? 'h-full 4xl:h-[50%]' : 'h-[50%]' } flex flex-col bg-white p-[10px] m-1 w-full border-l-[15px] border-blue-500 rounded-e-lg shadow-lg`}>
                                 <div className="border-b-1 border-[#D9D9D9] flex flex-row">
                                     <p className="text-[24px] font-bold w-[95%]">Prediction</p>
                                     <IoIosInformationCircle className="text-[35px] text-[#625F5F]" />
@@ -298,7 +296,7 @@ const ProjectedCostPage = () => {
                                 </div>
                             </div>
                             {/* Best & Worst Case Section */}
-                            <div className="flex flex-col bg-white p-[10px] m-1 h-[50%] w-full border-l-[15px] border-[#C7DCE1] rounded-e-lg shadow-lg">
+                            <div className={`${isOpen ? 'h-full 4xl:h-[50%]' : 'h-[50%]' } flex flex-col bg-white p-[10px] m-1 h-[50%] w-full border-l-[15px] border-[#C7DCE1] rounded-e-lg shadow-lg`}>
                                 <div className="flex flex-row border-b-1 border-[#D9D9D9] items-center justify-center w-full pl-[20px]">
                                     <div className="flex items-center justify-center w-[50%]">
                                         <p className="text-[24px] flex">Best Case</p>
