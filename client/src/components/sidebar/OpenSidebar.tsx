@@ -6,6 +6,8 @@ import { iconMap } from '@/utils/iconMap';
 import usePath from '@/hooks/usePath';
 import MiniSidebar from './MiniSidebar';
 import Link from 'next/link';
+import { useSidebarContext } from '@/context/SidebarContext';
+import { useRouter } from 'next/navigation';
 
 export interface IconOpenConfig {
   iconName: string;
@@ -15,9 +17,10 @@ export interface IconOpenConfig {
   routes?: string[];
 }
 const OpenSidebar: React.FC = () => {
-  const [isAdmin, setIsAdmin] = useState(true);
+  const { isAdmin } = useSidebarContext();
   const [isMore, setIsMore] = useState(false);
   const path = usePath();
+  const router = useRouter();
 
   return (
     <>
@@ -35,10 +38,12 @@ const OpenSidebar: React.FC = () => {
               src="https://i.imgur.com/AZOtzD7.jpg"
               alt={'Profile Picture'}
               className='flex object-cover size-[70px] 2xl:size-[80px] rounded-full border cursor-pointer'
+              onClick={()=>{router.push('/profile')}}
             />
             <div className='text-white ml-[15px] mt-[-8px]'>
               <h1 className='font-extrabold text-[24px] 2xl:text-[28px]'>Kathea Mari</h1>
-              <p className='font-light text-[16px] 2xl:text-[20px] mt-[-8px] cursor-pointer hover:text-[#dbdbdb]'>My Account</p>
+              <p className='font-light text-[16px] 2xl:text-[20px] mt-[-8px] cursor-pointer hover:text-[#dbdbdb]'
+                onClick={()=>{router.push('/profile')}}>My Account</p>
             </div>
           </div>
 
@@ -48,9 +53,8 @@ const OpenSidebar: React.FC = () => {
               {mainMenu.map(({ iconName, className, menuName, route }, index) => {
                 const IconComponent = iconMap[iconName];
                 return (
-                  <Link href={`/${route}`}>
+                  <Link href={`/${route}`} key={index}>
                     <li
-                      key={index}
                       className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${path === route
                         ? 'w-[88%] 2xl:w-[86%] text-primary bg-[#FFD3D3] ml-[17px] 2xl:ml-[25px] pr-[20px] pl-[10px] 2xl:pl-[15px] py-[5px] my-[8px] rounded-[20px]'
                         : 'my-[15px] 2xl:my-[12px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
@@ -73,9 +77,8 @@ const OpenSidebar: React.FC = () => {
                 (userDefaultMenu.map(({ iconName, className, menuName, route }, index) => {
                   const IconComponent = iconMap[iconName];
                   return (
-                    <Link href={`/${route}`}>
+                    <Link href={`/${route}`} key={index}>
                       <li
-                        key={index}
                         className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${path === route
                           ? 'w-[90%] 2xl:w-[88%] text-primary bg-[#FFD3D3] ml-[17px] 2xl:ml-[25px] pr-[20px] pl-[10px] 2xl:pl-[15px] py-[5px] my-[8px] rounded-[20px]'
                           : 'my-[14px] 2xl:my-[11px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
@@ -124,7 +127,7 @@ const OpenSidebar: React.FC = () => {
           </div>
         </div>
       </div>
-      {isMore && <MiniSidebar setIsMore={setIsMore} isAdmin={isAdmin} />}
+      {isMore && <MiniSidebar setIsMore={setIsMore} />}
     </>
   );
 };
@@ -135,7 +138,7 @@ const mainMenu: IconOpenConfig[] = [
   { iconName: 'RiDashboard2Fill', route: 'dashboard', menuName: 'Dashboard', className: 'text-[2.4em] 2xl:text-[2.8em]' },
   { iconName: 'BsFillFolderFill', route: 'file-manager', menuName: 'File Manager', className: 'text-[2.4em] 2xl:text-[2.8em]' },
   { iconName: 'RiFormula', route: 'formulation', menuName: 'Formulations', className: 'text-[2.4em] 2xl:text-[2.8em]' },
-  { iconName: 'BiSolidReport', route: 'report-generation', menuName: 'Report Generation', className: 'text-[2.4em] 2xl:text-[2.8em]' },
+  { iconName: 'BiSolidReport', route: 'cost-calculation', menuName: 'Cost Calculation', className: 'text-[2.4em] 2xl:text-[2.8em]' },
   { iconName: 'GiMoneyStack', route: 'projected-costing', menuName: 'Projected Costing', className: 'text-[2.4em] 2xl:text-[2.8em]' },
   { iconName: 'MdOutlineInventory', route: 'inventory', menuName: 'Inventory', className: 'text-[2.4em] 2xl:text-[2.8em]' },
   { iconName: 'GoHistory', route: 'audit-log', menuName: 'Audit Log', className: 'text-[2.4em] 2xl:text-[2.8em]' },

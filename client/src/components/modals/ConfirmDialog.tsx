@@ -1,7 +1,7 @@
 import React from 'react'
 import { RiFileWarningFill } from "react-icons/ri";
 import { IoIosClose } from "react-icons/io";
-import { useFileType } from '@/context/FileTypeContext';
+import { useFileManagerContext } from '@/context/FileManagerContext';
 
 interface ConfirmDialogProps { 
   setConfirmDialog: React.Dispatch<React.SetStateAction<boolean>>;
@@ -11,7 +11,7 @@ interface ConfirmDialogProps {
 }
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ tab, setConfirmDialog, setTab, setIsEmpty }) => {
-  const { setFileType } = useFileType();
+  const { setFileType } = useFileManagerContext();
   
   const handleTabChange = () => {
       if(tab){
@@ -26,10 +26,10 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ tab, setConfirmDialog, se
   }
 
   return (
-    <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]'>
+    <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000] z-[1000]'>
       <div className='animate-pop-out bg-white w-[460px] h-[380px] rounded-[20px] px-[10px]'>
         <div className='flex justify-end'>
-          <IoIosClose className='mt-[2px] text-[70px] text-[#CECECE] cursor-pointer hover:brightness-90'
+          <IoIosClose className='mt-[2px] text-[70px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out'
             onClick={() => { setConfirmDialog(false) }} />
         </div>
         <div className='flex justify-center'>

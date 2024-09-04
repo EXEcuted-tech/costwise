@@ -7,8 +7,10 @@ import { IoIosInformationCircle } from "react-icons/io";
 import { Chart as ChartJS } from "chart.js/auto";
 import LineChart from "@/components/charts/LineChart";
 import DoughnutChart from "@/components/charts/DoughnutChart";
+import { useSidebarContext } from "@/context/SidebarContext";
 
 const ProjectedCostPage = () => {
+    const { isOpen } = useSidebarContext();
     const [isActiveStart, setIsActiveStart] = useState(false);
     const [isActiveEnd, setIsActiveEnd] = useState(false);
     const [activeStart, setActiveStart] = useState("mm/yy");
@@ -258,9 +260,9 @@ const ProjectedCostPage = () => {
                         </ul>
                     </div>
                 </div>
-                <div className="flex flex-col 2xl:flex-row w-[97%] h-full gap-[2%] rounded-xl mt-[10px] 2xl:mt-0">
+                <div className={`${isOpen ? 'flex flex-col 4xl:flex-row' : 'flex flex-col 2xl:flex-row'} w-[97%] h-full gap-[2%] rounded-xl mt-[10px] 2xl:mt-0`}>
                     {/* Left Div */}
-                    <div className="flex flex-col w-full 2xl:w-[65%] h-full rounded-lg shadow-xl">
+                    <div className={`${isOpen ? 'w-full 4xl:w-[65%]' : 'w-full 2xl:w-[65%]' } flex flex-col h-full rounded-lg shadow-xl`}>
                         <div className="flex text-[30px] text-[#585858] font-bold h-[10%] bg-white items-center justify-start  border-b-2 pl-10">
                             <p className="w-[95%]">GRAPHS</p>
                             <IoIosInformationCircle className="text-[35px] text-[#625F5F]" />
@@ -276,8 +278,8 @@ const ProjectedCostPage = () => {
                         </div>
                     </div>
                     {/* Right Div */}
-                    <div className="flex flex-col gap-[10px] h-full w-full 2xl:w-[45%] mt-[10px] 2xl:mt-0">
-                        <div className="flex flex-row 2xl:flex-col gap-[20px] w-full">
+                    <div className={`${isOpen ? 'w-full 4xl:w-[45%]' : 'w-full 2xl:w-[45%]' } flex flex-col gap-[10px] h-full mt-[10px] 2xl:mt-0`}>
+                        <div className={`${isOpen ? 'flex flex-col 2xl:flex-row 4xl:flex-col' : 'flex flex-row 2xl:flex-col' } gap-[20px] w-full`}>
                             {/* Predictions Section */}
                             <div className="flex flex-col bg-white p-[10px] m-1 h-[50%] w-full border-l-[15px] border-blue-500 rounded-e-lg shadow-lg">
                                 <div className="border-b-1 border-[#D9D9D9] flex flex-row">

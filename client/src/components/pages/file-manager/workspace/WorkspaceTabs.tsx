@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { iconMap } from '@/utils/iconMap';
-import ConfirmDialog from '@/components/modal/ConfirmDialog';
+import ConfirmDialog from '@/components/modals/ConfirmDialog';
 
 interface WkspTabProps {
     setTab: React.Dispatch<React.SetStateAction<string>>;

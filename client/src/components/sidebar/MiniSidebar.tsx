@@ -7,16 +7,15 @@ import { useSidebarContext } from '@/context/SidebarContext';
 
 interface MiniSidebarProps {
   setIsMore: React.Dispatch<React.SetStateAction<boolean>>;
-  isAdmin?: boolean;
 }
 
-const MiniSidebar: React.FC<MiniSidebarProps> = ({ setIsMore, isAdmin }) => {
+const MiniSidebar: React.FC<MiniSidebarProps> = ({ setIsMore }) => {
+  const { isOpen, isAdmin } = useSidebarContext();
   const ref = useOutsideClick(() => setIsMore(false));
-  const { isOpen } = useSidebarContext();
 
   return (
 
-    <div ref={ref} className={`${isOpen ? 'bottom-[100px] 2xl:bottom-[60px]' : 'bottom-[60px]'} ${isAdmin ? 'left-[280px] 2xl:left-[360px]' : 'left-[120px]'} font-lato fixed animate-expand-width bg-[#FFD3D3] h-[120px] duration-300 ease-in-out rounded-r-lg z-[1000]`}
+    <div ref={ref} className={`${isOpen && isAdmin ? 'bottom-[100px] 2xl:bottom-[60px] left-[280px] 2xl:left-[360px]' : 'bottom-[60px] left-[120px]'} font-lato fixed animate-expand-width bg-[#FFD3D3] h-[120px] duration-300 ease-in-out rounded-r-lg z-[1000]`}
       onMouseEnter={() => setIsMore(true)}
       onMouseLeave={() => (
         setTimeout(() => {
@@ -27,8 +26,8 @@ const MiniSidebar: React.FC<MiniSidebarProps> = ({ setIsMore, isAdmin }) => {
         {miniMenu.map(({ iconName, className, menuName, route }, index) => {
           const IconComponent = iconMap[iconName];
           return (
-            <Link href={`/${route}`}>
-              <li key={index} className='flex cursor-pointer hover:text-[#851313] items-center my-[5px]'>
+            <Link href={`/${route}`} key={index}>
+              <li className='flex cursor-pointer hover:text-[#851313] items-center my-[5px]'>
                 <IconComponent className={`${className} mr-2`} />
                 <p className='font-semibold'>{menuName}</p>
               </li>

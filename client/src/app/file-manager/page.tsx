@@ -12,9 +12,12 @@ import { useSidebarContext } from '@/context/SidebarContext';
 import { BiSolidFile } from "react-icons/bi";
 import { BiFile } from "react-icons/bi";
 import useOutsideClick from '@/hooks/useOutsideClick';
+import ConfirmDelete from '@/components/modals/ConfirmDelete';
+import { useFileManagerContext } from '@/context/FileManagerContext';
 
 const FileManagerPage = () => {
   const { isOpen } = useSidebarContext();
+  const { deleteModal, setDeleteModal } = useFileManagerContext();
   const [tab, setTab] = useState('all');
   const [upload, setUpload] = useState(false);
   const ref = useOutsideClick(() => setUpload(false));
@@ -28,6 +31,7 @@ const FileManagerPage = () => {
 
   return (
     <>
+      {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} />}
       <Header icon={BsFolderFill} title={"File Manager"} />
       <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px] mt-[75px] 2xl:mt-[40px]' : 'px-[50px] mt-[36px]'} ml-[45px]`}>
         <div className='flex relative'>
@@ -36,13 +40,13 @@ const FileManagerPage = () => {
           </div>
           <div className={`${isOpen ? 'w-full' : 'w-full'} flex justify-end w-full pb-[6px]`}>
             <button className='flex justify-center items-center bg-white border-1 border-[#D3D3D3] px-[10px] mr-[1%] drop-shadow rounded-[10px]
-                            hover:bg-[#f7f7f7]'
+                            hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'
               onClick={() => { window.location.href = '/file-manager/workspace' }}>
               <PiScrewdriverFill className={`${isOpen ? 'text-[10px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`} />
               <p className={`ml-[5px] font-bold ${isOpen ? 'text-[10.5px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`}>Workspace</p>
             </button>
             <button className='flex justify-center items-center bg-white border-1 border-[#D3D3D3] px-[10px] mr-[1%] drop-shadow rounded-[10px]
-                            hover:bg-[#f7f7f7]'>
+                            hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'>
               <VscExport className={`${isOpen ? 'text-[10.5px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`} />
               <p className={`ml-[5px] font-bold ${isOpen ? 'hidden 2xl:block 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`}>
                 Export All Files
@@ -53,7 +57,7 @@ const FileManagerPage = () => {
             </button>
             <div ref={ref}>
               <button className='h-full flex justify-center items-center bg-primary text-white border-1 border-[#D3D3D3] px-[15px] 2xl:px-[30px] mr-[1%] drop-shadow rounded-[10px]
-                            hover:bg-[#9c1c1c]'
+                            hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out'
                 onClick={() => { setUpload(!upload) }}>
                 <PiUploadLight className={`${isOpen ? 'text-[10px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`} />
                 <p className={`mx-[5px] font-bold ${isOpen ? 'text-[10.5px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`}>Upload</p>

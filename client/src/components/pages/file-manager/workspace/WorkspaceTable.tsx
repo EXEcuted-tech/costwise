@@ -1,3 +1,4 @@
+import { formatHeader } from '@/utils/costwiseUtils';
 import React, { useState } from 'react'
 import { HiOutlinePlus } from "react-icons/hi";
 import { IoIosSave } from "react-icons/io";
@@ -12,25 +13,6 @@ interface WorkspaceTableProps {
 
 const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit, isTransaction }) => {
     const [tableData, setTableData] = useState(data);
-
-    const formatHeader = (key: string): string => {
-        const knownAcronyms = ['rm', 'total'];
-
-        const words = key.split(/(?=[A-Z])|\s|_/).filter(word => word.length > 0);
-
-        const formattedWords = words.map(word => {
-            const lowerWord = word.toLowerCase();
-
-            if (knownAcronyms.includes(lowerWord)) {
-                return lowerWord.toUpperCase();
-            }
-
-            return word.charAt(0).toUpperCase() + word.slice(1).toLowerCase();
-        });
-
-        return formattedWords.join(' ').trim();
-    };
-
 
     const handleInputChange = (rowIndex: number, key: string, value: string) => {
         const updatedData = tableData.map((row, i) => {
@@ -61,14 +43,14 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
             {isEdit &&
                 <div className={`h-[40px] animate-zoomIn fixed flex items-center ${isTransaction ? 'left-[20px]' : 'left-[40px]'}`}>
                     <div className='flex justify-end my-[10px] mr-[10px]'>
-                        <button className='hover:bg-[#961e1e] h-[35px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-primary'
+                        <button className='hover:bg-[#961e1e] h-[35px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-primary transition-colors delay-50 duration-[1000] ease-in'
                             onClick={addRow}>
                             <HiOutlinePlus className='mr-[5px]' />
                             Add Row
                         </button>
                     </div>
                     <div className='flex justify-end'>
-                        <button className='hover:bg-[#00780c] h-[35px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F]'
+                        <button className='hover:bg-[#00780c] h-[35px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F] transition-colors delay-50 duration-[1000] ease-in'
                             onClick={() => { setIsEdit(false) }}>
                             <IoIosSave className='mr-[5px]' />
                             Save
@@ -80,29 +62,29 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                 <thead className='bg-primary text-white'>
                     <tr>
                         {isEdit && <th className="w-[10px]"></th>}
-                        
+
                         {Object.keys(data[0]).map((key) => {
                             let textAlignClass = 'text-left';
                             if (key === 'itemDescription') {
                                 textAlignClass = 'text-left';
                             } else if (key === 'itemCode' || key === 'total') {
-                                textAlignClass =  'text-center';
+                                textAlignClass = 'text-center';
                             } else if (key === 'amount') {
                                 textAlignClass = 'text-right';
                             }
 
-                            return(
-                            isEdit
-                                ?
-                                <th key={key} className={`animate-zoomIn ${key == 'itemCode' || key == 'total' ? 'text-center' : (key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
+                            return (
+                                isEdit
+                                    ?
+                                    <th key={key} className={`animate-zoomIn ${key == 'itemCode' || key == 'total' ? 'text-center' : (key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
                                                         whitespace-nowrap font-medium text-[20px] py-2 px-6 border-b border-gray-300`}>
-                                    {formatHeader(key)}
-                                </th>
-                                :
-                                <th key={key} className={`animate-zoomIn ${key == 'itemCode' || key == 'total' ? 'text-center' : (key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
+                                        {formatHeader(key, ['rm', 'total'])}
+                                    </th>
+                                    :
+                                    <th key={key} className={`animate-zoomIn ${key == 'itemCode' || key == 'total' ? 'text-center' : (key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
                                                         whitespace-nowrap font-medium text-[20px] py-2 px-6 border-b border-gray-300`}>
-                                    {formatHeader(key)}
-                                </th>
+                                        {formatHeader(key, ['rm', 'total'])}
+                                    </th>
                             );
                         })}
                     </tr>
@@ -111,10 +93,10 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                     {isEdit
                         ?
                         tableData.map((row, rowIndex) => (
-                            <tr key={rowIndex} className="">
+                            <tr key={rowIndex} className="animate-pull-down">
                                 <td className="text-center border-t border-b border-gray-300">
-                                    <IoTrash className="ml-[5px] text-[#717171] text-[25px] cursor-pointer hover:text-red-700" 
-                                    onClick={()=>removeRow(rowIndex)}/>
+                                    <IoTrash className="ml-[5px] text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-250 ease-in-out"
+                                        onClick={() => removeRow(rowIndex)} />
                                 </td>
                                 {Object.entries(row).map(([key, value], colIndex) => {
                                     let textAlignClass = 'text-left';
@@ -122,13 +104,13 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                                     if (key === 'itemCode' || key === 'total') textAlignClass = 'text-center';
                                     return (
                                         <td
-                                            key={key}
-                                            className={`
-                                        py-2 px-6 
-                                        border-t border-b border-gray-300
-                                        ${colIndex === 0 ? 'border-l-0' : ''}
-                                        ${colIndex === Object.keys(row).length - 1 ? 'border-r-0' : ''}
-                                    `}
+                                          key={key}
+                                          className={`
+                                            py-2 px-6 
+                                            border-t border-b border-gray-300
+                                            ${colIndex === 0 ? 'border-l-0' : ''}
+                                            ${colIndex === Object.keys(row).length - 1 ? 'border-r-0' : ''}
+                                          `}
                                         >
                                             <input
                                                 type="text"
@@ -170,24 +152,6 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                     }
                 </tbody>
             </table>
-            {/* {isEdit && !isTransaction &&
-                <div className='animate-zoomIn fixed flex flex-col right-[40px] justify-end'>
-                    <div className={`flex justify-end mt-[25px] mb-[5px]`}>
-                        <button className='hover:bg-[#961e1e] h-[30px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-primary'
-                            onClick={addRow}>
-                            <HiOutlinePlus className='mr-[5px]' />
-                            Add Row
-                        </button>
-                    </div>
-                    <div className='flex justify-end'>
-                        <button className='hover:bg-[#00780c] h-[30px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F]'
-                            onClick={() => { setIsEdit(false) }}>
-                            <IoIosSave className='mr-[5px]' />
-                            Save
-                        </button>
-                    </div>
-                </div>
-            } */}
         </div>
     );
 }

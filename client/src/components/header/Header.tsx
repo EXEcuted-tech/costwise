@@ -22,7 +22,7 @@ const Header: React.FC<HeaderProps> = ({icon: Icon, title, style}) => {
                 </div>
 
                 {/* change this to proper dark mode */}
-                <div className="p-6 text-[2.2em] text-primary ml-auto mr-4">
+                <div className="hover:animate-shake-tilt hover:brightness-95 p-6 text-[2.2em] text-primary ml-auto mr-4">
                     <MdDarkMode className='cursor-pointer'/>
                 </div>
             </div>
