@@ -5,8 +5,9 @@ import virginialogo from '@/assets/virginia-logo.png';
 import { useSidebarContext } from "@/context/SidebarContext";
 import { IoCamera } from "react-icons/io5";
 import Link from "next/link";
-import UserInformation from '@/components/pages/account-profile/UserInformation';
+import UserInformation from '@/components/pages/profile/UserInformation';
 import PasswordChangeDialog from "@/components/modal/PasswordChangeDialog";
+import background from '@/assets/account-profile-bg.png';
 
 export interface AccountDataProps {
     firstName: string;
@@ -20,13 +21,13 @@ export interface AccountDataProps {
     role: string;
 }
 
-const AccountProfilePage = () => {
+const ProfilePage = () => {
 const { isOpen } = useSidebarContext();
 const [userInfo, setuserInfo] = useState(false);
 const [dialog, setDialog] = useState(false);
 
 return (
-        <div className='w-full h-screen flex flex-col items-center'>
+        <div className='w-full h-screen flex flex-col items-center bg-repeat' style={{ backgroundImage: `url(${background.src})` }}>
             {dialog && 
                 <PasswordChangeDialog 
                 setDialog={setDialog}
@@ -41,11 +42,11 @@ return (
             
             <div className={`${isOpen ? 'h-[65%] 3xl:h-[74%]' : 'h-[74%]'} flex flex-col w-[80%] mx-[50px] py-6 mt-[1%] bg-white shadow-md shadow-gray-800 rounded-lg`}> 
                 {/* Title */} 
-                <div className='flex mt-1 mb-2 border-b-2 border-[#A0A0A0]'>
+                <div className='flex flex-col mt mb-2 border-b-2 border-[#A0A0A0]'>
                     <div className="flex text-[24px] font-semibold mx-8 2xl:mx-12 mb-2">
                         Account Profile
                     </div>
-        
+                    <div className=' bg-primary w-[175px] h-[20px] rounded-[5px] mb-[-11px] ml-[31px] 2xl:ml-[45px]'></div>
                 </div>
 
                 {/* Profile Picture */}
@@ -75,7 +76,7 @@ return (
     );
 }
 
-export default AccountProfilePage
+export default ProfilePage
 
 const fakeAccData: AccountDataProps[] = [
     {
