@@ -13,10 +13,12 @@ import PrimaryPagination from "@/components/pagination/PrimaryPagination";
 
 export interface AuditTableProps {
     dateTimeAdded: string;
+    employeeName: string;
     employeeNo: string;
     userType: string;
     userEmail: string;
     actionEvent: string;
+    department: string;
 }
 
 interface AuditLogPageProps {
@@ -33,8 +35,8 @@ const AuditLogPage: React.FC<AuditLogPageProps> = ({ fileData }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
 
     const handleShowMore = (dataItem: AuditTableProps) => {
-        setSelectedData(dataItem); // Set the selected data
-        setDrawerOpen(true); // Open the drawer
+        setSelectedData(dataItem);
+        setDrawerOpen(true);
     };
 
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
@@ -123,114 +125,146 @@ export default AuditLogPage
 const fakeAuditAllData: AuditTableProps[] = [
     {
         dateTimeAdded: 'January 12, 2024 12:50:22',
+        employeeName: 'Kathea Mari Mayol',
         employeeNo: '#112391',
         userType: 'Regular User',
         userEmail: 'katheamari@gmail.com',
-        actionEvent: 'Record changed: BOM_V1_Cost.csv'
+        actionEvent: 'Record changed: BOM_V1_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 13, 2024 12:50:22',
+        employeeName: 'Franz Casimir Ondiano',
         employeeNo: '#123531',
         userType: 'Regular User',
         userEmail: 'franzcasimir.ondiano@gmail.com',
-        actionEvent: 'Record changed: BOM_V3_Cost.csv'
+        actionEvent: 'Record changed: BOM_V3_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 14, 2024 12:50:22',
+        employeeName: 'Hannah Angelica Galve',
         employeeNo: '#125131',
         userType: 'Regular User',
         userEmail: 'hannah.galve@gmail.com',
-        actionEvent: 'Record changed: BOM_V5_Cost.csv'
+        actionEvent: 'Record changed: BOM_V5_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 15, 2024 12:50:22',
+        employeeName: 'Tyrone Ybanez',
         employeeNo: '#199999',
         userType: 'Regular User',
         userEmail: 'tyrone.ybanez@gmail.com',
-        actionEvent: 'Record changed: BOM_V7_Cost.csv'
+        actionEvent: 'Record changed: BOM_V7_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 17, 2024 12:50:22',
+        employeeName: 'Kathea Mari Mayol',
         employeeNo: '#188888',
         userType: 'Regular User',
         userEmail: 'katheamari@gmail.com',
-        actionEvent: 'Record changed: BOM_V9_Cost.csv'
+        actionEvent: 'Record changed: BOM_V9_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 12, 2024 12:50:22',
+        employeeName: 'Franz Casimir Ondiano',
         employeeNo: '#112391',
         userType: 'Regular User',
         userEmail: 'franzcasimir.ondiano@gmail.com',
-        actionEvent: 'Record changed: BOM_V1_Cost.csv'
+        actionEvent: 'Record changed: BOM_V1_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 13, 2024 12:50:22',
+        employeeName: 'Hannah Angelica Galve',
         employeeNo: '#123531',
         userType: 'Regular User',
         userEmail: 'hannah.galve.ondiano@gmail.com',
-        actionEvent: 'Record changed: BOM_V3_Cost.csv'
+        actionEvent: 'Record changed: BOM_V3_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 14, 2024 12:50:22',
+        employeeName: 'Tyrone Ybanez',
         employeeNo: '#125131',
         userType: 'Regular User',
         userEmail: 'tyrone.ybanez@gmail.com',
-        actionEvent: 'Record changed: BOM_V5_Cost.csv'
+        actionEvent: 'Record changed: BOM_V5_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 15, 2024 12:50:22',
+        employeeName: 'Kathea Mari Mayol',
         employeeNo: '#199999',
         userType: 'Regular User',
         userEmail: 'katheamari@gmail.com',
-        actionEvent: 'Record changed: BOM_V7_Cost.csv'
+        actionEvent: 'Record changed: BOM_V7_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 17, 2024 12:50:22',
+        employeeName: 'Franz Casimir Ondiano',
         employeeNo: '#188888',
         userType: 'Regular User',
         userEmail: 'franzcasimir.ondiano@gmail.com',
-        actionEvent: 'Record changed: BOM_V9_Cost.csv'
+        actionEvent: 'Record changed: BOM_V9_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 12, 2024 12:50:22',
+        employeeName: 'Hannah Angelica Galve',
         employeeNo: '#112391',
         userType: 'Regular User',
         userEmail: 'hannah.galve@gmail.com',
-        actionEvent: 'Record changed: BOM_V1_Cost.csv'
+        actionEvent: 'Record changed: BOM_V1_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 13, 2024 12:50:22',
+        employeeName: 'Tyrone Ybanez',
         employeeNo: '#123531',
         userType: 'Regular User',
         userEmail: 'tyrone.ybanez@gmail.com',
-        actionEvent: 'Record changed: BOM_V3_Cost.csv'
+        actionEvent: 'Record changed: BOM_V3_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 14, 2024 12:50:22',
+        employeeName: 'Kathea Mari Mayol',
         employeeNo: '#125131',
         userType: 'Regular User',
         userEmail: 'katheamari@gmail.com',
-        actionEvent: 'Record changed: BOM_V5_Cost.csv'
+        actionEvent: 'Record changed: BOM_V5_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 15, 2024 12:50:22',
+        employeeName: 'Franz Casimir Ondiano',
         employeeNo: '#199999',
         userType: 'Regular User',
         userEmail: 'franzcasimir.ondiano@gmail.com',
-        actionEvent: 'Record changed: BOM_V7_Cost.csv'
+        actionEvent: 'Record changed: BOM_V7_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 17, 2024 12:50:22',
+        employeeName: 'Hannah Angelica Galve',
         employeeNo: '#188888',
         userType: 'Regular User',
         userEmail: 'hannah.galve@gmail.com',
-        actionEvent: 'Record changed: BOM_V9_Cost.csv'
+        actionEvent: 'Record changed: BOM_V9_Cost.csv',
+        department: 'Accounting',
     },
     {
         dateTimeAdded: 'January 13, 2024 12:50:22',
+        employeeName: 'Tyrone Ybanez',
         employeeNo: '#123531',
         userType: 'Regular User',
         userEmail: 'tyrone.ybanez@gmail.com',
-        actionEvent: 'Record changed: BOM_V3_Cost.csv'
+        actionEvent: 'Record changed: BOM_V3_Cost.csv',
+        department: 'Accounting',
     },
 ];

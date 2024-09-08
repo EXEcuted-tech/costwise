@@ -9,10 +9,12 @@ import useOutsideClick from '@/hooks/useOutsideClick';
 interface AuditDrawerProps {
     data: {
         dateTimeAdded: string;
+        employeeName: string;
         employeeNo: string;
         userType: string;
         userEmail: string;
         actionEvent: string;
+        department: string;
     } | null;
 }
 
@@ -54,7 +56,7 @@ const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
             </div>
             <div className="flex flex-col gap-[3px] pb-[10px] font-bold">
                 <p className="text-[26px] font-black">Audit Log Details</p>
-                <p className="text-[18px] text-[#9B9B9B]">Employee: {data.employeeNo} ‎ • ‎  {formatDate(data.dateTimeAdded)}</p>
+                <p className="text-[18px] text-[#9B9B9B]">{data.employeeName} ‎ • ‎ {formatDate(data.dateTimeAdded)}</p>
             </div>
             <div className="flex flex-col border-2 text-[17px] p-5 rounded-[10px]">
                 <div className="flex text-[20px] font-bold items-center pb-[10px]">
@@ -70,6 +72,11 @@ const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
                 <div className="flex py-[10px]">
                     <p className="w-[50%]">Email</p>
                     <p className="w-[50%] break-words leading-[20px] items-center">{data.userEmail}</p>
+                </div>
+                <hr className="border-t-[1px] border-[#989898]" />
+                <div className="flex py-[10px]">
+                    <p className="w-[50%]">Department</p>
+                    <p className="w-[50%] break-words leading-[20px] items-center">{data.department}</p>
                 </div>
                 <hr className="border-t-[1px] border-[#989898]" />
                 <div className="flex py-[10px]">
