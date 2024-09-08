@@ -31,7 +31,7 @@ const FileManagerPage = () => {
 
   return (
     <>
-      {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} />}
+      {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" />}
       <Header icon={BsFolderFill} title={"File Manager"} />
       <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px] mt-[75px] 2xl:mt-[40px]' : 'px-[50px] mt-[36px]'} ml-[45px]`}>
         <div className='flex relative'>

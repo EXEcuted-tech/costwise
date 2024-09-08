@@ -38,7 +38,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ tab, setConfirmDialog, se
         <div className='flex flex-col justify-center items-center pb-[20px]'>
           <h1 className='font-black text-[30px]'>Are You Sure?</h1>
           <p className='text-center text-[#9D9D9D] text-[19px] px-[30px]'>
-            Switching tabs will temporarily close your current file. Do you want to proceed?
+            Switching tabs will close your current file. Do you want to proceed?
           </p>
         </div>
         <div className='my-[2px] px-[50px] grid grid-cols-2 gap-4'>

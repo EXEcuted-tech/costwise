@@ -4,12 +4,13 @@ import { TiWarning } from "react-icons/ti";
 
 interface ConfirmDeleteProps {
     onClose: () => void;
+    subject: string;
 }
 
-const ConfirmDelete: React.FC<ConfirmDeleteProps> = ({ onClose }) => {
+const ConfirmDelete: React.FC<ConfirmDeleteProps> = ({ onClose, subject }) => {
     return (
         <div className='flex justify-center items-center z-[1000] w-full h-full fixed top-0 left-0 p-4 overflow-auto backdrop-brightness-50'>
-            <div className="flex flex-col w-[28rem] h-[380px] mx-[50px] px-3 py-2 bg-white rounded-[20px] animate-pop-out drop-shadow">
+            <div className="flex flex-col w-[28rem] min-h-[380px] mx-[50px] px-3 py-2 bg-white rounded-[20px] animate-pop-out drop-shadow">
 
                 {/* Close Button */}
                 <div className='flex justify-end'>
@@ -25,8 +26,8 @@ const ConfirmDelete: React.FC<ConfirmDeleteProps> = ({ onClose }) => {
                         <div className='font-black text-[26px]'>
                             <p>Are You Sure?</p>
                         </div>
-                        <div className='w-[20rem] text-center text-[20px] text-[#9D9D9D] break-words'>
-                            <p>Do you want to delete this user? This process cannot be undone.</p>
+                        <div className='text-center text-[20px] text-[#9D9D9D] break-words'>
+                            <p>Do you want to delete this {subject}? This process cannot be undone.</p>
                         </div>
 
                         {/* Buttons */}

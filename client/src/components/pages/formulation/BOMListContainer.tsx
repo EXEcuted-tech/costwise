@@ -99,7 +99,7 @@ const BOMListContainer = () => {
       </div>
       <div className='flex flex-wrap items-center w-full'>
         {data.map((info, index) =>
-          <p className='italic font-semibold text-[18px]'>{info.description} ({info.number}){index != data.length - 1 && ',\u00A0'}</p>
+          <p key={index} className='italic font-semibold text-[18px]'>{info.description} ({info.number}){index != data.length - 1 && ',\u00A0'}</p>
         )}
       </div>
       <div className='rounded-[5px] border border-[#656565] overflow-x-auto mt-[10px]'>
@@ -108,7 +108,7 @@ const BOMListContainer = () => {
             <tr>
               {data && Object.keys(data[0]).map((key) =>
                 (key != 'formulations') &&
-                <th className={`text-center animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6`}>
+                <th key={key} className={`text-center animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6`}>
                   {formatHeader(key)}{key == 'batchQty' && '.'}
                 </th>
               )}
@@ -117,7 +117,7 @@ const BOMListContainer = () => {
           <tbody>
             {data && data.map((info, index) =>
               <>
-                <tr className={`${info.productCost === maxProductCost ? 'text-[#930101]' : 'text-black'} animate-zoomIn text-center font-bold text-[18px] border-y border-[#ACACAC]`}>
+                <tr className={`${info.productCost === maxProductCost ? 'bg-[#fff873]' : 'text-black'} animate-zoomIn text-center font-bold text-[18px] border-y border-[#ACACAC]`}>
                   <td className='py-[10px] relative'>
                     {info.productCost === maxProductCost &&
                       <>

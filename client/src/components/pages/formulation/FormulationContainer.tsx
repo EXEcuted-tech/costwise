@@ -73,7 +73,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => 
 
     return (
         <>
-            {deleteModal && <ConfirmDelete onClose={()=>setDeleteModal(false)}/>}
+            {deleteModal && <ConfirmDelete onClose={()=>setDeleteModal(false)} subject="formulation"/>}
             {(view || edit) ? <FormulationTable view={view} setView={setView} /> :
                 viewFormulas ? <CompareFormulaContainer /> :
                     viewBOM ? <BOMListContainer /> :
