@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+// use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -16,16 +17,9 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $fillable = [
-        'user_type',
-        'first_name',
-        'middle_name',
-        'last_name',
-        'email_address',
-        'employee_number',
-        'employee_suffix',
-        'phone',
-        'department',
-        'employee_role',
+        'name',
+        'email',
+        'password',
     ];
 
     /**
@@ -34,25 +28,20 @@ class User extends Authenticatable
      * @var array<int, string>
      */
     protected $hidden = [
+        'password',
         'remember_token',
     ];
 
     /**
-     * The attributes that should be cast to native types.
+     * Get the attributes that should be cast.
      *
-     * @var array<string, string>
+     * @return array<string, string>
      */
-    protected $casts = [
-        // No specific casting needed based on the current schema
-    ];
-
-    /**
-     * The attributes that should be treated as dates.
-     *
-     * @var array<int, string>
-     */
-    protected $dates = [
-        'created_at',
-        'updated_at',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'email_verified_at' => 'datetime',
+            'password' => 'hashed',
+        ];
+    }
 }
