@@ -7,6 +7,7 @@ import { MdTrolley, MdCalendarToday } from "react-icons/md";
 import { IoIosArrowBack, IoIosArrowForward, IoIosSearch } from "react-icons/io";
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import MonthSelector from '@/components/modals/MonthSelector';
+import { HiOutlinePlus } from "react-icons/hi2";
 
 export interface InventoryProps {
     itemCode: String;
@@ -119,11 +120,11 @@ const Inventory = () => {
                             />
                         </div>
 
-                        <div className='mt-[0.8em] mr-4 ml-auto text-gray-400'>
+                        <div className='flex mt-[0.8em] mr-4 ml-auto text-gray-400 gap-4'>
                             <select
-                                className={`${isOpen ? '4xl:w-[20rem] 3xl:w-[20rem] 2xl:w-[15rem] xl:w-[10rem]' : ''} bg-white h-8 w-[20rem] pl-3 text-[1.1em] mr-4 border border-gray-400 rounded-lg focus:outline-none`}
+                                className={`${isOpen ? '4xl:w-[20rem] 3xl:w-[20rem] 2xl:w-[15rem] xl:w-[10rem]' : ''} bg-white h-8 w-[20rem] pl-3 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
                             >
-                                <option selected value="" disabled hidden>Item</option>
+                                <option selected value="" disabled hidden>Item Category</option>
                                 <option value="all">All</option>
                                 <option value="meat-materials">Meat Materials</option>
                                 <option value="food-additives">Food Additives & Meat Extenders</option>
@@ -139,6 +140,10 @@ const Inventory = () => {
                                 <option value="in-stock">In Stock</option>
                                 <option value="low-stock">Low Stock</option>
                             </select>
+                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[6rem] px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}>
+                                <span><HiOutlinePlus className='w-[20px]'/></span>
+                                <span className='font-semibold'>Import</span>
+                            </button>
                         </div>
                     </div>
 
@@ -167,7 +172,7 @@ const Inventory = () => {
                                                     <p
                                                         className={`${data.status === 'In Stock'
                                                             ? 'text-[#00930F] bg-[#9EE29E]'
-                                                            : 'text-[#317AFA] bg-[#B6CDFF]'
+                                                            : 'text-[#FF6F00] bg-[#FFD1AD]'
                                                             } rounded-2xl w-[9rem]`}
                                                     >
                                                         {data.status}
