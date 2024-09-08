@@ -10,11 +10,11 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { FileTableProps } from '@/components/pages/file-manager/FileContainer';
 import MasterFileContainer from '@/components/pages/file-manager/workspace/MasterFileContainer';
 import TransactionFileContainer from '@/components/pages/file-manager/workspace/TransactionFileContainer';
-import { useFileType } from '@/context/FileTypeContext';
+import { useFileManagerContext } from '@/context/FileManagerContext';
 
 const WorkspacePage = () => {
     const [tab, setTab] = useState('master files');
-    const { fileType, setFileType } = useFileType(); //0 is none, 1 is master file, 2 is transactions
+    const { fileType, setFileType } = useFileManagerContext(); //0 is none, 1 is master file, 2 is transactions
     const [fileData, setFileData] = useState<FileTableProps | null>(null);
     const [isEmpty, setIsEmpty] = useState(true);
 
@@ -61,7 +61,7 @@ const WorkspacePage = () => {
             <Header icon={BsFolderFill} title={"File Manager"} style={''}/>
             <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[40px] ml-[45px]`}>
                 <div className='bg-white flex items-center px-[20px] py-[10px] rounded-t-[10px] drop-shadow'>
-                    <IoIosArrowRoundBack className='text-primary text-[40px] mr-[15px] hover:text-[#D13131] cursor-pointer' 
+                    <IoIosArrowRoundBack className='text-primary text-[40px] mr-[15px] hover:text-[#D13131] transition-colors duration-300 ease-in-out cursor-pointer' 
                     onClick={redirectBack}/>
                     <h1 className='font-bold text-[28px] text-primary'>Workspace</h1>
                 </div>

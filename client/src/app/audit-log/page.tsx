@@ -47,7 +47,7 @@ const AuditLogPage: React.FC<AuditLogPageProps> = ({ fileData }) => {
 
     return (
         <div className={`w-full h-screen font-lato bg-background`}>
-            {drawerOpen && <AuditDrawer data={selectedData} />}
+            <AuditDrawer data={selectedData}/>
             <Header icon={GoHistory} title={"Audit Log"} />
             <div className="ml-[95px] mr-[50px]">
                 <div className="flex justify-between m-auto mb-[10px] gap-5 pt-[45px]">
@@ -56,14 +56,14 @@ const AuditLogPage: React.FC<AuditLogPageProps> = ({ fileData }) => {
                             <BiSearchAlt className="absolute left-3 top-[20px] 4xl:top-[24px] text-[20px] 4xl:text-[23px] transform -translate-y-1/2 text-gray-600" />
                             <input className={`${isOpen ? 'w-[300px] 3xl:w-[400px]': 'w-[400px]'} p-[6px] 4xl:p-[7px] text-[16px] 4xl:text-[20px] pl-[35px] 4xl:pl-[40px] border border-[#868686] rounded-full`} placeholder="Search here..." />
                         </div>
-                        <button className="flex justify-center items-center bg-white 4xl:p-[6px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]">
+                        <button className="flex justify-center items-center bg-white hover:bg-[#ebebeb] transition-colors duration-300 ease-in-out 4xl:p-[6px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]">
                             <LuArrowDownUp className="text-[20px] 4xl:text-[25px] text-[#414141]" />
                         </button>
-                        <button className="flex justify-center items-center bg-white 4xl:p-[10px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]">
+                        <button className="flex justify-center items-center bg-white hover:bg-[#ebebeb] transition-colors duration-300 ease-in-out 4xl:p-[10px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]">
                             <FaFilter className="text-[20px] 4xl:text-[25px] text-[#414141]" />
                         </button>
                     </div>
-                    <button className="flex bg-white text-[16px] 4xl:text-[20px] p-[6px] h-[40px] 4xl:h-[46px] border border-[#868686] rounded-[10px] justify-end gap-2">
+                    <button className="flex bg-white hover:bg-[#ebebeb] transition-colors duration-300 ease-in-out text-[16px] 4xl:text-[20px] p-[6px] h-[40px] 4xl:h-[46px] border border-[#868686] rounded-[10px] justify-end gap-2">
                         <FaFileExport className="text-[25px] text-[#414141] m-auto" />
                         Export
                     </button>
@@ -92,7 +92,7 @@ const AuditLogPage: React.FC<AuditLogPageProps> = ({ fileData }) => {
                                     {data.actionEvent}
                                 </td>
                                 <td className="flex items-center">
-                                    <span onClick={() => handleShowMore(data)} className="cursor-pointer font-bold text-primary">
+                                    <span onClick={() => handleShowMore(data)} className="cursor-pointer font-bold text-primary hover:text-[#851818] transition-colors duration-300 ease-in-out">
                                         Show More
                                     </span>
                                 </td>

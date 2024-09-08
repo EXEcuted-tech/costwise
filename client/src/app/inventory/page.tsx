@@ -6,7 +6,7 @@ import { LuCircle } from "react-icons/lu";
 import { MdTrolley, MdCalendarToday } from "react-icons/md";
 import { IoIosArrowBack, IoIosArrowForward, IoIosSearch } from "react-icons/io";
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
-import MonthSelector from '@/components/modal/MonthSelector';
+import MonthSelector from '@/components/modals/MonthSelector';
 
 export interface InventoryProps {
     itemCode: String;
@@ -80,7 +80,7 @@ const Inventory = () => {
                         {/* Month Button */}
                         <button
                             onClick={openMonthSelectorModal}
-                            className='ml-6 text-white text-[28px] bg-[#d9d9d98e] px-2 py-1 rounded-lg cursor-pointer opacity-100 hover:opacity-75 transition-opacity duration-300 ease-in-out'>
+                            className='ml-6 text-white text-[28px] bg-[#d9d9d98e] px-2 py-1 rounded-lg cursor-pointer hover:bg-[#bd2a2a] transition-colors duration-300 ease-in-out'>
                             <MdCalendarToday className='' />
                         </button>
 
@@ -90,7 +90,7 @@ const Inventory = () => {
                                 {currentIndex > 0 && (
                                     <button
                                         onClick={handlePreviousMonth}
-                                        className='w-[2.5rem] h-[2.5rem] rounded-full text-white text-[30px] px-1 mr-4 bg-[#d9d9d98e] cursor-pointer opacity-100 hover:opacity-75 transition-opacity duration-300 ease-in-out'>
+                                        className='w-[2.5rem] h-[2.5rem] rounded-full text-white text-[30px] px-1 mr-4 bg-[#d9d9d98e] cursor-pointer hover:bg-[#bd2a2a] transition-colors duration-300 ease-in-out'>
                                         <IoIosArrowBack />
                                     </button>
                                 )}
@@ -98,7 +98,7 @@ const Inventory = () => {
                             {currentIndex < monthOptions.length - 1 && (
                                 <button
                                     onClick={handleNextMonth}
-                                    className='w-[2.5rem] h-[2.5rem] rounded-full text-white text-[30px] px-2 mr-4 bg-[#d9d9d98e] cursor-pointer opacity-100 hover:opacity-75 transition-opacity duration-300 ease-in-out'>
+                                    className='w-[2.5rem] h-[2.5rem] rounded-full text-white text-[30px] px-2 mr-4 bg-[#d9d9d98e] cursor-pointer hover:bg-[#bd2a2a] transition-colors duration-300 ease-in-out'>
                                     <IoIosArrowForward />
                                 </button>
                             )}

@@ -17,7 +17,7 @@ const CompareFormulaDialog: React.FC<{ setCompareFormula: React.Dispatch<React.S
                         <MdCompare className='mr-[5px] text-[35px]' />
                         <h1 className='text-[35px] font-black'>Compare Formulas</h1>
                     </div>
-                    <IoClose className='text-[60px] text-[#CECECE] cursor-pointer hover:brightness-90 p-0'
+                    <IoClose className='text-[60px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out p-0'
                         onClick={() => setCompareFormula(false)} />
                 </div>
                 <hr />

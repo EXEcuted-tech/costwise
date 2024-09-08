@@ -37,8 +37,9 @@ const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
     };
 
     return (
-    <div className="fixed w-screen z-[1000] h-full backdrop-brightness-50 flex justify-end left-0">
-        <div ref={ref} className={`bg-white w-[50%] 2xl:w-[40%] 4xl:w-[30%] h-full p-10 pt-[20px] drop-shadow-2xl`}>
+        <>
+        {drawerOpen && <div className="animate-fade-in3 fixed w-screen h-full backdrop-brightness-50 flex justify-end left-0 z-[1000]"></div>}
+        <div ref={ref} className={`fixed top-0 right-0 h-full p-10 pt-[20px] w-[500px] bg-white z-[1500] drop-shadow transform transition-transform duration-400 ${drawerOpen ? "translate-x-0" : "translate-x-full"}`}>
             <div className="flex justify-end">
                 <div 
                     className="border-2 p-1 rounded-[5px] cursor-pointer" 
@@ -87,7 +88,7 @@ const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
                 </div>
             </div>
         </div>
-    </div>
+        </>
     )
 }
 

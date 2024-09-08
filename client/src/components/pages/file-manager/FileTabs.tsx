@@ -26,7 +26,7 @@ const FileTabs: React.FC<FileProps> = ({ tab, setTab, isOpen }) => {
             {fileTabs.map(({ iconName, tabName, tabIndicator, className}, index) => {
                 const IconComponent = iconMap[iconName];
                 return (
-                    <div key={index} className={`border-1 rounded-t-[15px] py-[2px] px-[15px] mr-[1px] drop-shadow-md 
+                    <div key={index} className={`border-1 rounded-t-[15px] py-[2px] px-[15px] mr-[1px] drop-shadow-md transition-colors duration-200 ease-in-out
                             ${isOpen ? 'text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]' } 
                             ${tab === tabIndicator
                             ? 'bg-primary border-primary text-white hover:bg-gradient-to-r hover:from-primary hover:to-[#d42020]'

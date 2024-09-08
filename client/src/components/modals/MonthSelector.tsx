@@ -34,7 +34,7 @@ const MonthSelector:React.FC<ModalProps> = ({months, onClose, onMonthSelect}) =>
                     </div>
                     <IoClose 
                         onClick={onClose}
-                        className='text-[40px] text-[#CECECE] cursor-pointer hover:brightness-90 p-0'
+                        className='text-[45px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out p-0'
                     />
                 </div>
                 <hr />

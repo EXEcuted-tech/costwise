@@ -28,7 +28,7 @@ const DashboardPage = () => {
           <p className={`${isOpen ? 'text-[14px] 2xl:text-[16px]' : 'text-[16px] 3xl:text-[21px]'} text-[#414141] italic text-right`}>11:05 A.M.</p>
         </div>
         <div>
-          <div className={`${isOpen ? 'text-[1.2em] 2xl:text-[1.8em]' : 'text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]'} text-primary p-3 drop-shadow-lg bg-white rounded-full cursor-pointer hover:brightness-95`}>
+          <div className={`${isOpen ? 'text-[1.2em] 2xl:text-[1.8em]' : 'text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]'} text-primary p-3 drop-shadow-lg bg-white rounded-full cursor-pointer hover:text-white hover:bg-primary transition-colors duration-300 ease-in-out`}>
             <MdDarkMode />
           </div>
         </div>
