@@ -59,7 +59,7 @@ return new class extends Migration {
             $table->increments('fodl_id');
             $table->decimal('factory_overhead', 10, 2);
             $table->decimal('direct_labor', 10, 2);
-            $table->string('monthYear', 10);
+            $table->unsignedInteger('monthYear');
             $table->timestamps();
         });
 
@@ -69,7 +69,7 @@ return new class extends Migration {
             $table->unsignedInteger('fodl_id');
             $table->string('fg_code', 255);
             $table->string('fg_desc', 255);
-            $table->string('monthYear', 10);
+            $table->unsignedInteger('monthYear');
             $table->foreign('fodl_id')->references('fodl_id')->on('fodl')->onDelete('cascade');
             $table->timestamps();
         });
