@@ -60,7 +60,6 @@ return new class extends Migration {
             $table->decimal('factory_overhead', 10, 2);
             $table->decimal('direct_labor', 10, 2);
             $table->unsignedInteger('monthYear');
-            $table->timestamps();
         });
 
         // Finished Goods Table
@@ -71,7 +70,6 @@ return new class extends Migration {
             $table->string('fg_desc', 255);
             $table->unsignedInteger('monthYear');
             $table->foreign('fodl_id')->references('fodl_id')->on('fodl')->onDelete('cascade');
-            $table->timestamps();
         });
 
         // Formulations Table
@@ -91,7 +89,6 @@ return new class extends Migration {
             $table->decimal('material_cost', 10, 2);
             $table->string('unit', 10);
             $table->date('date');
-            $table->timestamps();
         });
 
         // Inventory Table
