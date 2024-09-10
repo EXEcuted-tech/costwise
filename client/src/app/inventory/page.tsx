@@ -8,6 +8,7 @@ import { IoIosArrowBack, IoIosArrowForward, IoIosSearch } from "react-icons/io";
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import MonthSelector from '@/components/modals/MonthSelector';
 import { HiOutlinePlus } from "react-icons/hi2";
+import { CiImport } from "react-icons/ci";
 
 export interface InventoryProps {
     itemCode: String;
@@ -76,14 +77,15 @@ const Inventory = () => {
                 <div className={`${isOpen ? '4xl:h-[47rem] 3xl:h-[45rem] 2xl:h-[45rem] xl:h-[44rem]' : '4xl:h-[47rem] 3xl:h-[47rem] 2xl:h-[47rem] xl:h-[43rem]'} relative w-auto h-[47rem] ml-[4rem] mr-[3rem] my-[3rem] rounded-2xl bg-white border-1 border-[#656565] shadow-md animate-fade-in2`}>
                     {/* Header */}
                     <div className='flex h-14 rounded-t-2xl bg-[#B22222] text-white text-[26px] font-bold py-2 pl-5'>
-                        <LuCircle className='text-[30px] mt-1 mr-3' /> <p>{selectedMonth}</p>
 
                         {/* Month Button */}
                         <button
                             onClick={openMonthSelectorModal}
-                            className='ml-6 text-white text-[28px] bg-[#d9d9d98e] px-2 py-1 rounded-lg cursor-pointer hover:bg-[#bd2a2a] transition-colors duration-300 ease-in-out'>
+                            className='mt-1 mr-3 text-white text-[28px] bg-[#bd2a2a] px-2 py-1 rounded-lg cursor-pointer hover:bg-[#D9D9D98E] transition-colors duration-300 ease-in-out'>
                             <MdCalendarToday className='' />
                         </button>
+
+                        <p>{selectedMonth}</p>
 
                         {/* Navigator Buttons */}
                         <div className='flex w-[8rem] ml-auto'>
@@ -140,8 +142,8 @@ const Inventory = () => {
                                 <option value="in-stock">In Stock</option>
                                 <option value="low-stock">Low Stock</option>
                             </select>
-                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[6rem] px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}>
-                                <span><HiOutlinePlus className='w-[20px]'/></span>
+                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[7rem] px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}>
+                                <span><CiImport className='w-[30px] h-[22px]'/></span>
                                 <span className='font-semibold'>Import</span>
                             </button>
                         </div>
@@ -172,7 +174,7 @@ const Inventory = () => {
                                                     <p
                                                         className={`${data.status === 'In Stock'
                                                             ? 'text-[#00930F] bg-[#9EE29E]'
-                                                            : 'text-[#FF6F00] bg-[#FFD1AD]'
+                                                            : 'text-primary bg-[#F5BABA]'
                                                             } rounded-2xl w-[9rem]`}
                                                     >
                                                         {data.status}
