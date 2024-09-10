@@ -81,26 +81,26 @@ const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => 
                             <table className='w-full '>
                                 <thead className='border-b border-b-[#c4c4c4]'>
                                     <tr className='text-[#777777] font-bold text-[18px]'>
-                                        <th className='py-[10px]'>NO.</th>
-                                        <th>ITEM CODE</th>
-                                        <th>DESCRIPTION</th>
-                                        <th>BATCH QTY</th>
-                                        <th>UNIT</th>
-                                        <th>COST</th>
-                                        <th>MANAGE</th>
+                                        <th className='py-[10px] px-[15px] text-left'>NO.</th>
+                                        <th className='px-[15px] text-left'>ITEM CODE</th>
+                                        <th className='px-[15px] text-left'>DESCRIPTION</th>
+                                        <th className='px-[15px] text-right'>BATCH QTY</th>
+                                        <th className='px-[15px] text-left'>UNIT</th>
+                                        <th className='px-[15px] text-right'>COST</th>
+                                        <th className='px-[15px]'>MANAGE</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {currentListPage.length > 0 &&
                                         (currentListPage.map((data, index) => (
-                                            <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'} text-center`}>
-                                                <td className='py-[15px]'>{data.number}</td>
-                                                <td>{data.itemCode}</td>
-                                                <td>{data.description}</td>
-                                                <td>{data.batchQty}</td>
-                                                <td>{data.unit}</td>
-                                                <td>{data.cost}</td>
-                                                <td>
+                                            <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'}`}>
+                                                <td className='py-[15px] px-[15px]'>{data.number}</td>
+                                                <td className='px-[15px]'>{data.itemCode}</td>
+                                                <td className='px-[15px]'>{data.description}</td>
+                                                <td className='px-[15px] text-right'>{data.batchQty}</td>
+                                                <td className='px-[15px]'>{data.unit}</td>
+                                                <td className='px-[15px] text-right'>{data.cost}</td>
+                                                <td className='px-[15px]'>
                                                     <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
                                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
                                                                 cursor-pointer hover:bg-[#f7f7f7] rounded-l-[5px] transition-colors duration-200 ease-in-out'

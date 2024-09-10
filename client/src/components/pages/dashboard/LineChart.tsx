@@ -17,9 +17,9 @@ const LineChart: React.FC<LineChartProps> = ({className}) => {
       if (ctx) {
 
 
-        const labels = ['January', 'February', 'March', 'April', 'May'];
-        const dataset1Data = [10, 25, 13, 18, 30];
-        const dataset2Data = [20, 15, 28, 22, 10];
+        const labels = ['January', 'February', 'March', 'April', 'May','June'];
+        const dataset1Data = [10, 25, 13, 18, 30, 25];
+        const dataset2Data = [20, 15, 28, 22, 10, 15];
 
         chartInstanceRef.current = new Chart(ctx, {
           type: 'line',
@@ -84,7 +84,7 @@ const LineChart: React.FC<LineChartProps> = ({className}) => {
   }, []);
 
   return (
-    <div className={`relative flex justify-center items-center px-0 2xl:px-2 py-4 ${className}`}>
+    <div className={`relative flex flex-grow justify-center items-center px-0 2xl:px-2 py-4 ${className}`}>
       <canvas ref={chartRef} />
     </div>
   );

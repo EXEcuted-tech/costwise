@@ -115,16 +115,16 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                 {edit &&
                     <div className={`${isOpen ? 'flex-col 3xl:flex-row w-[20%] 3xl:w-[50%] ' : 'flex-col 2xl:flex-row w-[20%] 2xl:w-[50%]'} flex justify-end`}>
                         <div className={`${isOpen ? 'mt-[10px] 3xl:mr-[10px]' : 'mt-[10px] 2xl:my-[10px] 2xl:mr-[10px]'} flex justify-end`}>
-                            <button className={`${isOpen ? 'text-[15px] 2xl:text-[18px]': 'text-[18px]'} hover:bg-[#961e1e] transition-colors duration-250 ease-in-out h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-primary`}
+                            <button className={`${isOpen ? 'text-[15px] 2xl:text-[18px]' : 'text-[18px]'} hover:bg-[#961e1e] transition-colors duration-250 ease-in-out h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-primary`}
                                 onClick={addRow}>
                                 <HiOutlinePlus className='mr-[5px]' />
                                 Add Row
                             </button>
                         </div>
                         <div className='flex justify-end mt-[5px] mb-[10px] 2xl:my-[10px]'>
-                            <button className={`${isOpen ? 'text-[15px] 2xl:text-[18px]': 'text-[18px]'} hover:bg-[#00780c] transition-colors duration-250 ease-in-out h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F]`}
-                                onClick={() => { 
-                                    setEdit(false); 
+                            <button className={`${isOpen ? 'text-[15px] 2xl:text-[18px]' : 'text-[18px]'} hover:bg-[#00780c] transition-colors duration-250 ease-in-out h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F]`}
+                                onClick={() => {
+                                    setEdit(false);
                                     setView(true);
                                 }}>
                                 <IoIosSave className='mr-[5px]' />
@@ -138,12 +138,21 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                 <table className='table-auto w-full border-collapse'>
                     <thead>
                         <tr>
-                            {fileData && Object.keys(fileData).map((key) =>
-                                (key != 'formulations' && key != 'cost') &&
-                                <th key={key} className={`text-center animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}>
-                                    {formatHeader(key)}{key == 'batchQty' && '.'}
-                                </th>
-                            )}
+                            {fileData && Object.keys(fileData).map((key) => {
+                                let textAlignClass = 'text-left';
+                                if (key === 'level') {
+                                    textAlignClass = 'text-center';
+                                } else if (key === 'batchQty') {
+                                    textAlignClass = 'text-right';
+                                }
+
+                                return (
+                                    (key != 'formulations' && key != 'cost') &&
+                                    <th key={key} className={`${textAlignClass} animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}>
+                                        {formatHeader(key)}{key == 'batchQty' && '.'}
+                                    </th>
+                                );
+                            })}
                         </tr>
                     </thead>
                     <tbody>
@@ -152,22 +161,22 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                                 {fileData && (
                                     <>
                                         <tr className='animate-zoomIn text-center font-bold text-black text-[18px] border-b border-[#ACACAC]'>
-                                            <td className='py-[10px]'>{fileData.number}</td>
-                                            <td></td>
-                                            <td>{fileData.itemCode}</td>
-                                            <td>{fileData.description}</td>
-                                            <td>{fileData.batchQty}</td>
-                                            <td>{fileData.unit}</td>
+                                            <td className='py-[10px] px-6 text-left'>{fileData.number}</td>
+                                            <td className='px-6'></td>
+                                            <td className='px-6 text-left'>{fileData.itemCode}</td>
+                                            <td className='px-6 text-left'>{fileData.description}</td>
+                                            <td className='px-6 text-right'>{fileData.batchQty}</td>
+                                            <td className='px-6 text-left'>{fileData.unit}</td>
                                         </tr>
 
                                         {fileData.formulations?.map((formulation, index) => (
                                             <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'} animate-zoomIn text-center font-medium text-[#6B6B6B] text-[18px]`}>
                                                 <td></td>
-                                                <td className='py-[10px]'>{formulation.level}</td>
-                                                <td>{formulation.itemCode}</td>
-                                                <td>{formulation.description}</td>
-                                                <td>{formulation.batchQty}</td>
-                                                <td>{formulation.unit}</td>
+                                                <td className='py-[10px] px-6'>{formulation.level}</td>
+                                                <td className='px-6 text-left'>{formulation.itemCode}</td>
+                                                <td className='px-6 text-left'>{formulation.description}</td>
+                                                <td className='px-6 text-right'>{formulation.batchQty}</td>
+                                                <td className='px-6 text-left'>{formulation.unit}</td>
                                             </tr>
                                         ))}
                                     </>
@@ -178,14 +187,14 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                                 {fileData && (
                                     <>
                                         <tr className='animate-zoomIn text-center font-bold text-black text-[18px] border-b border-[#ACACAC]'>
-                                            <td className='py-[10px]'>{fileData.number}</td>
+                                            <td className='py-[10px] px-6 text-left'>{fileData.number}</td>
                                             <td></td>
                                             <td>
                                                 <input
                                                     type="text"
                                                     onChange={(e) => handleInputChange('itemCode', e.target.value)}
                                                     value={fileData.itemCode}
-                                                    className={`mx-[5px] text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                    className={`mx-[5px] text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
                                                 />
                                             </td>
                                             <td>
@@ -193,7 +202,7 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                                                     type="text"
                                                     onChange={(e) => handleInputChange('description', e.target.value)}
                                                     value={fileData.description}
-                                                    className={`mx-[5px] text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                    className={`mx-[5px] text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
                                                 />
                                             </td>
                                             <td>
@@ -201,7 +210,7 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                                                     type="text"
                                                     onChange={(e) => handleInputChange('batchQty', e.target.value)}
                                                     value={fileData.batchQty}
-                                                    className={`mx-[5px] text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                    className={`mx-[5px] text-right animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
                                                 />
                                             </td>
                                             <td>
@@ -209,7 +218,7 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                                                     type="text"
                                                     onChange={(e) => handleInputChange('unit', e.target.value)}
                                                     value={fileData.unit}
-                                                    className={`mx-[5px] text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                    className={`mx-[5px] text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
                                                 />
                                             </td>
                                         </tr>
@@ -233,7 +242,7 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                                                         type="text"
                                                         onChange={(e) => handleFormulationInputChange(index, 'itemCode', e.target.value)}
                                                         value={formulation.itemCode}
-                                                        className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
                                                     />
                                                 </td>
                                                 <td>
@@ -241,7 +250,7 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                                                         type="text"
                                                         onChange={(e) => handleFormulationInputChange(index, 'description', e.target.value)}
                                                         value={formulation.description}
-                                                        className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
                                                     />
                                                 </td>
                                                 <td>
@@ -249,7 +258,7 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                                                         type="text"
                                                         onChange={(e) => handleFormulationInputChange(index, 'batchQty', parseFloat(e.target.value))}
                                                         value={formulation.batchQty}
-                                                        className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                        className="text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
                                                     />
                                                 </td>
                                                 <td>
@@ -257,7 +266,7 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                                                         type="text"
                                                         onChange={(e) => handleFormulationInputChange(index, 'unit', e.target.value)}
                                                         value={formulation.unit}
-                                                        className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
                                                     />
                                                 </td>
                                             </tr>

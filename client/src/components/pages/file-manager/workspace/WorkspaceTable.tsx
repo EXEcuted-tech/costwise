@@ -15,13 +15,27 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
     const [tableData, setTableData] = useState(data);
 
     const handleInputChange = (rowIndex: number, key: string, value: string) => {
-        const updatedData = tableData.map((row, i) => {
-            if (i === rowIndex) {
-                const isNumber = typeof row[key] === 'number';
-                return { ...row, [key]: isNumber ? parseFloat(value) : value };
-            }
-            return row;
-        });
+        // const updatedData = tableData.map((row, i) => {
+        //     if (i === rowIndex) {
+        //         const isNumber = typeof row[key] === 'number';
+        //         return { ...row, [key]: isNumber ? parseFloat(value) : value };
+        //     }
+        //     return row;
+        // });
+        const updatedData = [...tableData];
+
+        // Check if the value is numeric (and not an empty string)
+        if (!isNaN(Number(value)) && value !== '') {
+          // Ensure the value is always represented with two decimal places
+          const formattedValue = Number(value).toFixed(2);
+        
+          // Assign the formatted value as a string to preserve '11.00' format
+          updatedData[rowIndex][key] = formattedValue;
+        } else {
+          // For non-numeric or empty values, assign as they are
+          updatedData[rowIndex][key] = value;
+        }
+        
         setTableData(updatedData);
     };
 
@@ -67,8 +81,6 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                             let textAlignClass = 'text-left';
                             if (key === 'itemDescription') {
                                 textAlignClass = 'text-left';
-                            } else if (key === 'itemCode' || key === 'total') {
-                                textAlignClass = 'text-center';
                             } else if (key === 'amount') {
                                 textAlignClass = 'text-right';
                             }
@@ -101,7 +113,6 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                                 {Object.entries(row).map(([key, value], colIndex) => {
                                     let textAlignClass = 'text-left';
                                     if (typeof value === 'number') textAlignClass = 'text-right';
-                                    if (key === 'itemCode' || key === 'total') textAlignClass = 'text-center';
                                     return (
                                         <td
                                           key={key}
@@ -115,7 +126,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                                             <input
                                                 type="text"
                                                 onChange={(e) => handleInputChange(rowIndex, key, e.target.value)}
-                                                value={typeof value === 'number' ? value : String(value)}
+                                                value={typeof value === 'number' ? Number(value).toFixed(2) : String(value)}
                                                 className={`${isTransaction ? 'w-auto' : 'w-full'} ${textAlignClass} animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
                                             />
                                         </td>
@@ -129,7 +140,6 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                                 {Object.entries(row).map(([key, value], colIndex) => {
                                     let textAlignClass = 'text-left';
                                     if (typeof value === 'number') textAlignClass = 'text-right';
-                                    if (key === 'itemCode' || key === 'total') textAlignClass = 'text-center';
                                     return (
                                         <td
                                             key={key}
