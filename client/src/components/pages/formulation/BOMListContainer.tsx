@@ -141,8 +141,8 @@ const BOMListContainer = () => {
                   <td></td>
                   <td className='text-left px-6'>{info.itemCode}</td>
                   <td className='text-left px-6'>{info.description}</td>
-                  <td className='text-right px-6'>{info.batchQty}</td>
                   <td className='text-left px-6'>{info.unit}</td>
+                  <td className='text-right px-6'>{info.batchQty}</td>
                   <td className='text-right px-6'>{info.materialCost}</td>
                   <td className='text-right px-6'>{info.productCost}</td>
                 </tr>
@@ -153,8 +153,8 @@ const BOMListContainer = () => {
                     <td className='py-[10px]'>{formulation.level}</td>
                     <td className='text-left px-6'>{formulation.itemCode}</td>
                     <td className='text-left px-6'>{formulation.description}</td>
-                    <td className='text-right px-6'>{formulation.batchQty}</td>
                     <td className='text-left px-6'>{formulation.unit}</td>
+                    <td className='text-right px-6'>{formulation.batchQty}</td>
                     <td className='text-right px-6'>{formulation.materialCost}</td>
                     <td></td>
                   </tr>
