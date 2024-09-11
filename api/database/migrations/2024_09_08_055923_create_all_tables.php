@@ -75,16 +75,17 @@ return new class extends Migration {
         // Formulations Table
         Schema::create('formulations', function (Blueprint $table) {
             $table->increments('formulation_id');
-            $table->string('formulation_no', 255);
             $table->unsignedInteger('fg_id');
+            $table->string('formulation_no', 255);
             $table->longText('material_qty_list');
-            $table->foreign('fg_id')->references('fg_id')->on('finished_goods')->onDelete('cascade');
             $table->timestamps();
+            $table->foreign('fg_id')->references('fg_id')->on('finished_goods')->onDelete('cascade');
         });
 
         // Material Table
         Schema::create('materials', function (Blueprint $table) {
             $table->increments('material_id');
+            $table->string('material_code', 255);
             $table->string('material_desc', 255);
             $table->decimal('material_cost', 10, 2);
             $table->string('unit', 10);
@@ -99,8 +100,8 @@ return new class extends Migration {
             $table->decimal('material_qty', 10, 2);
             $table->decimal('distributed_qty', 10, 2);
             $table->decimal('stock_qty', 10, 2);
-            $table->foreign('material_id')->references('material_id')->on('materials')->onDelete('cascade');
             $table->timestamps();
+            $table->foreign('material_id')->references('material_id')->on('materials')->onDelete('cascade');
         });
 
         // Article Table
@@ -108,6 +109,22 @@ return new class extends Migration {
             $table->increments('article_id');
             $table->longText('content');
             $table->timestamps();
+        });
+
+        Schema::create('transactions', function (Blueprint $table) {
+            $table->id('transaction_id');
+            $table->unsignedInteger('material_id');
+            $table->string('journal', 255);
+            $table->string('entry_num', 15);
+            $table->string('trans_desc', 255);
+            $table->string('project', 255);
+            $table->string('gl_account', 15);
+            $table->string('gl_desc', 255);
+            $table->string('warehouse', 10);
+            $table->timestamp('date');
+            $table->integer('month');
+            $table->integer('year');
+            $table->foreign('material_id')->references('material_id')->on('materials')->onDelete('cascade');
         });
     }
 
@@ -126,5 +143,6 @@ return new class extends Migration {
         Schema::dropIfExists('files');
         Schema::dropIfExists('audit_logs');
         Schema::dropIfExists('users');
+        Schema::dropIfExists('transactions');
     }
 };
