@@ -82,13 +82,12 @@ const AuditLogPage: React.FC<AuditLogPageProps> = ({ fileData }) => {
                     </thead>
                     <tbody>
                         {currentListPage.length > 0 ? currentListPage.map((data, index) => (
-                            <tr key={index} className={`flex w-full text-[14px] 4xl:text-[18px] pl-[15px] 4xl:pl-[20px] py-[7px] 4xl:py-[10px] border-b border-x border-black border-opacity-[50%] bg-white ${index === currentListPage.length - 1 ? 'rounded-b-xl' : ''}`}>
+                            <tr key={index} className={`flex w-full h-[74px] items-center text-[14px] 4xl:text-[18px] pl-[15px] 4xl:pl-[20px] py-[7px] 4xl:py-[10px] border-b border-x border-black border-opacity-[50%] bg-white ${index === currentListPage.length - 1 ? 'rounded-b-xl' : ''}`}>
                                 <td className="w-[27.5%]">
                                     {data.dateTimeAdded}
                                 </td>
                                 <td className="flex flex-col w-[23.5%]">
                                     {data.employeeNo}
-                                    <span className="text-[14px] 4xl:text-[16px] opacity-[50%]">{data.userType}</span>
                                 </td>
                                 <td className="flex w-[34.5%] 4xl:w-[37.5%] text-[14px] 4xl:text-[16px] items-center">
                                     {data.actionEvent}
