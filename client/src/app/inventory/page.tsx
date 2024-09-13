@@ -9,6 +9,7 @@ import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import MonthSelector from '@/components/modals/MonthSelector';
 import { HiOutlinePlus } from "react-icons/hi2";
 import { CiImport } from "react-icons/ci";
+import { IoTrash } from 'react-icons/io5';
 
 export interface InventoryProps {
     itemCode: String;
@@ -22,7 +23,7 @@ export interface InventoryProps {
 
 const Inventory = () => {
     const { isOpen } = useSidebarContext();
-    const columnNames = ["Item Code", "Description", "Unit", "Price", "Status", "In Stock", "Qty"];
+    const columnNames = ["Item Code", "Description", "Unit", "In Stock", "Qty", "Price", "Status"];
     const monthOptions = ["January 2024", "February 2024", "March 2024"];
 
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -146,6 +147,10 @@ const Inventory = () => {
                                 <span><CiImport className='w-[30px] h-[22px]'/></span>
                                 <span className='font-semibold'>Import</span>
                             </button>
+                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}>
+                                <IoTrash className="text-[25px] transition-colors duration-250 ease-in-out" />
+                            </button>
+                            
                         </div>
                     </div>
 
@@ -168,7 +173,9 @@ const Inventory = () => {
                                             <td className='w-[10rem] py-4'>{data.itemCode}</td>
                                             <td className='break-words'>{data.description}</td>
                                             <td>{data.unit}</td>
-                                            <td>{data.unit}</td>
+                                            <td className='w-[10%]'>{data.inStock}</td>
+                                            <td className=''>{data.qty}</td>
+                                            <td>{data.cost}</td>
                                             <td>
                                                 <div className='flex justify-center'>
                                                     <p
@@ -181,8 +188,6 @@ const Inventory = () => {
                                                     </p>
                                                 </div>
                                             </td>
-                                            <td className='w-[10%]'>{data.inStock}</td>
-                                            <td className=''>{data.qty}</td>
                                         </tr>
                                     ))
                                 ) : (
@@ -220,53 +225,53 @@ const InventoryFakeData = [
         unit: "strd",
         cost: "104.41",
         status: "In Stock",
-        inStock: "20 strd",
-        qty: "30 strd",
+        inStock: "20",
+        qty: "30",
     },
     {
         itemCode: "FG-02",
         description: "FLAVOR 1",
         unit: "kg",
-        cost: "104.41",
+        cost: "118.97",
         status: "In Stock",
-        inStock: "10 kg",
-        qty: "20 kg",
+        inStock: "10",
+        qty: "20",
     },
     {
         itemCode: "FG-03",
         description: "SEASONING 2",
         unit: "pcs",
-        cost: "104.41",
+        cost: "228.90",
         status: "Low Stock",
-        inStock: "5 pcs",
-        qty: "30 pcs",
+        inStock: "5",
+        qty: "30",
     },
     {
         itemCode: "FG-04",
         description: "MEAT MATERIAL 1",
         unit: "kg",
-        cost: "104.41",
+        cost: "257.00",
         status: "In Stock",
-        inStock: "20 kg",
-        qty: "30 kg",
+        inStock: "20",
+        qty: "30",
     },
     {
         itemCode: "FG-05",
         description: "ADDITIVE 3",
         unit: "g",
-        cost: "104.41",
+        cost: "52.67",
         status: "In Stock",
-        inStock: "20 g",
-        qty: "30 g",
+        inStock: "20",
+        qty: "30",
     },
     {
         itemCode: "FG-06",
         description: "PACKAGING 3",
         unit: "strd",
-        cost: "104.41",
+        cost: "274.00",
         status: "In Stock",
-        inStock: "20 strd",
-        qty: "30 strd",
+        inStock: "20",
+        qty: "30",
     },
     {
         itemCode: "FG-07",
@@ -274,8 +279,8 @@ const InventoryFakeData = [
         unit: "kg",
         cost: "118.97",
         status: "In Stock",
-        inStock: "20 kg",
-        qty: "30 kg",
+        inStock: "20",
+        qty: "30",
     },
     {
         itemCode: "FG-08",
@@ -283,8 +288,8 @@ const InventoryFakeData = [
         unit: "pcs",
         cost: "295.11",
         status: "Low Stock",
-        inStock: "10 pcs",
-        qty: "30 pcs",
+        inStock: "10",
+        qty: "30",
     },
     {
         itemCode: "FG-08",
@@ -292,7 +297,7 @@ const InventoryFakeData = [
         unit: "pcs",
         cost: "295.11",
         status: "Low Stock",
-        inStock: "10 pcs",
-        qty: "30 pcs",
+        inStock: "10",
+        qty: "30",
     },
 ]
