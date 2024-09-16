@@ -10,12 +10,14 @@ import { IoGitNetworkOutline } from "react-icons/io5";
 import { IoMdAdd, IoIosSearch } from "react-icons/io";
 import ReleaseNoteTile from '@/components/pages/system-maintenance/ReleaseNoteTile';
 import CreateReleaseNotes from '@/components/modals/CreateReleaseNotes';
+import EditReleaseNotes from '@/components/modals/EditReleaseNotes';
 
 
 export interface SystemMaintenanceProps {
     date: String;
     title: String;
     author: String;
+    setEditNotes: React.Dispatch<React.SetStateAction<boolean>>;
     //contents, idk how to structure it rn
 };
 
@@ -23,6 +25,8 @@ const SystemMaintenance = () => {
     const { isOpen } = useSidebarContext();
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [createNotes, setCreateNotes] = useState(false);
+    const [editNotes, setEditNotes] = useState(false);
+
 
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
@@ -39,6 +43,7 @@ const SystemMaintenance = () => {
                 <Header icon={GrSystem} title="System Maintenance" />
             </div>
             {createNotes && <CreateReleaseNotes setCreateNotes={setCreateNotes}/>}
+            {editNotes && <EditReleaseNotes setEditNotes={setEditNotes}/>}
             <div className='ml-[45px]'>
                 {/* Info Tiles */}
                 <div className='flex mx-16 mt-12 mb-9 gap-[5rem] justify-center'>
@@ -128,6 +133,7 @@ const SystemMaintenance = () => {
                                 date={note.date}
                                 title={note.title}
                                 author={note.author}
+                                setEditNotes={setEditNotes}
                             />
                         ))}
                     </div>
