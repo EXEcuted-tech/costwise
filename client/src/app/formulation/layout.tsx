@@ -1,7 +1,7 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
-import { FormulationProvider, useFormulationContext } from "@/context/FormulationContext";
-import { SidebarProvider, useSidebarContext } from "@/context/SidebarContext";
+import { FormulationProvider, useFormulationContext } from "@/contexts/FormulationContext";
+import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
 import { useEffect, useState } from "react";
 
 export default function FormulationLayout({

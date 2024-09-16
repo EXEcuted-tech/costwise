@@ -8,12 +8,12 @@ import { PiScrewdriverFill } from "react-icons/pi";
 import { VscExport } from "react-icons/vsc";
 import { PiUploadLight } from "react-icons/pi";
 import { IoIosArrowDown } from "react-icons/io";
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import { BiSolidFile } from "react-icons/bi";
 import { BiFile } from "react-icons/bi";
 import useOutsideClick from '@/hooks/useOutsideClick';
 import ConfirmDelete from '@/components/modals/ConfirmDelete';
-import { useFileManagerContext } from '@/context/FileManagerContext';
+import { useFileManagerContext } from '@/contexts/FileManagerContext';
 
 const FileManagerPage = () => {
   const { isOpen } = useSidebarContext();

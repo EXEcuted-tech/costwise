@@ -6,8 +6,8 @@ import { IoIosArrowRoundBack, IoIosSave } from 'react-icons/io';
 import { formatHeader } from '@/utils/costwiseUtils';
 import { HiOutlinePlus } from 'react-icons/hi2';
 import { IoTrash } from 'react-icons/io5';
-import { useFormulationContext } from '@/context/FormulationContext';
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useFormulationContext } from '@/contexts/FormulationContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import { HiClipboardList } from 'react-icons/hi';
 import Header from '@/components/header/Header';
 

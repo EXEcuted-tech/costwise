@@ -1,6 +1,7 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
-import { SidebarProvider, useSidebarContext } from "@/context/SidebarContext";
+import ProtectedRoute from "@/components/routes/ProtectedRoute";
+import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
 
 export default function DashboardLayout({
   children,
@@ -9,11 +10,13 @@ export default function DashboardLayout({
 }>) {
 
   return (
-    <SidebarProvider>
-      <DashboardContent>
-        {children}
-      </DashboardContent>
-    </SidebarProvider>
+    <ProtectedRoute>
+      <SidebarProvider>
+        <DashboardContent>
+          {children}
+        </DashboardContent>
+      </SidebarProvider>
+    </ProtectedRoute>
   );
 }
 

@@ -1,6 +1,6 @@
 "use client";
 import MainLayout from "@/components/layouts/MainLayout";
-import { SidebarProvider, useSidebarContext } from "@/context/SidebarContext";
+import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
 
 export default function UserManagementLayout({
   children,

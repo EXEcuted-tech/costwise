@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Image from 'next/image';
 import virginialogo from '@/assets/virginia-logo.png';
-import { useSidebarContext } from "@/context/SidebarContext";
+import { useSidebarContext } from "@/contexts/SidebarContext";
 import { IoCamera } from "react-icons/io5";
 import Link from "next/link";
 import UserInformation from '@/components/pages/profile/UserInformation';

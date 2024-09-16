@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { SystemMaintenanceProps } from '@/app/maintenance/page';
 import { TfiMoreAlt } from "react-icons/tfi";
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 
 const formatDate = (dateString: String) => {
     const date = new Date(dateString as string);

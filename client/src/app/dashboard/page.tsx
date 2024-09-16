@@ -1,7 +1,7 @@
 "use client"
 import CustomCalendar from '@/components/calendar/CustomCalendar';
 import CardHeader from '@/components/pages/dashboard/CardHeader';
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import { IoMdClock } from "react-icons/io";
 import { MdDarkMode } from 'react-icons/md';
 import { GiFactory, GiMoneyStack } from "react-icons/gi";

@@ -1,6 +1,6 @@
 "use client"
-import { useSidebarContext } from "@/context/SidebarContext";
-import { useDrawerContext } from "@/context/DrawerContext";
+import { useSidebarContext } from "@/contexts/SidebarContext";
+import { useDrawerContext } from "@/contexts/DrawerContext";
 import Link from "next/link";
 import { useState } from "react";
 import { MdClose } from "react-icons/md";

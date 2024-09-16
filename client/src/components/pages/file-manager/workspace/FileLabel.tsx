@@ -1,7 +1,7 @@
 import React from 'react'
 import { RiFileFill } from "react-icons/ri";
 import { FileTableProps } from '../FileContainer';
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 
 const FileLabel = (data: FileTableProps) => {
   const { isOpen } = useSidebarContext();

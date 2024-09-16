@@ -1,5 +1,5 @@
 import CustomMonthSelector from '@/components/form-controls/CustomMonthSelector';
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import React, { useState } from 'react';
 import { IoClose } from "react-icons/io5";
 import { MdCalendarMonth } from "react-icons/md";

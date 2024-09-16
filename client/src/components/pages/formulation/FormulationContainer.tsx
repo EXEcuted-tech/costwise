@@ -6,7 +6,7 @@ import { IoTrash } from "react-icons/io5";
 import { TiExport } from "react-icons/ti";
 import { useRouter } from 'next/navigation';
 import FormulationTable from './FormulationTable';
-import { useFormulationContext } from '@/context/FormulationContext';
+import { useFormulationContext } from '@/contexts/FormulationContext';
 import CompareFormulaContainer from './CompareFormulaContainer';
 import BOMListContainer from './BOMListContainer';
 import { FaFileCircleXmark } from "react-icons/fa6";

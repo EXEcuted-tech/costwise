@@ -6,8 +6,10 @@ import { iconMap } from '@/utils/iconMap';
 import usePath from '@/hooks/usePath';
 import MiniSidebar from './MiniSidebar';
 import Link from 'next/link';
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import { useRouter } from 'next/navigation';
+import api from '@/utils/api';
+import config from '@/server/config';
 
 export interface IconOpenConfig {
   iconName: string;
@@ -21,6 +23,16 @@ const OpenSidebar: React.FC = () => {
   const [isMore, setIsMore] = useState(false);
   const path = usePath();
   const router = useRouter();
+
+  const handleLogout = async () => {
+    try {
+      await api.delete(`${config.API}/api/logout`);
+      localStorage.removeItem('token');
+      router.push('/logout');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <>
@@ -38,12 +50,12 @@ const OpenSidebar: React.FC = () => {
               src="https://i.imgur.com/AZOtzD7.jpg"
               alt={'Profile Picture'}
               className='flex object-cover size-[70px] 2xl:size-[80px] rounded-full border cursor-pointer'
-              onClick={()=>{router.push('/profile')}}
+              onClick={() => { router.push('/profile') }}
             />
             <div className='text-white ml-[15px] mt-[-8px]'>
               <h1 className='font-extrabold text-[24px] 2xl:text-[28px]'>Kathea Mari</h1>
               <p className='font-light text-[16px] 2xl:text-[20px] mt-[-8px] cursor-pointer hover:text-[#dbdbdb]'
-                onClick={()=>{router.push('/profile')}}>My Account</p>
+                onClick={() => { router.push('/profile') }}>My Account</p>
             </div>
           </div>
 
@@ -77,17 +89,32 @@ const OpenSidebar: React.FC = () => {
                 (userDefaultMenu.map(({ iconName, className, menuName, route }, index) => {
                   const IconComponent = iconMap[iconName];
                   return (
-                    <Link href={`/${route}`} key={index}>
-                      <li
-                        className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${path === route
-                          ? 'w-[90%] 2xl:w-[88%] text-primary bg-[#FFD3D3] ml-[17px] 2xl:ml-[25px] pr-[20px] pl-[10px] 2xl:pl-[15px] py-[5px] my-[8px] rounded-[20px]'
-                          : 'my-[14px] 2xl:my-[11px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
-                          }`}
-                      >
-                        <IconComponent className={`${className} justify-center`} />
-                        <p className='font-lato ml-[8px] text-[20px] 2xl:text-[25px]'>{menuName}</p>
-                      </li>
-                    </Link>
+                    <>
+                      {menuName == 'Log Out' ?
+                        <li
+                          className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${path === route
+                            ? 'w-[90%] 2xl:w-[88%] text-primary bg-[#FFD3D3] ml-[17px] 2xl:ml-[25px] pr-[20px] pl-[10px] 2xl:pl-[15px] py-[5px] my-[8px] rounded-[20px]'
+                            : 'my-[14px] 2xl:my-[11px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
+                            }`}
+                          onClick={handleLogout}
+                        >
+                          <IconComponent className={`${className} justify-center`} />
+                          <p className='font-lato ml-[8px] text-[20px] 2xl:text-[25px]'>{menuName}</p>
+                        </li>
+                        :
+                        <Link href={`/${route}`} key={index}>
+                          <li
+                            className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${path === route
+                              ? 'w-[90%] 2xl:w-[88%] text-primary bg-[#FFD3D3] ml-[17px] 2xl:ml-[25px] pr-[20px] pl-[10px] 2xl:pl-[15px] py-[5px] my-[8px] rounded-[20px]'
+                              : 'my-[14px] 2xl:my-[11px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
+                              }`}
+                          >
+                            <IconComponent className={`${className} justify-center`} />
+                            <p className='font-lato ml-[8px] text-[20px] 2xl:text-[25px]'>{menuName}</p>
+                          </li>
+                        </Link>
+                      }
+                    </>
                   );
                 }))
                 :
@@ -95,18 +122,34 @@ const OpenSidebar: React.FC = () => {
                   const IconComponent = iconMap[iconName];
                   const isRoute = routes?.some(e => e === path);
                   return menuName !== 'More' ? (
-                    <Link href={`/${route}`}>
-                      <li
-                        key={index}
-                        className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${path === route
-                          ? 'w-[90%] 2xl:w-[88%] text-primary bg-[#FFD3D3] ml-[17px] 2xl:ml-[25px] pr-[20px] pl-[10px] 2xl:pl-[15px] py-[5px] my-[8px] rounded-[20px]'
-                          : 'my-[14px] 2xl:my-[11px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
-                          }`}
-                      >
-                        <IconComponent className={`${className} ml-[5px] 2xl:ml-0 justify-center`} />
-                        <p className='font-lato ml-[8px] text-[20px] 2xl:text-[25px]'>{menuName}</p>
-                      </li>
-                    </Link>
+                    <>
+                      {menuName == 'Log Out' ?
+                        <li
+                          key={index}
+                          className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${path === route
+                            ? 'w-[90%] 2xl:w-[88%] text-primary bg-[#FFD3D3] ml-[17px] 2xl:ml-[25px] pr-[20px] pl-[10px] 2xl:pl-[15px] py-[5px] my-[8px] rounded-[20px]'
+                            : 'my-[14px] 2xl:my-[11px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
+                            }`}
+                          onClick={handleLogout}
+                        >
+                          <IconComponent className={`${className} ml-[5px] 2xl:ml-0 justify-center`} />
+                          <p className='font-lato ml-[8px] text-[20px] 2xl:text-[25px]'>{menuName}</p>
+                        </li>
+                        :
+                        <Link href={`/${route}`}>
+                          <li
+                            key={index}
+                            className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${path === route
+                              ? 'w-[90%] 2xl:w-[88%] text-primary bg-[#FFD3D3] ml-[17px] 2xl:ml-[25px] pr-[20px] pl-[10px] 2xl:pl-[15px] py-[5px] my-[8px] rounded-[20px]'
+                              : 'my-[14px] 2xl:my-[11px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
+                              }`}
+                          >
+                            <IconComponent className={`${className} ml-[5px] 2xl:ml-0 justify-center`} />
+                            <p className='font-lato ml-[8px] text-[20px] 2xl:text-[25px]'>{menuName}</p>
+                          </li>
+                        </Link>
+                      }
+                    </>
                   )
                     :
                     (

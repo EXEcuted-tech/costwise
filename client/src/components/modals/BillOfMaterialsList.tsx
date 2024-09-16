@@ -5,7 +5,7 @@ import { TbPointFilled } from "react-icons/tb";
 import { BsThreeDotsVertical } from "react-icons/bs";
 import useOutsideClick from '@/hooks/useOutsideClick';
 import BOMListContainer from '../pages/formulation/BOMListContainer';
-import { useFormulationContext } from '@/context/FormulationContext';
+import { useFormulationContext } from '@/contexts/FormulationContext';
 
 const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateAction<boolean>> }> = ({ setBOM }) => {
     const [inputValue, setInputValue] = useState('');

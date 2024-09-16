@@ -20,9 +20,11 @@ return new class extends Migration {
             $table->string('last_name', 255);
             $table->string('suffix', 5)->nullable();
             $table->string('email_address', 255);
+            $table->string('password', 255);
             $table->string('phone_number', 255);
             $table->string('department', 255);
             $table->string('position', 25);
+            $table->longText('display_picture')->nullable();
             $table->longText('sys_role');
             $table->timestamps();
         });

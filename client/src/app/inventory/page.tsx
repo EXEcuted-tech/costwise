@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Header from '@/components/header/Header';
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import { LuCircle } from "react-icons/lu";
 import { MdTrolley, MdCalendarToday } from "react-icons/md";
 import { IoIosArrowBack, IoIosArrowForward, IoIosSearch } from "react-icons/io";

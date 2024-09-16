@@ -3,7 +3,8 @@
     "type": "module",
     "scripts": {
         "dev": "vite",
-        "build": "vite build"
+        "build": "vite build",
+        "migrate": "php artisan migrate && php artisan migrate --database=archive_mysql"
     },
     "devDependencies": {
         "axios": "^1.7.4",
