@@ -7,6 +7,9 @@ import { MdTrolley, MdCalendarToday } from "react-icons/md";
 import { IoIosArrowBack, IoIosArrowForward, IoIosSearch } from "react-icons/io";
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import MonthSelector from '@/components/modals/MonthSelector';
+import { HiOutlinePlus } from "react-icons/hi2";
+import { CiImport } from "react-icons/ci";
+import { IoTrash } from 'react-icons/io5';
 
 export interface InventoryProps {
     itemCode: String;
@@ -20,7 +23,7 @@ export interface InventoryProps {
 
 const Inventory = () => {
     const { isOpen } = useSidebarContext();
-    const columnNames = ["Item Code", "Description", "Unit", "Price", "Status", "In Stock", "Qty"];
+    const columnNames = ["Item Code", "Description", "Unit", "In Stock", "Qty", "Price", "Status"];
     const monthOptions = ["January 2024", "February 2024", "March 2024"];
 
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -75,14 +78,15 @@ const Inventory = () => {
                 <div className={`${isOpen ? '4xl:h-[47rem] 3xl:h-[45rem] 2xl:h-[45rem] xl:h-[44rem]' : '4xl:h-[47rem] 3xl:h-[47rem] 2xl:h-[47rem] xl:h-[43rem]'} relative w-auto h-[47rem] ml-[4rem] mr-[3rem] my-[3rem] rounded-2xl bg-white border-1 border-[#656565] shadow-md animate-fade-in2`}>
                     {/* Header */}
                     <div className='flex h-14 rounded-t-2xl bg-[#B22222] text-white text-[26px] font-bold py-2 pl-5'>
-                        <LuCircle className='text-[30px] mt-1 mr-3' /> <p>{selectedMonth}</p>
 
                         {/* Month Button */}
                         <button
                             onClick={openMonthSelectorModal}
-                            className='ml-6 text-white text-[28px] bg-[#d9d9d98e] px-2 py-1 rounded-lg cursor-pointer hover:bg-[#bd2a2a] transition-colors duration-300 ease-in-out'>
+                            className='mt-1 mr-3 text-white text-[28px] bg-[#bd2a2a] px-2 py-1 rounded-lg cursor-pointer hover:bg-[#D9D9D98E] transition-colors duration-300 ease-in-out'>
                             <MdCalendarToday className='' />
                         </button>
+
+                        <p>{selectedMonth}</p>
 
                         {/* Navigator Buttons */}
                         <div className='flex w-[8rem] ml-auto'>
@@ -119,11 +123,11 @@ const Inventory = () => {
                             />
                         </div>
 
-                        <div className='mt-[0.8em] mr-4 ml-auto text-gray-400'>
+                        <div className='flex mt-[0.8em] mr-4 ml-auto text-gray-400 gap-4'>
                             <select
-                                className={`${isOpen ? '4xl:w-[20rem] 3xl:w-[20rem] 2xl:w-[15rem] xl:w-[10rem]' : ''} bg-white h-8 w-[20rem] pl-3 text-[1.1em] mr-4 border border-gray-400 rounded-lg focus:outline-none`}
+                                className={`${isOpen ? '4xl:w-[20rem] 3xl:w-[20rem] 2xl:w-[15rem] xl:w-[10rem]' : ''} bg-white h-8 w-[20rem] pl-3 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
                             >
-                                <option selected value="" disabled hidden>Item</option>
+                                <option selected value="" disabled hidden>Item Category</option>
                                 <option value="all">All</option>
                                 <option value="meat-materials">Meat Materials</option>
                                 <option value="food-additives">Food Additives & Meat Extenders</option>
@@ -139,6 +143,14 @@ const Inventory = () => {
                                 <option value="in-stock">In Stock</option>
                                 <option value="low-stock">Low Stock</option>
                             </select>
+                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[7rem] px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}>
+                                <span><CiImport className='w-[30px] h-[22px]'/></span>
+                                <span className='font-semibold'>Import</span>
+                            </button>
+                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}>
+                                <IoTrash className="text-[25px] transition-colors duration-250 ease-in-out" />
+                            </button>
+                            
                         </div>
                     </div>
 
@@ -161,21 +173,21 @@ const Inventory = () => {
                                             <td className='w-[10rem] py-4'>{data.itemCode}</td>
                                             <td className='break-words'>{data.description}</td>
                                             <td>{data.unit}</td>
-                                            <td>{data.unit}</td>
+                                            <td className='w-[10%]'>{data.inStock}</td>
+                                            <td className=''>{data.qty}</td>
+                                            <td>{data.cost}</td>
                                             <td>
                                                 <div className='flex justify-center'>
                                                     <p
                                                         className={`${data.status === 'In Stock'
                                                             ? 'text-[#00930F] bg-[#9EE29E]'
-                                                            : 'text-[#317AFA] bg-[#B6CDFF]'
+                                                            : 'text-primary bg-[#F5BABA]'
                                                             } rounded-2xl w-[9rem]`}
                                                     >
                                                         {data.status}
                                                     </p>
                                                 </div>
                                             </td>
-                                            <td className='w-[10%]'>{data.inStock}</td>
-                                            <td className=''>{data.qty}</td>
                                         </tr>
                                     ))
                                 ) : (
@@ -213,53 +225,53 @@ const InventoryFakeData = [
         unit: "strd",
         cost: "104.41",
         status: "In Stock",
-        inStock: "20 strd",
-        qty: "30 strd",
+        inStock: "20",
+        qty: "30",
     },
     {
         itemCode: "FG-02",
         description: "FLAVOR 1",
         unit: "kg",
-        cost: "104.41",
+        cost: "118.97",
         status: "In Stock",
-        inStock: "10 kg",
-        qty: "20 kg",
+        inStock: "10",
+        qty: "20",
     },
     {
         itemCode: "FG-03",
         description: "SEASONING 2",
         unit: "pcs",
-        cost: "104.41",
+        cost: "228.90",
         status: "Low Stock",
-        inStock: "5 pcs",
-        qty: "30 pcs",
+        inStock: "5",
+        qty: "30",
     },
     {
         itemCode: "FG-04",
         description: "MEAT MATERIAL 1",
         unit: "kg",
-        cost: "104.41",
+        cost: "257.00",
         status: "In Stock",
-        inStock: "20 kg",
-        qty: "30 kg",
+        inStock: "20",
+        qty: "30",
     },
     {
         itemCode: "FG-05",
         description: "ADDITIVE 3",
         unit: "g",
-        cost: "104.41",
+        cost: "52.67",
         status: "In Stock",
-        inStock: "20 g",
-        qty: "30 g",
+        inStock: "20",
+        qty: "30",
     },
     {
         itemCode: "FG-06",
         description: "PACKAGING 3",
         unit: "strd",
-        cost: "104.41",
+        cost: "274.00",
         status: "In Stock",
-        inStock: "20 strd",
-        qty: "30 strd",
+        inStock: "20",
+        qty: "30",
     },
     {
         itemCode: "FG-07",
@@ -267,8 +279,8 @@ const InventoryFakeData = [
         unit: "kg",
         cost: "118.97",
         status: "In Stock",
-        inStock: "20 kg",
-        qty: "30 kg",
+        inStock: "20",
+        qty: "30",
     },
     {
         itemCode: "FG-08",
@@ -276,8 +288,8 @@ const InventoryFakeData = [
         unit: "pcs",
         cost: "295.11",
         status: "Low Stock",
-        inStock: "10 pcs",
-        qty: "30 pcs",
+        inStock: "10",
+        qty: "30",
     },
     {
         itemCode: "FG-08",
@@ -285,7 +297,7 @@ const InventoryFakeData = [
         unit: "pcs",
         cost: "295.11",
         status: "Low Stock",
-        inStock: "10 pcs",
-        qty: "30 pcs",
+        inStock: "10",
+        qty: "30",
     },
 ]
