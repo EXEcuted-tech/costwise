@@ -14,7 +14,7 @@ const UserManualPage = () => {
   return (
     <div className='overflow-hidden bg-cover bg-center items-center justify-center bg-[#FFC24B] bg-opacity-20' style={{ backgroundImage: "url('/images/usermanbg.png')" }}>
       <div>
-        <Header icon={PiBookOpenText} title="User's Management"></Header>
+        <Header icon={PiBookOpenText} title="User's Manual"></Header>
       </div>
       <div className='w-full h-[90vh] flex flex-col items-end justify-center ml-[45px] pr-[45px]'>
         {/* Top Div */}
