@@ -30,7 +30,7 @@ const CustomDatePicker = () => {
         <input
           type="text"
           value={selectedDate}
-          placeholder="Date/Period"
+          placeholder="Date Added"
           className="w-full pl-10 pr-10 bg-white border border-[#868686] text-[#5C5C5C] placeholder-[#B0B0B0] text-[15px] rounded-[5px] py-[3px] cursor-pointer"
           readOnly
           onClick={openDatePicker}

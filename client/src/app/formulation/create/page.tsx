@@ -98,7 +98,7 @@ const AddFormulationPage = () => {
         <>
             <Header icon={HiClipboardList} title={"Formulations"} />
             <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
-                    <div className='bg-white rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[25px]'>
+                <div className='bg-white rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[25px]'>
                     <div className='flex items-center py-[10px]'>
                         <IoIosArrowRoundBack className='text-primary text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] transition-colors duration-300 ease-in-out cursor-pointer'
                             onClick={handleBack} />
@@ -131,26 +131,35 @@ const AddFormulationPage = () => {
                         <table className='table-auto w-full border-collapse'>
                             <thead>
                                 <tr>
-                                    {fileData && Object.keys(fileData).map((key) =>
-                                        (key != 'formulations' && key != 'cost') &&
-                                        <th key={key} className={`text-center animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}>
-                                            {formatHeader(key)}{key == 'batchQty' && '.'}
-                                        </th>
-                                    )}
+                                    {fileData && Object.keys(fileData).map((key) => {
+                                        let textAlignClass = 'text-left';
+                                        if (key === 'level') {
+                                            textAlignClass = 'text-center';
+                                        } else if (key === 'batchQty') {
+                                            textAlignClass = 'text-right';
+                                        }
+
+                                        return (
+                                            (key != 'formulations' && key != 'cost') &&
+                                            <th key={key} className={`${textAlignClass} animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}>
+                                                {formatHeader(key)}{key == 'batchQty' && '.'}
+                                            </th>
+                                        );
+                                    })}
                                 </tr>
                             </thead>
                             <tbody>
                                 {fileData && (
                                     <>
                                         <tr className='animate-zoomIn text-center font-bold text-black text-[18px] border-b border-[#ACACAC]'>
-                                            <td className='py-[10px]'>{fileData.number}</td>
+                                            <td className='py-[10px] px-6 text-left'>{fileData.number}</td>
                                             <td></td>
                                             <td>
                                                 <input
                                                     type="text"
                                                     onChange={(e) => handleInputChange('itemCode', e.target.value)}
                                                     value={fileData.itemCode}
-                                                    className={`mx-[5px] text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                    className={`mx-[5px] text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
                                                 />
                                             </td>
                                             <td>
@@ -158,7 +167,7 @@ const AddFormulationPage = () => {
                                                     type="text"
                                                     onChange={(e) => handleInputChange('description', e.target.value)}
                                                     value={fileData.description}
-                                                    className={`mx-[5px] text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                    className={`mx-[5px] text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
                                                 />
                                             </td>
                                             <td>
@@ -166,7 +175,7 @@ const AddFormulationPage = () => {
                                                     type="text"
                                                     onChange={(e) => handleInputChange('batchQty', e.target.value)}
                                                     value={fileData.batchQty}
-                                                    className={`mx-[5px] text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                    className={`mx-[5px] text-right animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
                                                 />
                                             </td>
                                             <td>
@@ -174,7 +183,7 @@ const AddFormulationPage = () => {
                                                     type="text"
                                                     onChange={(e) => handleInputChange('unit', e.target.value)}
                                                     value={fileData.unit}
-                                                    className={`mx-[5px] text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                    className={`mx-[5px] text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
                                                 />
                                             </td>
                                         </tr>
@@ -182,7 +191,7 @@ const AddFormulationPage = () => {
                                         {fileData.formulations?.map((formulation, index) => (
                                             <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'} animate-zoomIn text-center font-medium text-[#6B6B6B] text-[18px]`}>
                                                 <td className='flex justify-center items-center py-[15px]'>
-                                                    <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-250 ease-in-out"
+                                                    <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-300 ease-in-out"
                                                         onClick={() => removeRow(index)} />
                                                 </td>
                                                 <td className='py-[10px]'>
@@ -198,7 +207,7 @@ const AddFormulationPage = () => {
                                                         type="text"
                                                         onChange={(e) => handleFormulationInputChange(index, 'itemCode', e.target.value)}
                                                         value={formulation.itemCode}
-                                                        className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
                                                     />
                                                 </td>
                                                 <td>
@@ -206,7 +215,7 @@ const AddFormulationPage = () => {
                                                         type="text"
                                                         onChange={(e) => handleFormulationInputChange(index, 'description', e.target.value)}
                                                         value={formulation.description}
-                                                        className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
                                                     />
                                                 </td>
                                                 <td>
@@ -214,7 +223,7 @@ const AddFormulationPage = () => {
                                                         type="text"
                                                         onChange={(e) => handleFormulationInputChange(index, 'batchQty', parseFloat(e.target.value))}
                                                         value={formulation.batchQty}
-                                                        className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                        className="text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
                                                     />
                                                 </td>
                                                 <td>
@@ -222,7 +231,7 @@ const AddFormulationPage = () => {
                                                         type="text"
                                                         onChange={(e) => handleFormulationInputChange(index, 'unit', e.target.value)}
                                                         value={formulation.unit}
-                                                        className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
                                                     />
                                                 </td>
                                             </tr>

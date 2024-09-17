@@ -58,16 +58,16 @@ const dummyData = [
     itemCode: 'FG-01',
     itemDescription: 'HOTDOG 1k',
     rmCost: 56.93,
-    factoryOverhead: 11.0,
-    directLabor: 4.0,
+    factoryOverhead: 11.00,
+    directLabor: 4.00,
     total: 71.93,
   },
   {
     itemCode: 'FG-02',
     itemDescription: 'BEEF LOAF 100g',
     rmCost: 8.64,
-    factoryOverhead: 11.0,
-    directLabor: 4.0,
+    factoryOverhead: 11.00,
+    directLabor: 4.00,
     total: 71.93,
   },
 ];
@@ -76,13 +76,13 @@ const fodlData = [
   {
     itemCode: 'FG-01',
     itemDescription: 'HOTDOG 1k',
-    factoryOverhead: 11.0,
-    directLabor: 4.0,
+    factoryOverhead: 11.00,
+    directLabor: 4.00,
   },
   {
     itemCode: 'FG-02',
     itemDescription: 'BEEF LOAF 100g',
-    factoryOverhead: 11.0,
-    directLabor: 4.0,
+    factoryOverhead: 11.00,
+    directLabor: 4.00,
   },
 ];

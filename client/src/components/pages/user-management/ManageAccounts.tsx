@@ -121,7 +121,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
 
             {/* Modals */}
             {isEditModalOpen && <EditUserInfo onClose={closeEditModal} />}
-            {isDeleteModalOpen && <ConfirmDelete onClose={closeDeleteModal} />}
+            {isDeleteModalOpen && <ConfirmDelete onClose={closeDeleteModal} subject="user"/>}
 
             {/* Footer */}
             <div className="flex w-full justify-center h-[5rem] rounded-b-xl bg-white border-[#868686]">

@@ -73,7 +73,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => 
 
     return (
         <>
-            {deleteModal && <ConfirmDelete onClose={()=>setDeleteModal(false)}/>}
+            {deleteModal && <ConfirmDelete onClose={()=>setDeleteModal(false)} subject="formulation"/>}
             {(view || edit) ? <FormulationTable view={view} setView={setView} /> :
                 viewFormulas ? <CompareFormulaContainer /> :
                     viewBOM ? <BOMListContainer /> :
@@ -81,26 +81,26 @@ const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => 
                             <table className='w-full '>
                                 <thead className='border-b border-b-[#c4c4c4]'>
                                     <tr className='text-[#777777] font-bold text-[18px]'>
-                                        <th className='py-[10px]'>NO.</th>
-                                        <th>ITEM CODE</th>
-                                        <th>DESCRIPTION</th>
-                                        <th>BATCH QTY</th>
-                                        <th>UNIT</th>
-                                        <th>COST</th>
-                                        <th>MANAGE</th>
+                                        <th className='py-[10px] px-[15px] text-left'>NO.</th>
+                                        <th className='px-[15px] text-left'>ITEM CODE</th>
+                                        <th className='px-[15px] text-left'>DESCRIPTION</th>
+                                        <th className='px-[15px] text-left'>UNIT</th>
+                                        <th className='px-[15px] text-right'>BATCH QTY</th>
+                                        <th className='px-[15px] text-right'>COST</th>
+                                        <th className='px-[15px]'>MANAGE</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {currentListPage.length > 0 &&
                                         (currentListPage.map((data, index) => (
-                                            <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'} text-center`}>
-                                                <td className='py-[15px]'>{data.number}</td>
-                                                <td>{data.itemCode}</td>
-                                                <td>{data.description}</td>
-                                                <td>{data.batchQty}</td>
-                                                <td>{data.unit}</td>
-                                                <td>{data.cost}</td>
-                                                <td>
+                                            <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'}`}>
+                                                <td className='py-[15px] px-[15px]'>{data.number}</td>
+                                                <td className='px-[15px]'>{data.itemCode}</td>
+                                                <td className='px-[15px]'>{data.description}</td>
+                                                <td className='px-[15px]'>{data.unit}</td>
+                                                <td className='px-[15px] text-right'>{data.batchQty}</td>
+                                                <td className='px-[15px] text-right'>{data.cost}</td>
+                                                <td className='px-[15px]'>
                                                     <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
                                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
                                                                 cursor-pointer hover:bg-[#f7f7f7] rounded-l-[5px] transition-colors duration-200 ease-in-out'
@@ -158,13 +158,13 @@ const fakeFormulaData: FormulationContainerProps[] = [
         level: 0,
         itemCode: 'FG-01',
         description: 'HOTDOG1K',
-        batchQty: 3164.00,
         unit: 'packs',
+        batchQty: 3164.00,
         cost: 60.39,
         formulations: [
-            { level: 1, itemCode: '', description: 'Emulsion', batchQty: 3164.00, unit: 'kg' },
-            { level: 2, itemCode: 'FG-01-A', description: 'Spices Blend', batchQty: 500.00, unit: 'kg' },
-            { level: 3, itemCode: 'FG-01-B', description: 'Meat Mix', batchQty: 1500.00, unit: 'kg' }
+            { level: 1, itemCode: '', description: 'Emulsion', unit: 'kg', batchQty: 3164.00 },
+            { level: 2, itemCode: 'FG-01-A', description: 'Spices Blend', unit: 'kg', batchQty: 500.00 },
+            { level: 3, itemCode: 'FG-01-B', description: 'Meat Mix', unit: 'kg', batchQty: 1500.00 }
         ]
     },
     {
@@ -172,13 +172,13 @@ const fakeFormulaData: FormulationContainerProps[] = [
         level: 0,
         itemCode: 'FG-01',
         description: 'HOTDOG1K',
-        batchQty: 3164.00,
         unit: 'kg',
+        batchQty: 3164.00,
         cost: 59.61,
         formulations: [
-            { level: 1, itemCode: 'FG-01', description: 'HOTDOG1K', batchQty: 3164.00, unit: 'kg' },
-            { level: 2, itemCode: 'FG-01-C', description: 'Casing Material', batchQty: 200.00, unit: 'kg' },
-            { level: 3, itemCode: 'FG-01-D', description: 'Preservatives', batchQty: 100.00, unit: 'kg' }
+            { level: 1, itemCode: 'FG-01', description: 'HOTDOG1K', unit: 'kg', batchQty: 3164.00 },
+            { level: 2, itemCode: 'FG-01-C', description: 'Casing Material', unit: 'kg', batchQty: 200.00 },
+            { level: 3, itemCode: 'FG-01-D', description: 'Preservatives', unit: 'kg', batchQty: 100.00 }
         ]
     },
     {

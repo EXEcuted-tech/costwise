@@ -114,17 +114,17 @@ const DashboardPage = () => {
       <div className={`${isOpen ? 'gap-3' : 'gap-8'} flex-col 3xl:flex-row flex my-[30px] justify-between`}>
         <div className={`${isAdmin ? 'w-full 3xl:w-[70%]' : 'w-full'}`}>
           <CardHeader cardName='Projected Costing' />
-          <div className='flex bg-white min-h-[347px] rounded-b-[10px] drop-shadow-lg px-[5px] 2xl:px-[20px]'>
-              <LineChart className={`${isOpen ? 'w-full 3xl:w-[60%]' : 'w-full'} h-[347px]`} />
-              <div className='flex justify-center mt-[30px] pr-[20px] w-full'>
+          <div className={`${isOpen ? '3xl:px-[20px]' : 'px-[5px] 2xl:px-[20px]'} flex flex-grow bg-white min-h-[600px] rounded-b-[10px] drop-shadow-lg`}>
+              <LineChart className={`${isOpen ? 'w-full 3xl:w-[60%]' : 'w-full'}`} />
+              {/* <div className='flex justify-center mt-[30px] pr-[20px] w-full'>
                 <CostTable className='h-[280px] w-full'/>
-              </div>
+              </div> */}
           </div>
         </div>
         {isAdmin &&
           <div className='w-full 3xl:w-[30%]'>
             <CardHeader cardName='User Activity' />
-            <div id="scroll-style" className='bg-white h-[347px] rounded-b-[10px] drop-shadow-lg overflow-y-auto py-[15px]'>
+            <div id="scroll-style" className='bg-white h-[600px] rounded-b-[10px] drop-shadow-lg overflow-y-auto py-[15px]'>
               {fakeData.map((data, index) => (
                 <div key={index}>
                   <UserActivity url={data.url} name={data.name} activity={data.activity} time={data.time} />

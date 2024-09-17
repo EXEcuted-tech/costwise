@@ -88,7 +88,7 @@ const BOMListContainer = () => {
       </div>
       <hr className='border-[#ACACAC]' />
       <div className='flex items-center pt-[15px]'>
-        <FiArchive className='text-[28px] mr-[5px]'/>
+        <FiArchive className='text-[28px] mr-[5px]' />
         <p className='text-black text-[25px] font-black underline underline-offset-4 mr-[5px]'>BOM ITEM 1 </p>
         <p className='text-[25px] text-[#8F8F8F] font-semibold italic'>(HOTDOG 1k)</p>
       </div>
@@ -99,29 +99,38 @@ const BOMListContainer = () => {
       </div>
       <div className='flex flex-wrap items-center w-full'>
         {data.map((info, index) =>
-          <p className='italic font-semibold text-[18px]'>{info.description} ({info.number}){index != data.length - 1 && ',\u00A0'}</p>
+          <p key={index} className='italic font-semibold text-[18px]'>{info.description} ({info.number}){index != data.length - 1 && ',\u00A0'}</p>
         )}
       </div>
       <div className='rounded-[5px] border border-[#656565] overflow-x-auto mt-[10px]'>
         <table className='table-auto w-full border-collapse'>
           <thead>
             <tr>
-              {data && Object.keys(data[0]).map((key) =>
-                (key != 'formulations') &&
-                <th className={`text-center animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6`}>
-                  {formatHeader(key)}{key == 'batchQty' && '.'}
-                </th>
-              )}
+              {data && Object.keys(data[0]).map((key) => {
+                let textAlignClass = 'text-left';
+                if (key === 'level') {
+                  textAlignClass = 'text-center';
+                } else if (key === 'batchQty' || key === 'materialCost' || key === 'productCost') {
+                  textAlignClass = 'text-right';
+                }
+
+                return (
+                  (key != 'formulations') &&
+                  <th key={key} className={`${textAlignClass} animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6`}>
+                    {formatHeader(key)}{key == 'batchQty' && '.'}
+                  </th>
+                );
+              })}
             </tr>
           </thead>
           <tbody>
             {data && data.map((info, index) =>
               <>
-                <tr className={`${info.productCost === maxProductCost ? 'text-[#930101]' : 'text-black'} animate-zoomIn text-center font-bold text-[18px] border-y border-[#ACACAC]`}>
-                  <td className='py-[10px] relative'>
+                <tr className={`${info.productCost === maxProductCost ? 'bg-[#fff873]' : 'text-black'} animate-zoomIn text-center font-bold text-[18px] border-y border-[#ACACAC]`}>
+                  <td className='py-[10px] relative text-left px-6'>
                     {info.productCost === maxProductCost &&
                       <>
-                        <div className="absolute bottom-[-5px] left-1/2 transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[10px] border-b-[#D9D9D9]"></div>
+                        <div className="absolute bottom-[-5px] left-[30%] transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[10px] border-b-[#D9D9D9]"></div>
                         <div className="absolute font-light text-black top-[50px] left-0 right-0 mx-auto w-max bg-[#D9D9D9] rounded-full px-4 py-2 shadow-lg z-10">
                           Least-Cost Formula
                         </div>
@@ -130,23 +139,23 @@ const BOMListContainer = () => {
                     {info.number}
                   </td>
                   <td></td>
-                  <td>{info.itemCode}</td>
-                  <td>{info.description}</td>
-                  <td>{info.batchQty}</td>
-                  <td>{info.unit}</td>
-                  <td>{info.materialCost}</td>
-                  <td>{info.productCost}</td>
+                  <td className='text-left px-6'>{info.itemCode}</td>
+                  <td className='text-left px-6'>{info.description}</td>
+                  <td className='text-left px-6'>{info.unit}</td>
+                  <td className='text-right px-6'>{info.batchQty}</td>
+                  <td className='text-right px-6'>{info.materialCost}</td>
+                  <td className='text-right px-6'>{info.productCost}</td>
                 </tr>
 
                 {info.formulations?.map((formulation, index) => (
                   <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'} animate-zoomIn text-center font-medium text-[#6B6B6B] text-[18px]`}>
                     <td></td>
                     <td className='py-[10px]'>{formulation.level}</td>
-                    <td>{formulation.itemCode}</td>
-                    <td>{formulation.description}</td>
-                    <td>{formulation.batchQty}</td>
-                    <td>{formulation.unit}</td>
-                    <td>{formulation.materialCost}</td>
+                    <td className='text-left px-6'>{formulation.itemCode}</td>
+                    <td className='text-left px-6'>{formulation.description}</td>
+                    <td className='text-left px-6'>{formulation.unit}</td>
+                    <td className='text-right px-6'>{formulation.batchQty}</td>
+                    <td className='text-right px-6'>{formulation.materialCost}</td>
                     <td></td>
                   </tr>
                 ))}
