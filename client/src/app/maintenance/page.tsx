@@ -9,18 +9,24 @@ import { PiFilesFill } from "react-icons/pi";
 import { IoGitNetworkOutline } from "react-icons/io5";
 import { IoMdAdd, IoIosSearch } from "react-icons/io";
 import ReleaseNoteTile from '@/components/pages/system-maintenance/ReleaseNoteTile';
+import CreateReleaseNotes from '@/components/modals/CreateReleaseNotes';
+import EditReleaseNotes from '@/components/modals/EditReleaseNotes';
 
 
 export interface SystemMaintenanceProps {
     date: String;
     title: String;
     author: String;
+    setEditNotes: React.Dispatch<React.SetStateAction<boolean>>;
     //contents, idk how to structure it rn
 };
 
 const SystemMaintenance = () => {
     const { isOpen } = useSidebarContext();
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const [createNotes, setCreateNotes] = useState(false);
+    const [editNotes, setEditNotes] = useState(false);
+
 
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
@@ -36,7 +42,8 @@ const SystemMaintenance = () => {
             <div>
                 <Header icon={GrSystem} title="System Maintenance" />
             </div>
-
+            {createNotes && <CreateReleaseNotes setCreateNotes={setCreateNotes}/>}
+            {editNotes && <EditReleaseNotes setEditNotes={setEditNotes}/>}
             <div className='ml-[45px]'>
                 {/* Info Tiles */}
                 <div className='flex mx-16 mt-12 mb-9 gap-[5rem] justify-center'>
@@ -103,7 +110,7 @@ const SystemMaintenance = () => {
                     <div className='flex w-full h-[4rem] px-4 py-3 font-medium bg-white border border-[#9290906c] drop-shadow-md rounded-t-lg'>
                         <IoGitNetworkOutline className='text-[32px] text-gray-500 mt-1 mr-3' />
                         <span className='text-[28px] text-[#5B5353]'>Release Notes</span>
-                        <button className={`${isOpen ? 'ml-2 2xl:ml-5' : 'ml-5' } w-[2rem] h-[2rem] text-[25px] mt-1 px-[3px] text-gray-500 border border-[#9290905b] bg-white drop-shadow-md rounded-lg`}><IoMdAdd /></button>
+                        <button className={`${isOpen ? 'ml-2 2xl:ml-5' : 'ml-5' } w-[2rem] h-[2rem] text-[25px] mt-1 px-[3px] text-gray-500 border border-[#9290905b] bg-white drop-shadow-md rounded-lg`} onClick={()=>setCreateNotes(true)}><IoMdAdd /></button>
                         <div className="mt-[3px] ml-auto text-gray-600">
                             <div className='flex absolute text-[1.3em] text-gray-400 mt-[0.3rem] ml-3'>
                                 <IoIosSearch />
@@ -126,6 +133,7 @@ const SystemMaintenance = () => {
                                 date={note.date}
                                 title={note.title}
                                 author={note.author}
+                                setEditNotes={setEditNotes}
                             />
                         ))}
                     </div>
