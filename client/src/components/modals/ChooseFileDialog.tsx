@@ -4,7 +4,7 @@ import { BiSolidFile } from "react-icons/bi";
 import { IoClose } from "react-icons/io5";
 import CustomDatePicker from '../form-controls/CustomDatePicker';
 import CustomSelect from '../form-controls/CustomSelect';
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import { FileTableProps } from '../pages/file-manager/FileContainer';
 
 interface ChooseFileProps {

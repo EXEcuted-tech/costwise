@@ -7,8 +7,11 @@ import { Tooltip } from "@nextui-org/react";
 import usePath from '@/hooks/usePath';
 import MiniSidebar from './MiniSidebar';
 import Link from 'next/link';
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import { useRouter } from 'next/navigation';
+import { useUserContext } from '@/contexts/UserContext';
+import api from '@/utils/api';
+import config from '@/server/config';
 
 interface IconClosedConfig {
   iconName: string;
@@ -23,23 +26,36 @@ const CloseSidebar: React.FC = () => {
   const [isMore, setIsMore] = useState(false);
   const path = usePath();
   const router = useRouter();
+  const { currentUser } = useUserContext();
+
+  const handleLogout = async () => {
+    try {
+      await api.delete(`${config.API}/api/logout`);
+      localStorage.removeItem('token');
+      router.push('/logout');
+    } catch (error) {
+      console.error('Logout failed:', error);
+    }
+  };
 
   return (
     <>
       <div className='flex justify-center w-full bg-primary min-h-screen'>
         <div className='relative top-0'>
           {/* Logo */}
-          <div className={`${path=='profile' ? 'mt-[25px] mb-[5px]' : 'my-[25px]'} flex justify-center`}>
+          <div className={`${path == 'profile' ? 'mt-[25px] mb-[5px]' : 'my-[25px]'} flex justify-center`}>
             <Image src={logo} alt={'Virginia Logo'} className='w-[90px] h-auto' />
           </div>
 
           {/* Account Profile */}
-          <div className={`${path=='profile' && 'bg-[#CD3939] w-[128px] h-[100px] items-center mb-0'} flex justify-center mb-[10px]`}>
+          <div className={`${path == 'profile' && 'bg-[#CD3939] w-[128px] h-[100px] items-center mb-0'} flex justify-center mb-[10px]`}>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            {/* @TODO: Display Profile Pictures Properly */}
             <img
-              src="https://i.imgur.com/AZOtzD7.jpg"
+              src={currentUser?.displayPicture ?? "https://i.imgur.com/AZOtzD7.jpg"}
               alt={'Profile Picture'}
               className='flex object-cover w-[80px] h-[80px] rounded-full border cursor-pointer'
-              onClick={()=>{router.push('/profile')}}
+              onClick={() => { router.push('/profile') }}
             />
           </div>
 
@@ -50,6 +66,7 @@ const CloseSidebar: React.FC = () => {
                 const IconComponent = iconMap[iconName];
                 return (
                   <Tooltip
+                    key={index}
                     content={tooltip}
                     placement={"right"}
                     classNames={{
@@ -84,6 +101,7 @@ const CloseSidebar: React.FC = () => {
                   const IconComponent = iconMap[iconName];
                   return (
                     <Tooltip
+                      key={index}
                       content={tooltip}
                       placement={"right"}
                       classNames={{
@@ -96,13 +114,23 @@ const CloseSidebar: React.FC = () => {
                         ],
                       }}
                     >
-                      <Link href={`/${route}`}>
-                        <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
-                          'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
-                          'my-[13px] hover:text-[#FFD3D3]'}`}>
+                      {tooltip == 'Log Out' ?
+                        < li
+                          key={index}
+                          onClick={handleLogout}
+                          className={`hover:animate-shrink-in cursor-pointer my-[12px] hover:text-[#FFD3D3]`}
+                        >
                           <IconComponent className={className} />
                         </li>
-                      </Link>
+                        :
+                        <Link href={`/${route}`}>
+                          <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
+                            'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
+                            'my-[13px] hover:text-[#FFD3D3]'}`}>
+                            <IconComponent className={className} />
+                          </li>
+                        </Link>
+                      }
                     </Tooltip>
                   );
                 }))
@@ -124,13 +152,23 @@ const CloseSidebar: React.FC = () => {
                         ],
                       }}
                     >
-                      <Link href={`/${route}`}>
-                        <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
-                          'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
-                          'my-[12px] hover:text-[#FFD3D3]'}`}>
+                      {tooltip == 'Log Out' ?
+                        < li
+                          key={index}
+                          onClick={handleLogout}
+                          className={`hover:animate-shrink-in cursor-pointer my-[12px] hover:text-[#FFD3D3]`}
+                        >
                           <IconComponent className={className} />
                         </li>
-                      </Link>
+                        :
+                        <Link href={`/${route}`}>
+                          <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
+                            'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
+                            'my-[13px] hover:text-[#FFD3D3]'}`}>
+                            <IconComponent className={className} />
+                          </li>
+                        </Link>
+                      }
                     </Tooltip>
                   )
                     :
@@ -147,8 +185,9 @@ const CloseSidebar: React.FC = () => {
             </ul>
           </div>
         </div>
-      </div>
-      {isMore && <MiniSidebar setIsMore={setIsMore} />}
+      </div >
+      {isMore && <MiniSidebar setIsMore={setIsMore} />
+      }
     </>
   );
 };

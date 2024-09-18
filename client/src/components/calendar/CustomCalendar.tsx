@@ -1,4 +1,4 @@
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import React, { useState } from 'react';
 import { BsCalendarDateFill, BsFillArrowLeftCircleFill, BsFillArrowRightCircleFill } from "react-icons/bs";
 import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-icons/md";

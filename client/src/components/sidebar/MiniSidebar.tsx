@@ -3,7 +3,7 @@ import { IconOpenConfig } from './OpenSidebar';
 import { iconMap } from '@/utils/iconMap';
 import useOutsideClick from '../../hooks/useOutsideClick';
 import Link from 'next/link';
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 
 interface MiniSidebarProps {
   setIsMore: React.Dispatch<React.SetStateAction<boolean>>;

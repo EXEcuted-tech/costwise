@@ -77,6 +77,17 @@ const config: Config = {
           '80%': { transform: 'rotate(2deg)' },
           '90%': { transform: 'rotate(-1deg)' },
         },
+        'shake': {
+          '0%, 100%': {
+            transform: 'translateX(0)',
+          },
+          '10%, 30%, 50%, 70%, 90%': {
+            transform: 'translateX(-2px)',
+          },
+          '20%, 40%, 60%, 80%': {
+            transform: 'translateX(2px)',
+          },
+        },
         'zoomIn': {
           '0%': { transform: 'scale(0.95)', opacity: '0' },
           '100%': { transform: 'scale(1)', opacity: '1' },
@@ -126,6 +137,7 @@ const config: Config = {
         'crop-left-to-right': 'crop-left-to-right 0.6s ease-in-out forwards',
         'pull-down': 'pull-down 0.3s ease-in-out forwards',
         'pop-out': 'pop-out 0.2s ease-out forwards',
+        'shake': 'shake 0.9s cubic-bezier(0.04, 0.04, 0.04, 0.04)',
         'shake-tilt': 'shake-tilt 1s ease-in-out',
         'zoomIn': 'zoomIn 0.4s ease-in-out',
         'zoomOut': 'zoomOut 0.4s ease-in-out',

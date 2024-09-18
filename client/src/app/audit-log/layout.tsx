@@ -1,10 +1,10 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
 import { useState, cloneElement } from "react";
-import { SidebarProvider, useSidebarContext } from "@/context/SidebarContext";
+import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
 import { BiSearchAlt } from "react-icons/bi";
 import type { SVGProps } from 'react';
-import { DrawerProvider } from "@/context/DrawerContext";
+import { DrawerProvider } from "@/contexts/DrawerContext";
 
 
 export default function AuditLogLayout({

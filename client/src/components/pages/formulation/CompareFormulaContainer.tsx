@@ -4,8 +4,8 @@ import { FormulationContainerProps } from './FormulationContainer';
 import { IoIosArrowRoundBack } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
 import { formatHeader } from '@/utils/costwiseUtils';
-import { useFormulationContext } from '@/context/FormulationContext';
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useFormulationContext } from '@/contexts/FormulationContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 
 export interface CompareFormulaProps {
     number: string;

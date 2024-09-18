@@ -4,7 +4,7 @@ import Header from '@/components/header/Header';
 import ManageAccounts from '@/components/pages/user-management/ManageAccounts';
 import PasswordRequests from '@/components/pages/user-management/PasswordRequests';
 import { RiShieldUserFill } from "react-icons/ri";
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 
 export interface ManageAccountsProps {
     userName: string;

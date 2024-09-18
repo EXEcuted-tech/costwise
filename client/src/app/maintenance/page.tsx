@@ -1,7 +1,7 @@
 "use client";
 import React, { useState } from 'react';
 import Header from '@/components/header/Header';
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import { GrSystem } from "react-icons/gr";
 import { AiFillDatabase } from "react-icons/ai";

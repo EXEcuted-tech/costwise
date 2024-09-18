@@ -51,21 +51,23 @@ const Alert: React.FC<AlertProps> = ({ className, variant = 'default', message, 
     );
 
     return (
-        <div className="fixed right-6 mt-4 z-[2000]">
-            <div className={`rounded-b-[10px] px-4 py-3 relative overflow-hidden ${outerElement}`}>
-                <div
-                    className={`absolute top-0 left-0 h-1 ${loadingStyle} transition-all duration-300 ease-out`}
-                    style={{ width: `${progress}%` }}
-                />
-                <div className="flex items-center">
-                    {variant == 'critical' && <IoAlertCircleOutline className="h-5 w-5 mr-2" />}
-                    {variant == 'default' && <CiBellOn className="h-5 w-5 mr-2" />}
-                    {variant == 'success' && <IoIosCheckmarkCircleOutline className="h-5 w-5 mr-2" />}
-                    {variant == 'warning' && <CiWarning className="h-5 w-5 mr-2" />}
-                    {variant == 'information' && <IoIosInformationCircleOutline className="h-5 w-5 mr-2" />}
-                    <p className="text-[18px] mr-4">{message}</p>
-                    <IoClose className='text-[20px] text-gray-500 cursor-pointer hover:text-gray-400 transition-colors duration-250 ease-in-out p-0'
-                        onClick={()=>{setClose(false)}} />
+        <div className={`absolute top-0 right-0 ${className}`}>
+            <div className="relative right-6 mt-4 z-[2000]">
+                <div className={`animate-shake rounded-b-[10px] px-4 py-3 relative overflow-hidden ${outerElement}`}>
+                    <div
+                        className={`absolute top-0 left-0 h-1 ${loadingStyle} transition-all duration-300 ease-out`}
+                        style={{ width: `${progress}%` }}
+                    />
+                    <div className="flex items-center">
+                        {variant == 'critical' && <IoAlertCircleOutline className="h-5 w-5 mr-2" />}
+                        {variant == 'default' && <CiBellOn className="h-5 w-5 mr-2" />}
+                        {variant == 'success' && <IoIosCheckmarkCircleOutline className="h-5 w-5 mr-2" />}
+                        {variant == 'warning' && <CiWarning className="h-5 w-5 mr-2" />}
+                        {variant == 'information' && <IoIosInformationCircleOutline className="h-5 w-5 mr-2" />}
+                        <p className="text-[18px] mr-4">{message}</p>
+                        <IoClose className='text-[20px] text-gray-500 cursor-pointer hover:text-gray-400 transition-colors duration-250 ease-in-out p-0'
+                            onClick={() => { setClose(false) }} />
+                    </div>
                 </div>
             </div>
         </div>

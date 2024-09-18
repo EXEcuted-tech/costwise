@@ -3,7 +3,7 @@ import { IoClose } from 'react-icons/io5'
 import { MdCompare } from 'react-icons/md'
 import CustomCompareSelect from '../form-controls/CustomCompareSelect'
 import CompareFormulaContainer from '../pages/formulation/CompareFormulaContainer'
-import { useFormulationContext } from '@/context/FormulationContext'
+import { useFormulationContext } from '@/contexts/FormulationContext'
 
 const CompareFormulaDialog: React.FC<{ setCompareFormula: React.Dispatch<React.SetStateAction<boolean>> }> = ({ setCompareFormula }) => {
     const [selectedOptions, setSelectedOptions] = useState<string[]>([]);

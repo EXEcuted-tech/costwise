@@ -4,7 +4,7 @@ import React from 'react'
 import Image from 'next/image';
 import background from '@/assets/virginia-mascot-bg.png';
 import { FcImageFile } from "react-icons/fc";
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 
 
 const AccountCreation = () => {

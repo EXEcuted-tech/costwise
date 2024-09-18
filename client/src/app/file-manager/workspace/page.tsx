@@ -3,14 +3,14 @@ import React, { useEffect, useState } from 'react'
 import Header from '@/components/header/Header'
 import { BsFolderFill } from "react-icons/bs";
 import { IoIosArrowRoundBack } from "react-icons/io";
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import WorkspaceTabs from '@/components/pages/file-manager/workspace/WorkspaceTabs';
 import NoFile from '@/components/pages/file-manager/workspace/NoFile';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { FileTableProps } from '@/components/pages/file-manager/FileContainer';
 import MasterFileContainer from '@/components/pages/file-manager/workspace/MasterFileContainer';
 import TransactionFileContainer from '@/components/pages/file-manager/workspace/TransactionFileContainer';
-import { useFileManagerContext } from '@/context/FileManagerContext';
+import { useFileManagerContext } from '@/contexts/FileManagerContext';
 
 const WorkspacePage = () => {
     const [tab, setTab] = useState('master files');

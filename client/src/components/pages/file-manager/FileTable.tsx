@@ -6,7 +6,7 @@ import { TiExport } from "react-icons/ti";
 import { IoTrash } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
 import { FaFileCircleXmark } from "react-icons/fa6";
-import { useFileManagerContext } from '@/context/FileManagerContext';
+import { useFileManagerContext } from '@/contexts/FileManagerContext';
 interface FileTableComponentProps {
     fileData: FileTableProps[];
     isOpen: boolean;

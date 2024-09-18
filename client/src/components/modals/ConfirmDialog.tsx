@@ -1,7 +1,7 @@
 import React from 'react'
 import { RiFileWarningFill } from "react-icons/ri";
 import { IoIosClose } from "react-icons/io";
-import { useFileManagerContext } from '@/context/FileManagerContext';
+import { useFileManagerContext } from '@/contexts/FileManagerContext';
 
 interface ConfirmDialogProps { 
   setConfirmDialog: React.Dispatch<React.SetStateAction<boolean>>;

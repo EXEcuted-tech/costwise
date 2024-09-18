@@ -1,4 +1,4 @@
-import { useSidebarContext } from '@/context/SidebarContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
 import React from 'react'
 
 const CostTable:React.FC<{className:string;}> = ({className}) => {

@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { IoIosArrowRoundBack } from 'react-icons/io';
 import { useRouter } from 'next/navigation';
 import { formatHeader } from '@/utils/costwiseUtils';
-import { useFormulationContext } from '@/context/FormulationContext';
+import { useFormulationContext } from '@/contexts/FormulationContext';
 import { CompareFormulaProps } from './CompareFormulaContainer';
 import { FiArchive } from 'react-icons/fi';
 

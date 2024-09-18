@@ -7,7 +7,7 @@ import { IoIosInformationCircle } from "react-icons/io";
 import { Chart as ChartJS } from "chart.js/auto";
 import LineChart from "@/components/charts/LineChart";
 import DoughnutChart from "@/components/charts/DoughnutChart";
-import { useSidebarContext } from "@/context/SidebarContext";
+import { useSidebarContext } from "@/contexts/SidebarContext";
 
 const ProjectedCostPage = () => {
     const { isOpen } = useSidebarContext();
