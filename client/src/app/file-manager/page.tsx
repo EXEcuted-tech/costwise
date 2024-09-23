@@ -2,7 +2,7 @@
 import Header from '@/components/header/Header';
 import FileContainer from '@/components/pages/file-manager/FileContainer'
 import FileTabs from '@/components/pages/file-manager/FileTabs';
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { BsFolderFill } from "react-icons/bs";
 import { PiScrewdriverFill } from "react-icons/pi";
 import { VscExport } from "react-icons/vsc";
@@ -14,6 +14,8 @@ import { BiFile } from "react-icons/bi";
 import useOutsideClick from '@/hooks/useOutsideClick';
 import ConfirmDelete from '@/components/modals/ConfirmDelete';
 import { useFileManagerContext } from '@/contexts/FileManagerContext';
+import { useDropzone } from 'react-dropzone';
+import api from '@/utils/api';
 
 const FileManagerPage = () => {
   const { isOpen } = useSidebarContext();
@@ -25,9 +27,46 @@ const FileManagerPage = () => {
   useEffect(() => {
     const currentTab = localStorage.getItem('fileTab');
     if (currentTab) {
-        setTab(currentTab);
+      setTab(currentTab);
     }
-}, []);
+  }, []);
+
+  // Start Upload
+  const [uploadType, setUploadType] = useState('');
+
+  const onDrop = useCallback((acceptedFiles: any[]) => {
+    const file = acceptedFiles[0];
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', uploadType);
+
+    api.post('/api/upload', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    })
+      .then(response => {
+        console.log("Uploaded");
+      })
+      .catch(error => {
+
+      });
+  }, [uploadType]);
+
+  const { getRootProps, getInputProps, open } = useDropzone({
+    onDrop,
+    noClick: true,
+    noKeyboard: true,
+    accept: {
+      'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+      'text/csv': ['.csv']
+    }
+  });
+
+  const handleUpload = (type: React.SetStateAction<string>) => {
+    setUploadType(type);
+    open();
+  };
 
   return (
     <>

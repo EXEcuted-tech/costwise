@@ -12,6 +12,7 @@ import { useRouter } from 'next/navigation';
 import { useUserContext } from '@/contexts/UserContext';
 import api from '@/utils/api';
 import config from '@/server/config';
+import { removeTokens } from '@/utils/removeTokens';
 
 interface IconClosedConfig {
   iconName: string;
@@ -29,15 +30,10 @@ const CloseSidebar: React.FC = () => {
   const { currentUser } = useUserContext();
 
   const handleLogout = async () => {
-    try {
-      await api.delete(`${config.API}/api/logout`);
-      localStorage.removeItem('token');
-      router.push('/logout');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
-
+    await removeTokens();
+    router.push('/logout');
+  }
+  
   return (
     <>
       <div className='flex justify-center w-full bg-primary min-h-screen'>

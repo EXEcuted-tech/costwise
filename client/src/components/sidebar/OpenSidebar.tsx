@@ -10,6 +10,7 @@ import { useSidebarContext } from '@/contexts/SidebarContext';
 import { useRouter } from 'next/navigation';
 import api from '@/utils/api';
 import config from '@/server/config';
+import { removeTokens } from '@/utils/removeTokens';
 
 export interface IconOpenConfig {
   iconName: string;
@@ -18,6 +19,7 @@ export interface IconOpenConfig {
   route?: string;
   routes?: string[];
 }
+
 const OpenSidebar: React.FC = () => {
   const { isAdmin } = useSidebarContext();
   const [isMore, setIsMore] = useState(false);
@@ -25,14 +27,9 @@ const OpenSidebar: React.FC = () => {
   const router = useRouter();
 
   const handleLogout = async () => {
-    try {
-      await api.delete(`${config.API}/api/logout`);
-      localStorage.removeItem('token');
-      router.push('/logout');
-    } catch (error) {
-      console.error('Logout failed:', error);
-    }
-  };
+    await removeTokens();
+    router.push('/logout');
+  }
 
   return (
     <>
