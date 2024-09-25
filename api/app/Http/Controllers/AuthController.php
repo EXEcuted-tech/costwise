@@ -77,8 +77,8 @@ class AuthController extends ApiController
 
             $user = User::where('email_address', $request->email_address)->first();
 
-            $accessToken = $user->createToken('accessToken', ['*'], now()->addMinutes(1));
-            $refreshToken = $user->createToken('refreshToken', ['*'], now()->addMinutes(3));
+            $accessToken = $user->createToken('accessToken', ['*'], now()->addMinutes(15));
+            $refreshToken = $user->createToken('refreshToken', ['*'], now()->addDays(30));
 
             $this->status = 200;
             $this->response['access_token'] = $accessToken->plainTextToken;
@@ -112,15 +112,15 @@ class AuthController extends ApiController
 
         $accessToken = $user->tokens()->where('name', 'accessToken')->first();
         if (!$accessToken) {
-            $accessToken = $user->createToken('accessToken', ['*'], now()->addMinutes(1));
+            $accessToken = $user->createToken('accessToken', ['*'], now()->addMinutes(15));
         } else {
             $accessToken->token = hash('sha256', $plainTextAccessToken = Str::random(48));
-            $accessToken->expires_at = now()->addMinutes(1);
+            $accessToken->expires_at = now()->addMinutes(15);
             $accessToken->save();
         }
         
         $token->token = hash('sha256', $plainTextRefreshToken = Str::random(48));
-        $token->expires_at = now()->addMinutes(3);
+        $token->expires_at = now()->addDays(30);
         $token->save();
 
         $this->response['access_token'] = $accessToken->id . '|' . ($plainTextAccessToken ?? $accessToken->plainTextToken);
