@@ -3,10 +3,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\User;
+use App\Models\PersonalAccessToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Str;
 
 class AuthController extends ApiController
 {
@@ -39,10 +41,10 @@ class AuthController extends ApiController
             $validatedData['password'] = Hash::make($request->password);
 
             $user = User::create($validatedData);
-            $accessToken = $user->createToken('authToken')->plainTextToken;
+            // $accessToken = $user->createToken('authToken')->plainTextToken;
 
             $this->status = 200;
-            $this->response['token'] = $accessToken;
+            // $this->response['token'] = $accessToken;
             return $this->getResponse("User created successfully!");
         } catch (\Throwable $th) {
             $this->status = $th->getCode();
@@ -74,16 +76,58 @@ class AuthController extends ApiController
             }
 
             $user = User::where('email_address', $request->email_address)->first();
-            $accessToken = $user->createToken('authToken')->plainTextToken;
+
+            $accessToken = $user->createToken('accessToken', ['*'], now()->addMinutes(15));
+            $refreshToken = $user->createToken('refreshToken', ['*'], now()->addDays(30));
 
             $this->status = 200;
-            $this->response['token'] = $accessToken;
+            $this->response['access_token'] = $accessToken->plainTextToken;
+            $this->response['refresh_token'] = $refreshToken->plainTextToken;
+            $this->response['access_token_expiration'] = $accessToken->accessToken->expires_at;
             return $this->getResponse("Logged in successfully!");
         } catch (\Throwable $th) {
             $this->status = 500;
             $this->response['message'] = $th->getMessage();
             return $this->getResponse();
         }
+    }
+
+    public function refresh(Request $request)
+    {
+        $refreshToken = $request->bearerToken();
+
+        if (!$refreshToken) {
+            $this->status = 401;
+            return $this->getResponse("Refresh token not provided");
+        }
+
+        $token = PersonalAccessToken::findToken($refreshToken);
+
+        if (!$token || $token->name !== 'refreshToken' || $token->expires_at->isPast()) {
+            $this->status = 401;
+            return $this->getResponse("Invalid or expired refresh token");
+        }
+
+        $user = $token->tokenable;
+
+        $accessToken = $user->tokens()->where('name', 'accessToken')->first();
+        if (!$accessToken) {
+            $accessToken = $user->createToken('accessToken', ['*'], now()->addMinutes(15));
+        } else {
+            $accessToken->token = hash('sha256', $plainTextAccessToken = Str::random(48));
+            $accessToken->expires_at = now()->addMinutes(15);
+            $accessToken->save();
+        }
+        
+        $token->token = hash('sha256', $plainTextRefreshToken = Str::random(48));
+        $token->expires_at = now()->addDays(30);
+        $token->save();
+
+        $this->response['access_token'] = $accessToken->id . '|' . ($plainTextAccessToken ?? $accessToken->plainTextToken);
+        $this->response['refresh_token'] = "{$token->id}|{$plainTextRefreshToken}";
+        $this->response['access_token_expiration'] = $accessToken->expires_at;
+        $this->status = 200;
+        return $this->getResponse("Tokens refreshed successfully!");
     }
 
     public function logout()

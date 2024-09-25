@@ -36,7 +36,11 @@ function LoginPage() {
       });
 
       if (response.status === 200) {
-        localStorage.setItem('token', response.data.token);
+        const { access_token, refresh_token, access_token_expiration } = response.data;
+        localStorage.setItem('accessToken', access_token);
+        localStorage.setItem('refreshToken', refresh_token);
+        localStorage.setItem('tokenExpiresAt', access_token_expiration);
+
         const user = await api.get('/user');
 
         const currentUser = {
@@ -145,7 +149,7 @@ function LoginPage() {
             <div className={`h-[10%] flex w-[100%]`}>
               <input
                 type="email"
-                className={`${emailError && 'text-[#ff2c2c] focus:!outline-[#ff2c2c] border-3 border-[#ff2c2c]'} text-[1.2em] font-semibold w-[100%] rounded-2xl text-tertiary px-[5%]`}
+                className={`${emailError ? 'text-[#ff2c2c] focus:!outline-[#ff2c2c] border-3 border-[#ff2c2c]' : 'text-black'} text-[1.2em] font-semibold w-[100%] rounded-2xl px-[5%]`}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -159,7 +163,7 @@ function LoginPage() {
             <div className=" h-[10%] flex w-[100%]">
               <input
                 type="password"
-                className={`${passwordError && 'text-[#ff2c2c] focus:!outline-[#ff2c2c] border-3 border-[#ff2c2c]'} text-[1.2em] font-semibold w-[100%] rounded-2xl text-tertiary px-[5%]`}
+                className={`${passwordError ? 'text-[#ff2c2c] focus:!outline-[#ff2c2c] border-3 border-[#ff2c2c]' : 'text-black'} text-[1.2em] font-semibold w-[100%] rounded-2xl px-[5%]`}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
