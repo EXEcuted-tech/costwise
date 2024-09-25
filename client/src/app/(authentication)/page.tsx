@@ -6,7 +6,7 @@ import { GiSmartphone } from "react-icons/gi";
 import config from "@/server/config";
 import { useRouter } from 'next/navigation';
 import api from "@/utils/api";
-import { SetStateAction, useState } from "react";
+import { SetStateAction, useEffect, useState } from "react";
 import { useUserContext } from "@/contexts/UserContext";
 import Alert from "@/components/alerts/Alert";
 import Spinner from "@/components/loaders/Spinner";
@@ -21,6 +21,18 @@ function LoginPage() {
   const [alertMessages, setAlertMessages] = useState<string[]>([]);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+
+  useEffect(() => {
+    const accessToken = localStorage.getItem('accessToken');
+    const tokenExpiresAt = localStorage.getItem('tokenExpiresAt');
+
+    if (accessToken && tokenExpiresAt) {
+      const expiresAt = new Date(tokenExpiresAt);
+      if (expiresAt > new Date()) {
+        router.push('/dashboard');
+      }
+    }
+  }, [router]);
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
     e.preventDefault();
@@ -180,7 +192,7 @@ function LoginPage() {
                 onClick={handleSubmit}>
                 <button className="flex items-center text-[1em] xl:text-[1.2em] 2xl:text-[1.4em] font-black">
                   <span className="w-full h-48 rounded bg-primary absolute bottom-0 left-0 translate-x-full ease-out duration-500 transition-all translate-y-full mb-9 ml-9 group-hover:ml-0 group-hover:mb-32 group-hover:translate-x-0"></span>
-                  {isLoading && <Spinner className="group-hover:!text-white mr-1 !size-[25px]"/>}
+                  {isLoading && <Spinner className="group-hover:!text-white mr-1 !size-[25px]" />}
                   <span className="relative w-full text-left text-primary transition-colors duration-300 ease-in-out group-hover:text-white">
                     Sign In
                   </span>
