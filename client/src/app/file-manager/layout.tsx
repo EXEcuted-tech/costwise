@@ -1,5 +1,6 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
+import ProtectedRoute from "@/components/routes/ProtectedRoute";
 import { FileManagerProvider } from '@/contexts/FileManagerContext';
 import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
 import { useEffect, useState } from "react";
@@ -10,25 +11,27 @@ export default function FileManagerLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
-      <FileManagerProvider>
-        <FileManagerContent>
-          {children}
-        </FileManagerContent>
-      </FileManagerProvider>
-    </SidebarProvider>
+    <ProtectedRoute>
+      <SidebarProvider>
+        <FileManagerProvider>
+          <FileManagerContent>
+            {children}
+          </FileManagerContent>
+        </FileManagerProvider>
+      </SidebarProvider>
+    </ProtectedRoute>
   );
 }
 
 function FileManagerContent({ children }: { children: React.ReactNode }) {
   const { isOpen } = useSidebarContext();
-  const [isWorkspace,setIsWorkspace] = useState(false);
-  
-  useEffect(()=>{
-    if(localStorage.getItem("wkspBool") === "true"){
+  const [isWorkspace, setIsWorkspace] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("wkspBool") === "true") {
       setIsWorkspace(true);
     }
-  },[])
+  }, [])
 
   return (
     <div className='w-full flex'>

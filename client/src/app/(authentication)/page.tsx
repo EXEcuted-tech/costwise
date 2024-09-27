@@ -42,7 +42,7 @@ function LoginPage() {
     setAlertMessages([]);
 
     try {
-      const response = await api.post(`${config.API}/api/login`, {
+      const response = await api.post('/login', {
         "email_address": email,
         password
       });

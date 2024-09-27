@@ -49,10 +49,8 @@ return new class extends Migration {
         // Bill of Materials Table
         Schema::create('bill_of_materials', function (Blueprint $table) {
             $table->increments('bom_id');
+            $table->string('bom_name', 255);
             $table->longText('formulations');
-            $table->decimal('total_cost', 10, 2);
-            $table->decimal('total_batch_qty', 10, 2);
-            $table->decimal('rm_cost', 10, 2);
             $table->timestamps();
         });
 
@@ -70,7 +68,13 @@ return new class extends Migration {
             $table->unsignedInteger('fodl_id');
             $table->string('fg_code', 255);
             $table->string('fg_desc', 255);
+            $table->decimal('total_cost', 10, 2)->nullable();
+            $table->decimal('total_batch_qty', 10, 2);
+            $table->decimal('rm_cost', 10, 2)->nullable();
+            $table->decimal('fg_price', 10, 2)->nullable();
+            $table->string('unit', 10);
             $table->unsignedInteger('monthYear');
+            $table->boolean('is_least_cost')->default(false)->index();
             $table->foreign('fodl_id')->references('fodl_id')->on('fodl')->onDelete('cascade');
         });
 
@@ -113,6 +117,7 @@ return new class extends Migration {
             $table->timestamps();
         });
 
+        // Transaction Table
         Schema::create('transactions', function (Blueprint $table) {
             $table->id('transaction_id');
             $table->unsignedInteger('material_id');

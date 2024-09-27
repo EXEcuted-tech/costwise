@@ -23,6 +23,7 @@ const FileManagerPage = () => {
   const { deleteModal, setDeleteModal } = useFileManagerContext();
   const [tab, setTab] = useState('all');
   const [upload, setUpload] = useState(false);
+  const [uploadType, setUploadType] = useState('');
   const ref = useOutsideClick(() => setUpload(false));
 
   useEffect(() => {
@@ -32,66 +33,68 @@ const FileManagerPage = () => {
     }
   }, []);
 
-  const [uploadType, setUploadType] = useState('');
-
   const onDrop = useCallback(
     (acceptedFiles: any[]) => {
       const file = acceptedFiles[0];
-  
-      if (file.type === 'text/csv') {
-        // Handle CSV file
-        // ... (CSV handling code as before)
-      } else {
-        // Handle Excel file
-        const reader = new FileReader();
-  
-        reader.onload = (e: ProgressEvent<FileReader>) => {
-          const data = e.target?.result;
-  
-          if (data && data instanceof ArrayBuffer) {
-            const dataArray = new Uint8Array(data);
-            const workbook = XLSX.read(dataArray, { type: 'array' });
-  
-            // Get the sheet names
-            const sheetNames = workbook.SheetNames;
-  
-            // Now you can check the sheet names
-            console.log('Sheet Names:', sheetNames);
-  
-            // Add your condition here to check for specific sheet names
-            if (sheetNames.includes('SUMMARY OF PRODUCT COSTING')) {
-              // Proceed with uploading the file
-              const formData = new FormData();
-              formData.append('file', file);
-              formData.append('type', uploadType);
-  
-              api
-                .post('/api/upload', formData)
-                .then((response) => {
-                  console.log("Response: ",response);
-                })
-                .catch((error) => {
-                  console.error(error);
-                });
-            } else {
-              // Handle the case where the required sheet is not present
-              alert('The Excel file does not contain the required sheets.');
-            }
-          } else {
-            console.error('Error: FileReader result is not an ArrayBuffer.');
+      const reader = new FileReader();
+
+      reader.onload = (e: ProgressEvent<FileReader>) => {
+        const data = e.target?.result;
+
+        if (data && data instanceof ArrayBuffer) {
+          const dataArray = new Uint8Array(data);
+          const workbook = XLSX.read(dataArray, { type: 'array' });
+
+          const sheetNames = workbook.SheetNames;
+
+          console.log('Sheet Names:', sheetNames);
+
+          let validSheets: string[] = [];
+
+          console.log(uploadType);
+          if (uploadType == 'master') {
+            validSheets = [
+              'SUMMARY',
+              'FODL Cost',
+              'Material Cost'
+            ];
+          
+            const bomSheets = sheetNames.filter(sheetName => sheetName.includes('BOM'));
+          
+            validSheets = [...validSheets, ...bomSheets];
           }
-        };
-  
-        reader.onerror = (ex) => {
-          console.error(ex);
-        };
-  
-        reader.readAsArrayBuffer(file);
-      }
+
+          console.log('Valid Sheets', validSheets);
+          if (validSheets.some(sheet => sheetNames.includes(sheet))) {
+            const formData = new FormData();
+            formData.append('file', file);
+            formData.append('type', uploadType);
+
+            api
+              .post('/files/upload', formData)
+              .then((response) => {
+                console.log("Response: ", response);
+              })
+              .catch((error) => {
+                console.error(error);
+              });
+          } else {
+            alert('The Excel file does not contain the required sheets.'); // change to modal
+          }
+        } else {
+          console.error('Error: FileReader result is not an ArrayBuffer.');
+        }
+      };
+
+      reader.onerror = (ex) => {
+        console.error(ex);
+      };
+
+      reader.readAsArrayBuffer(file);
     },
     [uploadType]
   );
-  
+
   const { getRootProps, getInputProps, open } = useDropzone({
     onDrop,
     noClick: true,
@@ -105,8 +108,17 @@ const FileManagerPage = () => {
 
   const handleUpload = (type: React.SetStateAction<string>) => {
     setUploadType(type);
-    open();
+    setShouldOpenDropzone(true);
   };
+  
+  const [shouldOpenDropzone, setShouldOpenDropzone] = useState(false);
+  
+  useEffect(() => {
+    if (shouldOpenDropzone) {
+      open();
+      setShouldOpenDropzone(false);
+    }
+  }, [uploadType, shouldOpenDropzone, open]);
 
   return (
     <>
