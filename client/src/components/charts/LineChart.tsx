@@ -42,7 +42,7 @@ const LineChart = ({ chartData }: ChartDataProps) => {
     responive: true,
     plugins: {
       legend: {
-        position: "bottom",
+        position: "bottom" as const,
       },
       title: {
         display: true,

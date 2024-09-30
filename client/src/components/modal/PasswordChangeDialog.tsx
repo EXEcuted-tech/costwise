@@ -1,7 +1,6 @@
 import React from 'react'
 import { RiFileWarningFill } from "react-icons/ri";
 import { IoIosClose } from "react-icons/io";
-import { useFileType } from '@/context/FileTypeContext';
 
 interface PasswordChangeDialogProps { 
   setDialog: React.Dispatch<React.SetStateAction<boolean>>;

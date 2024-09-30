@@ -113,6 +113,8 @@ return new class extends Migration {
         // Article Table
         Schema::create('articles', function (Blueprint $table) {
             $table->increments('article_id');
+            $table->enum('category', ['Manage Account', 'Getting Started', 'Essentials']);
+            $table->string('heading');
             $table->longText('content');
             $table->timestamps();
         });
@@ -132,6 +134,13 @@ return new class extends Migration {
             $table->integer('month');
             $table->integer('year');
             $table->foreign('material_id')->references('material_id')->on('materials')->onDelete('cascade');
+        });
+
+        Schema::create('models', function (Blueprint $table) {
+            $table->increments('model_id');
+            $table->string('model_name');
+            $table->longText('model_data');
+            $table->timestamps();
         });
     }
 

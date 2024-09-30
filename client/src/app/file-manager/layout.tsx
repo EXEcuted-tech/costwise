@@ -3,7 +3,7 @@ import MainLayout from "@/components/layouts/MainLayout";
 import ProtectedRoute from "@/components/routes/ProtectedRoute";
 import { FileManagerProvider } from '@/contexts/FileManagerContext';
 import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 export default function FileManagerLayout({
   children,
@@ -14,9 +14,11 @@ export default function FileManagerLayout({
     <ProtectedRoute>
       <SidebarProvider>
         <FileManagerProvider>
-          <FileManagerContent>
-            {children}
-          </FileManagerContent>
+        <Suspense fallback={<div>Loading workspace...</div>}>
+            <FileManagerContent>
+              {children}
+            </FileManagerContent>
+        </Suspense>
         </FileManagerProvider>
       </SidebarProvider>
     </ProtectedRoute>
