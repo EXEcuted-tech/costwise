@@ -2,7 +2,7 @@
 import MainLayout from "@/components/layouts/MainLayout";
 import { FileManagerProvider } from '@/contexts/FileManagerContext';
 import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 
 export default function FileManagerLayout({
   children,
@@ -12,9 +12,11 @@ export default function FileManagerLayout({
   return (
     <SidebarProvider>
       <FileManagerProvider>
-        <FileManagerContent>
-          {children}
-        </FileManagerContent>
+        <Suspense fallback={<div>Loading workspace...</div>}>
+          <FileManagerContent>
+            {children}
+          </FileManagerContent>
+        </Suspense>
       </FileManagerProvider>
     </SidebarProvider>
   );
@@ -22,13 +24,13 @@ export default function FileManagerLayout({
 
 function FileManagerContent({ children }: { children: React.ReactNode }) {
   const { isOpen } = useSidebarContext();
-  const [isWorkspace,setIsWorkspace] = useState(false);
-  
-  useEffect(()=>{
-    if(localStorage.getItem("wkspBool") === "true"){
+  const [isWorkspace, setIsWorkspace] = useState(false);
+
+  useEffect(() => {
+    if (localStorage.getItem("wkspBool") === "true") {
       setIsWorkspace(true);
     }
-  },[])
+  }, [])
 
   return (
     <div className='w-full flex'>

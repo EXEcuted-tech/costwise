@@ -1,3 +1,4 @@
+"use client"
 import React, { useEffect, useRef, useState } from 'react'
 import { IoClose } from 'react-icons/io5'
 import { MdCompare } from 'react-icons/md'
@@ -85,7 +86,7 @@ const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateActio
                     </div>
                     <div id="scroll-style" ref={scrollRef} className='h-[210px] my-[10px] overflow-y-auto'>
                         {filteredOptions.map((options, index) =>
-                            <div className='w-full flex items-center py-[5px]'>
+                            <div key={index} className='w-full flex items-center py-[5px]'>
                                 <div className='flex items-center w-[95%]'>
                                     <TbPointFilled className='text-[20px]' />
                                     <p className='text-[20px]'>{options.bomName} <span className='italic text-[#737373]'>({options.formulation})</span></p>
