@@ -8,23 +8,51 @@ import Link from "next/link";
 import UserInformation from '@/components/pages/profile/UserInformation';
 import PasswordChangeDialog from "@/components/modal/PasswordChangeDialog";
 import background from '@/assets/account-profile-bg.png';
+import { useUserContext } from "@/contexts/UserContext";
+import api from "@/utils/api";
 
-export interface AccountDataProps {
-    firstName: string;
-    middleName: string;
-    lastName: string;
-    emailAddress: string;
-    phoneNumber: string;
+interface UserProps {
+    fName: string;
+    mName: string;
+    lName: string;
+    email: string;
+    phoneNum: string;
     suffix: string;
-    department: string;
-    employeeNumber: string;
+    dept: string;
+    employeeNum: string;
     role: string;
 }
 
 const ProfilePage = () => {
 const { isOpen } = useSidebarContext();
+const { currentUser } = useUserContext();
+const [userAcc, setUserAcc] = useState<UserProps | null>(null);
 const [userInfo, setuserInfo] = useState(false);
 const [dialog, setDialog] = useState(false);
+
+useEffect(() => {
+    const fetchData = async () => {
+        try {
+            const user = await api.get('/user');
+            const userInformation = {
+                fName: user.data.first_name,
+                mName: user.data.middle_name,
+                lName: user.data.last_name,
+                email: user.data.email_address,
+                phoneNum: user.data.phone_number,   
+                suffix: user.data.suffix,
+                dept: user.data.department,
+                employeeNum: user.data.employee_number,
+                role: user.data.sys_role
+            }
+
+            setUserAcc(userInformation);
+        } catch (error: any) {
+            
+        }
+    }
+    fetchData();
+}, [currentUser?.email]);
 
 return (
         <div className='w-full h-screen flex flex-col items-center bg-repeat' style={{ backgroundImage: `url(${background.src})` }}>
@@ -60,8 +88,8 @@ return (
                         </div>
                     </div>
                     <div>
-                        <div className='text-[25px] 2xl:text-[30px] font-semibold'> {fakeAccData[0].firstName} {fakeAccData[0].lastName}</div>
-                        <div className='text-[22px] 2xl:text-[24px]'> {fakeAccData[0].role} </div>
+                        <div className='text-[25px] 2xl:text-[30px] font-semibold'> {userAcc?.fName} {userAcc?.lName}</div>
+                        <div className='text-[22px] 2xl:text-[24px]'> {userAcc?.role} </div>
                         <Link href="/logout">
                             <button className="text-[22px] 2xl:text-[24px] text-primary cursor-pointer hover:opacity-65">
                                 Logout
@@ -70,7 +98,7 @@ return (
                     </div>
                 </div>
                 
-                <UserInformation isOpen={isOpen} fakeAccData={fakeAccData}/>
+                <UserInformation isOpen={isOpen} userAcc={userAcc}/>
             </div>
         </div>
     );
@@ -78,16 +106,3 @@ return (
 
 export default ProfilePage
 
-const fakeAccData: AccountDataProps[] = [
-    {
-        firstName: 'Kathea Mari',
-        middleName: 'Catubig',
-        lastName: 'Mayol',
-        emailAddress: 'katheamari123@gmail.com',
-        phoneNumber: '09876543212',
-        suffix: 'N/A',
-        department: 'Cost Accounting',
-        employeeNumber: '#12934',
-        role: 'Administrator'
-    },
-];
