@@ -13,6 +13,8 @@ class Fodl extends Model
 
     protected $primaryKey = 'fodl_id';
 
+    public $timestamps = false;
+
     protected $fillable = [
         'factory_overhead',
         'direct_labor',

@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Helpers\DateHelper;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
-use League\Csv\Reader;
 use App\Models\File;
 use App\Models\FinishedGood;
 use App\Models\Fodl;
-
+use Illuminate\Support\Facades\Log;
 
 class FileController extends ApiController
 {
@@ -28,12 +28,14 @@ class FileController extends ApiController
         ];
 
         if ($extension == 'xlsx') {
-            $fileModel = File::create([
+            $this->fileModel = [
                 'file_type' => $uploadType == 'master' ? 'master_file' : 'transactional_file',
                 'settings' => json_encode($settings),
-            ]);
+            ];
 
-            $this->fileModel = $fileModel;
+            $this->processExcel($file->getRealPath(), $uploadType);
+
+            File::create($this->fileModel);
 
             $this->status = 200;
             return $this->getResponse();
@@ -48,38 +50,60 @@ class FileController extends ApiController
 
         foreach ($spreadsheet->getWorksheetIterator() as $worksheet) {
             $sheetName = $worksheet->getTitle();
-
             if ($uploadType == 'master') {
-                switch ($sheetName) {
-                    case 'SUMMARY':
-                        $this->processSummarySheet($worksheet);
-                        break;
-                    default:
-                        break;
-                    // Add cases for other sheets
+                $sheetProcessingOrder = [
+                    'FODL Cost' => 'processFodlCostSheet',
+                    'Material Cost' => 'processMaterialCostSheet',
+                    '/^BOM - /' => 'processBomSheet',
+                    'SUMMARY' => 'processSummarySheet',
+                ];
+
+                $worksheets = [];
+                foreach ($spreadsheet->getWorksheetIterator() as $worksheet) {
+                    $worksheets[$worksheet->getTitle()] = $worksheet;
+                }
+
+                foreach ($sheetProcessingOrder as $sheetPattern => $processingMethod) {
+                    $isRegex = $sheetPattern[0] === '/';
+
+                    if ($isRegex) {
+                        foreach ($worksheets as $sheetName => $worksheet) {
+                            if (preg_match($sheetPattern, $sheetName)) {
+                                $this->$processingMethod($worksheet);
+                            }
+                        }
+                    } else {
+                        if (isset($worksheets[$sheetPattern])) {
+                            $worksheet = $worksheets[$sheetPattern];
+                            $data = $worksheet->toArray();
+
+                            if (empty($data)) {
+                                $this->status = 400;
+                                return $this->getResponse("No data found in the SUMMARY sheet.");
+                            } else {
+                                $this->$processingMethod($data);
+                            }
+                        } else {
+                            Log::warning("Sheet '{$sheetPattern}' not found.");
+                        }
+                    }
                 }
             }
         }
-
-        $this->status = 200;
-        return $this->getResponse("File processed successfully!");
     }
 
-    private function processSummarySheet($worksheet)
-    {
-        $data = $worksheet->toArray();
-        if (empty($data)) {
-            $this->status = 400;
-            return $this->getResponse("No data found in the SUMMARY sheet.");
-        }
 
-        $monthYearStr = $data[2];
-        $monthYearInt = convertMonthYearStrToInt($monthYearStr);
-        $headers = $data[4];
-        unset($data[1], $data[2], $data[3], $data[4]);
+    private function processSummarySheet($data)
+    {
+        $monthYearStr = $data[1];
+        $monthYearInt = DateHelper::convertMonthYearStrToInt($monthYearStr[0]);
+        $headers = $data[3];
+
+        unset($data[0], $data[1], $data[2], $data[3]);
 
         $fgIds = [];
         $fodlIds = [];
+
 
         foreach ($data as $row) {
             $rowData = [];
@@ -93,10 +117,6 @@ class FileController extends ApiController
             $factoryOverhead = $rowData['Factory Overhead'] ?? 0;
             $directLabor = $rowData['Direct Labor'] ?? 0;
             $total = $rowData['TOTAL'] ?? 0;
-
-            // if (is_null($itemCode) || is_null($itemDescription) || is_null($rmCost)) {
-            //     continue;
-            // }
 
             $fodl = Fodl::where('monthYear', $monthYearInt)
                 ->where('factory_overhead', $factoryOverhead)
@@ -122,21 +142,25 @@ class FileController extends ApiController
                 'fodl_id' => $fodlId,
             ]);
 
-            $fgIds[] = $finishedGood->id;
+            $fgIds[] = $finishedGood->fg_id;
             $fodlIds[] = $fodlId;
         }
 
         $fodlIds = array_values(array_unique($fodlIds));
-
         if ($this->fileModel) {
-            $settings = json_decode($this->fileModel->settings, true);
+            $settings = json_decode($this->fileModel['settings'], true);
             $settings['fg_ids'] = $fgIds;
             $settings['fodl_ids'] = $fodlIds;
-            $this->fileModel->settings = json_encode($settings);
-            $this->fileModel->save();
+            $this->fileModel['settings'] = json_encode($settings);
         }
+    }
 
-        $this->status = 200;
-        return $this->getResponse("SUMMARY sheet processed successfully!");
+    private function processFODLCost($data)
+    {
+        $monthYearStr = $data[1];
+        $monthYearInt = DateHelper::convertMonthYearStrToInt($monthYearStr[0]);
+        $headers = $data[4];
+
+        unset($data[0], $data[1], $data[2], $data[3], $data[4]);
     }
 }

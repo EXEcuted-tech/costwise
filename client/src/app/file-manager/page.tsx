@@ -73,7 +73,7 @@ const FileManagerPage = () => {
             api
               .post('/files/upload', formData)
               .then((response) => {
-                console.log("Response: ", response);
+                console.log("File Manager Response: ", response);
               })
               .catch((error) => {
                 console.error(error);
