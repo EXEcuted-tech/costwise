@@ -20,9 +20,8 @@ class FinishedGood extends Model
         'fg_price',
         'unit',
         'monthYear',
+        'formulation_no',
         'is_least_cost',
-        // // Include 'bom_id' if Option 1 is chosen
-        // 'bom_id',
     ];
 
     public $timestamps = false;

@@ -16,6 +16,7 @@ class Fodl extends Model
     public $timestamps = false;
 
     protected $fillable = [
+        'fg_code',
         'factory_overhead',
         'direct_labor',
         'monthYear',

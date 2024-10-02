@@ -57,6 +57,7 @@ return new class extends Migration {
         // FODL Table
         Schema::create('fodl', function (Blueprint $table) {
             $table->increments('fodl_id');
+            $table->string('fg_code', 255);
             $table->decimal('factory_overhead', 10, 2);
             $table->decimal('direct_labor', 10, 2);
             $table->unsignedInteger('monthYear');
@@ -73,8 +74,9 @@ return new class extends Migration {
             $table->decimal('rm_cost', 10, 2)->nullable();
             $table->decimal('fg_price', 10, 2)->nullable();
             $table->string('unit', 10);
-            $table->unsignedInteger('monthYear');
+            $table->unsignedInteger('formulation_no')->nullable();
             $table->boolean('is_least_cost')->default(false)->index();
+            $table->unsignedInteger('monthYear');
             $table->foreign('fodl_id')->references('fodl_id')->on('fodl')->onDelete('cascade');
         });
 
@@ -82,7 +84,8 @@ return new class extends Migration {
         Schema::create('formulations', function (Blueprint $table) {
             $table->increments('formulation_id');
             $table->unsignedInteger('fg_id');
-            $table->string('formulation_no', 255);
+            $table->string('formula_code', 255);
+            $table->longText('emulsion');
             $table->longText('material_qty_list');
             $table->timestamps();
             $table->foreign('fg_id')->references('fg_id')->on('finished_goods')->onDelete('cascade');

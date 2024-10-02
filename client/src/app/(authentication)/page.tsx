@@ -10,6 +10,8 @@ import { SetStateAction, useEffect, useState } from "react";
 import { useUserContext } from "@/contexts/UserContext";
 import Alert from "@/components/alerts/Alert";
 import Spinner from "@/components/loaders/Spinner";
+import { isTokenExpired, refreshToken } from "@/utils/expirationCheck";
+import { removeTokens } from "@/utils/removeTokens";
 
 function LoginPage() {
   const router = useRouter();
@@ -26,6 +28,18 @@ function LoginPage() {
     const accessToken = localStorage.getItem('accessToken');
     const tokenExpiresAt = localStorage.getItem('tokenExpiresAt');
 
+    // if (tokenExpiresAt && isTokenExpired()) {
+    //   try {
+    //     const refreshed = refreshToken();
+    //     if (!refreshed) {
+    //       removeTokens();
+    //       router.push('/');
+    //     }
+    //   } catch (error) {
+    //     console.error('Failed to refresh token:', error);
+    //   }
+    // }
+    
     if (accessToken && tokenExpiresAt) {
       const expiresAt = new Date(tokenExpiresAt);
       console.log(expiresAt, new Date(), expiresAt > new Date());
