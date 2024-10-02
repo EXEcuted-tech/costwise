@@ -1,7 +1,4 @@
 import React, { useState } from 'react';
-import Link from 'next/link';
-import { IoIosSearch } from "react-icons/io";
-import { HiMiniPlus } from "react-icons/hi2";
 import { MdModeEdit } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
 import EditUserInfo from '@/components/modals/EditUserInfo';
@@ -45,27 +42,6 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
 
     return (
         <div className="flex flex-col w-auto h-auto rounded-lg shadow-md shadow-gray-300">
-            {/* Search Area */}
-            <div className="flex w-full h-[3.5rem] bg-[#F3F3F3] border-solid border-b border-[#868686]">
-                <div className="mt-[0.8em] ml-7 text-gray-600">
-                    <div className='flex absolute text-[1.3em] text-gray-400 mt-[0.3rem] ml-3'>
-                        <IoIosSearch />
-                    </div>
-                    <input
-                        className="bg-white h-8 w-[30rem] px-5 pl-9 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none"
-                        type="search"
-                        name="search"
-                        placeholder="Search here..."
-                    />
-                </div>
-
-                <Link href="/user-management/create" className='ml-auto'>
-                    <div className='flex w-[7rem] h-8 mt-[0.8em]  mr-4 p-2 bg-[#008000] text-white text-center items-center font-semibold rounded-[5px] hover:cursor-pointer hover:bg-[#006900] transition-colors delay-50 duration-[1000] ease-in'>
-                        <HiMiniPlus className="text-[1.4em]" /> <p className="text-[1em]">Add User</p>
-                    </div>
-                </Link>
-            </div>
-
             {/* Main Content */}
             <div className="animate-fade-in3 flex flex-col w-auto h-[35rem]">
                 <table className="w-full h-full text-left">
