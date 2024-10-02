@@ -299,9 +299,7 @@ const ProjectedCostPage = () => {
             <div className="flex text-[30px]  font-bold h-[10%] bg-white items-center justify-start pl-10">
               <p className="w-[95%] text-[#585858]">Estimated Summary</p>
             </div>
-            <div className="flex items-center justify-center h-[40%] bg-white">
-              <DoughnutChart doughnutData={doughnutData} />
-            </div>
+            <div className="flex items-center justify-center h-[40%] bg-white"></div>
           </div>
           {/* Right Div */}
           <div
