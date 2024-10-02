@@ -1,17 +1,20 @@
+"use client";
 import React, { useState } from 'react';
 import { MdModeEdit } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
 import EditUserInfo from '@/components/modals/EditUserInfo';
 import ConfirmDelete from '@/components/modals/ConfirmDelete';
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
-import { ManageAccountsProps } from '@/app/user-management/page';
+import { User } from '@/types/data';
+import { Spinner } from '@nextui-org/react';
 
 interface ManageAccountsPageProps {
-    fileData: ManageAccountsProps[];
+    fileData: User[];
     isOpen?: boolean;
+    isLoading: boolean;
 }
 
-const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen }) => {
+const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, isLoading }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
@@ -50,26 +53,35 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
                             <th className={`${isOpen ? 'pl-[2rem] 4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[14rem] xl:w-[8rem]' : 'pl-8 w-[20rem] 4xl:w-[20rem] 3xl:w-[15rem] 2xl:w-[14rem] xl:pl-6'} py-2`}
                                 >Name</th>
                             <th className={`${isOpen ? 'w-[10rem] 4xl:w-[10rem] 3xl:w-[7rem] 2xl:w-[8rem] xl:w-[6rem]' : 'w-[15rem] 4xl:w-[10rem] 3xl:w-[10rem] 2xl:w-[8rem] xl:w-[7rem]' } py-2 `}
-                                >Role</th>
+                                >Position</th>
                             <th className={`${isOpen ? '4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[12rem] xl:w-[12rem]' : '4xl:w-[15rem] xl:w-[15rem]' } py-2`}>
                                 Email</th>
                             <th className={`${isOpen ? '4xl:w-[13rem] 3xl:w-[10rem] 2xl:w-[12rem] xl:w-[10rem]' : '4xl:w-[13rem] 2xl:w-[10rem] xl:w-[13rem]' } py-2`}>
                                 Contact Number</th>
                             <th className={`${isOpen ? '4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[9rem] xl:w-[5rem]' : ' 4xl:w-[15rem] 3xl:w-[15rem] 2xl:w-[13rem] xl:w-[5rem]' } w-[15rem] py-2`}>
                                 Department</th>
+                            <th className={`${isOpen ? '4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[9rem] xl:w-[5rem]' : ' 4xl:w-[15rem] 3xl:w-[15rem] 2xl:w-[13rem] xl:w-[5rem]' } w-[15rem] py-2`}>
+                                Role</th>
                             <th className={`${isOpen ? 'pl-[1rem]' : 'pl-[3rem] xl:pl-[2rem] '} py-2 w-[12%]`}
                             >Manage</th>
                         </tr>
                     </thead>
                     <tbody>
-                        {currentListPage.length > 0 ? (
-                            currentListPage.map((data, index) => (
+                        {isLoading ? (
+                            <tr>
+                                <td colSpan={7} className="text-center py-6">
+                                    <Spinner color="danger" size="lg" label="Loading..." />
+                                </td>
+                            </tr>
+                        ) : fileData.length > 0 ? (
+                                currentListPage.map((data, index) => (
                                 <tr key={index} className={`${isOpen ? 'text-[1.1em] 4xl:text-[1.1em] 3xl:text-[0.9em] 2xl:text-[0.8em] xl:text-[0.7em]' : 'text-[1.2em] 4xl:text-[1.2em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[1em]' } border-b border-[#868686] hover:bg-gray-50`}>
-                                    <td className={`${isOpen ? 'pl-[2rem]' : 'pl-8 xl:pl-6'} py-2 break-words`}>{data.userName}</td>
-                                    <td className="py-2 break-words">{data.userRole}</td>
-                                    <td className="py-2 break-words">{data.userEmail}</td>
-                                    <td className="py-2 break-words">{data.contactNumber}</td>
+                                    <td className={`${isOpen ? 'pl-[2rem]' : 'pl-8 xl:pl-6'} py-2 break-words`}>{data.first_name} {data.last_name}</td>
+                                    <td className="py-2 break-words">{data.position}</td>
+                                    <td className="py-2 break-words">{data.email_address}</td>
+                                    <td className="py-2 break-words">{data.phone_number}</td>
                                     <td className="py-2 break-words">{data.department}</td>
+                                    <td className="py-2 break-words">{data.user_type}</td>
                                     <td className={`${isOpen ? 'pl-[1rem] 2xl:pr-2 xl:pr-2' : 'pl-[3rem] xl:pl-[2rem] xl:pr-2'} py-2`}>
                                         <div className="flex">
                                             <button
@@ -88,7 +100,9 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen })
                             ))
                         ) : (
                             <tr>
-                                <td colSpan={6} className="text-center py-6">No users to display.</td>
+                                <td colSpan={6} className="text-center py-6">
+                                   No users to display
+                                </td>
                             </tr>
                         )}
                     </tbody>

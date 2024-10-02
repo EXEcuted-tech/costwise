@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '@/components/header/Header';
 import ManageAccounts from '@/components/pages/user-management/ManageAccounts';
 import { RiShieldUserFill } from "react-icons/ri";
@@ -7,25 +7,58 @@ import { useSidebarContext } from '@/contexts/SidebarContext';
 import { IoIosSearch } from 'react-icons/io';
 import Link from 'next/link';
 import { HiMiniPlus } from 'react-icons/hi2';
-
-export interface ManageAccountsProps {
-    userName: string;
-    userRole: string;
-    userEmail: string;
-    contactNumber: string;
-    department: string;
-}
-
-export interface PasswordRequestProps {
-    userName: string;
-    userRole: string;
-    department: string;
-    status: string;
-    requestDate: string;
-}
+import api from '@/utils/api';
+import { User } from '@/types/data';
 
 const UserManagement = () => { 
     const { isOpen } = useSidebarContext();
+    const [users, setUsers] = useState<User[]>([]);
+    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
+    const [isLoading, setIsLoading] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    
+    useEffect(() => {
+        setIsLoading(true);
+        
+        //Get all users
+        api.get<User[]>('/users')
+        .then((res) => {
+            if (res.status === 200) {
+                setUsers(res.data);
+                setFilteredUsers(res.data);
+                setTimeout(() => {
+                    setIsLoading(false);
+                  }, 2000);
+            }
+        })
+        .catch((error) => {
+            setIsLoading(false);
+            console.error('Error fetching users:', error);
+        })
+    }, []);
+
+    //Search function
+    const handleSearch = (event: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(event.target.value);
+    };
+
+    useEffect(() => {
+        if (searchTerm === '') {
+            setFilteredUsers(users);
+        }
+        else {
+            const filtered = users.filter(user =>
+                user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.user_type.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.phone_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                user.department?.toLowerCase().includes(searchTerm.toLowerCase())
+            );
+            setFilteredUsers(filtered);
+        }
+    }, [searchTerm, users]);
+
 
     return (
         <div className="w-full animate-fade-in">
@@ -43,7 +76,9 @@ const UserManagement = () => {
                         className={` ${isOpen ? 'w-[19rem]' : 'w-[26rem]' } bg-white h-8  px-5 pl-9 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
                         type="search"
                         name="search"
-                        placeholder="Search here..."
+                        placeholder="Search by name, role, or department..."
+                        value={searchTerm}
+                        onChange={handleSearch}
                     />
                 </div>
 
@@ -56,76 +91,10 @@ const UserManagement = () => {
 
             {/* Main Content Area */}
             <div className={`${isOpen ? '' : '' } flex flex-col w-auto mr-[1rem] h-auto ml-[4rem] mt-3 rounded-xl bg-white shadow-md shadow-gray-300`}>
-                <ManageAccounts fileData = {fakeAccountsData} isOpen={isOpen} />
+                <ManageAccounts fileData = {filteredUsers} isOpen={isOpen} isLoading={isLoading} />
             </div>
         </div>
     );
 };
 
 export default UserManagement;
-
-const fakeAccountsData: ManageAccountsProps[] = [
-    {
-        userName: 'Franz Ondiano',
-        userRole: 'Employee',
-        userEmail: 'franzondiano@gmail.com',
-        contactNumber: '+63 12321232',
-        department: 'Marketing'
-    },
-
-    {
-        userName: 'Tyrone Ybanez',
-        userRole: 'Employee',
-        userEmail: 'tyroneybanez@gmail.com',
-        contactNumber: '+63 12321232',
-        department: 'Research and Development'
-    },
-
-    {
-        userName: 'Kathea Mari C. Mayol',
-        userRole: 'Administrator',
-        userEmail: 'katheamayol@gmail.com',
-        contactNumber: '+63 12321232',
-        department: 'Accounting'
-    },
-
-    {
-        userName: 'Hannah Angelica Galve',
-        userRole: 'Admin',
-        userEmail: 'hannahgalve@gmail.com',
-        contactNumber: '+63 12321232',
-        department: 'Production'
-    },
-
-    {
-        userName: 'Franz Ondiano',
-        userRole: 'Employee',
-        userEmail: 'franzondiano@gmail.com',
-        contactNumber: '+63 12321232',
-        department: 'Marketing'
-    },
-
-    {
-        userName: 'Tyrone Ybanez',
-        userRole: 'Employee',
-        userEmail: 'tyroneybanez@gmail.com',
-        contactNumber: '+63 12321232',
-        department: 'Research and Development'
-    },
-
-    {
-        userName: 'Kathea Mari C. Mayol',
-        userRole: 'Administrator',
-        userEmail: 'katheamayol@gmail.com',
-        contactNumber: '+63 12321232',
-        department: 'Accounting'
-    },
-
-    {
-        userName: 'Hannah Angelica Galve',
-        userRole: 'Admin',
-        userEmail: 'hannahgalve@gmail.com',
-        contactNumber: '+63 12321232',
-        department: 'Production'
-    }
-]

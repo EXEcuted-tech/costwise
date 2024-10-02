@@ -27,7 +27,8 @@ class AuthController extends ApiController
                     'department' => 'required',
                     'phone_number' => 'required|regex:/^(\+?[0-9]{1,4})?\s?-?[0-9]{10}$/',
                     'position' => 'required',
-                    'sys_role' => 'required'
+                    'sys_role' => 'required',
+                    'profile_picture' => 'required|image|mimes:jpeg,png,jpg|max:2048',
                 ]
             );
 
@@ -118,7 +119,7 @@ class AuthController extends ApiController
             $accessToken->expires_at = now()->addMinutes(15);
             $accessToken->save();
         }
-        
+
         $token->token = hash('sha256', $plainTextRefreshToken = Str::random(48));
         $token->expires_at = now()->addDays(30);
         $token->save();

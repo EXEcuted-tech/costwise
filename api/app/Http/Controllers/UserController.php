@@ -15,4 +15,10 @@ class UserController extends ApiController
         $user = Auth::user();
         return response()->json($user);
     }
+
+    public function getAllUsers()
+    {
+        $users = User::all();
+        return response()->json($users);
+    }
 }

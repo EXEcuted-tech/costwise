@@ -6,7 +6,8 @@ export interface User {
     email_address: string;
     employee_number?: string;
     employee_suffix?: string;
-    phone?: string;
+    phone_number?: string;
     department?: string;
-    employee_role?: string;
+    position?: string;
+    profile_picture?: string;
 }
