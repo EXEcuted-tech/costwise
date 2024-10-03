@@ -5,12 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class Training extends Model
+class MaterialCosts extends Model
 {
     use  HasFactory;
+    //=====================
+    //  Will Be Replaced
+    //=====================
 
-    protected $table = 'materilas';
-    protected $primaryKey = 'material_id';
+    protected $table = 'models';
+    protected $primaryKey = 'model_id';
     protected $keyType = 'int';
     public $incrementing = true;
 

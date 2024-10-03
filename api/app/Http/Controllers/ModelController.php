@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\ApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\MLModel;
@@ -26,6 +27,7 @@ class ModelController extends ApiController
             }
 
             $validatedData = $validator->validated();
+
             $model = MLModel::create($validatedData);
             $this->status = 200;
             $this->response['data'] = $model;
@@ -61,7 +63,7 @@ class ModelController extends ApiController
                 return $this->getResponse("Model not found.");
             }
 
-            $this->status = 200;
+            $this->status = 201;
             $this->response['data'] = $model;
             return $this->getResponse("Model retrieved successfully.");
         } catch (\Throwable $th) {

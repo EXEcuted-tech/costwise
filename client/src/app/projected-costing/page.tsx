@@ -1,6 +1,6 @@
 "use client";
 import Header from "@/components/header/Header";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdOutlineAnalytics } from "react-icons/md";
 import { IoCalendarSharp } from "react-icons/io5";
 import { IoIosInformationCircle } from "react-icons/io";
@@ -8,6 +8,8 @@ import { Chart as ChartJS } from "chart.js/auto";
 import LineChart from "@/components/charts/LineChart";
 import DoughnutChart from "@/components/charts/DoughnutChart";
 import { useSidebarContext } from "@/contexts/SidebarContext";
+import api from "@/utils/api";
+import config from "@/server/config";
 
 const ProjectedCostPage = () => {
   const { isOpen } = useSidebarContext();
@@ -20,8 +22,8 @@ const ProjectedCostPage = () => {
     { year: 2023 },
     { year: 2024 },
   ]);
-
   const [half, setHalf] = useState([{ half: "First" }, { half: "Second" }]);
+  const [file, setFile] = useState('')
   const [priceData, setPriceData] = useState([
     {
       id: 1,
@@ -60,7 +62,6 @@ const ProjectedCostPage = () => {
       month: "June",
     },
   ]);
-
   const [costData, setCostData] = useState([
     { id: 1, product: "Hotdog", cost: 25.0 },
     { id: 2, product: "Bacon", cost: 33.0 },
@@ -152,37 +153,6 @@ const ProjectedCostPage = () => {
     },
   ]);
 
-  const [doughnutData] = useState({
-    labels: costData.map((product) => product.product),
-    datasets: [
-      {
-        label: "Price Distribution",
-        data: costData.map((costs) => costs.cost),
-        backgroundColor: [
-          "rgba(75,192,192,0.2)",
-          "rgba(54,162,235,0.2)",
-          "rgba(255,206,86,0.2)",
-          "rgba(75,192,192,0.2)",
-          "rgba(153,102,255,0.2)",
-          "rgba(255,159,64,0.2)",
-        ],
-        borderColor: [
-          "rgba(75,192,192,1)",
-          "rgba(54,162,235,1)",
-          "rgba(255,206,86,1)",
-          "rgba(75,192,192,1)",
-          "rgba(153,102,255,1)",
-          "rgba(255,159,64,1)",
-        ],
-        borderWidth: 1,
-      },
-    ],
-    options: {
-      responsive: true,
-      maintainAspectRatio: false,
-    },
-  });
-
   const lineChartOptions = {
     responsive: true,
     maintainAspectRatio: true, // Set this to true for responsiveness
@@ -192,6 +162,17 @@ const ProjectedCostPage = () => {
       },
     },
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const file = await api.get('/training');
+        setFile(file.data.settings)
+      } catch (error: any) {
+
+      }
+    }
+  })
 
   return (
     <div className="overflow-auto overflow-x-hidden bg-cover bg-center items-center justify-center bg-[#FFFAF8] bg-opacity-20">
@@ -217,17 +198,15 @@ const ProjectedCostPage = () => {
                 <p className="">{activeStart}</p>
               </span>
               <ul
-                className={`list-none px-[1px] absolute border border-gray-300 rounded-lg top-[2.7em] left-50% w-full translate-[-50%] transition z-1 overflow-hidden bg-white shadow-md ${
-                  !isActiveStart
-                    ? "opacity-0 pointer-events-none"
-                    : "block opacity-100"
-                } ${yearList.length < 6 ? " " : "overflow-y-scroll h-[175px]"}`}
+                className={`list-none px-[1px] absolute border border-gray-300 rounded-lg top-[2.7em] left-50% w-full translate-[-50%] transition z-1 overflow-hidden bg-white shadow-md ${!isActiveStart
+                  ? "opacity-0 pointer-events-none"
+                  : "block opacity-100"
+                  } ${yearList.length < 6 ? " " : "overflow-y-scroll h-[175px]"}`}
               >
                 {yearList.map((date) => (
                   <li
-                    className={`px-[2px] py-[2px] mx-[0.1em] cursor-pointer hover:shadow-lg text-[20px] text-black ${
-                      activeStart === date.year ? "shadow-lg bg-gray-50" : " "
-                    }`}
+                    className={`px-[2px] py-[2px] mx-[0.1em] cursor-pointer hover:shadow-lg text-[20px] text-black ${activeStart === date.year ? "shadow-lg bg-gray-50" : " "
+                      }`}
                     onClick={() => {
                       setActiveStart(date.year);
                     }}
@@ -255,15 +234,13 @@ const ProjectedCostPage = () => {
               </span>
             </div>
             <ul
-              className={`list-none px-[1px] absolute border border-gray-300 rounded-lg top-[2.7em] left-50% w-full translate-[-50%] transition z-1 overflow-hidden bg-white shadow-md ${
-                !isActiveEnd ? "opacity-0 pointer-events-none" : "opacity-100"
-              } ${half.length < 6 ? " " : "overflow-y-scroll h-[175px]"}`}
+              className={`list-none px-[1px] absolute border border-gray-300 rounded-lg top-[2.7em] left-50% w-full translate-[-50%] transition z-1 overflow-hidden bg-white shadow-md ${!isActiveEnd ? "opacity-0 pointer-events-none" : "opacity-100"
+                } ${half.length < 6 ? " " : "overflow-y-scroll h-[175px]"}`}
             >
               {half.map((half) => (
                 <li
-                  className={`px-[2px] py-[2px] mx-[0.1em] cursor-pointer hover:shadow-lg text-[20px] ${
-                    activeEnd === half.half ? "shadow-lg bg-gray-50" : " "
-                  }`}
+                  className={`px-[2px] py-[2px] mx-[0.1em] cursor-pointer hover:shadow-lg text-[20px] ${activeEnd === half.half ? "shadow-lg bg-gray-50" : " "
+                    }`}
                   onClick={() => {
                     setActiveEnd(half.half);
                   }}
@@ -275,15 +252,13 @@ const ProjectedCostPage = () => {
           </div>
         </div>
         <div
-          className={`${
-            isOpen ? "flex flex-col 4xl:flex-row" : "flex flex-col 2xl:flex-row"
-          } w-[97%] h-full gap-[2%] rounded-xl mt-[10px] 2xl:mt-0`}
+          className={`${isOpen ? "flex flex-col 4xl:flex-row" : "flex flex-col 2xl:flex-row"
+            } w-[97%] h-full gap-[2%] rounded-xl mt-[10px] 2xl:mt-0`}
         >
           {/* Left Div */}
           <div
-            className={`${
-              isOpen ? "w-full 4xl:w-[65%]" : "w-full 2xl:w-[65%]"
-            } flex flex-col h-full rounded-lg shadow-xl`}
+            className={`${isOpen ? "w-full 4xl:w-[65%]" : "w-full 2xl:w-[65%]"
+              } flex flex-col h-full rounded-lg shadow-xl`}
           >
             <div className="flex text-[30px] text-[#585858] font-bold h-[10%] bg-white items-center justify-start  border-b-2 pl-10">
               <p className="w-[95%]">GRAPHS</p>
@@ -303,22 +278,19 @@ const ProjectedCostPage = () => {
           </div>
           {/* Right Div */}
           <div
-            className={`${
-              isOpen ? "w-full 4xl:w-[45%]" : "w-full 2xl:w-[45%]"
-            } flex flex-col gap-[10px] h-full mt-[10px] 2xl:mt-0`}
+            className={`${isOpen ? "w-full 4xl:w-[45%]" : "w-full 2xl:w-[45%]"
+              } flex flex-col gap-[10px] h-full mt-[10px] 2xl:mt-0`}
           >
             <div
-              className={`${
-                isOpen
-                  ? "flex flex-col 2xl:flex-row 4xl:flex-col"
-                  : "flex flex-row 2xl:flex-col"
-              } gap-[20px] w-full`}
+              className={`${isOpen
+                ? "flex flex-col 2xl:flex-row 4xl:flex-col"
+                : "flex flex-row 2xl:flex-col"
+                } gap-[20px] w-full`}
             >
               {/* Predictions Section */}
               <div
-                className={`${
-                  isOpen ? "h-full " : ""
-                } flex flex-col bg-white p-[10px] m-1 w-full border-l-[15px] border-blue-500 rounded-e-lg shadow-lg`}
+                className={`${isOpen ? "h-full " : ""
+                  } flex flex-col bg-white p-[10px] m-1 w-full border-l-[15px] border-blue-500 rounded-e-lg shadow-lg`}
               >
                 <div className="border-b-1 border-[#D9D9D9] flex flex-row">
                   <p className="text-[24px] font-bold w-[95%]">Prediction</p>
@@ -360,9 +332,8 @@ const ProjectedCostPage = () => {
                     {pItemCost.map((item) => (
                       <tr
                         key={item.id}
-                        className={`text-[#383838] ${
-                          item.id % 2 === 0 ? "bg-[#F6EBEB]" : " "
-                        } w-full`}
+                        className={`text-[#383838] ${item.id % 2 === 0 ? "bg-[#F6EBEB]" : " "
+                          } w-full`}
                       >
                         <td className="px-10 py-2">
                           <p>{item.material}</p>
