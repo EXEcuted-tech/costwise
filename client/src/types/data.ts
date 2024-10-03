@@ -10,3 +10,41 @@ export interface User {
     department?: string;
     employee_role?: string;
 }
+
+export interface File {
+    file_id: number;
+    file_type: string;
+    settings: string;
+    created_at: string;
+    updated_at: string;
+}
+
+export type FileSettings = {
+    file_name: string;
+    file_name_with_extension: string;
+    user: string;
+    fodls: object;
+    monthYear: number;
+    material_ids: object;
+    bom_ids: object;
+}
+
+export interface FodlPair {
+    fodl_id: number;
+    fg_code: string;
+}
+
+export interface FodlRecord extends Record<string, unknown> {
+    itemCode: string;
+    itemDescription: string;
+    unit: string;
+    factoryOverhead: number;
+    directLabor: number;
+}
+
+export interface MaterialRecord extends Record<string, unknown> {
+    itemCode: string;
+    itemDescription: string;
+    unit: string;
+    materialCost: number;
+}

@@ -17,6 +17,8 @@ import { useFileManagerContext } from '@/contexts/FileManagerContext';
 import { useDropzone } from 'react-dropzone';
 import api from '@/utils/api';
 import * as XLSX from 'xlsx';
+import Alert from "@/components/alerts/Alert";
+import { File } from '@/types/data';
 
 const FileManagerPage = () => {
   const { isOpen } = useSidebarContext();
@@ -24,7 +26,58 @@ const FileManagerPage = () => {
   const [tab, setTab] = useState('all');
   const [upload, setUpload] = useState(false);
   const [uploadType, setUploadType] = useState('');
+  const [infoMsg, setInfoMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [allData, setAllData] = useState<File[]>([]);
+  const [masterFileData, setMasterFileData] = useState<File[]>([]);
+  const [transactionData, setTransactionData] = useState<File[]>([]);
+
   const ref = useOutsideClick(() => setUpload(false));
+
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      if (tab === 'all') {
+        const response = await api.get('/files/retrieve_all');
+        if (response.data.status === 200) {
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1000);
+          setAllData(response.data.data);
+        }
+      } else if (tab === 'masterfile') {
+        const response = await api.get('/files/retrieve', {
+          params: { col: 'file_type', value: 'master_file' },
+        });
+        if (response.data.status === 200) {
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1000);
+          setMasterFileData(response.data.data);
+        }
+      } else if (tab === 'transactional') {
+        const response = await api.get('/files/retrieve', {
+          params: { col: 'file_type', value: 'transactional_file' },
+        });
+        if (response.data.status === 200) {
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1000);
+          setTransactionData(response.data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [tab]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     const currentTab = localStorage.getItem('fileTab');
@@ -35,6 +88,10 @@ const FileManagerPage = () => {
 
   const onDrop = useCallback(
     (acceptedFiles: any[]) => {
+      setErrorMsg('');
+      setInfoMsg('');
+      setUpload(false);
+      setIsLoading(true);
       const file = acceptedFiles[0];
       const reader = new FileReader();
 
@@ -47,25 +104,23 @@ const FileManagerPage = () => {
 
           const sheetNames = workbook.SheetNames;
 
-          console.log('Sheet Names:', sheetNames);
+          let hasRequiredSheets = false;
+          let bomSheets = [];
 
-          let validSheets: string[] = [];
-
-          console.log(uploadType);
-          if (uploadType == 'master') {
-            validSheets = [
-              'SUMMARY',
-              'FODL Cost',
-              'Material Cost'
-            ];
-          
-            const bomSheets = sheetNames.filter(sheetName => sheetName.includes('BOM'));
-          
-            validSheets = [...validSheets, ...bomSheets];
+          if (uploadType === 'master') {
+            const requiredSheets = ['FODL Cost', 'Material Cost'];
+            const bomSheetPattern = /^BOM/;
+            hasRequiredSheets = requiredSheets.every(sheetName => sheetNames.includes(sheetName));
+            bomSheets = sheetNames.filter(sheetName => bomSheetPattern.test(sheetName));
+          } else if (uploadType === 'transactional') {
+            const requiredSheets = ['Production Plan'];
+            hasRequiredSheets = requiredSheets.every(sheetName => sheetNames.includes(sheetName));
           }
 
-          console.log('Valid Sheets', validSheets);
-          if (validSheets.some(sheet => sheetNames.includes(sheet))) {
+          if (
+            hasRequiredSheets &&
+            ((uploadType === 'master' && bomSheets.length > 0) || uploadType === 'transactional')
+          ) {
             const formData = new FormData();
             formData.append('file', file);
             formData.append('type', uploadType);
@@ -73,13 +128,21 @@ const FileManagerPage = () => {
             api
               .post('/files/upload', formData)
               .then((response) => {
-                console.log("File Manager Response: ", response);
+                console.log("Went here");
+                if (response.data.status == 200) {
+                  setTimeout(() => {
+                    setIsLoading(false);
+                  }, 1000);
+
+                  setInfoMsg('Successfully uploaded the file!');
+                  fetchData();
+                }
               })
               .catch((error) => {
                 console.error(error);
               });
           } else {
-            alert('The Excel file does not contain the required sheets.'); // change to modal
+            setErrorMsg('The Excel file does not contain the required sheets.')
           }
         } else {
           console.error('Error: FileReader result is not an ArrayBuffer.');
@@ -92,7 +155,7 @@ const FileManagerPage = () => {
 
       reader.readAsArrayBuffer(file);
     },
-    [uploadType]
+    [fetchData, uploadType]
   );
 
   const { getRootProps, getInputProps, open } = useDropzone({
@@ -110,9 +173,9 @@ const FileManagerPage = () => {
     setUploadType(type);
     setShouldOpenDropzone(true);
   };
-  
+
   const [shouldOpenDropzone, setShouldOpenDropzone] = useState(false);
-  
+
   useEffect(() => {
     if (shouldOpenDropzone) {
       open();
@@ -122,6 +185,22 @@ const FileManagerPage = () => {
 
   return (
     <>
+      <div className="absolute top-0 right-0">
+        {errorMsg != '' &&
+          <Alert
+            className="!relative"
+            variant='critical'
+            message={errorMsg}
+            setClose={() => { setErrorMsg(''); }} />
+        }
+        {infoMsg != '' &&
+          <Alert
+            className="!relative"
+            variant='success'
+            message={infoMsg}
+            setClose={() => { setInfoMsg(''); }} />
+        }
+      </div>
       {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" />}
       <Header icon={BsFolderFill} title={"File Manager"} />
       <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px] mt-[75px] 2xl:mt-[40px]' : 'px-[50px] mt-[36px]'} ml-[45px]`}>
@@ -175,7 +254,16 @@ const FileManagerPage = () => {
           </div>
         </div>
         <div>
-          <FileContainer tab={tab} isOpen={isOpen} />
+          {/* <FileContainer tab={tab} isOpen={isOpen} isLoading={isLoading} setIsLoading={setIsLoading} /> */}
+          <FileContainer
+            tab={tab}
+            isOpen={isOpen}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            allData={allData}
+            masterFileData={masterFileData}
+            transactionData={transactionData}
+          />
         </div>
       </div>
     </>

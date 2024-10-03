@@ -1,5 +1,5 @@
 import { formatHeader } from '@/utils/costwiseUtils';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { HiOutlinePlus } from "react-icons/hi";
 import { IoIosSave } from "react-icons/io";
 import { IoTrash } from "react-icons/io5";
@@ -13,6 +13,10 @@ interface WorkspaceTableProps {
 
 const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit, isTransaction }) => {
     const [tableData, setTableData] = useState(data);
+
+    useEffect(() => {
+        setTableData(data);
+    }, [data]);
 
     const handleInputChange = (rowIndex: number, key: string, value: string) => {
         // const updatedData = tableData.map((row, i) => {
@@ -77,23 +81,23 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                     <tr>
                         {isEdit && <th className="w-[10px]"></th>}
 
-                        {Object.keys(data[0]).map((key) => {
+                        {data.length > 0 && Object?.keys(data[0]).map((key) => {
                             let textAlignClass = 'text-left';
                             if (key === 'itemDescription') {
                                 textAlignClass = 'text-left';
-                            } else if (key === 'amount') {
+                            } else if (key === 'materialCost' || key === 'amount') {
                                 textAlignClass = 'text-right';
                             }
 
                             return (
                                 isEdit
                                     ?
-                                    <th key={key} className={`animate-zoomIn ${key == 'itemCode' || key == 'total' ? 'text-center' : (key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
+                                    <th key={key} className={`animate-zoomIn ${key == 'total' ? 'text-center' : (key === 'materialCost' || key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
                                                         whitespace-nowrap font-medium text-[20px] py-2 px-6 border-b border-gray-300`}>
                                         {formatHeader(key, ['rm', 'total'])}
                                     </th>
                                     :
-                                    <th key={key} className={`animate-zoomIn ${key == 'itemCode' || key == 'total' ? 'text-center' : (key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
+                                    <th key={key} className={`animate-zoomIn ${key == 'total' ? 'text-center' : (key === 'materialCost' || key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
                                                         whitespace-nowrap font-medium text-[20px] py-2 px-6 border-b border-gray-300`}>
                                         {formatHeader(key, ['rm', 'total'])}
                                     </th>
@@ -110,7 +114,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                                     <IoTrash className="ml-[5px] text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-250 ease-in-out"
                                         onClick={() => removeRow(rowIndex)} />
                                 </td>
-                                {Object.entries(row).map(([key, value], colIndex) => {
+                                {Object.entries(row) && Object?.entries(row).map(([key, value], colIndex) => {
                                     let textAlignClass = 'text-left';
                                     if (typeof value === 'number') textAlignClass = 'text-right';
                                     return (
@@ -137,7 +141,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                         :
                         tableData.map((row, rowIndex) => (
                             <tr key={rowIndex} className="border border-gray-300 w-full">
-                                {Object.entries(row).map(([key, value], colIndex) => {
+                                {Object.entries(row) && Object.entries(row).map(([key, value], colIndex) => {
                                     let textAlignClass = 'text-left';
                                     if (typeof value === 'number') textAlignClass = 'text-right';
                                     return (

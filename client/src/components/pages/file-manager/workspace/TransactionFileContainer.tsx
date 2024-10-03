@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react'
 import FileLabel from './FileLabel'
-import { FileTableProps } from '../FileContainer'
 import WorkspaceTable from './WorkspaceTable'
 import { FaPencilAlt } from 'react-icons/fa'
 import { TbProgress } from 'react-icons/tb'
+import { File } from '@/types/data';
 
-const TransactionFileContainer = (data: FileTableProps) => {
+const TransactionFileContainer = (data: File) => {
   const [isEdit,setIsEdit] = useState(false);
 
   useEffect (()=>{

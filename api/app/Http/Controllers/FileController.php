@@ -7,6 +7,7 @@ use App\Helpers\ControllerHelper;
 use App\Models\Bom;
 use App\Models\Fodl;
 use App\Models\Formulation;
+use Illuminate\Support\Facades\Auth;
 use DateTime;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
@@ -23,6 +24,53 @@ class FileController extends ApiController
     private $emulsion;
 
     // Handle Errors Gracefully MAyolskie!
+    // Basic CRUD
+    public function retrieveAll()
+    {
+        try {
+            $allRecords = File::all();
+            $this->status = 200;
+            $this->response['data'] = $allRecords;
+            return $this->getResponse();
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = $e->getMessage();
+            return $this->getResponse();
+        }
+    }
+
+    public function retrieve(Request $request)
+    {
+        $allowedColumns = ['file_id', 'file_type'];
+    
+        $col = $request->query('col');
+        $value = $request->query('value');
+    
+        if (!in_array($col, $allowedColumns)) {
+            $this->status = 400;
+            return $this->getResponse("Invalid column specified.");
+        }
+    
+        try {
+            $records = File::where($col, $value)->get();
+    
+            if ($records->isEmpty()) {
+                $this->status = 404;
+                return $this->getResponse("No records found.");
+            }
+    
+            $this->status = 200;
+            $this->response['data'] = $records;
+            return $this->getResponse();
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = $e->getMessage();
+            return $this->getResponse();
+        }
+    }
+    
+
+    // Importing Process
     public function upload(Request $request)
     {
         $file = $request->file('file');
@@ -30,10 +78,14 @@ class FileController extends ApiController
         $extension = $file->getClientOriginalExtension();
         $fileNameWithExtension = $file->getClientOriginalName();
         $fileNameWithoutExtension = pathinfo($fileNameWithExtension, PATHINFO_FILENAME);
+        
+        $user = Auth::user();
+        $userName = "{$user->first_name} {$user->last_name}";
 
         $settings = [
             'file_name' => $fileNameWithoutExtension,
             'file_name_with_extension' => $fileNameWithExtension,
+            'user' => $userName
         ];
 
         if ($extension == 'xlsx') {
@@ -131,7 +183,7 @@ class FileController extends ApiController
             ]);
 
             $fodls[] = [
-                'fg_id' => $fodl->fodl_id,
+                'fodl_id' => $fodl->fodl_id,
                 'fg_code' => $fgCode,
             ];
         }
@@ -142,12 +194,13 @@ class FileController extends ApiController
             $existingFODLIds = array_column($existingFODLs, 'fodl_id');
 
             foreach ($fodls as $newFodl) {
-                if (!in_array($newFodl['fg_id'], $existingFODLIds)) {
+                if (!in_array($newFodl['fodl_id'], $existingFODLIds)) {
                     $existingFGs[] = $newFodl;
                 }
             }
 
             $settings['fodls'] = $existingFGs;
+            $settings['monthYear'] = $monthYearInt;
             $this->fileModel['settings'] = json_encode($settings);
         }
     }

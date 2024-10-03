@@ -1,6 +1,9 @@
 <?php
 
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\FinishedGoodController;
+use App\Http\Controllers\FodlController;
+use App\Http\Controllers\MaterialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -11,12 +14,29 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/refresh', [AuthController::class, 'refresh']);
 
-Route::prefix('/files')->group(function () {
-    Route::post('/upload', [FileController::class, 'upload']);
-});
+Route::group(['middleware' => ['auth:sanctum']], function () {
+    Route::delete('/logout', [AuthController::class, 'logout']);
+    Route::get('/user', [UserController::class, 'getCurrentUser']);
 
-Route::group(['middleware' => ['auth:sanctum']],function(){
-    Route::delete('/logout',[AuthController::class,'logout']);
-    Route::get('/user',[UserController::class,'getCurrentUser']);
+    Route::prefix('/files')->group(function () {
+        Route::post('upload', [FileController::class, 'upload']);
+        Route::get('retrieve_all', [FileController::class, 'retrieveAll']);
+        Route::get('retrieve', [FileController::class, 'retrieve']);
+    });
 
+    Route::prefix('/finished_goods')->group(function () {
+        Route::get('retrieve_all', [FinishedGoodController::class, 'retrieveAll']);
+        Route::get('retrieve', [FinishedGoodController::class, 'retrieve']);
+        Route::get('retrieve_first', [FinishedGoodController::class, 'retrieveFirst']);
+    });
+
+    Route::prefix('/fodls')->group(function () {
+        Route::get('retrieve_all', [FodlController::class, 'retrieveAll']);
+        Route::get('retrieve', [FodlController::class, 'retrieve']);
+    });
+
+    Route::prefix('/materials')->group(function () {
+        Route::get('retrieve_all', [MaterialController::class, 'retrieveAll']);
+        Route::get('retrieve', [MaterialController::class, 'retrieve']);
+    });
 });
