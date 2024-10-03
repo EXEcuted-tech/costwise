@@ -3,6 +3,7 @@ import React, { useState } from 'react';
 import { MdModeEdit } from 'react-icons/md';
 import EditInformation from './EditInformation';
 import PasswordChangeDialog from '@/components/modal/PasswordChangeDialog';
+import ConfirmChangeInfo from '@/components/modals/ConfirmChangeInfo';
 
 type UserInformationProps ={
     isOpen: boolean;
@@ -12,6 +13,7 @@ type UserInformationProps ={
 const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc} ) => {
     const [props, setProps] = useState(false);
     const [dialog, setDialog] = useState(false);
+    const [successModal, setSuccessModal] = useState(false);
     
     return (
         <>
@@ -20,8 +22,13 @@ const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc} ) =>
             setDialog={setDialog}
             />
         }
+        {successModal && 
+            <ConfirmChangeInfo 
+            setSuccessModal={setSuccessModal}
+            />
+        }
         {props ? 
-        <EditInformation setProps={setProps} setDialog={setDialog} isOpen={isOpen} userAcc={userAcc}/>
+        <EditInformation setProps={setProps} setSuccessModal={setSuccessModal} setDialog={setDialog} isOpen={isOpen} userAcc={userAcc}/>
         :
         <div className="mx-8 2xl:mx-12">
             <div className={`${isOpen ? 'text-[24px] 2xl:text-[32px]' : 'text-[28px] 2xl:text-[32px]'} flex text-[#8E8E8E] font-semibold mt-3 mb-2`}>

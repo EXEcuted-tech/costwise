@@ -5,15 +5,18 @@ import { MdModeEdit } from 'react-icons/md';
 import PasswordChangeDialog from '@/components/modal/PasswordChangeDialog';
 import { useRouter } from 'next/router';
 import api from '@/utils/api';
+import SuccessChangeInfo from '@/components/modals/ConfirmChangeInfo';
+import Spinner from "@/components/loaders/Spinner";
 
 type EditInformationprops = {
     setProps: React.Dispatch<React.SetStateAction<boolean>>;
     setDialog: React.Dispatch<React.SetStateAction<boolean>>;
+    setSuccessModal: React.Dispatch<React.SetStateAction<boolean>>;
     isOpen?: boolean;
     userAcc?: any;
 };
 
-const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, isOpen, userAcc} ) => {
+const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, setSuccessModal, isOpen, userAcc} ) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const [fName, setFName] = useState(userAcc?.fName || '');
@@ -202,17 +205,23 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
             
             {/* Buttons */}
             <div className={`${isOpen ? 'mt-[15px] 3xl:mt-[37px]' : 'mt-[37px]'} flex flex-col w-full justify-center items-center`}>
-                <button type="submit" className={`${isLoading ? 'bg-black': ''} w-[25%] 2xl:w-[20%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] bg-primary text-white rounded-xl hover:bg-[#9c1c1c]`}
-                onClick={handleSubmit}
+                <button type="submit" className={`${isLoading ? 'bg-black': ''} flex justify-center items-center w-[25%] 2xl:w-[20%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] bg-primary text-white rounded-xl hover:bg-[#9c1c1c]`}
+                onClick={() => {
+                    setSuccessModal(true); 
+                    handleSubmit;
+                    }}
                 >
-                    Update Profile 
+                    {isLoading && <Spinner className="group-hover:!text-white mr-1 !size-[25px]" />}
+                    <span>
+                        Update Profile 
+                    </span>
                 </button>
                 <div className="text-[#8F8F8F] text-[14px] 3xl:text-[19px] underline underline-offset-[7px] cursor-pointer hover:text-[#5B5353]"
                     onClick={() => setDialog(true)}>
                     Request Password Reset
                 </div>
             </div>
-            </form>
+            </form>    
         </>
     )
 }
