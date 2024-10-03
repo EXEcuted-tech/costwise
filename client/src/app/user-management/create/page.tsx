@@ -1,21 +1,31 @@
 "use client";
 
-import React, { ChangeEvent, useState } from 'react'
+import React, { ChangeEvent, useEffect, useState } from 'react'
 import Image from 'next/image';
 import background from '@/assets/virginia-mascot-bg.png';
 import { FcImageFile } from "react-icons/fc";
+import { IoMdArrowRoundBack } from "react-icons/io";
+import { FaCheck } from "react-icons/fa6";
 import { RiCloseLargeFill } from "react-icons/ri";
 import { BsExclamationCircle } from "react-icons/bs";
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import api from '@/utils/api';
 import Alert from "@/components/alerts/Alert";
+import { useRouter } from 'next/navigation';
+import ConfirmChanges from '@/components/modals/ConfirmChanges';
 
 
 
 const AccountCreation = () => {
     const { isOpen } = useSidebarContext();
+    const [isFormDirty, setIsFormDirty] = useState(false);
+    const [showConfirmChanges, setShowConfirmChanges] = useState(false);
+    const router = useRouter();
+
     const [profileImage, setProfileImage] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
+    const [imageName, setImageName] = useState<string | null>(null);
+    const [imageSize, setImageSize] = useState<number | null>(null);
     const [first_name, setFirst_name] = useState<string>('');
     const [email_address, setEmail] = useState<string>('');
     const [department, setDepartment] = useState<string>('');
@@ -26,7 +36,7 @@ const AccountCreation = () => {
     const [suffix, setSuffix] = useState<string>('');
     const [position, setPosition] = useState<string>('');
     const user_type = 'Regular'; //default user type
-    const sys_role = "[1,2,3]"; //default for now
+    const sys_role=[1,2,3] // default roles
     const defaultPassword = "#Password123"; //default password
 
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
@@ -41,32 +51,80 @@ const AccountCreation = () => {
     const [positionError, setPositionError] = useState(false);
     const [profilePictureError, setProfilePictureError] = useState(false);
 
+    //Confirm changes
+    useEffect(() => {
+        const isDirty = first_name !== '' || middle_name !== '' || last_name !== '' || 
+                        suffix !== '' || email_address !== '' || department !== '' || 
+                        employee_number !== '' || phone_number !== '' || position !== '' || 
+                        profileImage !== null;
+        setIsFormDirty(isDirty);
+    }, [first_name, middle_name, last_name, suffix, email_address, department, 
+        employee_number, phone_number, position, profileImage]);
+
+
+    // Update form fields
+    const updateField = (setter: React.Dispatch<React.SetStateAction<string>>) => (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        setter(e.target.value);
+        setIsFormDirty(true);
+    };
+
+    // Handle navigation
+    const handleNavigation = (url: string) => {
+        if (isFormDirty) {
+            setShowConfirmChanges(true);
+        } else {
+            router.push(url);
+        }
+    };
+    
+    
     //Image upload
-    const handleUpload =(event: ChangeEvent<HTMLInputElement>) => {
+    const handleDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
+        event.preventDefault();
+    };
+
+    const handleDrop = (event: React.DragEvent<HTMLLabelElement>) => {
+        event.preventDefault();
+        const file = event.dataTransfer.files?.[0];
+        if (file) {
+            handleFileUpload(file);
+        }
+    };
+
+    const handleFileUpload = (file: File) => {
+        if (!file.type.startsWith('image/')) {
+            setAlertMessages(['Please select a valid image file.']);
+            setAlertStatus('critical');
+            return;
+        }
+
+        if (file.size > 2 * 1024 * 1024) {
+            setAlertMessages(['File size exceeds 2MB.']);
+            setAlertStatus('critical');
+            return;
+        }
+
+        const fileSizeInMB = (file.size / (1024 * 1024)).toFixed(2);
+
+        setProfileImage(file);
+        setImageName(file.name);
+        setImageSize(parseFloat(fileSizeInMB));
+        const reader = new FileReader();
+        reader.onload = () => {
+            setPreviewUrl(reader.result as string);
+        };
+        reader.readAsDataURL(file);
+        setAlertMessages(['Profile picture uploaded successfully.']);
+        setAlertStatus('success');
+    };
+
+    const handleUpload = (event: ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            if (!file.type.startsWith('image/')) {
-                setAlertMessages(['Please select a valid image file.']);
-                setAlertStatus('critical');
-                return;
-            }
-
-            if (file.size > 2 * 1024 * 1024) {
-                setAlertMessages(['File size exceeds 2MB.']);
-                setAlertStatus('critical');
-                return;
-            }
-
-            setProfileImage(file);
-            const reader = new FileReader();
-            reader.onload = () => {
-                setPreviewUrl(reader.result as string);
-            };
-            reader.readAsDataURL(file);
-            setAlertMessages(['Profile picture uploaded successfully.']);
-            setAlertStatus('success');
+            handleFileUpload(file);
         }
-    }
+    };
+
 
     const handleSubmit = async () => {
         const newAlertMessages: string[] = [];
@@ -88,7 +146,7 @@ const AccountCreation = () => {
 
         // Check required fields
         if (!first_name && !last_name && !email_address && !department && !employee_number && !phone_number && !position && !profileImage) {
-            newAlertMessages.push('Fill in required fields!');
+            newAlertMessages.push('Fill in all required fields!');
             setAlertMessages(newAlertMessages);
             return;
         }
@@ -136,7 +194,7 @@ const AccountCreation = () => {
         if (!profileImage) {
             newAlertMessages.push('Profile picture is required.');
             setAlertStatus('critical');
-            return;
+            setProfilePictureError(true);
         }
 
         if (newAlertMessages.length > 0) {
@@ -160,9 +218,13 @@ const AccountCreation = () => {
             formData.append('suffix', suffix);
             formData.append('position', position);
             formData.append('password', defaultPassword);
-            formData.append('sys_role', sys_role);
+            formData.append('sys_role', JSON.stringify(sys_role));
+            sys_role.forEach((role, index) => {
+                formData.append(`sys_role[${index}]`, role.toString());
+            });
+
             if (profileImage) {
-                formData.append('profile_picture', profileImage);
+                formData.append('display_picture', profileImage);
             }
             const response = await api.post('/register', formData, {
                 headers: {
@@ -188,7 +250,27 @@ const AccountCreation = () => {
             setPreviewUrl('');
         } catch (error: any) {
             console.log(error)
-            setAlertMessages([`Unexpected error occured. Please try again.`]);
+            let errorMessages: string[] = []
+            
+            if (error.response && error.response.data) {
+                const responseData = error.response.data;
+                
+                if (responseData.errors && typeof responseData.errors === 'object') {
+                    Object.values(responseData.errors).forEach((errorArray: any) => {
+                        if (Array.isArray(errorArray)) {
+                            errorMessages = errorMessages.concat(errorArray);
+                        }
+                    });
+                } else if (responseData.message) {
+                    errorMessages.push(responseData.message);
+                }
+            }
+            
+            if (errorMessages.length === 0) {
+                errorMessages.push('Unexpected error occurred. Please try again.');
+            }
+            
+            setAlertMessages(errorMessages);
             setAlertStatus('critical');
         }
     }
@@ -202,13 +284,32 @@ const AccountCreation = () => {
                 }} />
                 ))}
             </div>
+            {showConfirmChanges && (
+                <ConfirmChanges 
+                    setConfirmChanges={setShowConfirmChanges} 
+                    onConfirm={() => {
+                        setShowConfirmChanges(false);
+                        router.push('/user-management');
+                    }}
+                />
+            )}
+            
             <div className='flex h-full bg-cover bg-center w-[550px]' style={{ backgroundImage: `url(${background.src})` }} />
             {/* Wait lang butngan panig margin */}
             <div className={` ${isOpen ? 'w-full' : 'w-full'} 
                     h-full bg-white shadow-2xl`}>
                 {/* Title */}
                 <div className={`${isOpen ? '' : 'pt-5 3xl:pt-2'} flex flex-col w-full h-[7.3rem] justify-center items-center`}>
-                    <div className='flex font-black text-[1.9em] 3xl:text-[2.2em]'> Account Creation </div>
+                    <div className='flex w-full items-center'>
+                        <div className='flex ml-4 mt-2 text-[2.5em] text-[#B22222] hover:text-[#7e2a2a] transition-colors duration-300 ease-in-out'>
+                            <IoMdArrowRoundBack 
+                                className='cursor-pointer' 
+                                onClick={() => handleNavigation('/user-management')}
+                            />
+                        </div>
+                        <p className='font-black text-[1.9em] 3xl:text-[2.2em] flex-grow text-center mr-[1.7em]'>
+                            Account Creation</p>
+                    </div>
                     <div className='mb-2 text-[1.1em] 3xl:text-[1.4em]'> Create an employee account </div>
                     <div className='w-full h-full bg-[#B22222]'></div>
                 </div>
@@ -216,30 +317,64 @@ const AccountCreation = () => {
                 {/* Upload Picture */}
                 <div className={`${profilePictureError ? 'border-[#B22222]' : 'border-[#929090]' } flex items-center justify-center w-full h-[18rem] border-b-3 bg-white`}>
                     {previewUrl ? (
-                        <div className="relative w-[90%] h-[13rem] flex items-center justify-center animate-fade-in2">
-                            <Image
-                                src={previewUrl}
-                                alt="Profile preview"
-                                layout="fill"
-                                objectFit="contain"
-                                className="border-2 border-[#B3B3B3] rounded-xl p-4"
-                            />
-                            <button
-                                onClick={() => {
-                                    setProfileImage(null);
-                                    setPreviewUrl(null);
-                                    setAlertMessages(['Profile picture removed.']);
-                                    setAlertStatus('warning');
-                                }}
-                                className="absolute top-3 right-5 bg-[#B22222] text-white rounded-full p-2 hover:[#c26565] transition-colors"
-                            >
-                                <RiCloseLargeFill />
-                            </button>
+                        <div className="flex flex-col items-center justify-center w-full animate-fade-in2">
+                            <label 
+                                htmlFor="dropzone-file" 
+                                className="flex flex-col items-center justify-center w-[93%] h-[6rem] border-2 border-dashed border-[#929090] rounded-xl cursor-pointer bg-white hover:bg-[#FFD3D3] hover:border-primary group transition-all duration-300 ease-in-out"
+                                onDragOver={handleDragOver}
+                                onDrop={handleDrop}
+                            >   
+                                <div className='flex flex-col items-center justify-center pt-5 pb-6 group-hover:scale-90 transition-all duration-300 ease-in-out'>
+                                    <p className="mb-2 text-lg text-gray-500"><span className="text-[#B22222] font-semibold underline">Click to upload</span> or drag and drop profile picture</p>
+                                    <p className="text-base text-gray-500">Support: JPG, JPEG, PNG (max: 2MB)</p>
+                                </div>
+                                <input 
+                                    id="dropzone-file" 
+                                    type="file" 
+                                    className="hidden"
+                                    onChange={handleUpload}
+                                    accept="image/jpeg,image/png"
+                                />
+                            </label>
+
+                            {/* Image Preview */}
+                            <div className="relative mt-5 w-[93%] h-[6rem] p-6 flex items-center justify-start animate-fade-in2 border-2 border-[#B3B3B3] rounded-xl group hover:border-[#B22222] hover:bg-gray-100 transition-all duration-300 ease-in-out">
+                                <div className='flex mr-5 group-hover:scale-95 transition-all duration-300 ease-in-out'>
+                                    <Image
+                                        src={previewUrl}
+                                        alt="Profile preview"
+                                        height={70}
+                                        width={70}
+                                        style={{ objectFit: 'contain', borderRadius: '50%', border: '2px solid ##929090', transition: 'border-color 0.3s ease-in-out' }}
+                                    />
+                                    
+                                </div>
+                               <div className='flex flex-col text-[16px] group-hover:text-[#B22222] transition-all duration-300 ease-in-out'>
+                                    <p className='font-semibold'>{imageName}</p>
+                                    <p className='text-[#929090]'>{imageSize} MB</p>
+                                </div>
+                                
+                                <FaCheck className='ml-auto text-[1.5em] text-[#B22222] visible opacity-100 group-hover:invisible group-hover:opacity-0 animate-zoom-out transition-all duration-300 ease-in-out' />                           
+
+                                <button
+                                    onClick={() => {
+                                        setProfileImage(null);
+                                        setPreviewUrl(null);
+                                        setAlertMessages(['Profile picture removed.']);
+                                        setAlertStatus('warning');
+                                    }}
+                                    className="absolute top-7 right-5 bg-[#B22222] text-white rounded-full p-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 animate-zoom-in transition-all duration-300 ease-in-out"
+                                >
+                                    <RiCloseLargeFill />
+                                </button>
+                            </div>
                         </div>
                     ) : (
                         <label 
                             htmlFor="dropzone-file" 
-                            className="flex flex-col items-center justify-center w-[90%] h-[13rem] border-2 border-dashed border-[#929090] rounded-xl cursor-pointer bg-white hover:bg-[#FFD3D3] hover:border-primary group transition-all duration-300 ease-in-out"
+                            className="flex flex-col items-center justify-center w-[93%] h-[13rem] border-2 border-dashed border-[#929090] rounded-xl cursor-pointer bg-white hover:bg-[#FFD3D3] hover:border-primary group transition-all duration-300 ease-in-out"
+                            onDragOver={handleDragOver}
+                            onDrop={handleDrop}
                         >   
                         <div className='flex flex-col items-center justify-center pt-5 pb-6 group-hover:scale-90 transition-all duration-300 ease-in-out'>
                             <FcImageFile className="w-16 h-16 mb-4 text-[5em] text-gray-500" />
@@ -278,11 +413,11 @@ const AccountCreation = () => {
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
                                         type="fname"
                                         name="fname"
                                         value={first_name}
-                                        onChange={(e) => setFirst_name(e.target.value)}
+                                        onChange={(e) => updateField(setFirst_name)(e)}
                                     />
                                 </div>
                             </div>
@@ -298,7 +433,7 @@ const AccountCreation = () => {
                                         name="email"
                                         placeholder=""
                                         value={email_address}
-                                        onChange={(e) => setEmail(e.target.value)}
+                                        onChange={(e) => updateField(setEmail)(e)}
                                     />
                                 </div>
                             </div>
@@ -312,10 +447,12 @@ const AccountCreation = () => {
                                         className={` ${departmentError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
                                         defaultValue=""
                                         value={department}
-                                        onChange={(e) => setDepartment(e.target.value)}
+                                        onChange={(e) => updateField(setDepartment)(e)}
                                     >
                                         <option value="" disabled>Choose department</option>
-                                        <option value="cost-accounting">Cost Accounting</option>
+                                        <option value="cost accounting">Cost Accounting</option>
+                                        <option value="human resources">Human Resources</option>
+                                        <option value="research development">Research & Development</option>
                                     </select>
                                 </div>
                             </div>
@@ -329,12 +466,12 @@ const AccountCreation = () => {
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${isOpen ? '' : ''} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline text-[13px] 2xl:text-base `}
+                                        className={` ${isOpen ? '' : ''} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline text-[13px] 2xl:text-base capitalize `}
                                         type="mname"
                                         name="mname"
                                         placeholder=""
                                         value={middle_name}
-                                        onChange={(e) => setMiddle_name(e.target.value)}
+                                        onChange={(e) => updateField(setMiddle_name)(e)}
                                     />
                                 </div>
                             </div>
@@ -350,7 +487,7 @@ const AccountCreation = () => {
                                         name="enum"
                                         placeholder=""
                                         value={employee_number}
-                                        onChange={(e) => setEmployee_number(e.target.value)}
+                                        onChange={(e) => updateField(setEmployee_number)(e)}
                                     />
                                 </div>
                             </div>
@@ -366,7 +503,7 @@ const AccountCreation = () => {
                                         name="contactnum"
                                         placeholder=""
                                         value={phone_number}
-                                        onChange={(e) => setPhone_number(e.target.value)}
+                                        onChange={(e) => updateField(setPhone_number)(e)}
                                     />
                                 </div>
                             </div>
@@ -380,12 +517,12 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
                                         type="lname"
                                         name="lname"
                                         placeholder=""
                                         value={last_name}
-                                        onChange={(e) => setLast_name(e.target.value)}
+                                        onChange={(e) => updateField(setLast_name)(e)}
                                     />
                                 </div>
                             </div>
@@ -396,12 +533,12 @@ const AccountCreation = () => {
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${suffixError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        className={` ${suffixError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
                                         type="suffix"
                                         name="suffix"
                                         placeholder=""
                                         value={suffix}
-                                        onChange={(e) => setSuffix(e.target.value)}
+                                        onChange={(e) => updateField(setSuffix)(e)}
                                     />
                                 </div>
                             </div>
@@ -412,12 +549,12 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${positionError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        className={` ${positionError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
                                         type="position"
                                         name="position"
                                         placeholder=""
                                         value={position}
-                                        onChange={(e) => setPosition(e.target.value)}
+                                        onChange={(e) => updateField(setPosition)(e)}
                                     />
                                 </div>
                             </div>

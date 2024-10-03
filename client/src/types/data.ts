@@ -9,5 +9,6 @@ export interface User {
     phone_number?: string;
     department?: string;
     position?: string;
-    profile_picture?: string;
+    display_picture?: string;
+    sys_role: number[];
 }

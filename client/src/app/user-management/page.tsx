@@ -83,14 +83,14 @@ const UserManagement = () => {
                 </div>
 
                 <Link href="/user-management/create" className='ml-auto'>
-                    <div className='flex w-[7rem] h-8 mt-[0.8em] mr-4 p-2 bg-[#008000] text-white text-center items-center font-semibold rounded-[5px] hover:cursor-pointer hover:bg-[#006900] transition-colors delay-50 duration-[1000] ease-in'>
+                    <div className='flex w-[7rem] h-8 mt-[0.8em] mr-7 p-2 bg-[#008000] text-white text-center items-center font-semibold rounded-[5px] hover:cursor-pointer hover:bg-[#006900] transition-colors delay-50 duration-[1000] ease-in'>
                         <HiMiniPlus className="text-[1.5em]" /> <p className="text-[1.05em]">Add User</p>
                     </div>
                 </Link>
             </div>
 
             {/* Main Content Area */}
-            <div className={`${isOpen ? '' : '' } flex flex-col w-auto mr-[1rem] h-auto ml-[4rem] mt-3 rounded-xl bg-white shadow-md shadow-gray-300`}>
+            <div className={`${isOpen ? '' : '' } flex flex-col w-auto mr-[2rem] h-auto ml-[4rem] mt-5 rounded-xl bg-white shadow-md shadow-gray-300`}>
                 <ManageAccounts fileData = {filteredUsers} isOpen={isOpen} isLoading={isLoading} />
             </div>
         </div>

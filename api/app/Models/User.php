@@ -35,7 +35,7 @@ class User extends Authenticatable
         'phone_number',
         'position',
         'sys_role',
-        'profile_picture',
+        'display_picture',
     ];
 
     /**
