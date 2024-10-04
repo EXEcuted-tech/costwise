@@ -7,7 +7,7 @@ import { removeTokens } from './removeTokens';
 export const isTokenExpired = (): boolean => {
     const expiresAt = localStorage.getItem('tokenExpiresAt');
     if (!expiresAt) return false;
-    console.log("Went Here", expiresAt, isAfter(new Date(), parseISO(expiresAt)));
+    // console.log("Went Here", expiresAt, isAfter(new Date(), parseISO(expiresAt)));
     return isAfter(new Date(), parseISO(expiresAt));
 };
 

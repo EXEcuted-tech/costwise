@@ -42,7 +42,7 @@ function LoginPage() {
     
     if (accessToken && tokenExpiresAt) {
       const expiresAt = new Date(tokenExpiresAt);
-      console.log(expiresAt, new Date(), expiresAt > new Date());
+      // console.log(expiresAt, new Date(), expiresAt > new Date());
       if (expiresAt > new Date()) {
         router.push('/dashboard');
       }

@@ -128,7 +128,7 @@ const FileManagerPage = () => {
             api
               .post('/files/upload', formData)
               .then((response) => {
-                console.log("Went here");
+                // console.log("Went here");
                 if (response.data.status == 200) {
                   setTimeout(() => {
                     setIsLoading(false);

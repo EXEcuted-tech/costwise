@@ -21,6 +21,7 @@ class FileController extends ApiController
     protected $monthYear;
     private $fgId;
     private $fgCode;
+    private $formulationCode;
     private $emulsion;
 
     // Handle Errors Gracefully MAyolskie!
@@ -271,7 +272,7 @@ class FileController extends ApiController
                     if (!empty($currentFormulation)) {
                         $formulation = Formulation::create([
                             'fg_id' => $this->fgId,
-                            'formula_code' => $this->fgCode,
+                            'formula_code' => $this->formulationCode,
                             'emulsion' => json_encode($this->emulsion ?? (object) []),
                             'material_qty_list' => json_encode($currentFormulation),
                         ]);
@@ -283,14 +284,14 @@ class FileController extends ApiController
                 continue;
             }
 
-            $formulationCode = $row[0];
+            $this->formulationCode = $row[0] ?? $this->formulationCode;
             $level = $row[1];
             $code = $row[2];
             $description = $row[3];
             $batchQty = floatval(str_replace(',', '', trim($row[5])));
             $unit = $row[6];
 
-            if (!is_null($formulationCode) && !is_null($code) && !is_null($description) && !is_null($row[4])) {
+            if (!is_null($this->formulationCode) && !is_null($code) && !is_null($description) && !is_null($row[4])) {
                 $this->fgCode = $code;
                 $fodl = Fodl::where('fg_code', $this->fgCode)->first();
                 $finishedGood = FinishedGood::Create(
@@ -331,11 +332,12 @@ class FileController extends ApiController
         if (!empty($currentFormulation)) {
             $formulation = Formulation::create([
                 'fg_id' => $this->fgId,
-                'formula_code' => $this->fgCode,
+                'formula_code' => $this->formulationCode,
                 'emulsion' => json_encode($this->emulsion ?? (object) []),
                 'material_qty_list' => json_encode($currentFormulation),
             ]);
             $formulations[] = $formulation->formulation_id;
+            $this->emulsion = null;
         }
 
         $bom = Bom::create([

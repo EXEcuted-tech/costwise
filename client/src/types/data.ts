@@ -1,3 +1,5 @@
+import Decimal from 'decimal.js';
+
 export interface User {
     user_type: string;
     first_name: string;
@@ -47,4 +49,20 @@ export interface MaterialRecord extends Record<string, unknown> {
     itemDescription: string;
     unit: string;
     materialCost: number;
+}
+
+export interface FormulationRecord extends Record<string, unknown> {
+    formula: string | null;
+    level: string | null;
+    itemCode: string | null;
+    description: string;
+    formulation: string | null;
+    batchQty: number | null;
+    unit: string;
+}
+
+export interface BOM {
+    bom_id: number;
+    bomName: string;
+    formulations: FormulationRecord[];
 }

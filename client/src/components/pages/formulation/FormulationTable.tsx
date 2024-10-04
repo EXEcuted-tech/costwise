@@ -22,7 +22,7 @@ const FormulationTable: React.FC<FormulationProps> = ({ setView, view }) => {
                 const decodedData = JSON.parse(decodeURIComponent(data)) as FormulationContainerProps;
 
                 setFileData(decodedData);
-                console.log(decodedData);
+                // console.log(decodedData);
             } catch (error) {
                 console.error('Error parsing file data:', error);
             }

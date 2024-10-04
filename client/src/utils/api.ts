@@ -26,8 +26,8 @@ api.interceptors.request.use(
   async (config: any) => {
     const token = localStorage.getItem('accessToken');
     
-    console.log("In api.ts");
-    console.log(token && isTokenExpired());
+    // console.log("In api.ts");
+    // console.log(token && isTokenExpired());
     if (token && isTokenExpired()) {
       const refreshed = await refreshToken();
       if (!refreshed) {

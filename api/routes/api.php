@@ -1,8 +1,10 @@
 <?php
 
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\BomController;
 use App\Http\Controllers\FinishedGoodController;
 use App\Http\Controllers\FodlController;
+use App\Http\Controllers\FormulationController;
 use App\Http\Controllers\MaterialController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -38,5 +40,15 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::prefix('/materials')->group(function () {
         Route::get('retrieve_all', [MaterialController::class, 'retrieveAll']);
         Route::get('retrieve', [MaterialController::class, 'retrieve']);
+    });
+
+    Route::prefix('/boms')->group(function () {
+        Route::get('retrieve_all', [BomController::class, 'retrieveAll']);
+        Route::get('retrieve', [BomController::class, 'retrieve']);
+    });
+
+    Route::prefix('/formulations')->group(function () {
+        Route::get('retrieve_all', [FormulationController::class, 'retrieveAll']);
+        Route::get('retrieve', [FormulationController::class, 'retrieve']);
     });
 });
