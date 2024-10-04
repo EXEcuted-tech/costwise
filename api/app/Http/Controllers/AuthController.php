@@ -28,8 +28,7 @@ class AuthController extends ApiController
                     'department' => 'required',
                     'phone_number' => 'required|regex:/^(\+?[0-9]{1,4})?\s?-?[0-9]{10}$/',
                     'position' => 'required',
-                    'sys_role' => 'required|array',
-                    'sys_role.*' => 'integer',
+                    'sys_role' => 'required|json',
                     'display_picture' => 'required|image|mimes:jpeg,png,jpg|max:2048',
                 ]
             );
@@ -42,7 +41,8 @@ class AuthController extends ApiController
 
             $validatedData = $validator->validated();
             $validatedData['password'] = Hash::make($request->password);
-            $validatedData['sys_role'] = json_encode(array_map('intval', $validatedData['sys_role']));
+            $validatedData['sys_role'] = $request->sys_role;
+
             $user = User::create($validatedData);
             // $accessToken = $user->createToken('authToken')->plainTextToken;
 

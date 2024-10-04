@@ -100,6 +100,7 @@ const AccountCreation = () => {
     const handleShowRolesSelectModal = () => {
         setShowRolesSelectModal(true);
     }
+
     //Image upload
     const handleDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
         event.preventDefault();
@@ -147,7 +148,7 @@ const AccountCreation = () => {
         }
     };
 
-
+    //Create user
     const handleSubmit = async () => {
         const newAlertMessages: string[] = [];
         setAlertStatus('critical');
@@ -246,9 +247,6 @@ const AccountCreation = () => {
             formData.append('position', position);
             formData.append('password', defaultPassword);
             formData.append('sys_role', JSON.stringify(selectedRoleValues));
-            selectedRoleValues.forEach((value, index) => {
-                formData.append(`sys_role[${index}]`, value.toString());
-            });
 
             if (profileImage) {
                 formData.append('display_picture', profileImage);

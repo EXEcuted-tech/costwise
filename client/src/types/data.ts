@@ -1,4 +1,5 @@
 export interface User {
+    user_id: number;
     user_type: string;
     first_name: string;
     middle_name?: string; // Optional fields
