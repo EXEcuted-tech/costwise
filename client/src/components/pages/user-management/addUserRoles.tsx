@@ -199,7 +199,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
                 </div>  
                 <div className='flex items-end'>
                   <button 
-                    className='text-[17px] bg-[#B6B6B6] text-[#5B5353] px-4 py-1 rounded-lg shadow-md hover:bg-gray-300 cursor-pointer transition-colors duration-300 ease-in-out'
+                    className='text-[17px] bg-gray-200 text-[#5B5353] px-4 py-1 rounded-lg border border-gray-300 hover:bg-gray-300 cursor-pointer transition-colors duration-300 ease-in-out'
                     onClick={handleClearAll}
                   >Clear All</button>
                 </div>

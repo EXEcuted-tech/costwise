@@ -443,13 +443,13 @@ const AccountCreation = () => {
                         <div className="flex w-full">
                             <div className='flex w-[800px]'>
                                 <button 
-                                    className='flex items-center ml-12 mr-4 bg-gray-100 rounded-lg p-2 px-3 shadow-lg hover:bg-gray-200 cursor-pointer transition-colors duration-300 ease-in-out'
+                                    className='flex items-center ml-12 mr-4 bg-gray-100 rounded-lg p-2 px-3 border border-gray-300 hover:bg-gray-200 cursor-pointer transition-colors duration-300 ease-in-out'
                                     onClick={handleShowRolesSelectModal}
                                     >
                                     <BsPersonLock className='text-[1.7em] text-[#5B5353]' />
                                     <span className=' text-[1.1em] text-gray-600 ml-2 mt-1'>User Roles</span>
                                     {selectedRoles.length > 0 && !roleError && (
-                                        <span className="ml-2 text-sm text-gray-600">
+                                        <span className="ml-2 mt-1 text-sm text-gray-600">
                                             {selectedRoles.length} role{selectedRoles.length !== 1 ? 's' : ''} selected
                                         </span>
                                     )}
