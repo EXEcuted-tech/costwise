@@ -30,25 +30,30 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_all', [FinishedGoodController::class, 'retrieveAll']);
         Route::get('retrieve', [FinishedGoodController::class, 'retrieve']);
         Route::get('retrieve_first', [FinishedGoodController::class, 'retrieveFirst']);
+        Route::get('retrieve_batch', [FinishedGoodController::class, 'retrieveBatch']);
     });
 
     Route::prefix('/fodls')->group(function () {
         Route::get('retrieve_all', [FodlController::class, 'retrieveAll']);
         Route::get('retrieve', [FodlController::class, 'retrieve']);
+        Route::get('retrieve_batch', [FodlController::class, 'retrieveBatch']);
     });
 
     Route::prefix('/materials')->group(function () {
         Route::get('retrieve_all', [MaterialController::class, 'retrieveAll']);
         Route::get('retrieve', [MaterialController::class, 'retrieve']);
+        Route::get('retrieve_batch', [MaterialController::class, 'retrieveBatch']);
     });
 
     Route::prefix('/boms')->group(function () {
         Route::get('retrieve_all', [BomController::class, 'retrieveAll']);
         Route::get('retrieve', [BomController::class, 'retrieve']);
+        Route::get('retrieve_batch', [BomController::class, 'retrieveBatch']);
     });
 
     Route::prefix('/formulations')->group(function () {
         Route::get('retrieve_all', [FormulationController::class, 'retrieveAll']);
         Route::get('retrieve', [FormulationController::class, 'retrieve']);
+        Route::get('retrieve_batch', [FormulationController::class, 'retrieveBatch']);
     });
 });

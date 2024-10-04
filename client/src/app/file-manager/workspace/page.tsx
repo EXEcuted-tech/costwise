@@ -12,6 +12,7 @@ import TransactionFileContainer from '@/components/pages/file-manager/workspace/
 import { useFileManagerContext } from '@/contexts/FileManagerContext';
 import api from '@/utils/api';
 import { File } from '@/types/data';
+import Spinner from '@/components/loaders/Spinner';
 
 const WorkspacePage = () => {
     const [tab, setTab] = useState('master files');
@@ -30,38 +31,39 @@ const WorkspacePage = () => {
 
     useEffect(() => {
         const fetchData = async () => {
-          const id = searchParams.get('id');
-          const type = searchParams.get('type');
-      
-          if (id && type) {
-            try {
-              const tabType = type === 'master_file' ? 'master files' : 'transactions';
-              const fileNumber = type === 'master_file' ? 1 : 2;
-              localStorage.setItem('wkspTab', tabType);
-              
-              const data = await retrieveFileData(Number(id));
-      
-              setFileType(fileNumber);
-              setTab(tabType);
-              setIsEmpty(false);
-              setFileData(data[0]);
-            } catch (error) {
-              console.error('Error parsing file data:', error);
-            }
-          }
-        };
-      
-        fetchData();
-      }, [searchParams, setFileType]);
-      
+            const id = searchParams.get('id');
+            const type = searchParams.get('type');
 
-    const retrieveFileData = async (id:number) => {
-        setIsLoading(true);
+            if (id && type) {
+                setIsLoading(true);
+                try {
+                    const tabType = type === 'master_file' ? 'master files' : 'transactions';
+                    const fileNumber = type === 'master_file' ? 1 : 2;
+                    localStorage.setItem('wkspTab', tabType);
+
+                    const data = await retrieveFileData(Number(id));
+
+                    setFileType(fileNumber);
+                    setTab(tabType);
+                    setIsEmpty(false);
+                    setFileData(data[0]);
+                    setIsLoading(false);
+                } catch (error) {
+                    console.error('Error parsing file data:', error);
+                }
+            }
+        };
+
+        fetchData();
+    }, [searchParams, setFileType]);
+
+
+    const retrieveFileData = async (id: number) => {
         try {
             const response = await api.get('/files/retrieve', {
                 params: { col: 'file_id', value: id },
             });
-    
+
             if (response.status === 200) {
                 return response.data.data;
             } else {
@@ -69,8 +71,6 @@ const WorkspacePage = () => {
             }
         } catch (error) {
             console.error('Error retrieving file data:', error);
-        } finally {
-            setIsLoading(false);
         }
     }
 
@@ -102,9 +102,17 @@ const WorkspacePage = () => {
                 </div>
             </div>
             <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
-                {fileType == 0 && <NoFile />}
-                {fileType == 1 && fileData && <MasterFileContainer {...fileData} />}
-                {fileType == 2 && fileData && <TransactionFileContainer {...fileData} />}
+                {isLoading ? (
+                    <div className='flex flex-col justify-center items-center bg-white rounded-[10px] drop-shadow text-white h-[660px] mx-auto'>
+                        <Spinner />
+                    </div>
+                ) : (
+                    <>
+                        {fileType === 0 && <NoFile />}
+                        {fileType === 1 && fileData && <MasterFileContainer {...fileData} />}
+                        {fileType === 2 && fileData && <TransactionFileContainer {...fileData} />}
+                    </>
+                )}
             </div>
         </div>
     )

@@ -38,23 +38,23 @@ class FinishedGoodController extends ApiController
             'formulation_no',
             'is_least_cost',
         ];
-    
+
         $col = $request->query('col');
         $value = $request->query('value');
-    
+
         if (!in_array($col, $allowedColumns)) {
             $this->status = 400;
             return $this->getResponse("Invalid column specified.");
         }
-    
+
         try {
             $records = FinishedGood::where($col, $value)->get();
-    
+
             if ($records->isEmpty()) {
                 $this->status = 404;
                 return $this->getResponse("No records found.");
             }
-    
+
             $this->status = 200;
             $this->response['data'] = $records;
             return $this->getResponse();
@@ -102,6 +102,53 @@ class FinishedGoodController extends ApiController
 
             $this->status = 200;
             $this->response['data'] = $record;
+            return $this->getResponse();
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = $e->getMessage();
+            return $this->getResponse();
+        }
+    }
+
+    public function retrieveBatch(Request $request)
+    {
+        $allowedColumns = [
+            'fg_id',
+            'fodl_id',
+            'fg_code',
+            'fg_desc',
+            'total_cost',
+            'total_batch_qty',
+            'rm_cost',
+            'fg_price',
+            'unit',
+            'monthYear',
+            'formulation_no',
+            'is_least_cost',
+        ];
+
+        $col = $request->query('col');
+        $values = $request->query('values');
+
+        if (!in_array($col, $allowedColumns)) {
+            $this->status = 400;
+            return $this->getResponse("Invalid column specified.");
+        }
+
+        if (empty($values) || !is_array($values)) {
+            $this->status = 400;
+            return $this->getResponse("Values should be a non-empty array.");
+        }
+
+        try {
+            $records = FinishedGood::whereIn($col, $values)->get();
+            if ($records->isEmpty()) {
+                $this->status = 404;
+                return $this->getResponse("No records found.");
+            }
+
+            $this->status = 200;
+            $this->response['data'] = $records;
             return $this->getResponse();
         } catch (\Exception $e) {
             $this->status = 500;
