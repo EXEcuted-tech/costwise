@@ -167,11 +167,22 @@ const ProjectedCostPage = () => {
     const fetchData = async () => {
       try {
         const file = await api.get('/training');
-        setFile(file.data.settings)
+        setFile(file.data.data.settings)
+        console.log(file.data.data.settings)
       } catch (error: any) {
 
       }
     }
+    const fetchFGs = async () => {
+      try{
+        const fg = await api.get('/fg/data');
+
+      }catch (error: any) {
+
+      }
+    }
+    fetchData()
+    fetchFGs()
   })
 
   return (

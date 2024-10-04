@@ -45,7 +45,7 @@ class ModelController extends ApiController
             $validator = Validator::make(
                 $request->all(),
                 [
-                    'model_id' => 'required', // Ensure model_id exists
+                    'model_id' => 'required',
                 ]
             );
 
