@@ -7,17 +7,20 @@ import { FcImageFile } from "react-icons/fc";
 import { IoMdArrowRoundBack } from "react-icons/io";
 import { FaCheck } from "react-icons/fa6";
 import { RiCloseLargeFill } from "react-icons/ri";
-import { BsExclamationCircle } from "react-icons/bs";
+import { BsExclamationCircle, BsPersonLock } from "react-icons/bs";
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import api from '@/utils/api';
 import Alert from "@/components/alerts/Alert";
 import { useRouter } from 'next/navigation';
 import ConfirmChanges from '@/components/modals/ConfirmChanges';
+import AddUserRoles from '@/components/pages/user-management/addUserRoles';
+import { CheckboxState } from '@/components/pages/user-management/addUserRoles';
 
 
 
 const AccountCreation = () => {
     const { isOpen } = useSidebarContext();
+    const [showRolesSelectModal, setShowRolesSelectModal] = useState(false);
     const [isFormDirty, setIsFormDirty] = useState(false);
     const [showConfirmChanges, setShowConfirmChanges] = useState(false);
     const router = useRouter();
@@ -35,9 +38,17 @@ const AccountCreation = () => {
     const [last_name, setLast_name] = useState<string>('');
     const [suffix, setSuffix] = useState<string>('');
     const [position, setPosition] = useState<string>('');
+    const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
+    const [selectedRoleValues, setSelectedRoleValues] = useState<number[]>([]);
     const user_type = 'Regular'; //default user type
-    const sys_role=[1,2,3] // default roles
     const defaultPassword = "#Password123"; //default password
+    const [checkboxStates, setCheckboxStates] = useState<CheckboxState>({
+        allRoles: false,
+        accounts: false,
+        audit: false,
+        files: false,
+        formulations: false
+      });
 
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
@@ -50,6 +61,7 @@ const AccountCreation = () => {
     const [phoneNumberError, setPhoneNumberError] = useState(false);
     const [positionError, setPositionError] = useState(false);
     const [profilePictureError, setProfilePictureError] = useState(false);
+    const [roleError, setRoleError] = useState(false);
 
     //Confirm changes
     useEffect(() => {
@@ -76,8 +88,18 @@ const AccountCreation = () => {
             router.push(url);
         }
     };
+
+    //Role options
+    const handleConfirmRoles = (roles: number[], roleNames: string[], newCheckboxStates: CheckboxState) => {
+       setSelectedRoleValues(roles);
+       setSelectedRoles(roleNames);
+       setCheckboxStates(newCheckboxStates);
+       setShowRolesSelectModal(false);
+    }
     
-    
+    const handleShowRolesSelectModal = () => {
+        setShowRolesSelectModal(true);
+    }
     //Image upload
     const handleDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
         event.preventDefault();
@@ -129,6 +151,9 @@ const AccountCreation = () => {
     const handleSubmit = async () => {
         const newAlertMessages: string[] = [];
         setAlertStatus('critical');
+                
+        const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        const phoneRegex = /^(\+?[0-9]{1,4})?\s?-?[0-9]{10}$/;
 
         // Reset errors
         setFirstNameError(false);
@@ -140,12 +165,10 @@ const AccountCreation = () => {
         setPhoneNumberError(false);
         setPositionError(false);
         setProfilePictureError(false);
-        
-        const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        const phoneRegex = /^(\+?[0-9]{1,4})?\s?-?[0-9]{10}$/;
+        setRoleError(false);
 
         // Check required fields
-        if (!first_name && !last_name && !email_address && !department && !employee_number && !phone_number && !position && !profileImage) {
+        if (!first_name && !last_name && !email_address && !department && !employee_number && !phone_number && !position && !profileImage && selectedRoleValues.length === 0) {
             newAlertMessages.push('Fill in all required fields!');
             setAlertMessages(newAlertMessages);
             return;
@@ -196,12 +219,16 @@ const AccountCreation = () => {
             setAlertStatus('critical');
             setProfilePictureError(true);
         }
-
+        if (selectedRoleValues.length === 0) {
+            newAlertMessages.push("Please assign atleast one role to the user.")
+            setAlertStatus('critical');
+            setRoleError(true);
+        }
         if (newAlertMessages.length > 0) {
             setAlertMessages(newAlertMessages);
             return;
         }
-
+        
         // Create user
         try {
             const accessToken = localStorage.getItem('accessToken');
@@ -218,14 +245,18 @@ const AccountCreation = () => {
             formData.append('suffix', suffix);
             formData.append('position', position);
             formData.append('password', defaultPassword);
-            formData.append('sys_role', JSON.stringify(sys_role));
-            sys_role.forEach((role, index) => {
-                formData.append(`sys_role[${index}]`, role.toString());
+            formData.append('sys_role', JSON.stringify(selectedRoleValues));
+            selectedRoleValues.forEach((value, index) => {
+                formData.append(`sys_role[${index}]`, value.toString());
             });
 
             if (profileImage) {
                 formData.append('display_picture', profileImage);
             }
+
+            console.log(formData)
+            
+            //Api call
             const response = await api.post('/register', formData, {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -248,6 +279,9 @@ const AccountCreation = () => {
             setPosition('');
             setProfileImage(null);
             setPreviewUrl('');
+            setSelectedRoleValues([]);
+            setSelectedRoles([]);
+            setCheckboxStates({ allRoles: false, accounts: false, audit: false, files: false, formulations: false });
         } catch (error: any) {
             console.log(error)
             let errorMessages: string[] = []
@@ -273,6 +307,7 @@ const AccountCreation = () => {
             setAlertMessages(errorMessages);
             setAlertStatus('critical');
         }
+
     }
 
     return (
@@ -291,6 +326,16 @@ const AccountCreation = () => {
                         setShowConfirmChanges(false);
                         router.push('/user-management');
                     }}
+                />
+            )}
+
+            {showRolesSelectModal && (
+                <AddUserRoles 
+                    onClose={() => setShowRolesSelectModal(false)} 
+                    onConfirm={handleConfirmRoles}
+                    initialSelectedRoles={selectedRoles}
+                    initialSelectedRoleValues={selectedRoleValues}
+                    initialCheckBoxStates={checkboxStates}
                 />
             )}
             
@@ -315,7 +360,7 @@ const AccountCreation = () => {
                 </div>
 
                 {/* Upload Picture */}
-                <div className={`${profilePictureError ? 'border-[#B22222]' : 'border-[#929090]' } flex items-center justify-center w-full h-[18rem] border-b-3 bg-white`}>
+                <div className='flex items-center justify-center w-full h-[18rem] border-[#929090] border-b-3 bg-white'>
                     {previewUrl ? (
                         <div className="flex flex-col items-center justify-center w-full animate-fade-in2">
                             <label 
@@ -392,16 +437,31 @@ const AccountCreation = () => {
                     )}
                 </div>
 
-                {/* Tooltip */}
+                {/* Tooltip & Assign Roles*/}
                 <div className='flex flex-col pr-12 pt-4 '> 
                     <div className='flex'>
-                        <div className='ml-auto group'>
-                            <BsExclamationCircle className='mt-3 text-[2em] cursor-pointer text-[#c26565] hover:text-[#B22222] hover:animate-shake-tilt transition-all duration-300 ease-in-out 4xl:text-[2em] 3xl:text-[1.8em] 2xl:text-[1.8em] xl:text-[1.6em]'/>
-                            <div className="absolute w-[250px] h-[48px] bg-[#FFD3D3] text-[1em] text-[#B22222] font-bold p-3 mt-2 right-[90px] top-[26rem] text-center items-center rounded-lg drop-shadow-lg invisible opacity-0 transition-all duration-300 ease-in-out group-hover:visible group-hover:opacity-100 4xl:text-[1em] 4xl:h-[48px] 3xl:text-[1em] 3xl:h-[44px] 2xl:text-[0.8em] 2xl:h-[42px] xl:text-[0.8em] xl:h-[40px]">
-                                Fields with * are required.
+                        <div className="flex w-full">
+                            <div className='flex w-[800px]'>
+                                <button 
+                                    className='flex items-center ml-12 mr-4 bg-gray-100 rounded-lg p-2 px-3 shadow-lg hover:bg-gray-200 cursor-pointer transition-colors duration-300 ease-in-out'
+                                    onClick={handleShowRolesSelectModal}
+                                    >
+                                    <BsPersonLock className='text-[1.7em] text-[#5B5353]' />
+                                    <span className=' text-[1.1em] text-gray-600 ml-2 mt-1'>User Roles</span>
+                                    {selectedRoles.length > 0 && !roleError && (
+                                        <span className="ml-2 text-sm text-gray-600">
+                                            {selectedRoles.length} role{selectedRoles.length !== 1 ? 's' : ''} selected
+                                        </span>
+                                    )}
+                                </button>  
+                            </div>
+                            <div className='ml-auto group'>
+                                <BsExclamationCircle className='mt-3 text-[2em] cursor-pointer text-[#c26565] hover:text-[#B22222] hover:animate-shake-tilt transition-all duration-300 ease-in-out 4xl:text-[2em] 3xl:text-[1.8em] 2xl:text-[1.8em] xl:text-[1.6em]'/>
+                                <div className="absolute w-[250px] h-[48px] bg-[#FFD3D3] text-[1em] text-[#B22222] font-bold p-3 mt-2 right-[90px] top-[26rem] text-center items-center rounded-lg drop-shadow-lg invisible opacity-0 transition-all duration-300 ease-in-out group-hover:visible group-hover:opacity-100 4xl:text-[1em] 4xl:h-[48px] 3xl:text-[1em] 3xl:h-[44px] 2xl:text-[0.8em] 2xl:h-[42px] xl:text-[0.8em] xl:h-[40px]">
+                                    Fields with * are required.
+                                </div>
                             </div>
                         </div>
-                    </div>
                 </div>
 
                 {/* Form */}
@@ -563,7 +623,7 @@ const AccountCreation = () => {
                 </div>
 
                 {/* Buttons */}
-                <div className='flex flex-col w-full mt-12 text-[1.1em] 2xl:text-[1.2em] items-center gap-[10px]'>
+                <div className='flex flex-col w-full mt-3 text-[1.1em] 2xl:text-[1.2em] items-center gap-[10px]'>
                     <div className="relative bg-primary overflow-hidden text-white w-[240px] h-[2.5em] 4xl:h-[3rem] flex items-center justify-center rounded-[10px] cursor-pointer transition-all hover:border-1 hover:border-primary group">
                         <button 
                             className="font-black"
@@ -577,6 +637,7 @@ const AccountCreation = () => {
                 </div>
             </div>
         </div>
+    </div>
     )
 }
 
