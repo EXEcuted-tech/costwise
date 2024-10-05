@@ -15,3 +15,24 @@ export const formatHeader = (key: string, knownAcronyms?: string[]): string => {
 
     return formattedWords.join(' ').trim();
 };
+
+export const formatMonthYear = (yyyymm: number | undefined): string => {
+    if (yyyymm === undefined || yyyymm === null) {
+        return 'Invalid Date';
+    }
+
+    if (!Number.isInteger(yyyymm)) {
+        return 'Invalid Date';
+    }
+
+    const year = Math.floor(yyyymm / 100);
+    const month = yyyymm % 100;
+
+    if (month < 1 || month > 12) {
+        return 'Invalid Date';
+    }
+
+    const date = new Date(year, month - 1);
+    const monthName = date.toLocaleString('default', { month: 'long' });
+    return `${monthName} ${year}`;
+};

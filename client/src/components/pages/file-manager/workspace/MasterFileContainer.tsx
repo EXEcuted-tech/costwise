@@ -5,13 +5,13 @@ import { TbProgress } from "react-icons/tb";
 import WorkspaceTable from './WorkspaceTable';
 import { BOM, File, FodlPair, FodlRecord, FormulationRecord, MaterialRecord } from '@/types/data';
 import api from '@/utils/api';
+import { formatMonthYear } from '@/utils/costwiseUtils';
 
 const MasterFileContainer = (data: File) => {
-  // Initialize isEdit with keys 'A', 'B'
+
   const [isEdit, setIsEdit] = useState<{ [key: string]: boolean }>({
     A: false, // FODL COST
     B: false, // MATERIAL COST
-    // 'C-<bom_id>' etc. will be added dynamically
   });
 
   const [isLoading, setIsLoading] = useState(true);
@@ -19,6 +19,7 @@ const MasterFileContainer = (data: File) => {
   const [fodlFileData, setFodlFileData] = useState<FodlRecord[]>([]);
   const [materialData, setMaterialData] = useState<MaterialRecord[]>([]);
   const [bomSheets, setBomSheets] = useState<BOM[]>([]);
+  const [removedFodlIds, setRemovedFodlIds] = useState<number[]>([]);
 
   useEffect(() => {
     if (localStorage.getItem("edit") === "true") {
@@ -29,7 +30,6 @@ const MasterFileContainer = (data: File) => {
     if (data.settings) {
       const settings = JSON.parse(data.settings);
 
-      // Wait for all fetching to complete
       const fetchAllData = async () => {
         try {
           await Promise.all([
@@ -85,6 +85,7 @@ const MasterFileContainer = (data: File) => {
 
         if (fodlData && fgData) {
           return {
+            id: fodl.fodl_id,
             itemCode: fodl.fg_code,
             itemDescription: fgData.fg_desc,
             unit: fgData.unit,
@@ -131,11 +132,11 @@ const MasterFileContainer = (data: File) => {
       const bomResponse = await api.get('/boms/retrieve_batch', {
         params: { col: 'bom_id', values: bom_ids },
       });
-  
+
       if (bomResponse.data.status !== 200) {
         throw new Error("Failed to fetch BOMs");
       }
-  
+
       const bomDataArray = bomResponse.data.data;
       const allFormulationIds: number[] = [];
 
@@ -147,18 +148,18 @@ const MasterFileContainer = (data: File) => {
       const formulationResponse = await api.get('/formulations/retrieve_batch', {
         params: { col: 'formulation_id', values: allFormulationIds },
       });
-  
+
       if (formulationResponse.data.status !== 200) {
         throw new Error("Failed to fetch formulations");
       }
-  
+
       const formulationDataArray = formulationResponse.data.data;
       const allMaterialIds: number[] = [];
       const allFinishedGoodIds: number[] = [];
-  
+
       formulationDataArray.forEach((formulation: { material_qty_list: string; fg_id: number }) => {
         allFinishedGoodIds.push(formulation.fg_id);
-  
+
         if (formulation.material_qty_list) {
           const materialList = JSON.parse(formulation.material_qty_list);
           materialList.forEach((material: {}) => {
@@ -167,40 +168,40 @@ const MasterFileContainer = (data: File) => {
           });
         }
       });
-  
+
       const finishedGoodResponse = await api.get('/finished_goods/retrieve_batch', {
         params: { col: 'fg_id', values: allFinishedGoodIds },
       });
-  
+
       if (finishedGoodResponse.data.status !== 200) {
         throw new Error("Failed to fetch finished goods");
       }
-  
+
       const finishedGoodDataArray = finishedGoodResponse.data.data;
       const materialResponse = await api.get('/materials/retrieve_batch', {
         params: { col: 'material_id', values: allMaterialIds },
       });
-  
+
       if (materialResponse.data.status !== 200) {
         throw new Error("Failed to fetch materials");
       }
-  
+
       const materialDataArray = materialResponse.data.data;
-  
+
       const bomSheets = bomDataArray.map((bomData: { formulations: string; bom_id: any; bom_name: any }) => {
         const formulations = JSON.parse(bomData.formulations);
         const currentFormulations: FormulationRecord[] = [];
-  
+
         formulations.forEach((formulationId: number, index: number) => {
           const formulation = formulationDataArray.find(
             (f: { formulation_id: number }) => f.formulation_id === formulationId
           );
-  
+
           if (formulation) {
             const finishedGood = finishedGoodDataArray.find(
               (fg: { fg_id: number }) => fg.fg_id === formulation.fg_id
             );
-  
+
             if (finishedGood) {
               let fgRow: FormulationRecord = {
                 formula: formulation.formula_code,
@@ -228,7 +229,7 @@ const MasterFileContainer = (data: File) => {
                 });
               }
             }
-  
+
             if (formulation.material_qty_list) {
               const materials = JSON.parse(formulation.material_qty_list);
               materials.forEach((material: { [x: string]: any }) => {
@@ -237,7 +238,7 @@ const MasterFileContainer = (data: File) => {
                 const materialDetails = materialDataArray.find(
                   (m: { material_id: string }) => m.material_id == materialId
                 );
-  
+
                 if (materialDetails) {
                   currentFormulations.push({
                     formula: null,
@@ -251,7 +252,7 @@ const MasterFileContainer = (data: File) => {
                 }
               });
             }
-  
+
             if (index !== formulations.length - 1) {
               const emptyFodlRecord: FormulationRecord = {
                 formula: null,
@@ -266,22 +267,22 @@ const MasterFileContainer = (data: File) => {
             }
           }
         });
-  
+
         return {
           bom_id: Number(bomData.bom_id),
           bomName: bomData.bom_name,
           formulations: currentFormulations,
         };
       });
-  
+
       setBomSheets(bomSheets);
-  
+
       const newEditFlags: { [key: string]: boolean } = {};
       bomSheets.forEach((bom: { bom_id: any }) => {
         const editKey = `C-${bom.bom_id}`;
         newEditFlags[editKey] = false;
       });
-  
+
       setIsEdit((prev) => ({ ...prev, ...newEditFlags }));
     } catch (error) {
       console.error("Error fetching BOM sheets:", error);
@@ -289,7 +290,115 @@ const MasterFileContainer = (data: File) => {
       setIsLoading(false);
     }
   };
- 
+
+  // onSave functions
+  // const onSaveFodlSheet = async (updatedData: any[]) => {
+  //   try {
+  //     console.log(updatedData);
+  //     const settings = JSON.parse(data.settings);
+
+  //     const transformedFodlData = updatedData.map(item => ({
+  //       fodl_id: item.id,
+  //       factory_overhead: parseFloat(item.factoryOverhead.toString()),
+  //       direct_labor: parseFloat(item.directLabor.toString()),
+  //       monthYear: settings.monthYear
+  //     }));
+
+  //     const transformedFgData = updatedData.map(item => ({
+  //       fg_code: item.itemCode,
+  //       fg_desc: item.itemDescription,
+  //       unit: item.unit,
+  //     }));
+
+  //     const payload = {
+  //       fodls: transformedFodlData,
+  //       finished_goods: transformedFgData,
+  //     };
+
+  //     const response = await api.post('/fodls/update_batch', payload);
+
+  //     if (response.data.status !== 200) {
+  //       throw new Error(`Failed to save sheets: ${response.data.message}`);
+  //     }
+
+  //     // Refetch data to ensure it's up-to-date
+  //     // fetchFodlSheet(JSON.parse(data.settings).fodls);
+  //     console.log('FODL and Finished Goods sheets saved successfully', response);
+  //   } catch (error) {
+  //     console.error('Error saving sheets:', error);
+  //   }
+  // };
+
+  const onSaveFodlSheet = async (updatedData: any[]) => {
+    try {
+      console.log('Updated Data:', updatedData);
+      const settings = JSON.parse(data.settings);
+
+      // Transform Fodl Data for Update
+      const transformedFodlData = updatedData.map(item => ({
+        fodl_id: item.id,
+        factory_overhead: parseFloat(item.factoryOverhead.toString()),
+        direct_labor: parseFloat(item.directLabor.toString()),
+        monthYear: settings.monthYear
+      }));
+
+      // Transform Finished Goods Data for Update
+      const transformedFgData = updatedData.map(item => ({
+        fg_code: item.itemCode,
+        fg_desc: item.itemDescription,
+        unit: item.unit,
+      }));
+
+      const payload = {
+        fodls: transformedFodlData,
+        finished_goods: transformedFgData,
+      };
+
+      // Perform Batch Update
+      const updateResponse = await api.post('/fodls/update_batch', payload);
+
+      if (updateResponse.data.status !== 200) {
+        throw new Error(`Failed to save sheets: ${updateResponse.data.message}`);
+      }
+
+      console.log('FODL and Finished Goods sheets saved successfully', updateResponse);
+      // toast.success('FODL and Finished Goods sheets saved successfully.');
+
+      // Handle Bulk Deletions After Successful Update
+      if (removedFodlIds.length > 0) {
+        console.log('Handling Bulk Deletions for Fodl IDs:', removedFodlIds);
+
+        try {
+          const deleteBulkResponse = await api.post('/fodls/delete_bulk', {
+            fodl_ids: removedFodlIds
+          });
+
+          if (deleteBulkResponse.data.status !== 200) {
+            console.error(`Failed to bulk delete Fodl IDs: ${deleteBulkResponse.data.message}`);
+            // toast.error(`Failed to delete some FODL records: ${deleteBulkResponse.data.message}`);
+          } else {
+            console.log(`Fodl IDs ${removedFodlIds.join(', ')} deleted successfully.`);
+            // toast.success('FODL records deleted successfully.');
+          }
+        } catch (deleteBulkError) {
+          console.error('Error bulk deleting Fodl records:', deleteBulkError);
+          // toast.error('An error occurred while deleting FODL records.');
+        }
+
+        // Clear the removedFodlIds after handling deletions
+        setRemovedFodlIds([]);
+      }
+
+      // Refetch data to ensure it's up-to-date
+      // await fetchFodlSheet();
+
+    } catch (error: any) { // Adjusted to capture 'message' property
+      console.error('Error saving sheets:', error);
+      // // Provide user feedback
+      // toast.error(`Error saving sheets: ${error.message}`);
+    }
+  };
+
   return (
     <div className='w-full bg-white rounded-[10px] drop-shadow mb-[35px]'>
       <FileLabel {...data} />
@@ -313,6 +422,9 @@ const MasterFileContainer = (data: File) => {
               isEdit={isEdit['A']}
               setIsEdit={() => toggleEdit('A')}
               isTransaction={false}
+              onSave={onSaveFodlSheet}
+              removedFodlIds={removedFodlIds}
+              setRemovedFodlIds={setRemovedFodlIds}
             />
           </div>
 
@@ -334,12 +446,14 @@ const MasterFileContainer = (data: File) => {
               isEdit={isEdit['B']}
               setIsEdit={() => toggleEdit('B')}
               isTransaction={false}
+              removedFodlIds={removedFodlIds}
+              setRemovedFodlIds={setRemovedFodlIds}
             />
           </div>
 
           {/* Dynamic BOM Sheets */}
           {bomSheets.map((bom) => {
-            const editKey = `C-${bom.bom_id}`; // Unique key for each BOM section
+            const editKey = `C-${bom.bom_id}`;
             return (
               <div key={bom.bom_id} className='mb-8'>
                 {/* BOM Header */}
@@ -361,6 +475,8 @@ const MasterFileContainer = (data: File) => {
                     isEdit={isEdit[editKey]}
                     setIsEdit={() => toggleEdit(editKey)}
                     isTransaction={false}
+                    removedFodlIds={removedFodlIds}
+              setRemovedFodlIds={setRemovedFodlIds}
                   />
                 </div>
               </div>
@@ -370,8 +486,6 @@ const MasterFileContainer = (data: File) => {
         :
         <div className='flex justify-center items-center overflow-auto min-h-[552px]'>
           <div className='flex flex-col justify-center'>
-            {/* <div className="loader"></div> */}
-
             <div className='flex justify-center'>
               <div className="🤚">
                 <div className="👉"></div>

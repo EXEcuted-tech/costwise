@@ -51,6 +51,8 @@ const WorkspacePage = () => {
                 } catch (error) {
                     console.error('Error parsing file data:', error);
                 }
+            } else {
+                setFileType(0);
             }
         };
 

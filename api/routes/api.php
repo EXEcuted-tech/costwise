@@ -37,6 +37,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_all', [FodlController::class, 'retrieveAll']);
         Route::get('retrieve', [FodlController::class, 'retrieve']);
         Route::get('retrieve_batch', [FodlController::class, 'retrieveBatch']);
+        Route::post('update_batch', [FodlController::class, 'updateBatchCombined']);
+        Route::post('delete', [FodlController::class, 'deleteFodl']);
+        Route::post('delete_bulk', [FodlController::class, 'deleteBulkFodl']);
     });
 
     Route::prefix('/materials')->group(function () {

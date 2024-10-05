@@ -9,9 +9,20 @@ interface WorkspaceTableProps {
     isEdit: boolean;
     data: Record<string, unknown>[]
     isTransaction: boolean;
+    onSave?: (updatedData: Record<string, unknown>[]) => void; 
+    removedFodlIds: number[];
+    setRemovedFodlIds: React.Dispatch<React.SetStateAction<number[]>>;
 }
 
-const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit, isTransaction }) => {
+const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ 
+        data, 
+        isEdit, 
+        setIsEdit, 
+        isTransaction, 
+        onSave,
+        removedFodlIds,
+        setRemovedFodlIds
+    }) => {
     const [tableData, setTableData] = useState(data);
 
     useEffect(() => {
@@ -45,6 +56,9 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
 
     const addRow = () => {
         const emptyRow = Object.keys(data[0]).reduce((acc, key) => {
+            // if (!key.toLowerCase().includes('id')) { // Exclude ID fields
+            //     acc[key] = '';
+            // }
             acc[key] = '';
             return acc;
         }, {} as Record<string, unknown>);
@@ -52,8 +66,24 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
         setTableData([...tableData, emptyRow]);
     }
 
+    // const removeRow = (index: number) => {
+    //     setTableData(tableData.filter((_, i) => i !== index));
+    // };
+
     const removeRow = (index: number) => {
-        setTableData(tableData.filter((_, i) => i !== index));
+        const rowToRemove = tableData[index];
+        const fodlId = rowToRemove['id']; // Assuming 'id' corresponds to 'fodl_id'
+    
+        const confirmDeletion = window.confirm('Are you sure you want to delete this FODL record?');
+        if (!confirmDeletion) return;
+    
+        // Optimistically update the UI
+        setTableData(prevData => prevData.filter((_, i) => i !== index));
+    
+        if (fodlId && typeof fodlId === 'number' && !removedFodlIds.includes(fodlId)) {
+            // Add the fodl_id to the removedFodlIds array
+            setRemovedFodlIds(prevIds => [...prevIds, fodlId]);
+        }
     };
 
     return (
@@ -69,7 +99,12 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                     </div>
                     <div className='flex justify-end'>
                         <button className='hover:bg-[#00780c] h-[35px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F] transition-colors delay-50 duration-[1000] ease-in'
-                            onClick={() => { setIsEdit(false) }}>
+                            onClick={() => { 
+                                if (onSave) {
+                                    onSave(tableData);
+                                }
+                                setIsEdit(false);
+                            }}>
                             <IoIosSave className='mr-[5px]' />
                             Save
                         </button>
@@ -81,7 +116,9 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                     <tr>
                         {isEdit && <th className="w-[10px]"></th>}
 
-                        {data.length > 0 && Object?.keys(data[0]).map((key) => {
+                        {data.length > 0 && Object?.keys(data[0])
+                            .filter(key => !key.toLowerCase().includes('id'))
+                            .map((key) => {
                             let textAlignClass = 'text-left';
                             if (key === 'itemDescription') {
                                 textAlignClass = 'text-left';
@@ -114,9 +151,12 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                                     <IoTrash className="ml-[5px] text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-250 ease-in-out"
                                         onClick={() => removeRow(rowIndex)} />
                                 </td>
-                                {Object.entries(row) && Object?.entries(row).map(([key, value], colIndex) => {
+                                {Object.entries(row) && Object?.entries(row)
+                                    .filter(([key]) => !key.toLowerCase().includes('id'))
+                                    .map(([key, value], colIndex) => {
                                     let textAlignClass = 'text-left';
                                     if (typeof value === 'number') textAlignClass = 'text-right';
+                                    if (key === 'factoryOverhead' || key === 'directLabor') textAlignClass = 'text-right';
                                     return (
                                         <td
                                           key={key}
@@ -130,7 +170,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                                             <input
                                                 type="text"
                                                 onChange={(e) => handleInputChange(rowIndex, key, e.target.value)}
-                                                value={typeof value === 'number' && !Number.isInteger(value) ? Number(value).toFixed(2) : String(value)}
+                                                value={typeof value === 'number' ? Number(value).toFixed(2) : String(value)}
                                                 className={`${isTransaction ? 'w-auto' : 'w-full'} ${textAlignClass} animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
                                             />
                                         </td>
@@ -141,9 +181,12 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({ data, isEdit, setIsEdit
                         :
                         tableData.map((row, rowIndex) => (
                             <tr key={rowIndex} className="border border-gray-300 w-full">
-                                {Object.entries(row) && Object.entries(row).map(([key, value], colIndex) => {
+                                {Object.entries(row) && Object.entries(row)
+                                    .filter(([key]) => !key.toLowerCase().includes('id'))
+                                    .map(([key, value], colIndex) => {
                                     let textAlignClass = 'text-left';
                                     if (typeof value === 'number') textAlignClass = 'text-right';
+                                    if (key === 'factoryOverhead' || key === 'directLabor') textAlignClass = 'text-right';
                                     if (key=='level' || key=='formulation') textAlignClass = 'text-center';
                                     return (
                                         <td

@@ -66,7 +66,7 @@ return new class extends Migration {
         // Finished Goods Table
         Schema::create('finished_goods', function (Blueprint $table) {
             $table->increments('fg_id');
-            $table->unsignedInteger('fodl_id');
+            $table->unsignedInteger('fodl_id')->nullable();
             $table->string('fg_code', 255);
             $table->string('fg_desc', 255);
             $table->decimal('total_cost', 10, 2)->nullable();

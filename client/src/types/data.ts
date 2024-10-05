@@ -36,7 +36,14 @@ export interface FodlPair {
     fg_code: string;
 }
 
+interface RowData {
+    id: string | number;
+    [key: string]: any;
+}
+
+
 export interface FodlRecord extends Record<string, unknown> {
+    id: number;
     itemCode: string;
     itemDescription: string;
     unit: string;
