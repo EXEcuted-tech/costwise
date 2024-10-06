@@ -11,6 +11,8 @@ class File extends Model
 
     protected $table = 'files';
 
+    protected $primaryKey = 'file_id';
+
         /**
      * The attributes that are mass assignable.
      *
@@ -20,4 +22,8 @@ class File extends Model
         'file_type',
         'settings',
     ];
+
+    // protected $casts = [
+    //     'settings' => 'array', // Ensure 'settings' is cast to an array
+    // ];
 }

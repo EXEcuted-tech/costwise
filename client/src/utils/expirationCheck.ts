@@ -25,14 +25,14 @@ export const refreshToken = async (): Promise<boolean> => {
             localStorage.setItem('refreshToken', refresh_token);
             localStorage.setItem('tokenExpiresAt', access_token_expiration);
         } else {
-            console.log("Log you out on Protected Route 1:");
+            console.log("Log you out on Protected Route 3:");
             await removeTokens();
             window.location.href = '/'; 
         }
 
         return true;
     } catch (error) {
-        console.log("Log you out on Protected Route 1:");
+        console.log("Log you out on Protected Route 4:");
         await removeTokens();
         window.location.href = '/'; 
         return false;

@@ -30,45 +30,42 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
     }, [data]);
 
     const handleInputChange = (rowIndex: number, key: string, value: string) => {
-        // const updatedData = tableData.map((row, i) => {
-        //     if (i === rowIndex) {
-        //         const isNumber = typeof row[key] === 'number';
-        //         return { ...row, [key]: isNumber ? parseFloat(value) : value };
-        //     }
-        //     return row;
-        // });
         const updatedData = [...tableData];
 
-        // Check if the value is numeric (and not an empty string)
         if (!isNaN(Number(value)) && value !== '') {
-          // Ensure the value is always represented with two decimal places
           const formattedValue = Number(value).toFixed(2);
-        
-          // Assign the formatted value as a string to preserve '11.00' format
           updatedData[rowIndex][key] = formattedValue;
         } else {
-          // For non-numeric or empty values, assign as they are
           updatedData[rowIndex][key] = value;
         }
         
         setTableData(updatedData);
     };
 
+    // const addRow = () => {
+    //     const emptyRow = Object.keys(data[0]).reduce((acc, key) => {
+    //         // if (!key.toLowerCase().includes('id')) { // Exclude ID fields
+    //         //     acc[key] = '';
+    //         // }
+    //         acc[key] = '';
+    //         return acc;
+    //     }, {} as Record<string, unknown>);
+
+    //     setTableData([...tableData, emptyRow]);
+    // }
+
     const addRow = () => {
-        const emptyRow = Object.keys(data[0]).reduce((acc, key) => {
-            // if (!key.toLowerCase().includes('id')) { // Exclude ID fields
-            //     acc[key] = '';
-            // }
-            acc[key] = '';
+        const nextId = tableData.length > 0 
+        ? Math.max(...tableData.map(row => row.id as number)) + 1 
+        : 1;
+
+        const emptyRow = Object.keys(tableData[0] || {}).reduce<Record<string, any>>((acc, key) => {
+            acc[key] = key === 'id' ? nextId : '';
             return acc;
-        }, {} as Record<string, unknown>);
+        }, {});
 
         setTableData([...tableData, emptyRow]);
-    }
-
-    // const removeRow = (index: number) => {
-    //     setTableData(tableData.filter((_, i) => i !== index));
-    // };
+    };
 
     const removeRow = (index: number) => {
         const rowToRemove = tableData[index];

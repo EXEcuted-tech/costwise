@@ -52,6 +52,7 @@ export interface FodlRecord extends Record<string, unknown> {
 }
 
 export interface MaterialRecord extends Record<string, unknown> {
+    id: number;
     itemCode: string;
     itemDescription: string;
     unit: string;

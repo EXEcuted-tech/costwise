@@ -6,6 +6,7 @@ import WorkspaceTable from './WorkspaceTable';
 import { BOM, File, FodlPair, FodlRecord, FormulationRecord, MaterialRecord } from '@/types/data';
 import api from '@/utils/api';
 import { formatMonthYear } from '@/utils/costwiseUtils';
+import Alert from '@/components/alerts/Alert';
 
 const MasterFileContainer = (data: File) => {
 
@@ -20,6 +21,9 @@ const MasterFileContainer = (data: File) => {
   const [materialData, setMaterialData] = useState<MaterialRecord[]>([]);
   const [bomSheets, setBomSheets] = useState<BOM[]>([]);
   const [removedFodlIds, setRemovedFodlIds] = useState<number[]>([]);
+
+  const [alertMessages, setAlertMessages] = useState<string[]>([]);
+  const [successMessage, setSuccessMessage] = useState('');
 
   useEffect(() => {
     if (localStorage.getItem("edit") === "true") {
@@ -85,8 +89,8 @@ const MasterFileContainer = (data: File) => {
 
         if (fodlData && fgData) {
           return {
-            id: fodl.fodl_id,
-            itemCode: fodl.fg_code,
+            id: fodlData.fodl_id,
+            itemCode: fodlData.fg_code,
             itemDescription: fgData.fg_desc,
             unit: fgData.unit,
             factoryOverhead: parseFloat(fodlData.factory_overhead),
@@ -292,49 +296,27 @@ const MasterFileContainer = (data: File) => {
   };
 
   // onSave functions
-  // const onSaveFodlSheet = async (updatedData: any[]) => {
-  //   try {
-  //     console.log(updatedData);
-  //     const settings = JSON.parse(data.settings);
-
-  //     const transformedFodlData = updatedData.map(item => ({
-  //       fodl_id: item.id,
-  //       factory_overhead: parseFloat(item.factoryOverhead.toString()),
-  //       direct_labor: parseFloat(item.directLabor.toString()),
-  //       monthYear: settings.monthYear
-  //     }));
-
-  //     const transformedFgData = updatedData.map(item => ({
-  //       fg_code: item.itemCode,
-  //       fg_desc: item.itemDescription,
-  //       unit: item.unit,
-  //     }));
-
-  //     const payload = {
-  //       fodls: transformedFodlData,
-  //       finished_goods: transformedFgData,
-  //     };
-
-  //     const response = await api.post('/fodls/update_batch', payload);
-
-  //     if (response.data.status !== 200) {
-  //       throw new Error(`Failed to save sheets: ${response.data.message}`);
-  //     }
-
-  //     // Refetch data to ensure it's up-to-date
-  //     // fetchFodlSheet(JSON.parse(data.settings).fodls);
-  //     console.log('FODL and Finished Goods sheets saved successfully', response);
-  //   } catch (error) {
-  //     console.error('Error saving sheets:', error);
-  //   }
-  // };
-
   const onSaveFodlSheet = async (updatedData: any[]) => {
     try {
-      console.log('Updated Data:', updatedData);
-      const settings = JSON.parse(data.settings);
+      const hasEmptyEntry = updatedData.some(item => {
+        return (
+            typeof item === 'object' &&
+            item !== null &&
+            !Array.isArray(item) &&
+            (item.itemCode === '' &&
+             item.itemDescription === '' &&
+             item.unit === '' &&
+             item.factoryOverhead === '' &&
+             item.directLabor === '')
+        );
+    });
 
-      // Transform Fodl Data for Update
+      if (hasEmptyEntry) {
+        setAlertMessages(['One or more entries are empty. Please fill in all required fields.']);
+        return;
+      }
+
+      const settings = JSON.parse(data.settings);
       const transformedFodlData = updatedData.map(item => ({
         fodl_id: item.id,
         factory_overhead: parseFloat(item.factoryOverhead.toString()),
@@ -342,7 +324,6 @@ const MasterFileContainer = (data: File) => {
         monthYear: settings.monthYear
       }));
 
-      // Transform Finished Goods Data for Update
       const transformedFgData = updatedData.map(item => ({
         fg_code: item.itemCode,
         fg_desc: item.itemDescription,
@@ -352,177 +333,197 @@ const MasterFileContainer = (data: File) => {
       const payload = {
         fodls: transformedFodlData,
         finished_goods: transformedFgData,
+        file_id: data.file_id
       };
 
-      // Perform Batch Update
       const updateResponse = await api.post('/fodls/update_batch', payload);
 
       if (updateResponse.data.status !== 200) {
-        throw new Error(`Failed to save sheets: ${updateResponse.data.message}`);
+        setIsLoading(false);
+        if (updateResponse.data.errors) {
+          setAlertMessages(updateResponse.data.errors);
+        } else if (updateResponse.data.message) {
+          setAlertMessages([updateResponse.data.message]);
+        }
       }
 
-      console.log('FODL and Finished Goods sheets saved successfully', updateResponse);
-      // toast.success('FODL and Finished Goods sheets saved successfully.');
+      setSuccessMessage("FODL sheets saved successfully.");
 
-      // Handle Bulk Deletions After Successful Update
       if (removedFodlIds.length > 0) {
-        console.log('Handling Bulk Deletions for Fodl IDs:', removedFodlIds);
-
         try {
           const deleteBulkResponse = await api.post('/fodls/delete_bulk', {
-            fodl_ids: removedFodlIds
+            fodl_ids: removedFodlIds,
+            file_id: data.file_id
           });
 
           if (deleteBulkResponse.data.status !== 200) {
-            console.error(`Failed to bulk delete Fodl IDs: ${deleteBulkResponse.data.message}`);
-            // toast.error(`Failed to delete some FODL records: ${deleteBulkResponse.data.message}`);
+            setAlertMessages(['Failed to bulk delete Fodl IDs.']);
           } else {
-            console.log(`Fodl IDs ${removedFodlIds.join(', ')} deleted successfully.`);
-            // toast.success('FODL records deleted successfully.');
+            setSuccessMessage("FODL records deleted successfully.");
           }
         } catch (deleteBulkError) {
-          console.error('Error bulk deleting Fodl records:', deleteBulkError);
-          // toast.error('An error occurred while deleting FODL records.');
+          setAlertMessages(['An error occurred while deleting FODL records.']);
         }
 
-        // Clear the removedFodlIds after handling deletions
         setRemovedFodlIds([]);
       }
 
-      // Refetch data to ensure it's up-to-date
       // await fetchFodlSheet();
-
-    } catch (error: any) { // Adjusted to capture 'message' property
-      console.error('Error saving sheets:', error);
-      // // Provide user feedback
-      // toast.error(`Error saving sheets: ${error.message}`);
+    } catch (error: any) {
+      if (error.response.data.errors) {
+        const errorMessages = [];
+        for (const key in error.response.data.errors) {
+          if (error.response.data.errors.hasOwnProperty(key)) {
+            errorMessages.push(...error.response.data.errors[key]);
+          }
+        }
+        setAlertMessages(errorMessages);
+      } else if (error.response.data.message) {
+        setAlertMessages([error.response.data.message]);
+      } else {
+        setAlertMessages(['Error saving sheets due to invalid inputs. Retry again!']);
+      }
     }
   };
 
+  useEffect(() => {
+    console.log('Updated alertMessages:', alertMessages);
+  }, [alertMessages]);
+
   return (
-    <div className='w-full bg-white rounded-[10px] drop-shadow mb-[35px]'>
-      <FileLabel {...data} />
-      {!isLoading ?
-        <div className='overflow-auto'>
-          {/* FODL Costing */}
-          <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
-            <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>FODL COST</h1>
-            {isEdit['A'] ?
-              <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin' />
-              :
-              <FaPencilAlt
-                className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
-                onClick={() => toggleEdit('A')}
+    <>
+      <div className="absolute top-0 right-0">
+        {alertMessages && alertMessages.map((msg, index) => (
+          <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+            setAlertMessages(prev => prev.filter((_, i) => i !== index));
+          }} />
+        ))}
+        {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+      </div>
+      <div className='w-full bg-white rounded-[10px] drop-shadow mb-[35px]'>
+        <FileLabel {...data} />
+        {!isLoading ?
+          <div className='overflow-auto'>
+            {/* FODL Costing */}
+            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
+              <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>FODL COST</h1>
+              {isEdit['A'] ?
+                <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin' />
+                :
+                <FaPencilAlt
+                  className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
+                  onClick={() => toggleEdit('A')}
+                />
+              }
+            </div>
+            <div className={`${isEdit['A'] ? 'pb-[30px] pt-[15px]' : 'py-[30px]'} px-[40px]`}>
+              <WorkspaceTable
+                data={fodlFileData}
+                isEdit={isEdit['A']}
+                setIsEdit={() => toggleEdit('A')}
+                isTransaction={false}
+                onSave={onSaveFodlSheet}
+                removedFodlIds={removedFodlIds}
+                setRemovedFodlIds={setRemovedFodlIds}
               />
-            }
-          </div>
-          <div className={`${isEdit['A'] ? 'pb-[30px] pt-[15px]' : 'py-[30px]'} px-[40px]`}>
-            <WorkspaceTable
-              data={fodlFileData}
-              isEdit={isEdit['A']}
-              setIsEdit={() => toggleEdit('A')}
-              isTransaction={false}
-              onSave={onSaveFodlSheet}
-              removedFodlIds={removedFodlIds}
-              setRemovedFodlIds={setRemovedFodlIds}
-            />
-          </div>
+            </div>
 
-          {/* Material Cost */}
-          <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
-            <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>MATERIAL COST</h1>
-            {isEdit['B'] ?
-              <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin' />
-              :
-              <FaPencilAlt
-                className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
-                onClick={() => toggleEdit('B')}
+            {/* Material Cost */}
+            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
+              <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>MATERIAL COST</h1>
+              {isEdit['B'] ?
+                <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin' />
+                :
+                <FaPencilAlt
+                  className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
+                  onClick={() => toggleEdit('B')}
+                />
+              }
+            </div>
+            <div className={`${isEdit['B'] ? 'pb-[30px] pt-[15px]' : 'py-[30px]'} px-[40px]`}>
+              <WorkspaceTable
+                data={materialData}
+                isEdit={isEdit['B']}
+                setIsEdit={() => toggleEdit('B')}
+                isTransaction={false}
+                removedFodlIds={removedFodlIds}
+                setRemovedFodlIds={setRemovedFodlIds}
               />
-            }
-          </div>
-          <div className={`${isEdit['B'] ? 'pb-[30px] pt-[15px]' : 'py-[30px]'} px-[40px]`}>
-            <WorkspaceTable
-              data={materialData}
-              isEdit={isEdit['B']}
-              setIsEdit={() => toggleEdit('B')}
-              isTransaction={false}
-              removedFodlIds={removedFodlIds}
-              setRemovedFodlIds={setRemovedFodlIds}
-            />
-          </div>
+            </div>
 
-          {/* Dynamic BOM Sheets */}
-          {bomSheets.map((bom) => {
-            const editKey = `C-${bom.bom_id}`;
-            return (
-              <div key={bom.bom_id} className='mb-8'>
-                {/* BOM Header */}
-                <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
-                  <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px] uppercase'>{bom.bomName}</h1>
-                  {isEdit[editKey] ?
-                    <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin' />
-                    :
-                    <FaPencilAlt
-                      className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
-                      onClick={() => toggleEdit(editKey)}
+            {/* Dynamic BOM Sheets */}
+            {bomSheets.map((bom) => {
+              const editKey = `C-${bom.bom_id}`;
+              return (
+                <div key={bom.bom_id} className='mb-8'>
+                  {/* BOM Header */}
+                  <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
+                    <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px] uppercase'>{bom.bomName}</h1>
+                    {isEdit[editKey] ?
+                      <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin' />
+                      :
+                      <FaPencilAlt
+                        className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
+                        onClick={() => toggleEdit(editKey)}
+                      />
+                    }
+                  </div>
+                  {/* BOM Formulations Table */}
+                  <div className={`${isEdit[editKey] ? 'pb-[30px] pt-[15px]' : 'py-[30px]'} px-[40px]`}>
+                    <WorkspaceTable
+                      data={bom.formulations}
+                      isEdit={isEdit[editKey]}
+                      setIsEdit={() => toggleEdit(editKey)}
+                      isTransaction={false}
+                      removedFodlIds={removedFodlIds}
+                      setRemovedFodlIds={setRemovedFodlIds}
                     />
-                  }
+                  </div>
                 </div>
-                {/* BOM Formulations Table */}
-                <div className={`${isEdit[editKey] ? 'pb-[30px] pt-[15px]' : 'py-[30px]'} px-[40px]`}>
-                  <WorkspaceTable
-                    data={bom.formulations}
-                    isEdit={isEdit[editKey]}
-                    setIsEdit={() => toggleEdit(editKey)}
-                    isTransaction={false}
-                    removedFodlIds={removedFodlIds}
-              setRemovedFodlIds={setRemovedFodlIds}
-                  />
+              )
+            })}
+          </div>
+          :
+          <div className='flex justify-center items-center overflow-auto min-h-[552px]'>
+            <div className='flex flex-col justify-center'>
+              <div className='flex justify-center'>
+                <div className="🤚">
+                  <div className="👉"></div>
+                  <div className="👉"></div>
+                  <div className="👉"></div>
+                  <div className="👉"></div>
+                  <div className="🌴"></div>
+                  <div className="👍"></div>
                 </div>
               </div>
-            )
-          })}
-        </div>
-        :
-        <div className='flex justify-center items-center overflow-auto min-h-[552px]'>
-          <div className='flex flex-col justify-center'>
-            <div className='flex justify-center'>
-              <div className="🤚">
-                <div className="👉"></div>
-                <div className="👉"></div>
-                <div className="👉"></div>
-                <div className="👉"></div>
-                <div className="🌴"></div>
-                <div className="👍"></div>
-              </div>
-            </div>
 
-            <div className='ml-[100px] mt-[50px] flex justify-center'>
-              <h1 className="flex items-center text-3xl h-[2em] font-bold text-neutral-400">
-                Loading...
-                <span className="relative ml-3 h-[1.2em] w-[470px] overflow-hidden">
-                  <span
-                    className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary"
-                  >
-                    Organizing your information!
+              <div className='ml-[100px] mt-[50px] flex justify-center'>
+                <h1 className="flex items-center text-3xl h-[2em] font-bold text-neutral-400">
+                  Loading...
+                  <span className="relative ml-3 h-[1.2em] w-[470px] overflow-hidden">
+                    <span
+                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary"
+                    >
+                      Organizing your information!
+                    </span>
+                    <span
+                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary [animation-delay:0.83s]"
+                    >
+                      Slowly sorting your files!
+                    </span>
+                    <span
+                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary [animation-delay:1.83s]"
+                    >
+                      Skimming your documents!
+                    </span>
                   </span>
-                  <span
-                    className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary [animation-delay:0.83s]"
-                  >
-                    Slowly sorting your files!
-                  </span>
-                  <span
-                    className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary [animation-delay:1.83s]"
-                  >
-                    Skimming your documents!
-                  </span>
-                </span>
-              </h1>
+                </h1>
+              </div>
             </div>
           </div>
-        </div>
-      }
-    </div>
+        }
+      </div>
+    </>
   )
 }
 

@@ -25,7 +25,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
         try {
           const refreshed = await refreshToken();
           if (!refreshed) {
-            console.log("Log you out on Protected Route 1:");
+            console.log("Log you out on Protected Route 2:");
             removeTokens();
             router.push('/');
           }
