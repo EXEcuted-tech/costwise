@@ -8,6 +8,7 @@ import { FaFileCircleXmark } from "react-icons/fa6";
 import { useFileManagerContext } from '@/contexts/FileManagerContext';
 import Spinner from '@/components/loaders/Spinner';
 import { File, FileSettings } from '@/types/data';
+import api from '@/utils/api';
 
 interface FileTableComponentProps {
     fileData: File[];
@@ -37,9 +38,29 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
         router.push(`/file-manager/workspace?id=${data.file_id}&type=${data.file_type}`);
     }
 
-    const handleExport = (data: File) => {
-
-    }
+    const handleExport = async (data: File) => {
+        try {
+          const fileId = data.file_id;
+      
+          const response = await api.post('/files/export', 
+            { file_id: fileId },
+            { responseType: 'blob' }
+          );
+      
+          const settings = JSON.parse(data.settings);
+          const url = window.URL.createObjectURL(new Blob([response.data]));
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${settings.file_name_with_extension}`;
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+      
+        } catch (error) {
+          console.error('Export failed:', error);
+        }
+      };
 
     const handleDelete = (data: File) => {
         setDeleteModal(true);

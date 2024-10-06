@@ -24,6 +24,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('upload', [FileController::class, 'upload']);
         Route::get('retrieve_all', [FileController::class, 'retrieveAll']);
         Route::get('retrieve', [FileController::class, 'retrieve']);
+        Route::post('export', [FileController::class, 'export']);
     });
 
     Route::prefix('/finished_goods')->group(function () {

@@ -14,6 +14,11 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\File;
 use App\Models\FinishedGood;
 use App\Models\Material;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
+use PhpOffice\PhpSpreadsheet\Style\Color;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
+use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 
 class FileController extends ApiController
 {
@@ -43,23 +48,23 @@ class FileController extends ApiController
     public function retrieve(Request $request)
     {
         $allowedColumns = ['file_id', 'file_type'];
-    
+
         $col = $request->query('col');
         $value = $request->query('value');
-    
+
         if (!in_array($col, $allowedColumns)) {
             $this->status = 400;
             return $this->getResponse("Invalid column specified.");
         }
-    
+
         try {
             $records = File::where($col, $value)->get();
-    
+
             if ($records->isEmpty()) {
                 $this->status = 404;
                 return $this->getResponse("No records found.");
             }
-    
+
             $this->status = 200;
             $this->response['data'] = $records;
             return $this->getResponse();
@@ -69,7 +74,7 @@ class FileController extends ApiController
             return $this->getResponse();
         }
     }
-    
+
 
     // Importing Process
     public function upload(Request $request)
@@ -79,7 +84,7 @@ class FileController extends ApiController
         $extension = $file->getClientOriginalExtension();
         $fileNameWithExtension = $file->getClientOriginalName();
         $fileNameWithoutExtension = pathinfo($fileNameWithExtension, PATHINFO_FILENAME);
-        
+
         $user = Auth::user();
         $userName = "{$user->first_name} {$user->last_name}";
 
@@ -151,7 +156,7 @@ class FileController extends ApiController
                         }
                     } else {
                         $this->status = 400;
-                        return $this->getResponse("Lacking required sheet.");                       
+                        return $this->getResponse("Lacking required sheet.");
                     }
                 }
             }
@@ -405,6 +410,222 @@ class FileController extends ApiController
     //         $settings['monthYear'] = $monthYearInt;
     //         $settings['fg_ids'] = $fgIds;
     //         $this->fileModel['settings'] = json_encode($settings);
+    //     }
+    // }
+
+
+
+
+
+
+
+
+    // EXPORTING PROCESS
+    public function export(Request $request)
+    {
+        try {
+            $fileId = $request->input('file_id');
+            $file = File::findOrFail($fileId);
+
+            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+
+            if ($file->file_type === 'master_file') {
+                $this->addMasterFileSheets($spreadsheet, $file);
+            } elseif ($file->file_type === 'transactional_file') {
+                $this->addTransactionalFileSheets($spreadsheet, $file);
+            }
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $fileName = $file->file_name_with_extension;
+
+            $tempFile = tempnam(sys_get_temp_dir(), $fileName);
+            $writer->save($tempFile);
+
+            return response()->download($tempFile, $fileName, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ])->deleteFileAfterSend(true);
+
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = "Export failed: " . $e->getMessage();
+            return $this->getResponse();
+        }
+    }
+
+    private function addMasterFileSheets($spreadsheet, $file)
+    {
+        $settings = json_decode($file->settings, true);
+        $this->monthYear = $settings["monthYear"];
+
+        if (isset($settings['fodls'])) {
+            $this->addFODLSheet($spreadsheet, $settings['fodls']);
+        }
+
+        if (isset($settings['material_ids'])) {
+            $this->addMaterialSheet($spreadsheet, $settings['material_ids']);
+        }
+
+        // if (isset($settings['bom_ids'])) {
+        //     $this->addBOMSheet($spreadsheet, $settings['bom_ids']);
+        // }
+    }
+
+    private function addTransactionalFileSheets($spreadsheet, $file)
+    {
+        // Add logic for transactional file data
+        // This will depend on what data is associated with transactional files
+    }
+
+    private function addFODLSheet($spreadsheet, $fodlIds)
+    {
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('FODL Cost');
+
+        $monthYear = DateHelper::formatMonthYear($this->monthYear);
+        $sheet->setCellValue('A2', "for the month of $monthYear");
+        $sheet->getStyle('A2')->getFont()->setItalic(true)->setBold(true)->setName('Arial')->setSize(10)->setColor(new Color(Color::COLOR_RED));
+
+        $sheet->getColumnDimension('A')->setWidth(10.29);
+        $sheet->getColumnDimension('B')->setWidth(36.57);
+        $sheet->getColumnDimension('C')->setWidth(11.29);
+        $sheet->getColumnDimension('D')->setWidth(11.29);
+
+        $sheet->setCellValue('A1', 'FO/DL Cost');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(12)->setName('Arial');
+
+        $sheet->getRowDimension('3')->setRowHeight(29);
+        $sheet->getRowDimension('4')->setRowHeight(21.5);
+        $sheet->getRowDimension('5')->setRowHeight(50.25);
+
+        $sheet->setCellValue('C4', date('Y'));
+        $sheet->mergeCells('C4:D4');
+        $sheet->getStyle('C4')->getFont()->setBold(true)->setSize(11);
+        $sheet->getStyle('C4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+
+        $headers = ['ITEM CODE', 'ITEM DESCRIPTION', 'FO', 'DL'];
+        $sheet->fromArray($headers, NULL, 'A5');
+
+        $headerStyle = $sheet->getStyle('A5:D5');
+        $headerStyle->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+        $headerBorders = $headerStyle->getBorders();
+        $headerBorders->getOutline()->setBorderStyle(Border::BORDER_MEDIUM);
+
+        $headerStyleAtoB = $sheet->getStyle('A5:B5');
+        $headerStyleAtoB->getFont()->setBold(true)->setSize(9)->setName('Arial');
+        $headerStyleAtoB->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E6B8B7');
+        $headerStyleAtoB->getFont()->setBold(true);
+
+        $headerStyleCtoD = $sheet->getStyle('C5:D5');
+        $headerStyleCtoD->getFont()->setBold(true)->setSize(11);
+        $headerStyleCtoD->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F2DCDB');
+        $headerStyleCtoD->getFont()->setBold(true)->getColor()->setRGB('0000FF');
+
+        $row = 6;
+        foreach ($fodlIds as $fodlData) {
+            $fodl = Fodl::find($fodlData['fodl_id']);
+            $fg = FinishedGood::where('fodl_id', $fodlData['fodl_id'])->first();
+            if ($fodl) {
+                $sheet->setCellValue("A$row", $fodl->fg_code);
+                $sheet->setCellValue("B$row", $fg->fg_desc);
+                $sheet->setCellValue("C$row", $fodl->factory_overhead);
+                $sheet->setCellValue("D$row", $fodl->direct_labor);
+
+                $sheet->getStyle("C$row")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                $sheet->getStyle("D$row")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+
+                $sheet->getStyle("A$row:B$row")->getFont()->setSize(8)->setName('Arial');
+                $sheet->getStyle("C$row:D$row")->getFont()->setSize(11)->setBold(true)->getColor()->setRGB('0000FF');
+
+                $row++;
+            }
+        }
+
+        $dataRange = 'A5:D' . ($row - 1);
+        $sheet->setAutoFilter($dataRange);
+    }
+
+    private function addMaterialSheet($spreadsheet, $materialIds)
+    {
+        $sheet = $spreadsheet->createSheet();
+        $sheet->setTitle('Material Cost');
+    
+        $sheet->getColumnDimension('A')->setWidth(10.29);
+        $sheet->getColumnDimension('B')->setWidth(36.57);
+        $sheet->getColumnDimension('C')->setWidth(5.86);
+        $sheet->getColumnDimension('D')->setWidth(11.29);
+
+        $sheet->getRowDimension('3')->setRowHeight(29);
+        $sheet->getRowDimension('4')->setRowHeight(21.5);
+        $sheet->getRowDimension('5')->setRowHeight(50.25);
+    
+        $sheet->setCellValue('A1', 'Material Cost');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(12)->setName('Arial');
+    
+        $monthYear = DateHelper::formatMonthYear($this->monthYear);
+        $sheet->setCellValue('A2', "for the month of $monthYear");
+        $sheet->getStyle('A2')->getFont()->setItalic(true)->setBold(true)->setName('Arial')->setSize(10)->getColor()->setRGB('FF0000');
+    
+        $sheet->setCellValue('D4', date('Y'));
+        $sheet->getStyle('D4')->getFont()->setBold(true)->setSize(11);
+        $sheet->getStyle('D4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+    
+        $month = DateHelper::formatMonth($this->monthYear);
+        $headers = ['ITEM CODE', 'ITEM DESCRIPTION', 'UNIT', (string) $month];
+        $sheet->fromArray($headers, NULL, 'A5');
+    
+        $headerStyle = $sheet->getStyle('A5:D5');
+        $headerStyle->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+        $headerBorders = $headerStyle->getBorders();
+        $headerBorders->getOutline()->setBorderStyle(Border::BORDER_MEDIUM);
+    
+        $headerStyleAtoB = $sheet->getStyle('A5:C5');
+        $headerStyleAtoB->getFont()->setBold(true)->setSize(9)->setName('Arial');
+        $headerStyleAtoB->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E6B8B7');
+    
+        $headerStyleD = $sheet->getStyle('D5');
+        $headerStyleD->getFont()->setBold(true)->setSize(11);
+        $headerStyleD->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F2DCDB');
+        $headerStyleD->getFont()->getColor()->setRGB('0000FF');
+    
+        $row = 6;
+        foreach ($materialIds as $materialId) {
+            $material = Material::where('material_id', $materialId)->first();
+            $sheet->setCellValue("A$row", $material['material_code']);
+            $sheet->setCellValue("B$row", $material['material_desc']);
+            $sheet->setCellValue("C$row", $material['unit']);
+            $sheet->setCellValue("D$row", $material['material_cost']);
+    
+            $sheet->getStyle("A$row:C$row")->getFont()->setSize(8)->setName('Arial');
+    
+            $styleRowD = $sheet->getStyle("D$row");
+            $styleRowD->getFont()->setSize(11)->setBold(true)->getColor()->setRGB('0000FF');;
+            $styleRowD->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+    
+            $row++;
+        }
+
+        $dataRange = 'A5:D' . ($row - 1);
+        $sheet->setAutoFilter($dataRange);
+    }
+
+    // private function addBOMSheet($spreadsheet, $bomIds)
+    // {
+    //     $sheet = $spreadsheet->createSheet();
+    //     $sheet->setTitle('BOM');
+
+    //     $sheet->setCellValue('A1', 'BOM ID');
+    //     $sheet->setCellValue('B1', 'BOM Name');
+    //     $sheet->setCellValue('C1', 'Formulations');
+
+    //     $row = 2;
+    //     foreach ($bomIds as $bomId) {
+    //         $bom = Bom::find($bomId);
+    //         if ($bom) {
+    //             $sheet->setCellValue('A' . $row, $bom->bom_id);
+    //             $sheet->setCellValue('B' . $row, $bom->bom_name);
+    //             $sheet->setCellValue('C' . $row, $bom->formulations);
+    //             $row++;
+    //         }
     //     }
     // }
 }
