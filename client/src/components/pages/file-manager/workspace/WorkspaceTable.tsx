@@ -69,9 +69,9 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
 
     const removeRow = (index: number) => {
         const rowToRemove = tableData[index];
-        const fodlId = rowToRemove['id']; // Assuming 'id' corresponds to 'fodl_id'
+        const fodlId = rowToRemove['id'];
     
-        const confirmDeletion = window.confirm('Are you sure you want to delete this FODL record?');
+        const confirmDeletion = window.confirm('Are you sure you want to delete this record?'); // Change this to modal!
         if (!confirmDeletion) return;
     
         // Optimistically update the UI
@@ -153,7 +153,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                                     .map(([key, value], colIndex) => {
                                     let textAlignClass = 'text-left';
                                     if (typeof value === 'number') textAlignClass = 'text-right';
-                                    if (key === 'factoryOverhead' || key === 'directLabor') textAlignClass = 'text-right';
+                                    if (key === 'factoryOverhead' || key === 'directLabor' || key === 'materialCost') textAlignClass = 'text-right';
                                     return (
                                         <td
                                           key={key}
@@ -183,7 +183,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                                     .map(([key, value], colIndex) => {
                                     let textAlignClass = 'text-left';
                                     if (typeof value === 'number') textAlignClass = 'text-right';
-                                    if (key === 'factoryOverhead' || key === 'directLabor') textAlignClass = 'text-right';
+                                    if (key === 'factoryOverhead' || key === 'directLabor' || key === 'materialCost') textAlignClass = 'text-right';
                                     if (key=='level' || key=='formulation') textAlignClass = 'text-center';
                                     return (
                                         <td

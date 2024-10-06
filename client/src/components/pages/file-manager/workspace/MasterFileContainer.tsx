@@ -5,7 +5,7 @@ import { TbProgress } from "react-icons/tb";
 import WorkspaceTable from './WorkspaceTable';
 import { BOM, File, FodlPair, FodlRecord, FormulationRecord, MaterialRecord } from '@/types/data';
 import api from '@/utils/api';
-import { formatMonthYear } from '@/utils/costwiseUtils';
+import { formatMonthYear, transformMonthYearToDate } from '@/utils/costwiseUtils';
 import Alert from '@/components/alerts/Alert';
 
 const MasterFileContainer = (data: File) => {
@@ -20,7 +20,9 @@ const MasterFileContainer = (data: File) => {
   const [fodlFileData, setFodlFileData] = useState<FodlRecord[]>([]);
   const [materialData, setMaterialData] = useState<MaterialRecord[]>([]);
   const [bomSheets, setBomSheets] = useState<BOM[]>([]);
+
   const [removedFodlIds, setRemovedFodlIds] = useState<number[]>([]);
+  const [removedMaterialIds, setRemovedMaterialIds] = useState<number[]>([]);
 
   const [alertMessages, setAlertMessages] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
@@ -107,7 +109,6 @@ const MasterFileContainer = (data: File) => {
     }
   };
 
-
   const fetchMaterialSheet = async (material_ids: Number[]) => {
     try {
       const response = await api.get('/materials/retrieve_batch', {
@@ -115,7 +116,8 @@ const MasterFileContainer = (data: File) => {
       });
 
       if (response.data.status === 200) {
-        const validResults = response.data.data.map((data: { material_code: any; material_desc: any; unit: any; material_cost: string; }) => ({
+        const validResults = response.data.data.map((data: { material_id: any, material_code: any; material_desc: any; unit: any; material_cost: string; }) => ({
+          id: data.material_id,
           itemCode: data.material_code,
           itemDescription: data.material_desc,
           unit: data.unit,
@@ -300,16 +302,16 @@ const MasterFileContainer = (data: File) => {
     try {
       const hasEmptyEntry = updatedData.some(item => {
         return (
-            typeof item === 'object' &&
-            item !== null &&
-            !Array.isArray(item) &&
-            (item.itemCode === '' &&
-             item.itemDescription === '' &&
-             item.unit === '' &&
-             item.factoryOverhead === '' &&
-             item.directLabor === '')
+          typeof item === 'object' &&
+          item !== null &&
+          !Array.isArray(item) &&
+          (item.itemCode === '' &&
+            item.itemDescription === '' &&
+            item.unit === '' &&
+            item.factoryOverhead === '' &&
+            item.directLabor === '')
         );
-    });
+      });
 
       if (hasEmptyEntry) {
         setAlertMessages(['One or more entries are empty. Please fill in all required fields.']);
@@ -370,7 +372,9 @@ const MasterFileContainer = (data: File) => {
 
       // await fetchFodlSheet();
     } catch (error: any) {
-      if (error.response.data.errors) {
+      if (error.response?.data?.message) {
+        setAlertMessages([error.response.data.message]);
+      } else if (error.response?.data?.errors) {
         const errorMessages = [];
         for (const key in error.response.data.errors) {
           if (error.response.data.errors.hasOwnProperty(key)) {
@@ -378,17 +382,90 @@ const MasterFileContainer = (data: File) => {
           }
         }
         setAlertMessages(errorMessages);
-      } else if (error.response.data.message) {
-        setAlertMessages([error.response.data.message]);
       } else {
         setAlertMessages(['Error saving sheets due to invalid inputs. Retry again!']);
       }
     }
   };
 
-  useEffect(() => {
-    console.log('Updated alertMessages:', alertMessages);
-  }, [alertMessages]);
+  const onSaveMaterialSheet = async (materials: any[]) => {
+    try {
+      console.log(materials);
+      const hasEmptyEntry = materials.some(item => {
+        return (
+          typeof item === 'object' &&
+          item !== null &&
+          !Array.isArray(item) &&
+          (item.itemCode === '' &&
+            item.itemDescription === '' &&
+            item.unit === '' &&
+            item.materialCost === '')
+        );
+      });
+
+      if (hasEmptyEntry) {
+        setAlertMessages(['One or more entries are empty. Please fill in all required fields.']);
+        return;
+      }
+
+      const settings = JSON.parse(data.settings);
+      const transformedMaterials = materials.map((item) => ({
+        material_id: item.id,
+        material_code: item.itemCode,
+        material_desc: item.itemDescription,
+        material_cost: parseFloat(item.materialCost.toString()),
+        unit: item.unit,
+        date: transformMonthYearToDate(settings.monthYear)
+      }));
+
+      const payload = {
+        materials: transformedMaterials,
+        file_id: data.file_id
+      };
+
+      const saveResponse = await api.post('/materials/update_batch', payload);
+
+      if (saveResponse.data.status === 200) {
+        setSuccessMessage('Material sheet saved successfully.');
+
+        if (removedMaterialIds.length > 0) {
+          try {
+            const deletePayload = {
+              material_ids: removedMaterialIds,
+              file_id: data.file_id,
+            };
+            const deleteResponse = await api.post('/materials/delete_bulk', deletePayload);
+
+            if (deleteResponse.data.status === 200) {
+              setSuccessMessage('Material records deleted successfully.');
+              setRemovedFodlIds([]);
+            } else {
+              setAlertMessages(['Failed to bulk delete Material IDs.']);
+            }
+          } catch (deleteError) {
+            setAlertMessages(['An error occurred while deleting Material records.']);
+          }
+        }
+      } else {
+        const errorMsg = saveResponse.data.message || 'Failed to save material sheet.';
+        setAlertMessages([errorMsg]);
+      }
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        setAlertMessages([error.response.data.message]);
+      } else if (error.response?.data?.errors) {
+        const errorMessages = [];
+        for (const key in error.response.data.errors) {
+          if (error.response.data.errors.hasOwnProperty(key)) {
+            errorMessages.push(...error.response.data.errors[key]);
+          }
+        }
+        setAlertMessages(errorMessages);
+      } else {
+        setAlertMessages(['Error saving Material sheet. Please try again.']);
+      }
+    }
+  };
 
   return (
     <>
@@ -446,8 +523,9 @@ const MasterFileContainer = (data: File) => {
                 isEdit={isEdit['B']}
                 setIsEdit={() => toggleEdit('B')}
                 isTransaction={false}
-                removedFodlIds={removedFodlIds}
-                setRemovedFodlIds={setRemovedFodlIds}
+                onSave={onSaveMaterialSheet}
+                removedFodlIds={removedMaterialIds}
+                setRemovedFodlIds={setRemovedMaterialIds}
               />
             </div>
 

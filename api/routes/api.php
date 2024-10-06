@@ -46,6 +46,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_all', [MaterialController::class, 'retrieveAll']);
         Route::get('retrieve', [MaterialController::class, 'retrieve']);
         Route::get('retrieve_batch', [MaterialController::class, 'retrieveBatch']);
+        Route::post('update_batch', [MaterialController::class, 'updateBatch']);
+        Route::post('delete_bulk', [MaterialController::class, 'deleteBulk']);
     });
 
     Route::prefix('/boms')->group(function () {

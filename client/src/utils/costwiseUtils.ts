@@ -36,3 +36,17 @@ export const formatMonthYear = (yyyymm: number | undefined): string => {
     const monthName = date.toLocaleString('default', { month: 'long' });
     return `${monthName} ${year}`;
 };
+
+export const transformMonthYearToDate = (monthYearInt: number): string => {
+    const year = Math.floor(monthYearInt / 100);
+    const month = monthYearInt % 100;            
+  
+    if (month < 1 || month > 12) {
+      throw new Error('Invalid month value in monthYear.');
+    }
+  
+    const pad = (n: number): string => (n < 10 ? '0' + n : n.toString());
+    const formattedDate = `${year}-${pad(month)}-01`;
+  
+    return formattedDate;
+};

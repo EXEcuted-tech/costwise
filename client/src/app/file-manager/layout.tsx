@@ -1,5 +1,6 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
+import Spinner from "@/components/loaders/Spinner";
 import ProtectedRoute from "@/components/routes/ProtectedRoute";
 import { FileManagerProvider } from '@/contexts/FileManagerContext';
 import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
@@ -14,7 +15,7 @@ export default function FileManagerLayout({
     <ProtectedRoute>
       <SidebarProvider>
         <FileManagerProvider>
-        <Suspense fallback={<div>Loading workspace...</div>}>
+        <Suspense fallback={<div className="flex justify-center items-center size-full"><Spinner/></div>}>
             <FileManagerContent>
               {children}
             </FileManagerContent>

@@ -185,7 +185,7 @@ class FodlController extends ApiController
         if ($validator->fails()) {
             $this->status = 422;
             $this->response['errors'] = $validator->errors();
-            return $this->getResponse("Incorrect input details!");
+            return $this->getResponse("Incorrect/Lacking input details!");
         }
 
         $fodls = $request->input('fodls');
@@ -304,7 +304,6 @@ class FodlController extends ApiController
         } catch (\Exception $e) {
             \DB::rollBack();
             $this->status = 500;
-            $this->response['message'] = "An error occurred while updating records.";
             return $this->getResponse("An error occurred while updating records.");
         }
     }
@@ -318,11 +317,9 @@ class FodlController extends ApiController
         ]);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => 422,
-                'errors' => $validator->errors(),
-                'message' => 'Validation failed.'
-            ], 422);
+            $this->status = 422;
+            $this->response['errors'] = $validator->errors();
+            return $this->getResponse("Validation failed.");
         }
 
         $fodlIds = $request->input('fodl_ids');
@@ -369,17 +366,12 @@ class FodlController extends ApiController
 
             \DB::commit();
 
-            return response()->json([
-                'status' => 200,
-                'message' => 'FODL records deleted and archived successfully.'
-            ], 200);
+            $this->status = 200;
+            return $this->getResponse('FODL records deleted and archived successfully.');
         } catch (\Exception $e) {
             \DB::rollBack();
-
-            return response()->json([
-                'status' => 500,
-                'message' => 'An error occurred while deleting the FODL records.'
-            ], 500);
+            $this->status = 500;
+            return $this->getResponse("An error occurred while deleting records.");
         }
     }
 }

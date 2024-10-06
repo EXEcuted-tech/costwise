@@ -2,8 +2,10 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\File;
 use App\Models\Material;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Validator;
 
 class MaterialController extends ApiController
 {
@@ -102,82 +104,164 @@ class MaterialController extends ApiController
     }
 
 
-    public function onSaveMaterialSheet(Request $request)
+    public function updateBatch(Request $request)
     {
-        // Define validation rules
         $rules = [
             'materials' => 'required|array|min:1',
-            'materials.*.material_id' => 'sometimes|integer|exists:materials,material_id',
+            'materials.*.material_id' => 'sometimes|integer',
             'materials.*.material_code' => 'required|string|max:255',
             'materials.*.material_desc' => 'required|string|max:1000',
             'materials.*.unit' => 'required|string|max:50',
-            // Add other fields and their validation rules as necessary
+            'materials.*.material_cost' => 'required|numeric|min:0',
         ];
 
-        // Validate the request
         $validator = Validator::make($request->all(), $rules);
 
         if ($validator->fails()) {
-            return response()->json([
-                'status' => 422,
-                'errors' => $validator->errors(),
-                'message' => 'Validation failed.',
-            ], 422);
+            $this->status = 422;
+            $this->response['errors'] = $validator->errors();
+            return $this->getResponse("Incorrect/Lacking input details!");
         }
 
         $materialsData = $request->input('materials');
+        $file_id = $request->input('file_id');
 
-        DB::beginTransaction();
+        \DB::beginTransaction();
 
-        try {
-            foreach ($materialsData as $materialData) {
-                // Check if material_id is present to determine update or create
-                if (isset($materialData['material_id'])) {
-                    // Update existing material
-                    $material = Material::find($materialData['material_id']);
-                    if ($material) {
-                        $material->update([
-                            'material_code' => $materialData['material_code'],
-                            'material_desc' => $materialData['material_desc'],
-                            'unit' => $materialData['unit'],
-                            // Update other fields as necessary
-                        ]);
-                    } else {
-                        // This case should not occur due to validation, but added for safety
-                        DB::rollBack();
-                        return response()->json([
-                            'status' => 404,
-                            'message' => "Material with ID {$materialData['material_id']} not found.",
-                        ], 404);
-                    }
-                } else {
-                    // Create new material
-                    Material::create([
+        // try {
+        foreach ($materialsData as $materialData) {
+            if (isset($materialData['material_id'])) {
+                $material = Material::find($materialData['material_id']);
+
+                if ($material) {
+                    $material->update([
                         'material_code' => $materialData['material_code'],
                         'material_desc' => $materialData['material_desc'],
+                        'material_cost' => $materialData['material_cost'],
                         'unit' => $materialData['unit'],
-                        // Add other fields as necessary
+                        'date' => $materialData['date'],
                     ]);
+                    $material->save();
+                } else {
+                    $existingCode = Material::where('material_code', $materialData['material_code'])->first();
+
+                    if ($existingCode) {
+                        $this->status = 401;
+                        return $this->getResponse("Material code already exists.");
+                    } else {
+                        Material::create([
+                            'material_code' => $materialData['material_code'],
+                            'material_desc' => $materialData['material_desc'],
+                            'material_cost' => $materialData['material_cost'],
+                            'unit' => $materialData['unit'],
+                            'date' => $materialData['date'],
+                        ]);
+
+                        $files = File::where('file_id', $file_id)->get();
+
+                        foreach ($files as $file) {
+                            $settings = json_decode($file->settings, true);
+                        
+                            if (!isset($settings['material_ids']) || !is_array($settings['material_ids'])) {
+                                $settings['material_ids'] = [];
+                            }
+                        
+                            $settings['material_ids'][] = $materialData['material_id'];
+                            $settings['material_ids'] = array_values($settings['material_ids']);
+                            $file->settings = json_encode($settings);
+                            $file->save();
+                        }
+                    }
+                }
+            }
+        }
+
+        \DB::commit();
+
+        $this->status = 200;
+        return $this->getResponse('Materials have been successfully saved.');
+        // } catch (\Exception $e) {
+        //     \DB::rollBack();
+        //     $this->status = 500;
+        //     $this->response['message'] = "An error occurred while updating records.";
+        //     return $this->getResponse("An error occurred while updating records.");
+        // }
+    }
+
+    public function deleteBulk(Request $request)
+    {
+        // Validation rules for materials
+        $rules = [
+            'material_ids' => 'required|array|min:1',
+            'material_ids.*' => 'required|integer|exists:materials,material_id',
+        ];
+
+        $validator = Validator::make($request->all(), $rules);
+
+        // Check for validation failures
+        if ($validator->fails()) {
+            $this->status = 422;
+            $this->response['errors'] = $validator->errors();
+            return $this->getResponse("Validation failed.");
+        }
+
+        $materialIds = $request->input('material_ids');
+        $file_id = $request->input('file_id');
+
+        \DB::beginTransaction();
+
+        try {
+            // Get the materials to be deleted
+            $materials = Material::whereIn('material_id', $materialIds)->get();
+
+            if ($materials->isEmpty()) {
+                \DB::rollBack();
+                $this->status = 404;
+                return $this->getResponse('No materials found to delete.');
+            }
+
+            // Archive the materials to another database
+            foreach ($materials as $material) {
+                $archivedMaterialData = $material->toArray();
+                Material::on('archive_mysql')->create($archivedMaterialData);
+            }
+
+            // Retrieve the files associated with the given file_id
+            $files = File::where('file_id', $file_id)->get();
+
+            foreach ($files as $file) {
+                $settings = json_decode($file->settings, true);
+
+                if (isset($settings['material_ids']) && is_array($settings['material_ids'])) {
+                    $originalCount = count($settings['material_ids']);
+
+                    // Remove the deleted materials from the settings
+                    $settings['material_ids'] = array_filter($settings['material_ids'], function ($materialId) use ($materialIds) {
+                        return !in_array($materialId, $materialIds);
+                    });
+
+                    $newCount = count($settings['material_ids']);
+
+                    // If there was a change in the count, update the file's settings
+                    if ($newCount < $originalCount) {
+                        $settings['material_ids'] = array_values($settings['material_ids']); // Reindex the array
+                        $file->settings = json_encode($settings);
+                        $file->save();
+                    }
                 }
             }
 
-            DB::commit();
+            // Finally, delete the materials from the original database
+            Material::whereIn('material_id', $materialIds)->delete();
 
-            return response()->json([
-                'status' => 200,
-                'message' => 'Materials have been successfully saved.',
-            ], 200);
+            \DB::commit();
+
+            $this->status = 200;
+            return $this->getResponse('Materials have been successfully deleted and archived.');
         } catch (\Exception $e) {
-            DB::rollBack();
-
-            // Log the exception if necessary
-            // Log::error($e->getMessage());
-
-            return response()->json([
-                'status' => 500,
-                'message' => 'An error occurred while saving materials.',
-                'error' => $e->getMessage(), // Optional: Remove in production for security
-            ], 500);
+            \DB::rollBack();
+            $this->status = 500;
+            return $this->getResponse("An error occurred while deleting records.");
         }
     }
 }
