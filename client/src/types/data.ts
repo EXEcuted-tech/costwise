@@ -60,6 +60,9 @@ export interface MaterialRecord extends Record<string, unknown> {
 }
 
 export interface FormulationRecord extends Record<string, unknown> {
+    id?: number;
+    rowType?: string;
+    track_id?: number;
     formula: string | null;
     level: string | null;
     itemCode: string | null;
@@ -74,3 +77,9 @@ export interface BOM {
     bomName: string;
     formulations: FormulationRecord[];
 }
+
+export interface RemovedId {
+    id: number;
+    track_id:number;
+    rowType: string;
+  }

@@ -128,69 +128,68 @@ class MaterialController extends ApiController
 
         \DB::beginTransaction();
 
-        // try {
-        foreach ($materialsData as $materialData) {
-            if (isset($materialData['material_id'])) {
-                $material = Material::find($materialData['material_id']);
+        try {
+            foreach ($materialsData as $materialData) {
+                if (isset($materialData['material_id'])) {
+                    $material = Material::find($materialData['material_id']);
 
-                if ($material) {
-                    $material->update([
-                        'material_code' => $materialData['material_code'],
-                        'material_desc' => $materialData['material_desc'],
-                        'material_cost' => $materialData['material_cost'],
-                        'unit' => $materialData['unit'],
-                        'date' => $materialData['date'],
-                    ]);
-                    $material->save();
-                } else {
-                    $existingCode = Material::where('material_code', $materialData['material_code'])->first();
-
-                    if ($existingCode) {
-                        $this->status = 401;
-                        return $this->getResponse("Material code already exists.");
-                    } else {
-                        Material::create([
+                    if ($material) {
+                        $material->update([
                             'material_code' => $materialData['material_code'],
                             'material_desc' => $materialData['material_desc'],
                             'material_cost' => $materialData['material_cost'],
                             'unit' => $materialData['unit'],
                             'date' => $materialData['date'],
                         ]);
+                        $material->save();
+                    } else {
+                        $existingCode = Material::where('material_code', $materialData['material_code'])->first();
 
-                        $files = File::where('file_id', $file_id)->get();
+                        if ($existingCode) {
+                            $this->status = 401;
+                            return $this->getResponse("Material code already exists.");
+                        } else {
+                            Material::create([
+                                'material_code' => $materialData['material_code'],
+                                'material_desc' => $materialData['material_desc'],
+                                'material_cost' => $materialData['material_cost'],
+                                'unit' => $materialData['unit'],
+                                'date' => $materialData['date'],
+                            ]);
 
-                        foreach ($files as $file) {
-                            $settings = json_decode($file->settings, true);
-                        
-                            if (!isset($settings['material_ids']) || !is_array($settings['material_ids'])) {
-                                $settings['material_ids'] = [];
+                            $files = File::where('file_id', $file_id)->get();
+
+                            foreach ($files as $file) {
+                                $settings = json_decode($file->settings, true);
+
+                                if (!isset($settings['material_ids']) || !is_array($settings['material_ids'])) {
+                                    $settings['material_ids'] = [];
+                                }
+
+                                $settings['material_ids'][] = $materialData['material_id'];
+                                $settings['material_ids'] = array_values($settings['material_ids']);
+                                $file->settings = json_encode($settings);
+                                $file->save();
                             }
-                        
-                            $settings['material_ids'][] = $materialData['material_id'];
-                            $settings['material_ids'] = array_values($settings['material_ids']);
-                            $file->settings = json_encode($settings);
-                            $file->save();
                         }
                     }
                 }
             }
+
+            \DB::commit();
+
+            $this->status = 200;
+            return $this->getResponse('Materials have been successfully saved.');
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            $this->status = 500;
+            $this->response['message'] = "An error occurred while updating records.";
+            return $this->getResponse("An error occurred while updating records.");
         }
-
-        \DB::commit();
-
-        $this->status = 200;
-        return $this->getResponse('Materials have been successfully saved.');
-        // } catch (\Exception $e) {
-        //     \DB::rollBack();
-        //     $this->status = 500;
-        //     $this->response['message'] = "An error occurred while updating records.";
-        //     return $this->getResponse("An error occurred while updating records.");
-        // }
     }
 
     public function deleteBulk(Request $request)
     {
-        // Validation rules for materials
         $rules = [
             'material_ids' => 'required|array|min:1',
             'material_ids.*' => 'required|integer|exists:materials,material_id',
@@ -198,7 +197,6 @@ class MaterialController extends ApiController
 
         $validator = Validator::make($request->all(), $rules);
 
-        // Check for validation failures
         if ($validator->fails()) {
             $this->status = 422;
             $this->response['errors'] = $validator->errors();
@@ -211,7 +209,6 @@ class MaterialController extends ApiController
         \DB::beginTransaction();
 
         try {
-            // Get the materials to be deleted
             $materials = Material::whereIn('material_id', $materialIds)->get();
 
             if ($materials->isEmpty()) {
@@ -220,13 +217,11 @@ class MaterialController extends ApiController
                 return $this->getResponse('No materials found to delete.');
             }
 
-            // Archive the materials to another database
             foreach ($materials as $material) {
                 $archivedMaterialData = $material->toArray();
                 Material::on('archive_mysql')->create($archivedMaterialData);
             }
 
-            // Retrieve the files associated with the given file_id
             $files = File::where('file_id', $file_id)->get();
 
             foreach ($files as $file) {
@@ -235,14 +230,12 @@ class MaterialController extends ApiController
                 if (isset($settings['material_ids']) && is_array($settings['material_ids'])) {
                     $originalCount = count($settings['material_ids']);
 
-                    // Remove the deleted materials from the settings
                     $settings['material_ids'] = array_filter($settings['material_ids'], function ($materialId) use ($materialIds) {
                         return !in_array($materialId, $materialIds);
                     });
 
                     $newCount = count($settings['material_ids']);
 
-                    // If there was a change in the count, update the file's settings
                     if ($newCount < $originalCount) {
                         $settings['material_ids'] = array_values($settings['material_ids']); // Reindex the array
                         $file->settings = json_encode($settings);
@@ -251,7 +244,6 @@ class MaterialController extends ApiController
                 }
             }
 
-            // Finally, delete the materials from the original database
             Material::whereIn('material_id', $materialIds)->delete();
 
             \DB::commit();

@@ -3,7 +3,7 @@ import FileLabel from './FileLabel'
 import { FaPencilAlt } from "react-icons/fa";
 import { TbProgress } from "react-icons/tb";
 import WorkspaceTable from './WorkspaceTable';
-import { BOM, File, FodlPair, FodlRecord, FormulationRecord, MaterialRecord } from '@/types/data';
+import { BOM, File, FodlPair, FodlRecord, FormulationRecord, MaterialRecord, RemovedId } from '@/types/data';
 import api from '@/utils/api';
 import { formatMonthYear, transformMonthYearToDate } from '@/utils/costwiseUtils';
 import Alert from '@/components/alerts/Alert';
@@ -23,6 +23,7 @@ const MasterFileContainer = (data: File) => {
 
   const [removedFodlIds, setRemovedFodlIds] = useState<number[]>([]);
   const [removedMaterialIds, setRemovedMaterialIds] = useState<number[]>([]);
+  const [removedIds, setRemovedIds] = useState<RemovedId[]>([]);
 
   const [alertMessages, setAlertMessages] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
@@ -210,6 +211,9 @@ const MasterFileContainer = (data: File) => {
 
             if (finishedGood) {
               let fgRow: FormulationRecord = {
+                id: finishedGood.fg_id,
+                track_id: formulationId,
+                rowType: 'finishedGood',
                 formula: formulation.formula_code,
                 level: null,
                 itemCode: finishedGood.fg_code,
@@ -225,6 +229,9 @@ const MasterFileContainer = (data: File) => {
               const emulsionData = JSON.parse(formulation.emulsion);
               if (Object.keys(emulsionData).length !== 0) {
                 currentFormulations.push({
+                  id: formulationId,
+                  track_id: formulationId,
+                  rowType: 'emulsion',
                   formula: null,
                   level: emulsionData.level,
                   itemCode: null,
@@ -247,6 +254,9 @@ const MasterFileContainer = (data: File) => {
 
                 if (materialDetails) {
                   currentFormulations.push({
+                    id: materialDetails.material_id,
+                    track_id: formulationId,
+                    rowType: 'material',
                     formula: null,
                     level: parseFloat(materialInfo.level).toString(),
                     itemCode: materialDetails.material_code,
@@ -261,6 +271,7 @@ const MasterFileContainer = (data: File) => {
 
             if (index !== formulations.length - 1) {
               const emptyFodlRecord: FormulationRecord = {
+                rowType: 'endIdentifier',
                 formula: null,
                 level: null,
                 itemCode: null,
@@ -390,7 +401,7 @@ const MasterFileContainer = (data: File) => {
 
   const onSaveMaterialSheet = async (materials: any[]) => {
     try {
-      console.log(materials);
+      // console.log(materials);
       const hasEmptyEntry = materials.some(item => {
         return (
           typeof item === 'object' &&
@@ -467,6 +478,274 @@ const MasterFileContainer = (data: File) => {
     }
   };
 
+  const onSaveBOMSheet = async (updatedData: any, bomId: number) => {
+    // console.log(updatedData);
+    // const hasEmptyEntry = updatedData.some(item => {
+    //   return (
+
+    //   );
+    // });
+
+    // if (hasEmptyEntry) {
+    //   setAlertMessages(['One or more entries are empty. Please fill in all required fields.']);
+    //   return;
+    // }
+    //1. Check if the addedRow is null (same like other onSaveBomSheets)
+    try {
+      const bomResponse = await api.get('/boms/retrieve', {
+        params: { col: 'bom_id', value: bomId },
+      });
+
+      const formulaArray = JSON.parse(bomResponse.data.data[0].formulations);
+      if (bomResponse.data.status == 200) {
+        const formulations = splitFormulations(updatedData, formulaArray);
+
+        formulations.forEach(async ({ id, formulations }, index) => {
+          const formulationData = formulations;
+          const finishedGood = formulationData[0];
+
+          let fgRow = {
+            fg_id: finishedGood.id,
+            fg_code: finishedGood.itemCode,
+            fg_desc: finishedGood.description,
+            total_batch_qty: finishedGood.batchQty,
+            unit: finishedGood.unit,
+            formulation_no: parseInt(finishedGood.formulation ?? '0', 10),
+          };
+
+          const fgResponse = await api.post('/finished_goods/update', fgRow);
+
+          if (fgResponse.data.status !== 200) {
+
+          }
+
+          let emulsion = formulationData[1]?.description === 'EMULSION' ? formulationData[1] : null;
+
+          if (!emulsion) {
+            const emulsions = formulationData.filter(item => item.description === 'EMULSION');
+
+            if (emulsions.length === 1) {
+              emulsion = emulsions[0];
+            }
+            else if (emulsions.length > 1) {
+              emulsion = formulationData[1];
+            }
+          }
+
+          const transformedEmulsionData = emulsion
+            ? {
+              level: emulsion.level,
+              batch_qty: emulsion.batchQty,
+              unit: emulsion.unit
+            }
+            : {};
+
+          const materials = formulationData.slice(2);
+
+          const transformedMaterialData = materials.map(item => ({
+            material_id: item.id,
+            material_code: item.itemCode,
+            material_desc: item.description,
+            unit: item.unit,
+            level: item.level,
+            batchQty: item.batchQty,
+          }));
+
+          const payload = {
+            emulsion: formulationData[1].description == 'EMULSION' ? transformedEmulsionData : {},
+            materials: transformedMaterialData,
+            formulation_id: id,
+            formula_code: finishedGood.formula
+          };
+          const saveResponse = await api.post('/boms/update_batch', payload);
+          if (saveResponse.data.status == 200) {
+            setIsLoading(false);
+            setSuccessMessage("FODL sheets saved successfully.");
+          } else {
+            setIsLoading(false);
+            if (saveResponse.data.message) {
+              setAlertMessages([saveResponse.data.message]);
+            } else if (saveResponse.data.errors) {
+              setAlertMessages(saveResponse.data.errors);
+            }
+          }
+          // deletionzzz afterzz
+        });
+        const finishedGoodIds = removedIds
+          .filter(item => item.rowType === 'finishedGood')
+          .map(item => item.id);
+
+        const materialIds = removedIds
+          .filter(item => item.rowType === 'material')
+          .map(item => ({
+            id: item.id,
+            track_id: item.track_id
+          }));
+
+        const emulsionIds = removedIds
+          .filter(item => item.rowType === 'emulsion')
+          .map(item => item.id);
+
+        if (finishedGoodIds.length > 0) {
+          try {
+            const deleteFgResponse = await api.post('/formulations/delete_fg', {
+              fg_ids: finishedGoodIds,
+              bom_id: bomId,
+            });
+
+            if (deleteFgResponse.data.status !== 200) {
+              setAlertMessages(['Failed to delete records.']);
+            } else {
+              setSuccessMessage("Finished Goods deleted successfully.");
+            }
+          } catch (deleteFgError) {
+            setAlertMessages(['An error occurred while deleting Finished Goods.']);
+          }
+        }
+
+        if (materialIds.length > 0) {
+          const groupedByFormulationId = materialIds.reduce((acc, curr) => {
+            const { track_id, id } = curr;
+
+            if (!acc[track_id]) {
+              acc[track_id] = [];
+            }
+
+            acc[track_id].push(id);
+
+            return acc;
+          }, {} as { [key: number]: number[] });
+
+          for (const [formulation_id, material_ids] of Object.entries(groupedByFormulationId)) {
+            const payload = {
+              formulation_id: parseInt(formulation_id, 10),
+              material_ids: material_ids
+            };
+
+            try {
+              const deleteMaterialResponse = await api.post('/formulations/delete_material', payload);
+              if (deleteMaterialResponse.data.status === 200) {
+                setSuccessMessage(`Materials for formulation_id ${formulation_id} deleted successfully.`);
+              } else {
+                setAlertMessages([`Failed to delete materials for formulation_id ${formulation_id}.`]);
+              }
+            } catch (deleteMaterialError) {
+              setAlertMessages([`An error occurred while deleting materials for formulation_id ${formulation_id}.`]);
+            }
+          }
+        }
+
+        if (emulsionIds.length > 0) {
+          try {
+            const updateEmulsionResponses = await Promise.all(
+              emulsionIds.map(async (formulation_id) => {
+                return await api.post('/formulations/update_emulsion', {
+                  formulation_id: formulation_id
+                });
+              })
+            );
+        
+            const failedUpdates = updateEmulsionResponses.filter(
+              response => response.data.status !== 200
+            );
+        
+            if (failedUpdates.length > 0) {
+              setAlertMessages(['Failed to update some emulsions.']);
+            } else {
+              setSuccessMessage("Emulsions updated successfully.");
+            }
+          } catch (error) {
+            setAlertMessages(['An error occurred while updating emulsions.']);
+          }
+        }
+
+        setRemovedIds([]);
+
+        setIsLoading(false);
+      }
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        setAlertMessages([error.response.data.message]);
+      } else if (error.response?.data?.errors) {
+        const errorMessages = [];
+        for (const key in error.response.data.errors) {
+          if (error.response.data.errors.hasOwnProperty(key)) {
+            errorMessages.push(...error.response.data.errors[key]);
+          }
+        }
+        setAlertMessages(errorMessages);
+      } else {
+        setAlertMessages(['Error saving Material sheet. Please try again.']);
+      }
+    }
+  }
+
+  const splitFormulations = (
+    data: FormulationRecord[],
+    ids: number[]
+  ): { id: number; formulations: FormulationRecord[] }[] => {
+    const formulations: FormulationRecord[][] = [];
+    let currentFormulation: FormulationRecord[] = [];
+
+    if (!Array.isArray(data)) {
+      console.error('Error: data is not an array.');
+      throw new Error('The "data" argument must be an array.');
+    }
+
+    if (!ids) {
+      console.error('Error: ids is undefined or null.');
+      throw new Error('The "ids" argument is required and cannot be undefined.');
+    }
+
+    if (!Array.isArray(ids)) {
+      console.error('Error: ids is not an array.');
+      throw new Error('The "ids" argument must be an array of numbers.');
+    }
+    data.forEach((item, index) => {
+      const isSeparator =
+        item.formula === null &&
+        item.level === null &&
+        item.itemCode === null &&
+        item.description === "" &&
+        item.formulation === null &&
+        item.batchQty === null &&
+        item.unit === "";
+
+      if (isSeparator) {
+        if (currentFormulation.length > 0) {
+          formulations.push(currentFormulation);
+          currentFormulation = [];
+        }
+      } else {
+        currentFormulation.push(item);
+      }
+    });
+
+    if (currentFormulation.length > 0) {
+      formulations.push(currentFormulation);
+    }
+
+    if (ids.length !== formulations.length) {
+      console.warn(
+        `The number of IDs (${ids.length}) does not match the number of formulations (${formulations.length}).`
+      );
+      const minLength = Math.min(ids.length, formulations.length);
+      return formulations.slice(0, minLength).map((formulation, index) => ({
+        id: ids[index],
+        formulations: formulation,
+      }));
+    }
+
+    const mappedFormulations = formulations.map((formulation, index) => ({
+      id: ids[index],
+      formulations: formulation,
+    }));
+
+    return mappedFormulations;
+  };
+
+
+
   return (
     <>
       <div className="absolute top-0 right-0">
@@ -500,8 +779,8 @@ const MasterFileContainer = (data: File) => {
                 setIsEdit={() => toggleEdit('A')}
                 isTransaction={false}
                 onSave={onSaveFodlSheet}
-                removedFodlIds={removedFodlIds}
-                setRemovedFodlIds={setRemovedFodlIds}
+                removedIds={removedFodlIds}
+                setRemovedIds={setRemovedFodlIds}
               />
             </div>
 
@@ -524,8 +803,8 @@ const MasterFileContainer = (data: File) => {
                 setIsEdit={() => toggleEdit('B')}
                 isTransaction={false}
                 onSave={onSaveMaterialSheet}
-                removedFodlIds={removedMaterialIds}
-                setRemovedFodlIds={setRemovedMaterialIds}
+                removedIds={removedMaterialIds}
+                setRemovedIds={setRemovedMaterialIds}
               />
             </div>
 
@@ -553,8 +832,10 @@ const MasterFileContainer = (data: File) => {
                       isEdit={isEdit[editKey]}
                       setIsEdit={() => toggleEdit(editKey)}
                       isTransaction={false}
-                      removedFodlIds={removedFodlIds}
-                      setRemovedFodlIds={setRemovedFodlIds}
+                      onSaveBOM={onSaveBOMSheet}
+                      bomId={bom.bom_id}
+                      removedBomIds={removedIds}
+                      setRemovedBomIds={setRemovedIds}
                     />
                   </div>
                 </div>

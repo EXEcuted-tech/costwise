@@ -415,11 +415,6 @@ class FileController extends ApiController
 
 
 
-
-
-
-
-
     // EXPORTING PROCESS
     public function export(Request $request)
     {
@@ -464,10 +459,14 @@ class FileController extends ApiController
         if (isset($settings['material_ids'])) {
             $this->addMaterialSheet($spreadsheet, $settings['material_ids']);
         }
-
-        // if (isset($settings['bom_ids'])) {
-        //     $this->addBOMSheet($spreadsheet, $settings['bom_ids']);
-        // }
+       
+        if (isset($settings['bom_ids'])) {
+            $bomIds = $settings['bom_ids'];
+            foreach ($bomIds as $bomId) {
+                $bom = Bom::find($bomId);
+                $this->addBOMSheet($spreadsheet, $bom);
+            }
+        }
     }
 
     private function addTransactionalFileSheets($spreadsheet, $file)
@@ -489,6 +488,7 @@ class FileController extends ApiController
         $sheet->getColumnDimension('B')->setWidth(36.57);
         $sheet->getColumnDimension('C')->setWidth(11.29);
         $sheet->getColumnDimension('D')->setWidth(11.29);
+        $sheet->getColumnDimension('E')->setWidth(11.29);
 
         $sheet->setCellValue('A1', 'FO/DL Cost');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(12)->setName('Arial');
@@ -497,28 +497,28 @@ class FileController extends ApiController
         $sheet->getRowDimension('4')->setRowHeight(21.5);
         $sheet->getRowDimension('5')->setRowHeight(50.25);
 
-        $sheet->setCellValue('C4', date('Y'));
-        $sheet->mergeCells('C4:D4');
-        $sheet->getStyle('C4')->getFont()->setBold(true)->setSize(11);
-        $sheet->getStyle('C4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->setCellValue('D4', date('Y'));
+        $sheet->mergeCells('D4:E4');
+        $sheet->getStyle('D4')->getFont()->setBold(true)->setSize(11);
+        $sheet->getStyle('D4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
 
-        $headers = ['ITEM CODE', 'ITEM DESCRIPTION', 'FO', 'DL'];
+        $headers = ['ITEM CODE', 'ITEM DESCRIPTION', 'UNIT', 'FO', 'DL'];
         $sheet->fromArray($headers, NULL, 'A5');
 
-        $headerStyle = $sheet->getStyle('A5:D5');
+        $headerStyle = $sheet->getStyle('A5:E5');
         $headerStyle->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
         $headerBorders = $headerStyle->getBorders();
         $headerBorders->getOutline()->setBorderStyle(Border::BORDER_MEDIUM);
 
-        $headerStyleAtoB = $sheet->getStyle('A5:B5');
-        $headerStyleAtoB->getFont()->setBold(true)->setSize(9)->setName('Arial');
-        $headerStyleAtoB->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E6B8B7');
-        $headerStyleAtoB->getFont()->setBold(true);
+        $headerStyleAtoC = $sheet->getStyle('A5:C5');
+        $headerStyleAtoC->getFont()->setBold(true)->setSize(9)->setName('Arial');
+        $headerStyleAtoC->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E6B8B7');
+        $headerStyleAtoC->getFont()->setBold(true);
 
-        $headerStyleCtoD = $sheet->getStyle('C5:D5');
-        $headerStyleCtoD->getFont()->setBold(true)->setSize(11);
-        $headerStyleCtoD->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F2DCDB');
-        $headerStyleCtoD->getFont()->setBold(true)->getColor()->setRGB('0000FF');
+        $headerStyleDtoE = $sheet->getStyle('D5:E5');
+        $headerStyleDtoE->getFont()->setBold(true)->setSize(11);
+        $headerStyleDtoE->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F2DCDB');
+        $headerStyleDtoE->getFont()->setBold(true)->getColor()->setRGB('0000FF');
 
         $row = 6;
         foreach ($fodlIds as $fodlData) {
@@ -527,20 +527,21 @@ class FileController extends ApiController
             if ($fodl) {
                 $sheet->setCellValue("A$row", $fodl->fg_code);
                 $sheet->setCellValue("B$row", $fg->fg_desc);
-                $sheet->setCellValue("C$row", $fodl->factory_overhead);
-                $sheet->setCellValue("D$row", $fodl->direct_labor);
+                $sheet->setCellValue("C$row", $fg->unit);
+                $sheet->setCellValue("D$row", $fodl->factory_overhead);
+                $sheet->setCellValue("E$row", $fodl->direct_labor);
 
-                $sheet->getStyle("C$row")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
                 $sheet->getStyle("D$row")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
+                $sheet->getStyle("E$row")->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 
-                $sheet->getStyle("A$row:B$row")->getFont()->setSize(8)->setName('Arial');
-                $sheet->getStyle("C$row:D$row")->getFont()->setSize(11)->setBold(true)->getColor()->setRGB('0000FF');
+                $sheet->getStyle("A$row:C$row")->getFont()->setSize(8)->setName('Arial');
+                $sheet->getStyle("D$row:E$row")->getFont()->setSize(11)->setBold(true)->getColor()->setRGB('0000FF');
 
                 $row++;
             }
         }
 
-        $dataRange = 'A5:D' . ($row - 1);
+        $dataRange = 'A5:E' . ($row - 1);
         $sheet->setAutoFilter($dataRange);
     }
 
@@ -608,24 +609,36 @@ class FileController extends ApiController
         $sheet->setAutoFilter($dataRange);
     }
 
-    // private function addBOMSheet($spreadsheet, $bomIds)
-    // {
-    //     $sheet = $spreadsheet->createSheet();
-    //     $sheet->setTitle('BOM');
+    private function addBOMSheet($spreadsheet, $bom)
+    {
+        // dd($bom);
 
-    //     $sheet->setCellValue('A1', 'BOM ID');
-    //     $sheet->setCellValue('B1', 'BOM Name');
-    //     $sheet->setCellValue('C1', 'Formulations');
+        $sheet = $spreadsheet->createSheet();
+        $bomName = $bom['bom_name'];
+        $sheet->setTitle((string) $bomName);
 
-    //     $row = 2;
-    //     foreach ($bomIds as $bomId) {
-    //         $bom = Bom::find($bomId);
-    //         if ($bom) {
-    //             $sheet->setCellValue('A' . $row, $bom->bom_id);
-    //             $sheet->setCellValue('B' . $row, $bom->bom_name);
-    //             $sheet->setCellValue('C' . $row, $bom->formulations);
-    //             $row++;
-    //         }
-    //     }
-    // }
+        $headers = ['Formula', 'Level', 'Item Code', 'Description', 'Formulation', 'Batch Quantity', 'Unit' ];
+        $sheet->fromArray($headers, NULL, 'A1');
+
+        $formulations = json_decode($bom['formulations'], true);
+        $row = 2;
+        foreach ($formulations as $formulation) {
+            $formulationData = Formulation::find($formulation);
+            $fg = FinishedGood::find($formulationData['fg_id']);
+
+            dd($formulationData);
+            dd($fg);
+            $sheet->setCellValue("A$row", $fg['formula']);
+            // foreach ($bom['items'] as $item) {
+            //     $sheet->setCellValue("A$row", $item['formula']);
+            //     $sheet->setCellValue("B$row", $item['level']);
+            //     $sheet->setCellValue("C$row", $item['item_code']);
+            //     $sheet->setCellValue("D$row", $item['description']);
+            //     $sheet->setCellValue("E$row", $formulation);
+            //     $sheet->setCellValue("F$row", $item['batch_quantity']);
+            //     $sheet->setCellValue("G$row", $item['unit']);
+            //     $row++;
+            // }
+        }
+    }
 }
