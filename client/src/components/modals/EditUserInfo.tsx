@@ -55,13 +55,6 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
     const [last_name, setLast_name] = useState<string>('');
     const [suffix, setSuffix] = useState<string>('');
     const [position, setPosition] = useState<string>('');
-    const [checkboxStates, setCheckboxStates] = useState<CheckboxState>({
-        allRoles: false,
-        accounts: false,
-        audit: false,
-        files: false,
-        formulations: false
-      });
 
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
@@ -123,24 +116,6 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
         }
         const newSelectedRoles = sysRoles.map((roleId: number) => getRoleName(roleId));
         setSelectedRoles(newSelectedRoles);
-        
-        // Set checkbox states based on user roles
-        const newCheckboxStates = {
-            allRoles: false,
-            accounts: false,
-            audit: false,
-            files: false,
-            formulations: false
-        };
-        sysRoles.forEach((roleId: number) => {
-            const roleName = getRoleName(roleId).toLowerCase();
-            if (roleName.includes('account')) newCheckboxStates.accounts = true;
-            if (roleName.includes('audit')) newCheckboxStates.audit = true;
-            if (roleName.includes('file')) newCheckboxStates.files = true;
-            if (roleName.includes('formula')) newCheckboxStates.formulations = true;
-        });
-        newCheckboxStates.allRoles = Object.values(newCheckboxStates).every(Boolean);
-        setCheckboxStates(newCheckboxStates);
     }
 
     //Confirm changes
@@ -320,20 +295,10 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
             formData.append('suffix', suffix);
             formData.append('position', position);
             formData.append('sys_role', JSON.stringify(selectedRoleValues));
-            // const rolesArray = Array.isArray(selectedRoleValues) ? selectedRoleValues : [];
-            // formData.append('sys_role', JSON.stringify(rolesArray));
-
-            Array.from(formData.entries()).forEach(([key, value]) => {
-                console.log(key, value);
-            });
 
             if (profileImage) {
                 formData.append('display_picture', profileImage);
             }
-
-            Array.from(formData.entries()).forEach(([key, value]) => {
-                console.log(key, value);
-            });
 
             //Api call
             const response = await api.post(`/user/update/${user.user_id}`, formData, {
@@ -346,7 +311,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
             setAlertMessages([response.data.message]);
             setAlertStatus('success');
 
-            // window.location.reload();
+            window.location.reload();
 
         } catch (error: any) {
             console.log(error)
