@@ -10,7 +10,6 @@ import config from '@/server/config';
 import api from '@/utils/api';
 import ConfirmChanges from './ConfirmChanges';
 import Alert from '../alerts/Alert';
-import router from 'next/router';
 
 interface EditUserInfoProps {
     user: User;
@@ -38,11 +37,10 @@ const getRoleName = (roleId: number): string => {
 
 
 const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
-    console.log(user)
     const [isInitialized, setIsInitialized] = useState(false);
     const [showRolesSelectModal, setShowRolesSelectModal] = useState(false);
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
-    const [selectedRoleValues, setSelectedRoleValues] = useState<number[]>([]);
+    const [selectedRoleValues, setSelectedRoleValues] = useState<number[]>(Array.isArray(user.sys_role) ? user.sys_role : []);
     const [isFormDirty, setIsFormDirty] = useState(false);
     const [showConfirmChanges, setShowConfirmChanges] = useState(false);
     
@@ -78,6 +76,15 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
     const [profilePictureError, setProfilePictureError] = useState(false);
     const [roleError, setRoleError] = useState(false);
     
+    useEffect(() => {
+        if (user && user.sys_role) {
+            const roles = Array.isArray(user.sys_role) 
+                ? user.sys_role 
+                : JSON.parse(user.sys_role);
+            setSelectedRoleValues(roles);
+        }
+    }, [user]);
+
     //Roles select modal      
     const handleShowRolesSelectModal = () => {
         setShowRolesSelectModal(true);
@@ -86,7 +93,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
     //Prefill form fields
     useEffect (() => {  
         if (user && Object.keys(user).length > 0) {
-            console.log('Initializing user info with:', user);
+            // console.log('Initializing user info with:', user);
             retireveUserInfo(user);
             setIsInitialized(true);
         }
@@ -152,16 +159,15 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                 localProfileImage !== (user.display_picture ? `${config.API}/storage/${user.display_picture}` : defaultProfile.src) ||
                 JSON.stringify(selectedRoleValues) !== JSON.stringify(user.sys_role || []);
             
-            console.log('Form dirty state:', isDirty);
-            console.log('Current values:', { first_name, middle_name, last_name, suffix, email_address, department, employee_number, phone_number, position, localProfileImage, selectedRoleValues });
-            console.log('Original user values:', user);
+            // console.log('Form dirty state:', isDirty);
+            // console.log('Current values:', { first_name, middle_name, last_name, suffix, email_address, department, employee_number, phone_number, position, localProfileImage, selectedRoleValues });
+            // console.log('Original user values:', user);
 
         setIsFormDirty(isDirty);
         }
     }, [first_name, middle_name, last_name, suffix, email_address, department, 
         employee_number, phone_number, position, localProfileImage, selectedRoleValues, user, isInitialized]);
 
-    // Handle navigation
     const handleNavigation = () => {
         if (isFormDirty) {
             setShowConfirmChanges(true);
@@ -170,7 +176,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
         }
     }
 
-    //Update fields
+    //Update fields & file upload
     const updateField = (setter: React.Dispatch<React.SetStateAction<string>>) => (e: React.ChangeEvent<HTMLInputElement>) => {
         setter(e.target.value);
     }
@@ -211,11 +217,11 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
     };
 
     //Role options
-    const handleConfirmRoles = (roles: number[], roleNames: string[], newCheckboxStates: CheckboxState) => {
+    const handleConfirmRoles = (roles: number[], roleNames: string[]) => {
         setSelectedRoleValues(roles);
         setSelectedRoles(roleNames);
-        setCheckboxStates(newCheckboxStates);
         setShowRolesSelectModal(false);
+
     }
 
     //Update user info
@@ -314,8 +320,12 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
             formData.append('suffix', suffix);
             formData.append('position', position);
             formData.append('sys_role', JSON.stringify(selectedRoleValues));
-            const rolesArray = Array.isArray(selectedRoleValues) ? selectedRoleValues : [];
-            formData.append('sys_role', JSON.stringify(rolesArray));
+            // const rolesArray = Array.isArray(selectedRoleValues) ? selectedRoleValues : [];
+            // formData.append('sys_role', JSON.stringify(rolesArray));
+
+            Array.from(formData.entries()).forEach(([key, value]) => {
+                console.log(key, value);
+            });
 
             if (profileImage) {
                 formData.append('display_picture', profileImage);
@@ -336,7 +346,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
             setAlertMessages([response.data.message]);
             setAlertStatus('success');
 
-            window.location.reload();
+            // window.location.reload();
 
         } catch (error: any) {
             console.log(error)
@@ -392,7 +402,6 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                     onConfirm={handleConfirmRoles}
                     initialSelectedRoles={selectedRoles}
                     initialSelectedRoleValues={selectedRoleValues}
-                    initialCheckBoxStates={checkboxStates}
                 />
             )}
             

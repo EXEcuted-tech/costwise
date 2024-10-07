@@ -5,11 +5,10 @@ import { BsPersonLock } from 'react-icons/bs';
 import { CiSquareCheck } from "react-icons/ci";
 
 interface AddUserRolesProps { 
-  onConfirm: (roles: number[], roleNames: string[], checkboxStates: CheckboxState) => void;
+  onConfirm: (roles: number[], roleNames: string[]) => void;
   onClose: () => void;
   initialSelectedRoles: string[];
   initialSelectedRoleValues: number[];
-  initialCheckBoxStates: CheckboxState;
 }
 
 export interface CheckboxState {
@@ -25,92 +24,73 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
   onConfirm, 
   initialSelectedRoles, 
   initialSelectedRoleValues, 
-  initialCheckBoxStates 
 }) => {
   const [selectedRoles, setSelectedRoles] = useState<string[]>(initialSelectedRoles);
   const [selectedRoleValues, setSelectedRoleValues] = useState<number[]>(initialSelectedRoleValues);    
   const [isAllChecked, setIsAllChecked] = useState(false);
-  const [checkboxStates, setCheckboxStates] = useState<CheckboxState>(initialCheckBoxStates);
+  const [checkboxStates, setCheckboxStates] = useState<CheckboxState>(
+    getInitialCheckboxStates(initialSelectedRoleValues)
+);
 
   const handleCloseModal = () => {
     onClose();
   };
 
   const handleConfirm = () => {
-    onConfirm(selectedRoleValues, selectedRoles, checkboxStates);
-    console.log(selectedRoleValues, selectedRoles);
+    onConfirm(selectedRoleValues, selectedRoles);
     onClose();
   }
 
-  const handleCheckAll = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setIsAllChecked(e.target.checked);
-    setCheckboxStates(prev => ({ ...prev, allRoles: true }));
-    if (e.target.checked) {
-      setSelectedRoles(['Create Account', 'Update Account', 'View Account', 'Archive Account', 'View Audit Log', 'View File', 'Upload File', 'Edit File', 'Archive File', 'View Formula', 'Upload Formula', 'Edit Formula', 'Archive Formula']);
-      setSelectedRoleValues([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]);
-    } else {
-      setSelectedRoles([]);
-      setSelectedRoleValues([]);
-      setCheckboxStates(prev => ({ ...prev, allRoles: false }));
-    }
-  }
+  function getInitialCheckboxStates(roles: number[]): CheckboxState {
+    return {
+        allRoles: roles.length === 13,
+        accounts: roles.some(r => [0,1,2,3].includes(r)),
+        audit: roles.includes(4),
+        files: roles.some(r => [5,6,7,8].includes(r)),
+        formulations: roles.some(r => [9,10,11,12].includes(r))
+    };
+}
 
-  const handleCheckAccounts = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const roles = ['Create Account', 'Update Account', 'View Account', 'Archive Account'];
-    const roleValues = [0, 1, 2, 3];
-    setCheckboxStates(prev => ({ ...prev, accounts: true }));
-    if (e.target.checked && !isAllChecked) {
-      setSelectedRoles(prev => [...prev, ...roles]);
-      setSelectedRoleValues(prev => [...prev, ...roleValues]);
-    } else {
-      setSelectedRoles([]);
-      setSelectedRoleValues([]);
-      setCheckboxStates(prev => ({ ...prev, accounts: false }));
-    }
-  }
+  const roleMap: { [key: string]: { ids: number[], names: string[] } } = {
+    accounts: { ids: [0, 1, 2, 3], names: ['Create Account', 'Update Account', 'View Account', 'Archive Account'] },
+    audit: { ids: [4], names: ['View Audit Log'] },
+    files: { ids: [5, 6, 7, 8], names: ['View File', 'Upload File', 'Edit File', 'Archive File'] },
+    formulations: { ids: [9, 10, 11, 12], names: ['View Formula', 'Upload Formula', 'Edit Formula', 'Archive Formula'] },
+  };
 
-  const handleCheckAudit = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCheckboxStates(prev => ({ ...prev, audit: true }));
-    if (e.target.checked && !isAllChecked) {
-      setSelectedRoles(prev => [...prev, 'View Audit Log']);
-      setSelectedRoleValues(prev => [...prev, 4]);
-    } else {
-      setSelectedRoles([]);
-      setSelectedRoleValues([]);
-      setCheckboxStates(prev => ({ ...prev, audit: false }));
-    }
-  }
+  const handleCheckCategory = (category: keyof CheckboxState, e: React.ChangeEvent<HTMLInputElement>) => {
+    const isChecked = e.target.checked;
+    setCheckboxStates(prev => ({...prev, [category]: isChecked}));
 
-  const handleCheckFiles = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCheckboxStates(prev => ({ ...prev, files: true }));
-    if (e.target.checked && !isAllChecked) {
-      setSelectedRoles(prev => [...prev, 'View File', 'Upload File', 'Edit File', 'Archive File']);
-      setSelectedRoleValues(prev => [...prev, 5, 6, 7, 8]);
+    if (category === 'allRoles') {
+      setIsAllChecked(isChecked);
+      if (isChecked) {
+        setSelectedRoles(Object.values(roleMap).flatMap(r => r.names));
+        setSelectedRoleValues(Object.values(roleMap).flatMap(r => r.ids));
+        setCheckboxStates({ allRoles: true, accounts: true, audit: true, files: true, formulations: true });
+      } else {
+        setSelectedRoles([]);
+        setSelectedRoleValues([]);
+        setCheckboxStates({ allRoles: false, accounts: false, audit: false, files: false, formulations: false });
+      }
     } else {
-      setSelectedRoles([]);
-      setSelectedRoleValues([]);
-      setCheckboxStates(prev => ({ ...prev, files: false }));
+      const { ids, names } = roleMap[category];
+      setSelectedRoles(prev => 
+        isChecked ? Array.from(new Set([...prev, ...names])) : prev.filter(role => !names.includes(role))
+      );
+      setSelectedRoleValues(prev => 
+        isChecked ? Array.from(new Set([...prev, ...ids])) : prev.filter(id => !ids.includes(id))
+      );
     }
-  }
-  
-  const handleCheckFormulations = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setCheckboxStates(prev => ({ ...prev, formulations: true }));
-    if (e.target.checked && !isAllChecked) {
-      setSelectedRoles(prev => [...prev, 'View Formula', 'Upload Formula', 'Edit Formula', 'Archive Formula']);
-      setSelectedRoleValues(prev => [...prev, 9, 10, 11, 12]);
-    } else {
-      setSelectedRoles([]);
-      setSelectedRoleValues([]);
-      setCheckboxStates(prev => ({ ...prev, formulations: false }));
-    }
-  }
+  };
 
   const handleClearAll = () => {
     setSelectedRoles([]);
     setSelectedRoleValues([]);
-    setCheckboxStates(({ allRoles: false, accounts: false, audit: false, files: false, formulations: false }));
+    setCheckboxStates({ allRoles: false, accounts: false, audit: false, files: false, formulations: false });
     setIsAllChecked(false);
-  }
+  };
+
 
   return (
     <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]'>
@@ -147,7 +127,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
                     <input 
                       type="checkbox"
                       className='w-5 h-5 mr-3 rounded bg-primary text-primary focus:ring-primary focus:ring-1'
-                      onChange={handleCheckAll}
+                      onChange={(e) => handleCheckCategory('allRoles', e)}
                       checked={checkboxStates.allRoles}
                     />
                     <label className='text-[17px]'>All Roles</label>
@@ -157,7 +137,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
                     <input 
                       type="checkbox"
                       className={'w-5 h-5 mr-3 rounded bg-primary text-primary focus:ring-primary focus:ring-1'}
-                      onChange={handleCheckAccounts}
+                      onChange={(e) => handleCheckCategory('accounts', e)}
                       disabled={isAllChecked}
                       checked={checkboxStates.accounts}
                     />
@@ -168,7 +148,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
                     <input 
                       type="checkbox"
                       className='w-5 h-5 mr-3 rounded bg-primary text-primary focus:ring-primary focus:ring-1'
-                      onChange={handleCheckAudit}
+                      onChange={(e) => handleCheckCategory('audit', e)}
                       disabled={isAllChecked}
                       checked={checkboxStates.audit}
                     />
@@ -179,7 +159,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
                     <input 
                       type="checkbox"
                       className='w-5 h-5 mr-3 rounded bg-primary text-primary focus:ring-primary focus:ring-1'
-                      onChange={handleCheckFiles}
+                      onChange={(e) => handleCheckCategory('files', e)}
                       disabled={isAllChecked}
                       checked={checkboxStates.files}
                     />
@@ -190,7 +170,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
                     <input 
                       type="checkbox"
                       className='w-5 h-5 mr-3 rounded bg-primary text-primary focus:ring-primary focus:ring-1'
-                      onChange={handleCheckFormulations}
+                      onChange={(e) => handleCheckCategory('formulations', e)}
                       disabled={isAllChecked}
                       checked={checkboxStates.formulations}
                     />

@@ -13,14 +13,12 @@ import { User } from '@/types/data';
 const UserManagement = () => { 
     const { isOpen } = useSidebarContext();
     const [users, setUsers] = useState<User[]>([]);
-    const [filteredUsers, setFilteredUsers] = useState<User[]>([]);
-    const [isLoading, setIsLoading] = useState(false);
+    const [filteredUsers, setFilteredUsers] = useState<User[] | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
     
-    useEffect(() => {
-        setIsLoading(true);
-        
+    useEffect(() => {        
         //Get all users
         api.get<User[]>('/users')
         .then((res) => {
@@ -44,18 +42,20 @@ const UserManagement = () => {
     };
 
     useEffect(() => {
-        if (searchTerm === '') {
-            setFilteredUsers(users);
-        }
-        else {
-            const filtered = users.filter(user =>
-                user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.position?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.phone_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                user.department?.toLowerCase().includes(searchTerm.toLowerCase())
-            );
-            setFilteredUsers(filtered);
+        if (users.length > 0) {
+            if (searchTerm === '') {
+                setFilteredUsers(users);
+            }
+            else {
+                const filtered = users.filter(user =>
+                    user.first_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    user.last_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    user.position?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    user.phone_number?.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                    user.department?.toLowerCase().includes(searchTerm.toLowerCase())
+                );
+                setFilteredUsers(filtered);
+            }
         }
     }, [searchTerm, users]);
 
@@ -91,7 +91,7 @@ const UserManagement = () => {
 
             {/* Main Content Area */}
             <div className={`${isOpen ? '' : '' } flex flex-col w-auto mr-[2rem] h-auto ml-[4rem] mt-5 rounded-xl bg-white shadow-md shadow-gray-300`}>
-                <ManageAccounts fileData = {filteredUsers} isOpen={isOpen} isLoading={isLoading} />
+                <ManageAccounts fileData = {filteredUsers || []} isOpen={isOpen} isLoading={isLoading} />
             </div>
         </div>
     );

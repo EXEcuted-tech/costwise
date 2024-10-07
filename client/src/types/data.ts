@@ -1,6 +1,7 @@
 export interface User {
     user_id: number;
     user_type: string;
+    password: string;
     first_name: string;
     middle_name?: string; // Optional fields
     last_name: string;
