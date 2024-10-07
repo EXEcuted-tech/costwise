@@ -163,7 +163,7 @@ class BomController extends ApiController
                     'unit' => $emulsionData['unit'],
                 ];
             }
-        } else if (empty($emulsion)) {
+        } else if (empty(get_object_vars($emulsion))) {
             $emulsion = new \stdClass();
         }
 

@@ -459,7 +459,7 @@ class FileController extends ApiController
         if (isset($settings['material_ids'])) {
             $this->addMaterialSheet($spreadsheet, $settings['material_ids']);
         }
-       
+
         if (isset($settings['bom_ids'])) {
             $bomIds = $settings['bom_ids'];
             foreach ($bomIds as $bomId) {
@@ -549,7 +549,7 @@ class FileController extends ApiController
     {
         $sheet = $spreadsheet->createSheet();
         $sheet->setTitle('Material Cost');
-    
+
         $sheet->getColumnDimension('A')->setWidth(10.29);
         $sheet->getColumnDimension('B')->setWidth(36.57);
         $sheet->getColumnDimension('C')->setWidth(5.86);
@@ -558,36 +558,36 @@ class FileController extends ApiController
         $sheet->getRowDimension('3')->setRowHeight(29);
         $sheet->getRowDimension('4')->setRowHeight(21.5);
         $sheet->getRowDimension('5')->setRowHeight(50.25);
-    
+
         $sheet->setCellValue('A1', 'Material Cost');
         $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(12)->setName('Arial');
-    
+
         $monthYear = DateHelper::formatMonthYear($this->monthYear);
         $sheet->setCellValue('A2', "for the month of $monthYear");
         $sheet->getStyle('A2')->getFont()->setItalic(true)->setBold(true)->setName('Arial')->setSize(10)->getColor()->setRGB('FF0000');
-    
+
         $sheet->setCellValue('D4', date('Y'));
         $sheet->getStyle('D4')->getFont()->setBold(true)->setSize(11);
         $sheet->getStyle('D4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
-    
+
         $month = DateHelper::formatMonth($this->monthYear);
         $headers = ['ITEM CODE', 'ITEM DESCRIPTION', 'UNIT', (string) $month];
         $sheet->fromArray($headers, NULL, 'A5');
-    
+
         $headerStyle = $sheet->getStyle('A5:D5');
         $headerStyle->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
         $headerBorders = $headerStyle->getBorders();
         $headerBorders->getOutline()->setBorderStyle(Border::BORDER_MEDIUM);
-    
+
         $headerStyleAtoB = $sheet->getStyle('A5:C5');
         $headerStyleAtoB->getFont()->setBold(true)->setSize(9)->setName('Arial');
         $headerStyleAtoB->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('E6B8B7');
-    
+
         $headerStyleD = $sheet->getStyle('D5');
         $headerStyleD->getFont()->setBold(true)->setSize(11);
         $headerStyleD->getFill()->setFillType(Fill::FILL_SOLID)->getStartColor()->setRGB('F2DCDB');
         $headerStyleD->getFont()->getColor()->setRGB('0000FF');
-    
+
         $row = 6;
         foreach ($materialIds as $materialId) {
             $material = Material::where('material_id', $materialId)->first();
@@ -595,13 +595,14 @@ class FileController extends ApiController
             $sheet->setCellValue("B$row", $material['material_desc']);
             $sheet->setCellValue("C$row", $material['unit']);
             $sheet->setCellValue("D$row", $material['material_cost']);
-    
+
             $sheet->getStyle("A$row:C$row")->getFont()->setSize(8)->setName('Arial');
-    
+
             $styleRowD = $sheet->getStyle("D$row");
-            $styleRowD->getFont()->setSize(11)->setBold(true)->getColor()->setRGB('0000FF');;
+            $styleRowD->getFont()->setSize(11)->setBold(true)->getColor()->setRGB('0000FF');
+            ;
             $styleRowD->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
-    
+
             $row++;
         }
 
@@ -611,34 +612,78 @@ class FileController extends ApiController
 
     private function addBOMSheet($spreadsheet, $bom)
     {
-        // dd($bom);
-
         $sheet = $spreadsheet->createSheet();
         $bomName = $bom['bom_name'];
         $sheet->setTitle((string) $bomName);
 
-        $headers = ['Formula', 'Level', 'Item Code', 'Description', 'Formulation', 'Batch Quantity', 'Unit' ];
+        $headers = ['Formula', 'Level', 'Item Code', 'Description', 'Formulation', 'Batch Quantity', 'Unit'];
         $sheet->fromArray($headers, NULL, 'A1');
+        $sheet->freezePane('A1');
 
+        $sheet->getColumnDimension('A')->setWidth(10);
+        $sheet->getColumnDimension('B')->setWidth(8.71);
+        $sheet->getColumnDimension('C')->setWidth(11.5);
+        $sheet->getColumnDimension('D')->setWidth(56.43);
+        $sheet->getColumnDimension('E')->setWidth(12.29);
+        $sheet->getColumnDimension('F')->setWidth(16.57);
+        $sheet->getColumnDimension('G')->setWidth(8.57);
+
+        $sheet->getStyle('A1:G1')->getFont()->setBold(true)->setSize(8)->setName('Open Sans');
+        $sheet->setAutoFilter('B1:G1');
         $formulations = json_decode($bom['formulations'], true);
         $row = 2;
         foreach ($formulations as $formulation) {
             $formulationData = Formulation::find($formulation);
             $fg = FinishedGood::find($formulationData['fg_id']);
 
-            dd($formulationData);
-            dd($fg);
-            $sheet->setCellValue("A$row", $fg['formula']);
-            // foreach ($bom['items'] as $item) {
-            //     $sheet->setCellValue("A$row", $item['formula']);
-            //     $sheet->setCellValue("B$row", $item['level']);
-            //     $sheet->setCellValue("C$row", $item['item_code']);
-            //     $sheet->setCellValue("D$row", $item['description']);
-            //     $sheet->setCellValue("E$row", $formulation);
-            //     $sheet->setCellValue("F$row", $item['batch_quantity']);
-            //     $sheet->setCellValue("G$row", $item['unit']);
-            //     $row++;
-            // }
+            $sheet->setCellValue("A$row", $formulationData['formula_code']);
+            $sheet->getStyle("A$row")->getFont()->setBold(true);
+
+            $sheet->getStyle("A$row:F$row")->getFill()->setFillType(Fill::FILL_SOLID);
+            $sheet->getStyle("A$row:F$row")->getFill()->getStartColor()->setRGB('DAEEF3');
+            $sheet->getStyle("A$row:G$row")->getFont()->setSize(8)->setName('Open Sans');
+
+            $sheet->setCellValue("C$row", $fg['fg_code']);
+            $sheet->setCellValue("D$row", $fg['fg_desc']);
+            $sheet->setCellValue("E$row", $fg['formulation_no']);
+            $sheet->setCellValue("F$row", $fg['total_batch_qty']);
+            $sheet->getStyle("F$row")->getNumberFormat()->setFormatCode('0.00');
+            $sheet->setCellValue("G$row", $fg['unit']);
+            $row++;
+
+            $emulsion = json_decode($formulationData->emulsion);
+            if (!empty(get_object_vars($emulsion))) {
+                $sheet->setCellValue("B$row", $emulsion->level);
+                $sheet->setCellValue("D$row", "EMULSION");
+                $sheet->setCellValue("F$row", $emulsion->batch_qty);
+                $sheet->getStyle("F$row")->getNumberFormat()->setFormatCode('0.00');
+                $sheet->setCellValue("G$row", $emulsion->unit);
+                $sheet->getStyle("B$row:G$row")->getFont()->setSize(8)->setName('Open Sans');
+                $row++;
+            }
+
+            $materialQtyList = json_decode($formulationData['material_qty_list'], true);
+            foreach ($materialQtyList as $materialEntry) {
+                foreach ($materialEntry as $materialId => $data) {
+                    $level = $data['level'];
+                    $qty = $data['qty'];
+
+                    $material = Material::find($materialId);
+
+                    if ($material) {
+                        $sheet->setCellValue("B$row", $level);
+                        $sheet->setCellValue("C$row", $material->material_code);
+                        $sheet->setCellValue("D$row", $material->material_desc);
+                        $sheet->setCellValue("F$row", $qty);
+                        $sheet->getStyle("F$row")->getNumberFormat()->setFormatCode('0.00');
+                        $sheet->setCellValue("G$row", $material->unit);
+                        $sheet->getStyle("B$row:G$row")->getFont()->setSize(8)->setName('Open Sans');
+                        $row++;
+                    }
+                }
+            }
+
+            $row++;
         }
     }
 }
