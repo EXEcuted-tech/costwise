@@ -65,8 +65,8 @@ class FileController extends ApiController
             $validator = Validator::make(
                 $request->all(),
                 [
-                    'file_type' => 'required',
-                    'settings' => 'required',
+                    'file_type' => 'required|string',
+                    'settings' => 'required|file|mimes:csv,txt|max:2048',
                 ]
             );
 
@@ -78,26 +78,105 @@ class FileController extends ApiController
 
             $validatedData = $validator->validated();
 
-            $file = File::create($validatedData);
-            $this->status = 200;
-            $this->response['data'] = $file;
-            return $this->getResponse("File Successfully Uploaded");
+            if ($request->hasFile('settings')) {
+                $file = $request->file('settings');
+
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $csvData = $this->processCsvData($file);
+
+                $fileData = [
+                    'file_type' => $validatedData['file_type'],
+                    'settings' => json_encode($csvData),
+                ];
+
+                $fileRecord = File::on(connection: 'archive_mysql')->create($fileData);
+                $this->status = 200;
+                $this->response['data'] = [
+                    'file_record' => $fileRecord,
+                    'csv_data' => $csvData,
+                ];
+                return $this->getResponse("File Successfully Uploaded");
+            }
+
+            $this->status = 400;
+            $this->response['message'] = "No file uploaded.";
+            return $this->getResponse("File upload failed.");
         } catch (\Throwable $th) {
-            $this->status = $th->getCode();
+            $this->status = $th->getCode() ?: 500;
             $this->response['message'] = $th->getMessage();
             return $this->getResponse();
         }
     }
 
+    private function processCsvData($file)
+    {
+        $parsedCostData = [];
+        $currentMonthYear = '';
+
+        if (($handle = fopen($file->getRealPath(), 'r')) !== false) {
+            fgetcsv($handle); // Skip header
+            while (($data = fgetcsv($handle)) !== false) {
+                if (empty($data) || $data[0] === "Item Code") {
+                    continue; // Skip empty rows or headers
+                }
+
+                // If the first column has a month/year but no cost, this is a new month-year entry
+                if (!empty($data[0]) && empty($data[2])) {
+                    $currentMonthYear = $data[0]; // Store the current month/year
+                }
+                // If the first column has both a code and cost, it's a product entry
+                elseif (!empty($data[0]) && !empty($data[2])) {
+                    $productName = $data[1]; // Extract product name
+                    $productCost = floatval($data[2]); // Extract product cost
+
+                    // Find or create the monthYear entry
+                    $monthYearIndex = null;
+                    foreach ($parsedCostData as $index => $entry) {
+                        if ($entry['monthYear'] === $currentMonthYear) {
+                            $monthYearIndex = $index;
+                            break;
+                        }
+                    }
+
+                    if ($monthYearIndex === null) {
+                        // Add a new entry if month-year does not exist
+                        $parsedCostData[] = [
+                            'monthYear' => $currentMonthYear,
+                            'products' => [
+                                [
+                                    'productName' => $productName,
+                                    'cost' => $productCost,
+                                ]
+                            ],
+                        ];
+                    } else {
+                        // Append the product to the existing month-year entry
+                        $parsedCostData[$monthYearIndex]['products'][] = [
+                            'productName' => $productName,
+                            'cost' => $productCost,
+                        ];
+                    }
+                }
+            }
+            fclose($handle);
+        }
+
+        return $parsedCostData;
+    }
+
+
     public function getData()
     {
         try {
-            $file = File::find(1);
+            $file = File::on(connection: 'archive_mysql')->where('file_type', 'training_file')->get();
 
             if (!$file) {
-                $this->status = 404;
-                return $this->getResponse("Model not found.");
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Model not found.'
+                ], 404);
             }
+
             $this->status = 201;
             $this->response['data'] = $file;
             return $this->getResponse("File retrieved successfully.");

@@ -5,13 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class FinishedGoods extends Model
+class Prediction extends Model
 {
-    use HasFactory;
+    use  HasFactory;
 
-    protected $connection = 'archive_mysql';
-    protected $table = 'finished_goods';
-    protected $primaryKey = 'fg_id';
+    protected $table = 'predictions';
+    protected $primaryKey = 'prediction_id';
     protected $keyType = 'int';
     public $incrementing = true;
 
@@ -21,9 +20,8 @@ class FinishedGoods extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'fodl_id',
-        'fg_code',
-        'fg_desc',
+        'product_num',
+        'product_name',
         'cost',
         'monthYear'
     ];

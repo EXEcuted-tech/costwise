@@ -5,18 +5,21 @@ namespace App\Http\Controllers;
 use App\Http\Controllers\ApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
-use App\Models\MLModel;
+use App\Models\Prediction;
 
-class ModelController extends ApiController
+class PredictionController extends ApiController
 {
-    public function uploadModel(Request $request)
+
+    public function uploadPrediction(Request $request)
     {
         try {
             $validator = Validator::make(
                 $request->all(),
                 [
-                    'model_name' => 'required',
-                    'model_data' => 'required'
+                    'product_num' => 'required',
+                    'product_name' => 'required',
+                    'cost' => 'required',
+                    'monthYear' => 'required'
                 ]
             );
 
@@ -27,23 +30,24 @@ class ModelController extends ApiController
             }
 
             $validatedData = $validator->validated();
+            dump($validatedData);
+            $prediction = Prediction::create($validatedData);
 
-            $model = MLModel::create($validatedData);
             $this->status = 200;
-            $this->response['data'] = $model;
-            return $this->getResponse("Model Successfully Uploaded");
+            $this->response['data'] = $prediction;
+            $this->response['message'] = "Prediction records updated successfully.";
         } catch (\Throwable $th) {
-            $this->status = $th->getCode();
+            $this->status = 500;
             $this->response['message'] = $th->getMessage();
             return $this->getResponse();
         }
     }
 
-    public function getModel(Request $request)
+    public function getPrediction(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-                'model_id' => 'required|integer',
+                'monthYear' => 'required',
             ]);
 
             if ($validator->fails()) {
@@ -54,9 +58,9 @@ class ModelController extends ApiController
                 ], 400);
             }
 
-            $model = MLModel::find($request->model_id);
+            $prediction = Prediction::where('monthYear', $request->monthYear)->get();
 
-            if (!$model) {
+            if (!$prediction) {
                 return response()->json([
                     'status' => 'error',
                     'message' => 'Model not found.'
@@ -65,7 +69,7 @@ class ModelController extends ApiController
 
             return response()->json([
                 'status' => 'success',
-                'data' => $model,
+                'data' => $prediction,
                 'message' => 'Model retrieved successfully.'
             ], 200);
         } catch (\Throwable $th) {
@@ -75,4 +79,6 @@ class ModelController extends ApiController
             ], 500);
         }
     }
+
+    public function getAllData() {}
 }
