@@ -2,7 +2,7 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { MdModeEdit } from 'react-icons/md';
 import EditInformation from './EditInformation';
-import PasswordChangeDialog from '@/components/modal/PasswordChangeDialog';
+import PasswordChangeDialog from '@/components/modals/SendEmailDialog';
 import ConfirmChangeInfo from '@/components/modals/ConfirmChangeInfo';
 
 type UserInformationProps ={

@@ -6,7 +6,7 @@ import { useSidebarContext } from "@/contexts/SidebarContext";
 import { IoCamera } from "react-icons/io5";
 import Link from "next/link";
 import UserInformation from '@/components/pages/profile/UserInformation';
-import PasswordChangeDialog from "@/components/modal/PasswordChangeDialog";
+import PasswordChangeDialog from "@/components/modals/SendEmailDialog";
 import background from '@/assets/account-profile-bg.png';
 import { useUserContext } from "@/contexts/UserContext";
 import api from "@/utils/api";

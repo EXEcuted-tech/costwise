@@ -2,7 +2,7 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { IoIosArrowRoundBack } from 'react-icons/io';
 import { MdModeEdit } from 'react-icons/md';
-import PasswordChangeDialog from '@/components/modal/PasswordChangeDialog';
+import PasswordChangeDialog from '@/components/modals/SendEmailDialog';
 import { useRouter } from 'next/router';
 import api from '@/utils/api';
 import SuccessChangeInfo from '@/components/modals/ConfirmChangeInfo';
@@ -38,8 +38,6 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
             phoneNum,
             suffix
         };
-        console.log("This is payload: ", payload);
-
         try{
             await api.put('/user/update', payload);
         }catch(error: any){
@@ -218,10 +216,10 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
                 </button>
                 <div className="text-[#8F8F8F] text-[14px] 3xl:text-[19px] underline underline-offset-[7px] cursor-pointer hover:text-[#5B5353]"
                     onClick={() => setDialog(true)}>
-                    Request Password Reset
+                    Change Password
                 </div>
             </div>
-            </form>    
+            </form>
         </>
     )
 }
