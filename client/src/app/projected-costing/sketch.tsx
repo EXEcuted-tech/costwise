@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from "react";
-import Papa from "papaparse";
 import _ from "lodash";
 import * as tf from "@tensorflow/tfjs";
 import api from "@/utils/api";
-import { initialize } from "next/dist/server/lib/render-server";
+import { MdModelTraining, MdOutlineCalculate, MdOnlinePrediction } from "react-icons/md";
+
 interface Product {
   productName: string;
   cost: number;
@@ -14,32 +14,31 @@ interface CostDataEntry {
   products: Product[];
 }
 
-interface MonthDataEntry {
-  monthYear: string;
-  cost: number;
-}
-
-interface ProductEntry {
-  product_num: number;
-  product_name: string;
-  cost: number;
-  monthYear: string;
-}
-
 function TrainingModel() {
+
   const [costData, setCostData] = useState<CostDataEntry[]>([]);
   const [model, setModel] = useState<tf.Sequential | null>(null);
   const [trained, setTrained] = useState(false);
-  const [lossHistory, setLossHistory] = useState<number[]>([]);
+  const [lossHistory, setLossHistory] = useState<number[]>([0]);
   const [latestDate, setLatestDate] = useState(0);
   let currentMonthYear: string = "";
   const [trainingSpeed, setTrainingSpeed] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [error, setError] = useState(null); // Error state
 
   const addNewData = (newData: CostDataEntry[]) => {
     setCostData((prevData) => [...prevData, ...newData]);
+    if (costData) {
+      const recentCostData = costData[costData.length - 1];
+      localStorage.setItem('recentCost', JSON.stringify({
+        cost: recentCostData.products.reduce((acc, product) => acc + product.cost, 0), // Sum of costs for the most recent month
+        monthYear: recentCostData.monthYear,
+      }));
+    }
   };
 
-  const [totalPrediction, setTotalPrediction] = useState<MonthDataEntry[]>([]);
+  const [totalPrediction, setTotalPrediction] = useState<{ monthYear: string; cost: number }[]>([]);
+
 
   const [metrics, setMetrics] = useState({
     mse: 0,
@@ -129,7 +128,7 @@ function TrainingModel() {
         validationSplit: 0.2,
         callbacks: {
           onEpochEnd: (epoch, logs) => {
-            if (logs?.loss) currentLossHistory.push(logs.loss / 4);
+            if (logs?.loss) currentLossHistory.push(parseFloat((logs.loss / costData.length).toFixed(6)));
           },
           ...[earlyStopping],
         },
@@ -142,9 +141,6 @@ function TrainingModel() {
         console.log(
           `Model training complete in ${duration.toFixed(2)} seconds`
         );
-        console.log(JSON.stringify(newModel.toJSON()));
-        // newModel.evaluate()
-        setModel(newModel);
         setModel(newModel);
         setTrained(true);
         setLossHistory(currentLossHistory);
@@ -188,24 +184,18 @@ function TrainingModel() {
             const productPrediction = predictionArray[0][productIndex];
             totalPredictionForMonth += productPrediction;
 
-            // await uploadPredictions(
-            //   productIndex,
-            //   productPrediction,
-            //   monthYear,
-            //   productName
-            // );
+            await uploadPredictions(
+              productIndex,
+              productPrediction,
+              monthYear,
+              productName
+            );
 
             console.log(
               `Prediction for ${productName}, ${monthYear}:`,
               productPrediction
             );
           }
-
-          totalPrediction.push(totalPredictionForMonth);
-          console.log(
-            `Total Prediction for ${monthYear}:`,
-            totalPredictionForMonth
-          );
         }
 
         console.log("Predictions complete.");
@@ -246,7 +236,7 @@ function TrainingModel() {
 
     newModel.add(tf.layers.dense({ units: 4 }));
     newModel.compile({
-      optimizer: tf.train.adam(0.5),
+      optimizer: 'adam',
       loss: "meanSquaredError",
     });
     return newModel;
@@ -274,6 +264,7 @@ function TrainingModel() {
     }
   };
 
+
   const fetchPredictions = async () => {
     const months = ["January 2025", "February 2025", "March 2025"];
 
@@ -284,33 +275,32 @@ function TrainingModel() {
         )
       );
 
+
       const predictionData = responses.map((res) => res.data.data);
-      const totalledPredictions = predictionData.reduce(
-        (acc: Record<string, number>, entry) => {
-          const cost = parseFloat(entry.cost.toString());
 
-          if (acc[entry.monthYear]) {
-            acc[entry.monthYear] += cost;
-          } else {
-            acc[entry.monthYear] = cost;
-          }
-          return acc;
-        },
-        {}
-      );
+      const formattedPredictions = predictionData.map((monthPredictions, index) => {
+        const totalCost = monthPredictions.reduce((acc, prediction) => {
+          return acc + parseFloat(prediction.cost);
+        }, 0);
 
-      const formattedPredictions = Object.entries(totalledPredictions).map(
-        ([monthYear, cost]) => ({
-          monthYear,
-          cost,
-        })
-      );
-      setTotalPrediction(formattedPredictions);
-      console.log("Predictions loaded successfully", formattedPredictions);
+        return {
+          monthYear: months[index],
+          cost: totalCost.toFixed(2)
+        };
+      });
+
+      console.log("Formatted Predictions: ", formattedPredictions);
+      setTotalPrediction(formattedPredictions)
+
     } catch (error) {
       console.error("Failed to load models:", error);
     }
   };
+
+  useEffect(() => {
+    console.log("Total Prediction", totalPrediction)
+    console.log(lossHistory)
+  })
 
   useEffect(() => {
     const fetchData = async () => {
@@ -326,7 +316,6 @@ function TrainingModel() {
           parsedData = dataString;
         }
         addNewData(parsedData);
-        await initializeModel();
       } catch (error) {
         console.error("Error fetching data:", error);
       }
@@ -343,30 +332,96 @@ function TrainingModel() {
     if (costData.length > 0) {
       initializeModel();
     }
+    setIsLoading(false);
   }, [costData]);
 
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const itemsPerPage = 1; // Number of items to display at once
+
+  const next = () => {
+    setCurrentIndex((prevIndex) => Math.min(prevIndex + itemsPerPage, totalPrediction.length - itemsPerPage));
+  };
+
+  const prev = () => {
+    setCurrentIndex((prevIndex) => Math.max(prevIndex - itemsPerPage, 0));
+  };
+
   return (
-    <div className="App container mx-auto p-4">
-      <div id="outcome-cont" className="mb-6"></div>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-white shadow-md rounded-lg p-6 flex flex-col items-center">
-          <p className="text-3xl font-bold text-[#005898]">{trainingSpeed}s</p>
-          <p className="text-lg text-gray-500">Training Duration</p>
+    <div className="mx-auto p-2 flex flex-col xl:flex-row gap-6 h-[90%]">
+      {/* Left Section */}
+      {isLoading ? (
+        <div className="flex items-center justify-center flex-1 bg-white shadow-lg rounded-lg p-8">
+          {/* Loading Spinner or Message */}
+          <p className="text-xl font-semibold text-primary">Loading...</p>
+          {/* You can also use a spinner component here */}
         </div>
-        {totalPrediction.map((monthData, index) => (
-          <div
-            key={index}
-            className="bg-white shadow-md rounded-lg p-6 flex flex-col items-center"
-          >
-            <p className="text-3xl font-bold text-[#005898]">
-              {monthData.cost ? monthData.cost.toFixed(2) : "N/A"}
+      ) : (
+        <>
+          <div className="w-[500px] flex-1 bg-white shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
+            <h2 className="flex items-center 2xl:text-2xl text-4xl font-semibold text-primary mb-4 xl:mb-2">
+              <MdModelTraining className="2xl:text-4xl text-4xl font-semibold text-primary mr-2" />
+              Training Duration
+            </h2>
+            <p className="text-5xl font-bold text-primary">{trainingSpeed}s</p>
+            <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
+              Duration of model training
             </p>
-            <p className="text-lg text-gray-500">{monthData.monthYear}</p>
           </div>
-        ))}
+          <div className="flex-1 bg-white shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
+            <h2 className="flex items-center 2xl:text-2xl text-4xl font-semibold text-primary mb-4 xl:mb-2">
+              <MdOutlineCalculate className="2xl:text-4xl text-4xl font-semibold text-primary mr-2" />
+              Average Loss
+            </h2>
+            <p className="text-5xl font-bold text-primary">{lossHistory[lossHistory.length - 1]}</p>
+            <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
+              Average loss of all predictions
+            </p>
+          </div>
+        </>
+      )}
+
+      {/* Right Section */}
+      <div className="flex-1 bg-primary shadow-lg rounded-lg p-4 grid grid-cols-1 gap-4 items-center justify-center">
+        <h2 className="flex items-center text-2xl font-semibold text-white">
+          <MdOnlinePrediction className="text-4xl font-semibold text-white mr-2" />
+          Total Cost Prediction
+        </h2>
+
+        <div className="flex items-center justify-between w-full">
+          <button
+            onClick={prev}
+            disabled={currentIndex === 0}
+            className="p-1 pl-[10%] text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200"
+            aria-label="Previous predictions"
+          >
+            &#9664; {/* Left arrow */}
+          </button>
+
+          <div className="flex-grow flex flex-wrap justify-center p-0">
+            {totalPrediction.slice(currentIndex, currentIndex + itemsPerPage).map((monthData, index) => (
+              <div
+                key={index}
+                className="bg-primary shadow-sm rounded-lg flex flex-col items-center transition-transform duration-300 hover:scale-105"
+              >
+                <p className="text-4xl font-bold text-white">₱{monthData.cost}</p>
+                <p className="text-sm text-white">{monthData.monthYear}</p>
+              </div>
+            ))}
+          </div>
+
+          <button
+            onClick={next}
+            disabled={currentIndex + itemsPerPage >= totalPrediction.length}
+            className="p-1 pr-[10%] text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200"
+            aria-label="Next predictions"
+          >
+            &#9654; {/* Right arrow */}
+          </button>
+        </div>
       </div>
     </div>
   );
+
 }
 
 export default TrainingModel;
