@@ -222,7 +222,7 @@ const ProjectedCostPage = () => {
                                     } ${monthList.length < 6 ? " " : "overflow-y-scroll h-[175px]"
                                     }`}
                             >
-                                {monthList.map((date) => (
+                                {monthList.map((date, index) => (
                                     <li
                                         className={`px-[2px] py-[2px] mx-[0.1em] cursor-pointer hover:shadow-lg text-[20px] text-black ${activeStart === date.month + " " + date.year
                                             ? "shadow-lg bg-gray-50"
@@ -231,6 +231,7 @@ const ProjectedCostPage = () => {
                                         onClick={() => {
                                             setActiveStart(date.month + " " + date.year);
                                         }}
+                                        key={index}
                                     >
                                         {date.month} {date.year}
                                     </li>
@@ -258,7 +259,7 @@ const ProjectedCostPage = () => {
                             className={`list-none px-[1px] absolute border border-gray-300 rounded-lg top-[2.7em] left-50% w-full translate-[-50%] transition z-1 overflow-hidden bg-white shadow-md ${!isActiveEnd ? "opacity-0 pointer-events-none" : "opacity-100"
                                 } ${monthList.length < 6 ? " " : "overflow-y-scroll h-[175px]"}`}
                         >
-                            {monthList.map((date) => (
+                            {monthList.map((date, index) => (
                                 <li
                                     className={`px-[2px] py-[2px] mx-[0.1em] cursor-pointer hover:shadow-lg text-[20px] ${activeEnd === date.month + " " + date.year
                                         ? "shadow-lg bg-gray-50"
@@ -267,6 +268,7 @@ const ProjectedCostPage = () => {
                                     onClick={() => {
                                         setActiveEnd(date.month + " " + date.year);
                                     }}
+                                    key={index}
                                 >
                                     {date.month} {date.year}
                                 </li>
@@ -287,8 +289,8 @@ const ProjectedCostPage = () => {
                         <div className="flex text-[30px]  font-bold h-[10%] bg-white items-center justify-start pl-10">
                             <p className="w-[95%] text-[#585858]">Estimated Summary</p>
                         </div>
-                        <div className="flex items-center justify-center h-[40%]">
-                            <DoughnutChart doughnutData={doughnutData} />
+                        <div className="flex items-center justify-center h-[40%] bg-white">
+                            <DoughnutChart chartData={doughnutData} />
                         </div>
                     </div>
                     {/* Right Div */}

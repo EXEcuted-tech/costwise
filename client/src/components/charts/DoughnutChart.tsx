@@ -26,12 +26,12 @@ type DoughnutDataProps = {
   };
 };
 
-const DoughnutChart = ({ doughnutData }: DoughnutDataProps) => {
+const DoughnutChart = ({ chartData }: DoughnutDataProps) => {
   const options = {
     responsive: true,
     plugins: {
       legend: {
-        position: "right",
+        position: "right" as const,
       },
       title: {
         display: true,
@@ -43,7 +43,7 @@ const DoughnutChart = ({ doughnutData }: DoughnutDataProps) => {
   };
 
   return (
-    <Doughnut data={doughnutData} options={options} />
+    <Doughnut data={chartData} options={options} />
   );
 };
 

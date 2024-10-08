@@ -1,7 +1,7 @@
+"use client"
 import React from 'react';
 import { CgRemoveR } from "react-icons/cg";
 import { ReportProps } from '@/app/cost-calculation/page';
-import { finished } from 'stream';
 import CustomGoodsSelect from '@/components/form-controls/CustomGoodsSelect';
 
 type SpecificFGProps = {

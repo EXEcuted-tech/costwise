@@ -25,7 +25,7 @@ interface AuditLogPageProps {
     fileData: AuditTableProps[];
 }
 
-const AuditLogPage: React.FC<AuditLogPageProps> = ({ fileData }) => {
+const AuditLogPage = () => {
     const { drawerOpen, setDrawerOpen } = useDrawerContext();
     const { isOpen, setIsOpen } = useSidebarContext();
 
