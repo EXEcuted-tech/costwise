@@ -26,13 +26,16 @@ class User extends Authenticatable
         'employee_number',
         'user_type',
         'first_name',
+        'middle_name',
         'last_name',
+        'suffix',
         'email_address',
         'password',
         'department',
         'phone_number',
         'position',
         'sys_role',
+        'display_picture',
     ];
 
     /**
@@ -55,6 +58,7 @@ class User extends Authenticatable
         return [
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
+            'sys_role' => 'array',
         ];
     }
 }

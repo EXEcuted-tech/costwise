@@ -13,4 +13,7 @@ Route::post('/refresh', [AuthController::class, 'refresh']);
 Route::group(['middleware' => ['auth:sanctum']],function(){
     Route::delete('/logout',[AuthController::class,'logout']);
     Route::get('/user',[UserController::class,'getCurrentUser']);
+    Route::get('/users',[UserController::class,'getAllUsers']);
+    Route::post('/user/update/{id}',[UserController::class,'updateUser']);
+    Route::delete('user/archive/{id}', [UserController::class, 'archiveUser']);
 });

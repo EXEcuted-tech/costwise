@@ -1,5 +1,6 @@
 "use client";
 import MainLayout from "@/components/layouts/MainLayout";
+import ProtectedRoute from "@/components/routes/ProtectedRoute";
 import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
 
 export default function SystemMaintenanceLayout({
@@ -8,12 +9,14 @@ export default function SystemMaintenanceLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ProtectedRoute>
     <SidebarProvider>
       <div className="flex font-lato">
         <MainLayout/>
         <MainContent>{children}</MainContent>
       </div>
     </SidebarProvider>
+    </ProtectedRoute>
   );
 }
 
