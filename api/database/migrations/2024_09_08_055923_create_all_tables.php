@@ -41,7 +41,7 @@ return new class extends Migration {
         // Files Table
         Schema::create('files', function (Blueprint $table) {
             $table->increments('file_id');
-            $table->enum('file_type', ['master_file', 'transactional_file']);
+            $table->enum('file_type', ['master_file', 'transactional_file', 'inventory_file']);
             $table->longText('settings');
             $table->timestamps();
         });
@@ -98,10 +98,11 @@ return new class extends Migration {
         Schema::create('inventory', function (Blueprint $table) {
             $table->increments('inventory_id');
             $table->unsignedInteger('material_id');
+            $table->enum('material_category', ['meat_material', 'meat_alternate', 'packaging', 'food_ingredient', 'casing', 'tin_can', 'other']);
             $table->enum('stock_status', ['In Stock', 'Low Stock']);
-            $table->decimal('material_qty', 10, 2);
-            $table->decimal('distributed_qty', 10, 2);
-            $table->decimal('stock_qty', 10, 2);
+            $table->decimal('purchased_qty', 10, 2);
+            $table->decimal('usage_qty', 10, 2);
+            $table->decimal('total_qty', 10, 2);
             $table->timestamps();
             $table->foreign('material_id')->references('material_id')->on('materials')->onDelete('cascade');
         });

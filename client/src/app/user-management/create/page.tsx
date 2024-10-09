@@ -14,17 +14,15 @@ import Alert from "@/components/alerts/Alert";
 import { useRouter } from 'next/navigation';
 import ConfirmChanges from '@/components/modals/ConfirmChanges';
 import AddUserRoles from '@/components/pages/user-management/addUserRoles';
-import { CheckboxState } from '@/components/pages/user-management/addUserRoles';
-
-
+import dotenv from "dotenv";
 
 const AccountCreation = () => {
+    const router = useRouter();
     const { isOpen } = useSidebarContext();
     const [showRolesSelectModal, setShowRolesSelectModal] = useState(false);
     const [isFormDirty, setIsFormDirty] = useState(false);
     const [showConfirmChanges, setShowConfirmChanges] = useState(false);
-    const router = useRouter();
-
+    
     const [profileImage, setProfileImage] = useState<File | null>(null);
     const [previewUrl, setPreviewUrl] = useState<string | null>(null);
     const [imageName, setImageName] = useState<string | null>(null);
@@ -41,14 +39,7 @@ const AccountCreation = () => {
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
     const [selectedRoleValues, setSelectedRoleValues] = useState<number[]>([]);
     const user_type = 'Regular'; //default user type
-    const defaultPassword = "#Password123"; //default password
-    const [checkboxStates, setCheckboxStates] = useState<CheckboxState>({
-        allRoles: false,
-        accounts: false,
-        audit: false,
-        files: false,
-        formulations: false
-      });
+    const defaultPassword = process.env.NEXT_PUBLIC_DEFAULT_PASSWORD; //default password
 
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
@@ -80,7 +71,6 @@ const AccountCreation = () => {
         setIsFormDirty(true);
     };
 
-    // Handle navigation
     const handleNavigation = (url: string) => {
         if (isFormDirty) {
             setShowConfirmChanges(true);
@@ -90,10 +80,9 @@ const AccountCreation = () => {
     };
 
     //Role options
-    const handleConfirmRoles = (roles: number[], roleNames: string[], newCheckboxStates: CheckboxState) => {
+    const handleConfirmRoles = (roles: number[], roleNames: string[]) => {
        setSelectedRoleValues(roles);
        setSelectedRoles(roleNames);
-       setCheckboxStates(newCheckboxStates);
        setShowRolesSelectModal(false);
     }
     
@@ -245,7 +234,7 @@ const AccountCreation = () => {
             formData.append('last_name', last_name);
             formData.append('suffix', suffix);
             formData.append('position', position);
-            formData.append('password', defaultPassword);
+            formData.append('password', defaultPassword || '');
             formData.append('sys_role', JSON.stringify(selectedRoleValues));
 
             if (profileImage) {
@@ -279,7 +268,6 @@ const AccountCreation = () => {
             setPreviewUrl('');
             setSelectedRoleValues([]);
             setSelectedRoles([]);
-            setCheckboxStates({ allRoles: false, accounts: false, audit: false, files: false, formulations: false });
         } catch (error: any) {
             console.log(error)
             let errorMessages: string[] = []
@@ -333,7 +321,6 @@ const AccountCreation = () => {
                     onConfirm={handleConfirmRoles}
                     initialSelectedRoles={selectedRoles}
                     initialSelectedRoleValues={selectedRoleValues}
-                    initialCheckBoxStates={checkboxStates}
                 />
             )}
             
