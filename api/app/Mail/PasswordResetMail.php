@@ -15,10 +15,12 @@ class PasswordResetMail extends Mailable
 
     public function build()
     {
+        $resetUrl = config('app.url') . '/profile/' . $this->token;
+
         return $this->subject('Password Reset Request')
             ->view('emails.passwordReset')
             ->with([
-                'resetLink' => url('/profile/' . $this->token),
+                'resetUrl' => $resetUrl,
             ]);
     }
 }
