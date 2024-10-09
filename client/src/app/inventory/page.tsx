@@ -10,6 +10,9 @@ import MonthSelector from '@/components/modals/MonthSelector';
 import { HiOutlinePlus } from "react-icons/hi2";
 import { CiImport } from "react-icons/ci";
 import { IoTrash } from 'react-icons/io5';
+import ImportInventoryList from '@/components/modals/ImportInventory';
+import ConfirmDelete from '@/components/modals/ConfirmDelete';
+
 
 export interface InventoryProps {
     itemCode: String;
@@ -23,16 +26,31 @@ export interface InventoryProps {
 
 const Inventory = () => {
     const { isOpen } = useSidebarContext();
-    const columnNames = ["Item Code", "Description", "Unit", "In Stock", "Qty", "Price", "Status"];
+    const columnNames = ["Item Code", "Description", "Unit", "Purchased Qty", "Total Qty", "Usage Qty", "Status"];
     const monthOptions = ["January 2024", "February 2024", "March 2024"];
 
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const [selectedMonth, setSelectedMonth] = useState<string>(monthOptions[1]); // Default to February 2024
     const [isMonthSelectorModalOpen, setMonthSelectorModalOpen] = useState(false);
+    const [isImportInventoryListModalOpen, setImportInventoryListModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
-    const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
-        setCurrentPage(page);
-    };
+    const [selectedMonth, setSelectedMonth] = useState<string>(monthOptions[1]); // Default to February 2024
+
+    const currentIndex = monthOptions.indexOf(selectedMonth);
+    const indexOfLastItem = currentPage * 8;
+    const indexOfFirstItem = indexOfLastItem - 8;
+    const currentListPage = InventoryFakeData.slice(indexOfFirstItem, indexOfLastItem); //change to data
+
+
+
+    // Modals
+    const openImportInventoryListModal = () => {
+        setImportInventoryListModalOpen(true);
+    }
+
+    const closeImportInventoryListModal = () => {
+        setImportInventoryListModalOpen(false);
+    }
 
     const openMonthSelectorModal = () => {
         setMonthSelectorModalOpen(true);
@@ -40,6 +58,19 @@ const Inventory = () => {
 
     const closeMonthSelectorModal = () => {
         setMonthSelectorModalOpen(false);
+    };
+
+    const openDeleteModal = () => {
+        setIsDeleteModalOpen(true);
+    };
+
+    const closeDeleteModal = () => {
+        setIsDeleteModalOpen(false);
+    };
+
+    // Month Pagination
+    const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
+        setCurrentPage(page);
     };
 
     const handleMonthSelect = (month: string) => {
@@ -59,16 +90,22 @@ const Inventory = () => {
         setSelectedMonth(monthOptions[nextIndex]);
     };
 
-    const currentIndex = monthOptions.indexOf(selectedMonth);
-    const indexOfLastItem = currentPage * 8;
-    const indexOfFirstItem = indexOfLastItem - 8;
-    const currentListPage = InventoryFakeData.slice(indexOfFirstItem, indexOfLastItem); //change to data
+    // Import inventory file
+    const handleImport = () => {
+
+    }
 
     return (
         <>
             {isMonthSelectorModalOpen &&
                 <MonthSelector months={monthOptions} onMonthSelect={handleMonthSelect} onClose={closeMonthSelectorModal} />
             }
+
+            {isImportInventoryListModalOpen &&
+                <ImportInventoryList onClose={closeImportInventoryListModal} onConfirm={handleImport} />
+            }
+
+            {isDeleteModalOpen && <ConfirmDelete subject={"inventory list"} onClose={closeDeleteModal}/>}
 
             <div className='w-full'>
                 <div>
@@ -86,7 +123,7 @@ const Inventory = () => {
                             <MdCalendarToday className='' />
                         </button>
 
-                        <p>{selectedMonth}</p>
+                        <p className="animate-appearance-in">{selectedMonth}</p>
 
                         {/* Navigator Buttons */}
                         <div className='flex w-[8rem] ml-auto'>
@@ -129,9 +166,13 @@ const Inventory = () => {
                             >
                                 <option selected value="" disabled hidden>Item Category</option>
                                 <option value="all">All</option>
-                                <option value="meat-materials">Meat Materials</option>
-                                <option value="food-additives">Food Additives & Meat Extenders</option>
-                                <option value="packaging-materials">Packaging Materials</option>
+                                <option value="meat_material">Meat Materials</option>
+                                <option value="meat_alternate">Meat Alternates</option>
+                                <option value="food_ingredient">Food Ingredients</option>
+                                <option value="packaging">Packaging Materials</option>
+                                <option value="casing">Casing</option>
+                                <option value="tin_can">Tin Can</option>
+                                <option value="other">Other</option>
 
                             </select>
 
@@ -143,11 +184,19 @@ const Inventory = () => {
                                 <option value="in-stock">In Stock</option>
                                 <option value="low-stock">Low Stock</option>
                             </select>
-                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[7rem] px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}>
+
+                            {/* Action Buttons */}
+                            <button 
+                                className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[7rem] px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
+                                onClick={openImportInventoryListModal}
+                            >
                                 <span><CiImport className='w-[30px] h-[22px]'/></span>
                                 <span className='font-semibold'>Import</span>
                             </button>
-                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}>
+                            <button 
+                                className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
+                                onClick={openDeleteModal}
+                            >
                                 <IoTrash className="text-[25px] transition-colors duration-250 ease-in-out" />
                             </button>
                             
