@@ -114,22 +114,18 @@ class FileController extends ApiController
         $currentMonthYear = '';
 
         if (($handle = fopen($file->getRealPath(), 'r')) !== false) {
-            fgetcsv($handle); // Skip header
+            fgetcsv($handle);
             while (($data = fgetcsv($handle)) !== false) {
                 if (empty($data) || $data[0] === "Item Code") {
-                    continue; // Skip empty rows or headers
+                    continue;
                 }
 
-                // If the first column has a month/year but no cost, this is a new month-year entry
                 if (!empty($data[0]) && empty($data[2])) {
-                    $currentMonthYear = $data[0]; // Store the current month/year
-                }
-                // If the first column has both a code and cost, it's a product entry
-                elseif (!empty($data[0]) && !empty($data[2])) {
-                    $productName = $data[1]; // Extract product name
-                    $productCost = floatval($data[2]); // Extract product cost
+                    $currentMonthYear = $data[0];
+                } elseif (!empty($data[0]) && !empty($data[2])) {
+                    $productName = $data[1];
+                    $productCost = floatval($data[2]);
 
-                    // Find or create the monthYear entry
                     $monthYearIndex = null;
                     foreach ($parsedCostData as $index => $entry) {
                         if ($entry['monthYear'] === $currentMonthYear) {
@@ -139,7 +135,6 @@ class FileController extends ApiController
                     }
 
                     if ($monthYearIndex === null) {
-                        // Add a new entry if month-year does not exist
                         $parsedCostData[] = [
                             'monthYear' => $currentMonthYear,
                             'products' => [
@@ -150,7 +145,6 @@ class FileController extends ApiController
                             ],
                         ];
                     } else {
-                        // Append the product to the existing month-year entry
                         $parsedCostData[$monthYearIndex]['products'][] = [
                             'productName' => $productName,
                             'cost' => $productCost,
