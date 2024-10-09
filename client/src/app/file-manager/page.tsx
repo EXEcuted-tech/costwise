@@ -57,9 +57,9 @@ const FileManagerPage = () => {
           }, 1000);
           setMasterFileData(response.data.data);
         }
-      } else if (tab === 'transactional') {
+      } else if (tab === 'transactionfile') {
         const response = await api.get('/files/retrieve', {
-          params: { col: 'file_type', value: 'transactional_file' },
+          params: { col: 'file_type', value: 'transactional_file' }, //will improve this to batch if needed
         });
         if (response.data.status === 200) {
           setTimeout(() => {
@@ -113,10 +113,11 @@ const FileManagerPage = () => {
             hasRequiredSheets = requiredSheets.every(sheetName => sheetNames.includes(sheetName));
             bomSheets = sheetNames.filter(sheetName => bomSheetPattern.test(sheetName));
           } else if (uploadType === 'transactional') {
-            const requiredSheets = ['Production Plan'];
+            const requiredSheets = ['Production Transactions'];
             hasRequiredSheets = requiredSheets.every(sheetName => sheetNames.includes(sheetName));
           }
 
+          console.log(hasRequiredSheets, uploadType);
           if (
             hasRequiredSheets &&
             ((uploadType === 'master' && bomSheets.length > 0) || uploadType === 'transactional')
@@ -183,6 +184,63 @@ const FileManagerPage = () => {
     }
   }, [uploadType, shouldOpenDropzone, open]);
 
+  // const handleExportAll = async () => {
+  //   try {
+  //     const response = await api.post('/files/export_all', {}, {
+  //       responseType: 'blob',
+  //     });
+
+  //     const url = window.URL.createObjectURL(new Blob([response.data]));
+
+  //     const a = document.createElement('a');
+  //     a.href = url;
+  //     a.download = 'exported_files.zip';
+  //     document.body.appendChild(a);
+
+  //     a.click();
+
+  //     a.remove();
+  //     window.URL.revokeObjectURL(url);
+
+  //   } catch (error) {
+  //     console.error('Export all files failed:', error);
+  //   }
+  // };
+
+  const handleExportAll = async () => {
+    try {
+      const response = await api.post('/files/export_all', {}, {
+        responseType: 'blob',
+      });
+
+      // Check if the response is actually a blob
+      if (response.data instanceof Blob) {
+        // Check if the blob is not empty
+        if (response.data.size > 0) {
+          const url = window.URL.createObjectURL(response.data);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'exported_all_files.zip';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        } else {
+          console.error('Received an empty zip file');
+          // Handle empty zip file (e.g., show an error message to the user)
+        }
+      } else {
+        // If it's not a blob, it might be an error response
+        const errorText = await response.data.text();
+        console.error('Export failed:', errorText);
+        // Handle error (e.g., show error message to the user)
+      }
+    } catch (error) {
+      console.error('Export all files failed:', error);
+      // Handle error (e.g., show error message to the user)
+    }
+  };
+
   return (
     <>
       <div className="absolute top-0 right-0">
@@ -218,10 +276,12 @@ const FileManagerPage = () => {
             <button className='flex justify-center items-center bg-white border-1 border-[#D3D3D3] px-[10px] mr-[1%] drop-shadow rounded-[10px]
                             hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'>
               <VscExport className={`${isOpen ? 'text-[10.5px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`} />
-              <p className={`ml-[5px] font-bold ${isOpen ? 'hidden 2xl:block 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`}>
+              <p className={`ml-[5px] font-bold ${isOpen ? 'hidden 2xl:block 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`}
+                onClick={handleExportAll}>
                 Export All Files
               </p>
-              <p className={`ml-[5px] font-bold ${isOpen ? 'text-[10.5px] 2xl:hidden' : 'hidden'}`}>
+              <p className={`ml-[5px] font-bold ${isOpen ? 'text-[10.5px] 2xl:hidden' : 'hidden'}`}
+                onClick={handleExportAll}>
                 Export All
               </p>
             </button>
@@ -243,7 +303,7 @@ const FileManagerPage = () => {
                     </li>
                     <hr className='h-[2px] bg-primary opacity-50' />
                     <li className={`${isOpen ? 'px-1 2xl:px-3' : 'px-1 2xl:px-3'} flex cursor-pointer hover:text-[#851313] items-center my-[5px]`}
-                      onClick={() => handleUpload('transaction')}>
+                      onClick={() => handleUpload('transactional')}>
                       <BiFile className={`${isOpen ? 'text-[12px] 2xl:text-[18px] 3xl:text-[21px]' : 'text-[17px] 2xl:text-[21px]'} mr-1`} />
                       <p className={`${isOpen ? 'text-[10.5px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'} `}>Transaction</p>
                     </li>

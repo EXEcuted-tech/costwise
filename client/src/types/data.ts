@@ -1,4 +1,5 @@
 import Decimal from 'decimal.js';
+import internal from 'stream';
 
 export interface User {
     user_type: string;
@@ -80,6 +81,25 @@ export interface BOM {
 
 export interface RemovedId {
     id: number;
-    track_id:number;
+    track_id: number;
     rowType: string;
-  }
+}
+
+export interface TransactionRecord {
+    id?: number;
+    year: number;
+    month: number;
+    date: string;
+    journal: string;
+    entryNumber: string;
+    description: string;
+    project: string;
+    glAccount: string;
+    glDescription: string;
+    warehouse: string;
+    itemCode: string;
+    itemDescription: string;
+    quantity: number;
+    amount: number;
+    unitCode: string;
+}

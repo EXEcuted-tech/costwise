@@ -33,34 +33,33 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
     }
 
     const handleEdit = (data: File) => {
-        const encodedData = encodeURIComponent(JSON.stringify(data));
         localStorage.setItem("edit", "true");
         router.push(`/file-manager/workspace?id=${data.file_id}&type=${data.file_type}`);
     }
 
     const handleExport = async (data: File) => {
         try {
-          const fileId = data.file_id;
-      
-          const response = await api.post('/files/export', 
-            { file_id: fileId },
-            { responseType: 'blob' }
-          );
-      
-          const settings = JSON.parse(data.settings);
-          const url = window.URL.createObjectURL(new Blob([response.data]));
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = `${settings.file_name_with_extension}`;
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          window.URL.revokeObjectURL(url);
-      
+            const fileId = data.file_id;
+
+            const response = await api.post('/files/export',
+                { file_id: fileId },
+                { responseType: 'blob' }
+            );
+
+            const settings = JSON.parse(data.settings);
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `${settings.file_name_with_extension}`;
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+
         } catch (error) {
-          console.error('Export failed:', error);
+            console.error('Export failed:', error);
         }
-      };
+    };
 
     const handleDelete = (data: File) => {
         setDeleteModal(true);
@@ -100,11 +99,12 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
                             const fileName = settings.file_name_with_extension;
                             const fileType = data.file_type == 'master_file' ? 'Master File' : 'Transactional File';
                             const dateAdded = data.created_at &&
-                                                new Date(data.created_at).toLocaleDateString('en-US', {
-                                                    year: 'numeric',
-                                                    month: '2-digit',
-                                                    day: '2-digit',
-                                                })
+                                new Date(data.created_at).toLocaleDateString('en-US', {
+                                    year: 'numeric',
+                                    month: '2-digit',
+                                    day: '2-digit',
+                                    timeZone: 'UTC',
+                                });
                             const addedBy = settings.user;
                             return (
                                 <tr key={index} className='border-b-[0.3px] border-[#d9d9d9]'>

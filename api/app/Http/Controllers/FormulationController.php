@@ -195,7 +195,6 @@ class FormulationController extends ApiController
                     'total_cost' => $item->total_cost,
                     'total_batch_qty' => $item->total_batch_qty,
                     'rm_cost' => $item->rm_cost,
-                    'fg_price' => $item->fg_price,
                     'unit' => $item->unit,
                     'formulation_no' => $item->formulation_no,
                     'is_least_cost' => $item->is_least_cost,

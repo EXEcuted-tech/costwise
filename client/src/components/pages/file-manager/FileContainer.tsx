@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from 'react'
+import React, { useEffect, useMemo, useRef, useState } from 'react'
 import { AiOutlineSearch } from "react-icons/ai";
 import CustomDatePicker from '@/components/form-controls/CustomDatePicker';
 import FileTable from './FileTable';
@@ -25,49 +25,69 @@ const FileContainer: React.FC<FileContainerProps> = ({
     masterFileData,
     transactionData,
 }) => {
-    // const [allData, setAllData] = useState<File[]>([]);
-    // const [masterFileData, setMasterFileData] = useState<File[]>([]);
-    // const [transactionData, setTransactionData] = useState([]);
+    const [searchTerm, setSearchTerm] = useState('');
+    const [selectedDate, setSelectedDate] = useState('');
+    // const dataToDisplay = tab === 'all' ? allData : tab === 'masterfile' ? masterFileData : allData;
 
-    // useEffect(() => {
-    //     const fetchData = async () => {
-    //         setIsLoading(true);
+    // useEffect(()=>{
+    //     console.log(dataToDisplay);
+    // },[dataToDisplay])
 
-    //         try {
-    //             if (tab === 'all') {
-    //                 const response = await api.get('/files/retrieve_all');
-    //                 if (response.data.status == 200) {
-    //                     console.log(response);
-    //                     setTimeout(() => {
-    //                         setIsLoading(false);
-    //                     }, 1000);
-    //                     setAllData(response.data.data);
-    //                 }
-    //             } else if (tab === 'masterfile') {
-    //                 const response = await api.get('/files/retrieve', {
-    //                     params: { col: 'file_type', value: 'master_file' },
-    //                 });
-    //                 if (response.data.status == 200) {
-    //                     setTimeout(() => {
-    //                         setIsLoading(false);
-    //                     }, 1000);
-    //                     setMasterFileData(response.data.data);
-    //                 }
-    //             } else if (tab === 'transactional') {
-    //                 const response = await api.get('/files/retrieve', {
-    //                     params: { col: 'file_type', value: 'transactional_file' },
-    //                 });
-    //                 setTransactionData(response.data.data);
-    //             }
-    //         } catch (error) {
-    //             console.error('Error fetching data:', error);
-    //         } finally {
-    //             setIsLoading(false);
-    //         }
-    //     };
+    // const filteredData = dataToDisplay.filter((file) =>
+    //     file.name.toLowerCase().includes(searchTerm.toLowerCase())
+    // );
 
-    //     fetchData();
-    // }, [setIsLoading, tab]);
+    // const filteredData = dataToDisplay.filter((file) => {
+    //     try {
+    //         const settings = JSON.parse(file.settings);
+    //         const fileName = settings.file_name || '';
+
+    //         return fileName.toLowerCase().includes(searchTerm.toLowerCase());
+    //     } catch (error) {
+    //         console.error('Error parsing settings JSON:', error);
+    //         return false;
+    //     }
+    // });
+
+    const dataToDisplay = useMemo(() => {
+        const data =
+            tab === 'all' ? allData : tab === 'masterfile' ? masterFileData : transactionData;
+        return data.map((file) => {
+            try {
+                const settings = JSON.parse(file.settings);
+                return {
+                    ...file,
+                    fileName: settings.file_name || '',
+                    addedBy: settings.user || '',
+                };
+            } catch (error) {
+                console.error('Error parsing settings JSON:', error);
+                return { ...file, fileName: '', addedBy: '' };
+            }
+        });
+    }, [tab, allData, masterFileData, transactionData]);
+
+    // const filteredData = dataToDisplay.filter((file) => {
+    //     const searchTermLower = searchTerm.toLowerCase();
+    //     return (
+    //         file.fileName.toLowerCase().includes(searchTermLower) ||
+    //         file.addedBy.toLowerCase().includes(searchTermLower) ||
+    //         file.file_type.toLowerCase().includes(searchTermLower)
+    //     );
+    // });
+
+    const filteredData = dataToDisplay.filter((file) => {
+        const searchTermLower = searchTerm.toLowerCase();
+        const matchesSearch = (
+            file.fileName.toLowerCase().includes(searchTermLower) ||
+            file.addedBy.toLowerCase().includes(searchTermLower) ||
+            file.file_type.toLowerCase().includes(searchTermLower)
+        );
+
+        const matchesDate = !selectedDate || (file.created_at && file.created_at.startsWith(selectedDate));
+
+        return matchesSearch && matchesDate;
+    });
 
     return (
         <div className={`!font-lato bg-white w-full rounded-lg drop-shadow-lg`}>
@@ -85,18 +105,23 @@ const FileContainer: React.FC<FileContainerProps> = ({
                         type="text"
                         className="w-full pl-[35px] pr-[5px] bg-white border border-[#868686] placeholder-text-[#B0B0B0] text-[#5C5C5C] text-[15px] rounded-[5px] py-[3px]"
                         placeholder="Search here..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
                         required
                     />
                 </div>
                 {/* Date Picker */}
                 <div className={`${isOpen ? 'w-[26%] 2xl:w-[25%] 3xl:w-[20%]' : 'w-[25%] 3xl:w-[15.5%]'} relative`}>
-                    <CustomDatePicker />
+                    <CustomDatePicker
+                        selectedDate={selectedDate}
+                        setSelectedDate={setSelectedDate}
+                    />
                 </div>
             </div>
             {/* Table */}
             <div>
                 <FileTable
-                    fileData={tab === 'all' ? allData : tab === 'masterfile' ? masterFileData : allData}
+                    fileData={filteredData}
                     isOpen={isOpen}
                     isLoading={isLoading}
                 />

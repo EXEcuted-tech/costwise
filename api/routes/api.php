@@ -6,6 +6,7 @@ use App\Http\Controllers\FinishedGoodController;
 use App\Http\Controllers\FodlController;
 use App\Http\Controllers\FormulationController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -24,7 +25,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('upload', [FileController::class, 'upload']);
         Route::get('retrieve_all', [FileController::class, 'retrieveAll']);
         Route::get('retrieve', [FileController::class, 'retrieve']);
+        Route::post('delete', [FileController::class, 'delete']);
         Route::post('export', [FileController::class, 'export']);
+        Route::post('export_all', [FileController::class, 'exportAll']);
     });
 
     Route::prefix('/finished_goods')->group(function () {
@@ -66,5 +69,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('update_emulsion', [FormulationController::class, 'updateEmulsion']);
         Route::post('delete_fg', [FormulationController::class, 'deleteBulkWithFg']);
         Route::post('delete_material', [FormulationController::class, 'deleteBulkWithMaterial']);
+    });
+
+    Route::prefix('/transactions')->group(function () {
+        Route::get('retrieve_batch', [TransactionController::class, 'retrieveBatch']);
+        Route::post('update_batch', [TransactionController::class, 'updateBatch']);
+        Route::post('delete_bulk', [TransactionController::class, 'deleteBulk']);
     });
 });

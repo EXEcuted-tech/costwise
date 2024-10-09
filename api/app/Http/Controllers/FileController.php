@@ -7,6 +7,8 @@ use App\Helpers\ControllerHelper;
 use App\Models\Bom;
 use App\Models\Fodl;
 use App\Models\Formulation;
+use App\Models\Transaction;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use DateTime;
 use Illuminate\Http\Request;
@@ -14,11 +16,13 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\File;
 use App\Models\FinishedGood;
 use App\Models\Material;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
+use ZipArchive;
 
 class FileController extends ApiController
 {
@@ -28,6 +32,10 @@ class FileController extends ApiController
     private $fgCode;
     private $formulationCode;
     private $emulsion;
+
+    // For Transactional Files
+    private $trMaterialId = null;
+    private $trFgId = null;
 
     // Handle Errors Gracefully MAyolskie!
     // Basic CRUD
@@ -75,6 +83,44 @@ class FileController extends ApiController
         }
     }
 
+    public function delete(Request $request)
+    {
+        $allowedColumns = ['file_id', 'file_type'];
+
+        $col = $request->input('col');
+        $value = $request->input('value');
+
+        if (!in_array($col, $allowedColumns)) {
+            $this->status = 400;
+            return $this->getResponse("Invalid column specified.");
+        }
+
+        try {
+            $records = File::where($col, $value)->get();
+
+            if ($records->isEmpty()) {
+                $this->status = 404;
+                return $this->getResponse("No records found to delete.");
+            }
+
+            // if master files 
+            // pangitaon sa diay ang settings
+            // if transactional files
+            // pangitaon pud ang settings
+            // archive
+            // then delete each
+            File::on('archive_mysql')->create($records->first());
+
+            $records->delete();
+
+            $this->status = 200;
+            return $this->getResponse("Records successfully deleted.");
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = $e->getMessage();
+            return $this->getResponse();
+        }
+    }
 
     // Importing Process
     public function upload(Request $request)
@@ -160,6 +206,148 @@ class FileController extends ApiController
                     }
                 }
             }
+        } else if ($uploadType == 'transactional') {
+            if (isset($worksheets["Production Transactions"])) {
+                $worksheet = $worksheets["Production Transactions"];
+                $data = $worksheet->toArray();
+                if (empty($data)) {
+                    $this->status = 400;
+                    return $this->getResponse("No data found in the Production Transactions sheet.");
+                } else {
+                    $this->processTransactionsSheet($data);
+                }
+            }
+        }
+    }
+
+    private function processTransactionsSheet($data)
+    {
+        $headers = $data[0];
+        unset($data[0]);
+
+        $transactionIds = [];
+
+        if (isset($data[1][2])) {
+            $firstDate = $data[1][2];
+            $monthYearInt = Carbon::parse($firstDate)->format('Ym');
+            $settings = json_decode($this->fileModel['settings'], true) ?? [];
+            $settings['monthYear'] = (int) $monthYearInt;
+            $this->fileModel['settings'] = json_encode($settings);
+        }
+
+        foreach ($data as $row) {
+            $rowData = [];
+            foreach ($headers as $column => $header) {
+                $rowData[$header] = $row[$column] ?? null;
+            }
+
+            $year = $rowData['Year'] ?? null;
+            $month = $rowData['Month'] ?? null;
+            $date = $rowData['Date'] ?? null;
+            $journal = $rowData['Journal'] ?? null;
+            $entryNumber = $rowData['Entry Number'] ?? null;
+            $description = $rowData['Description'] ?? null;
+            $project = $rowData['Project'] ?? null;
+            $glAccount = $rowData['GL Account'] ?? null;
+            $glDesc = $rowData['GL Description'] ?? null;
+            $warehouse = $rowData['Warehouse'] ?? null;
+            $itemCode = $rowData['Item Code'] ?? null;
+            $itemDesc = $rowData['Item Description'] ?? null;
+            $qty = floatval($rowData['Qty'] ?? null);
+            $amount = floatval($rowData['Amount'] ?? null);
+            $unit = isset($rowData['Unit Code']) ? trim($rowData['Unit Code']) : "";
+
+            if (is_null($description) || $qty == null) {
+                continue;
+            }
+
+            $material = Material::where('material_code', $itemCode)->first();
+            $fg = FinishedGood::where('fg_code', $itemCode)->first();
+
+            $materialId = $material->material_id ?? null;
+            $finishedGoodId = $fg->fg_id ?? null;
+
+            $timestamp = Carbon::createFromFormat('n/j/y h:i A', $date)->format('Y-m-d H:i:s');
+
+            $settings;
+            if (!$material && (str_starts_with($itemCode, 'RM') || str_starts_with($itemCode, 'SA'))) {
+                $dateOnly = Carbon::createFromFormat('n/j/y h:i A', $date)->format('Y-m-d');
+
+                $newMaterial = Material::create([
+                    'material_code' => $itemCode,
+                    'material_desc' => $itemDesc,
+                    'material_cost' => $amount,
+                    'unit' => $unit,
+                    'date' => $dateOnly
+                ]);
+
+                $settings = [
+                    'qty' => $qty,
+                ];
+
+                $materialId = $newMaterial->material_id;
+            } else if (!$fg && !(str_starts_with($itemCode, 'EMULSION') || str_starts_with($itemCode, 'REWORK') || str_starts_with($itemCode, 'RM') || str_starts_with($itemCode, 'SA'))) {
+                $yearMonth = Carbon::createFromFormat('n/j/y h:i A', $date)->format('Ym');
+                $yearMonthInt = (int) $yearMonth;
+
+                $newFinishedGood = FinishedGood::create([
+                    'fodl_id' => null,
+                    'fg_code' => $itemCode,
+                    'fg_desc' => $itemDesc,
+                    'total_batch_qty' => $qty,
+                    'rm_cost' => $amount,
+                    'unit' => $unit,
+                    'monthYear' => $yearMonthInt
+                ]);
+
+                $settings = [];
+                $finishedGoodId = $newFinishedGood->fg_id;
+            }
+
+            if ($finishedGoodId == null && $materialId == null) {
+                $settings = [
+                    'item_code' => $itemCode,
+                    'item_desc' => $itemDesc,
+                    'qty' => $qty,
+                    'amount' => $amount,
+                    'unit' => $unit
+                ];
+            }
+
+            if ($materialId != null) {
+                $settings = [
+                    'qty' => $qty,
+                ];
+            }
+
+            $passSettings = empty($settings) ? json_encode(new \stdClass()) : json_encode($settings);
+
+            $transaction = Transaction::create([
+                'material_id' => $materialId,
+                'fg_id' => $finishedGoodId,
+                'journal' => $journal,
+                'entry_num' => $entryNumber,
+                'trans_desc' => $description,
+                'project' => $project,
+                'gl_account' => $glAccount,
+                'gl_desc' => $glDesc,
+                'warehouse' => $warehouse,
+                'date' => $timestamp,
+                'month' => $month,
+                'year' => $year,
+                'settings' => $passSettings
+            ]);
+
+            $settings = [];
+            $transactionIds[] = $transaction->transaction_id;
+        }
+
+        if ($this->fileModel) {
+            $settings = json_decode($this->fileModel['settings'], true) ?? [];
+            $existingTransactionIds = $settings['transaction_ids'] ?? [];
+            $mergedTransactionIds = array_values(array_unique(array_merge($existingTransactionIds, $transactionIds)));
+            $settings['transaction_ids'] = $mergedTransactionIds;
+            $this->fileModel['settings'] = json_encode($settings);
         }
     }
 
@@ -234,7 +422,7 @@ class FileController extends ApiController
                 $rowData[$header] = $row[$column] ?? null;
             }
 
-            $itemCode = $rowData['ITEMCODE'] ?? null;
+            $itemCode = $rowData['ITEM CODE'] ?? null;
             $itemDescription = $rowData['ITEM DESCRIPTION'] ?? null;
             $unit = $rowData['UNIT'] ?? " ";
             $unitIndex = array_search('UNIT', $headers);
@@ -422,12 +610,12 @@ class FileController extends ApiController
             $fileId = $request->input('file_id');
             $file = File::findOrFail($fileId);
 
-            $spreadsheet = new \PhpOffice\PhpSpreadsheet\Spreadsheet();
+            $spreadsheet = new Spreadsheet();
 
             if ($file->file_type === 'master_file') {
                 $this->addMasterFileSheets($spreadsheet, $file);
             } elseif ($file->file_type === 'transactional_file') {
-                $this->addTransactionalFileSheets($spreadsheet, $file);
+                $this->addTransactionalFileSheet($spreadsheet, $file);
             }
 
             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
@@ -446,6 +634,53 @@ class FileController extends ApiController
             return $this->getResponse();
         }
     }
+
+    // public function exportAll(Request $request)
+    // {
+    //     try {
+    //         $files = File::all();
+
+    //         if ($files->isEmpty()) {
+    //             return response()->json(['message' => 'No files to export'], 404);
+    //         }
+
+    //         $tempDir = sys_get_temp_dir() . '/exported_files_' . time();
+    //         if (!file_exists($tempDir)) {
+    //             mkdir($tempDir, 0777, true);
+    //         }
+
+    //         $zip = new ZipArchive();
+    //         $zipFileName = $tempDir . '/exported_files.zip';
+    //         $zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+
+    //         foreach ($files as $file) {
+    //             $spreadsheet = new Spreadsheet();
+
+    //             if ($file->file_type === 'master_file') {
+    //                 $this->addMasterFileSheets($spreadsheet, $file);
+    //             } elseif ($file->file_type === 'transactional_file') {
+    //                 $this->addTransactionalFileSheet($spreadsheet, $file);
+    //             }
+
+    //             $fileName = $file->file_name_with_extension;
+
+    //             $tempFilePath = $tempDir . '/' . $fileName;
+    //             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    //             $writer->save($tempFilePath);
+
+    //             $zip->addFile($tempFilePath, $fileName);
+    //         }
+
+    //         $zip->close();
+
+    //         return response()->download($zipFileName, 'exported_files.zip', [
+    //             'Content-Type' => 'application/zip',
+    //         ])->deleteFileAfterSend(true);
+
+    //     } catch (\Exception $e) {
+    //         return response()->json(['message' => "Export failed: " . $e->getMessage()], 500);
+    //     }
+    // }
 
     private function addMasterFileSheets($spreadsheet, $file)
     {
@@ -469,10 +704,86 @@ class FileController extends ApiController
         }
     }
 
-    private function addTransactionalFileSheets($spreadsheet, $file)
+    private function addTransactionalFileSheet($spreadsheet, $file)
     {
-        // Add logic for transactional file data
-        // This will depend on what data is associated with transactional files
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Production Transactions');
+        $headers = ['Year', 'Month', 'Date', 'Journal', 'Entry Number', 'Description', 'Project', 'GL Account', 'GL Description', 'Warehouse', 'Item Code', 'Item Description', 'Qty', 'Amount', 'Unit Code'];
+        $sheet->fromArray($headers, NULL, 'A1');
+        $dataRange = 'A1:O1';
+        $sheet->setAutoFilter($dataRange);
+
+        $sheet->getColumnDimension('A')->setWidth(7.71);
+        $sheet->getColumnDimension('B')->setWidth(8);
+        $sheet->getColumnDimension('C')->setWidth(19.14);
+        $sheet->getColumnDimension('D')->setWidth(9.43);
+        $sheet->getColumnDimension('E')->setWidth(15.38);
+        $sheet->getColumnDimension('F')->setWidth(26.38);
+        $sheet->getColumnDimension('G')->setWidth(22.38);
+        $sheet->getColumnDimension('H')->setWidth(19.38);
+        $sheet->getColumnDimension('I')->setWidth(30.38);
+        $sheet->getColumnDimension('J')->setWidth(11.14);
+        $sheet->getColumnDimension('K')->setWidth(19.29);
+        $sheet->getColumnDimension('L')->setWidth(21.29);
+        $sheet->getColumnDimension('M')->setWidth(11.57);
+        $sheet->getColumnDimension('N')->setWidth(11.57);
+        $sheet->getColumnDimension('O')->setWidth(9.57);
+
+        $settings = json_decode($file->settings, true);
+        if (isset($settings['transaction_ids'])) {
+            $transactionIds = $settings['transaction_ids'];
+
+            $row = 2;
+            foreach ($transactionIds as $transactionId) {
+                $transaction = Transaction::find($transactionId);
+                $settings = json_decode($transaction->settings, true);
+
+                $date = new DateTime($transaction->date);
+                $formattedDate = $date->format('m/d/y h:i A');
+
+                $sheet->setCellValue("A$row", $transaction->year);
+                $sheet->setCellValue("B$row", $transaction->month);
+                $sheet->setCellValue("C$row", $formattedDate);
+                $sheet->setCellValue("D$row", $transaction->journal);
+                $sheet->setCellValue("E$row", $transaction->entry_num);
+                $sheet->setCellValue("F$row", $transaction->trans_desc);
+                $sheet->setCellValue("G$row", $transaction->project);
+                $sheet->setCellValue("H$row", $transaction->gl_account);
+                $sheet->setCellValue("I$row", $transaction->gl_desc);
+                $sheet->setCellValue("J$row", $transaction->warehouse);
+
+                if ($transaction->material_id != null) {
+                    $material = Material::find($transaction->material_id);
+
+                    $sheet->setCellValue("K$row", $material->material_code);
+                    $sheet->setCellValue("L$row", $material->material_desc);
+                    $sheet->setCellValue("M$row", $settings['qty']);
+                    $sheet->setCellValue("N$row", $material->material_cost);
+                    $sheet->setCellValue("O$row", $material->unit);
+                }
+
+                if ($transaction->fg_id != null) {
+                    $fg = FinishedGood::find($transaction->fg_id);
+
+                    $sheet->setCellValue("K$row", $fg->fg_code);
+                    $sheet->setCellValue("L$row", $fg->fg_desc);
+                    $sheet->setCellValue("M$row", $fg->total_batch_qty);
+                    $sheet->setCellValue("N$row", $fg->rm_cost);
+                    $sheet->setCellValue("O$row", $fg->unit);
+                }
+
+                if ($transaction->material_id == null && $transaction->fg_id == null) {
+                    $sheet->setCellValue("K$row", $settings['item_code']);
+                    $sheet->setCellValue("L$row", $settings['item_desc']);
+                    $sheet->setCellValue("M$row", $settings['qty']);
+                    $sheet->setCellValue("N$row", $settings['amount']);
+                    $sheet->setCellValue("O$row", $settings['unit']);
+                }
+
+
+                $row++;
+            }
+        }
     }
 
     private function addFODLSheet($spreadsheet, $fodlIds)
@@ -600,7 +911,7 @@ class FileController extends ApiController
 
             $styleRowD = $sheet->getStyle("D$row");
             $styleRowD->getFont()->setSize(11)->setBold(true)->getColor()->setRGB('0000FF');
-            ;
+
             $styleRowD->getNumberFormat()->setFormatCode(NumberFormat::FORMAT_NUMBER_COMMA_SEPARATED1);
 
             $row++;
@@ -616,9 +927,10 @@ class FileController extends ApiController
         $bomName = $bom['bom_name'];
         $sheet->setTitle((string) $bomName);
 
-        $headers = ['Formula', 'Level', 'Item Code', 'Description', 'Formulation', 'Batch Quantity', 'Unit'];
+        $headers = ['Formula', 'Level', 'Item Code', 'Description', 'Formulation', 'Batch Quantity', 'unit'];
         $sheet->fromArray($headers, NULL, 'A1');
-        $sheet->freezePane('A1');
+        $sheet->getStyle('A1:G1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->freezePane('A2');
 
         $sheet->getColumnDimension('A')->setWidth(10);
         $sheet->getColumnDimension('B')->setWidth(8.71);
@@ -637,6 +949,7 @@ class FileController extends ApiController
             $fg = FinishedGood::find($formulationData['fg_id']);
 
             $sheet->setCellValue("A$row", $formulationData['formula_code']);
+            $sheet->getStyle("A$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
             $sheet->getStyle("A$row")->getFont()->setBold(true);
 
             $sheet->getStyle("A$row:F$row")->getFill()->setFillType(Fill::FILL_SOLID);

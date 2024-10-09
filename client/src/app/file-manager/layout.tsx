@@ -15,7 +15,7 @@ export default function FileManagerLayout({
     <ProtectedRoute>
       <SidebarProvider>
         <FileManagerProvider>
-        <Suspense fallback={<div className="flex justify-center items-center size-full"><Spinner/></div>}>
+        <Suspense fallback={<div className="flex justify-center items-center w-full h-screen"><Spinner/></div>}>
             <FileManagerContent>
               {children}
             </FileManagerContent>

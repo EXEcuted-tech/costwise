@@ -72,7 +72,6 @@ return new class extends Migration {
             $table->decimal('total_cost', 10, 2)->nullable();
             $table->decimal('total_batch_qty', 10, 2);
             $table->decimal('rm_cost', 10, 2)->nullable();
-            $table->decimal('fg_price', 10, 2)->nullable();
             $table->string('unit', 10);
             $table->unsignedInteger('formulation_no')->nullable();
             $table->boolean('is_least_cost')->default(false)->index();
@@ -125,18 +124,21 @@ return new class extends Migration {
         // Transaction Table
         Schema::create('transactions', function (Blueprint $table) {
             $table->id('transaction_id');
-            $table->unsignedInteger('material_id');
+            $table->unsignedInteger('material_id')->nullable();
+            $table->unsignedInteger('fg_id')->nullable();
             $table->string('journal', 255);
             $table->string('entry_num', 15);
             $table->string('trans_desc', 255);
             $table->string('project', 255);
-            $table->string('gl_account', 15);
+            $table->string('gl_account', 50);
             $table->string('gl_desc', 255);
-            $table->string('warehouse', 10);
+            $table->string('warehouse', 20);
             $table->timestamp('date');
             $table->integer('month');
             $table->integer('year');
+            $table->longText('settings');
             $table->foreign('material_id')->references('material_id')->on('materials')->onDelete('cascade');
+            $table->foreign('fg_id')->references('fg_id')->on('finished_goods')->onDelete('cascade');
         });
 
         Schema::create('models', function (Blueprint $table) {

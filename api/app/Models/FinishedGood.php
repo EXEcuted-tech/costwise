@@ -17,7 +17,6 @@ class FinishedGood extends Model
         'total_cost',
         'total_batch_qty',
         'rm_cost',
-        'fg_price',
         'unit',
         'monthYear',
         'formulation_no',

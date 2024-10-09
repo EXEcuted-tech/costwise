@@ -759,3 +759,35 @@ input[type="date"] {
     transform: rotate(50deg) scale(1);
   }
 }
+
+
+.scroll-container-wrapper {
+  position: relative;
+}
+
+.scroll-message {
+  position: fixed;
+  top: 60px; 
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 10px 20px;
+  border-radius: 8px;
+  z-index: 1000;
+  font-size: 17px;
+  opacity: 1;
+  animation: fadeOut 10s ease-out forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}

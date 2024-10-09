@@ -1,6 +1,6 @@
 import { RemovedId } from '@/types/data';
 import { formatHeader } from '@/utils/costwiseUtils';
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useRef, useState } from 'react'
 import { HiOutlinePlus } from "react-icons/hi";
 import { IoIosSave } from "react-icons/io";
 import { IoTrash } from "react-icons/io5";
@@ -17,6 +17,8 @@ interface WorkspaceTableProps {
     onSaveBOM?: (updatedData: Record<string, any>[], bomId: number) => void;
     removedBomIds?: RemovedId[];
     setRemovedBomIds?: React.Dispatch<React.SetStateAction<RemovedId[]>>;
+    transactionCount?: number;
+    setTransactionCount?: React.Dispatch<React.SetStateAction<number>>;
 }
 
 const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
@@ -30,9 +32,12 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
     removedIds,
     setRemovedIds,
     removedBomIds,
-    setRemovedBomIds
+    setRemovedBomIds,
+    transactionCount,
+    setTransactionCount
 }) => {
     const [tableData, setTableData] = useState(data);
+    const containerRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
         setTableData(data);
@@ -41,7 +46,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
     const handleInputChange = (rowIndex: number, key: string, value: string) => {
         const updatedData = [...tableData];
 
-        if (key == 'level' || key == 'formulation') {
+        if (key == 'level' || key == 'formulation' || key == 'year' || key == 'month') {
             const formattedValue = String(value);
             updatedData[rowIndex][key] = formattedValue;
         } else if (!isNaN(Number(value)) && value !== '') {
@@ -54,22 +59,12 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
         setTableData(updatedData);
     };
 
-    // const addRow = () => {
-    //     const emptyRow = Object.keys(data[0]).reduce((acc, key) => {
-    //         // if (!key.toLowerCase().includes('id')) { // Exclude ID fields
-    //         //     acc[key] = '';
-    //         // }
-    //         acc[key] = '';
-    //         return acc;
-    //     }, {} as Record<string, unknown>);
-
-    //     setTableData([...tableData, emptyRow]);
-    // }
-
     const addRow = () => {
-        const nextId = tableData.length > 0
-            ? Math.max(...tableData.map(row => row.id as number)) + 1
-            : 1;
+        const nextId = typeof transactionCount === 'number'
+            ? transactionCount + 1
+            : (tableData.length > 0
+                ? Math.max(...tableData.map(row => row.id as number)) + 1
+                : 1);
 
         const emptyRow = Object.keys(tableData[0] || {}).reduce<Record<string, any>>((acc, key) => {
             acc[key] = key === 'id' ? nextId : '';
@@ -77,6 +72,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
         }, {});
 
         setTableData([...tableData, emptyRow]);
+       // if add row, it will go setCurrentPage to the last page and the itemsPerPage will change for the last page
     };
     // different addRow for BOM
 
@@ -96,32 +92,8 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
         }
     };
 
-    // const removeBomRow = (index: number, rowType: string) => {
-    //     const rowToRemove = tableData[index];
-    //     const id = rowToRemove?.id;
-
-    //     if (id === undefined || typeof id !== 'number') {
-    //         return;
-    //     }
-
-    //     const confirmDeletion = window.confirm(
-    //         'Are you sure you want to delete this record?' // Change to modal
-    //     );
-    //     if (!confirmDeletion) return;
-
-    //     setTableData(prevData => prevData.filter((_, i) => i !== index));
-
-    //     const isAlreadyRemoved = removedBomIds?.some(
-    //         removed => removed.id === id && removed.rowType === rowType
-    //     );
-
-    //     if (setRemovedBomIds && !isAlreadyRemoved) {
-    //         setRemovedBomIds(prevIds => [...prevIds, { id, rowType }]);
-    //     }
-    // };
-
     const removeBomRow = (index: number, rowType: string) => {
-        if(rowType == 'endIdentifier'){
+        if (rowType == 'endIdentifier') {
             alert("That's a row identifier!");
             return;
         }
@@ -181,8 +153,29 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
         }
     };
 
+    const handleMouseMove = (e: React.MouseEvent) => {
+        const container = containerRef.current;
+
+        if (!container) return;
+
+        const { clientX } = e;
+        const { left, right } = container.getBoundingClientRect();
+
+        const distanceToRight = right - clientX;
+        const distanceToLeft = clientX - left;
+
+        const threshold = 100;
+        const scrollStep = 50;
+
+        if (distanceToRight < threshold) {
+            container.scrollLeft += scrollStep;
+        } else if (distanceToLeft < threshold) {
+            container.scrollLeft -= scrollStep;
+        }
+    };
+
     return (
-        <div className="overflow-x-auto">
+        <div ref={containerRef} onMouseMove={handleMouseMove} className="overflow-x-auto">
             {isEdit &&
                 <div className={`h-[40px] animate-zoomIn fixed flex items-center ${isTransaction ? 'left-[20px]' : 'left-[40px]'}`}>
                     <div className='flex justify-end my-[10px] mr-[10px]'>
@@ -223,22 +216,22 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                                 let textAlignClass = 'text-left';
                                 if (key === 'itemDescription') {
                                     textAlignClass = 'text-left';
-                                } else if (key === 'materialCost' || key === 'amount') {
+                                } else if (key === 'materialCost' || key === 'amount' || key === 'quantity') {
                                     textAlignClass = 'text-right';
                                 }
 
                                 return (
-                                    isEdit
-                                        ?
-                                        <th key={key} className={`animate-zoomIn ${key == 'level' || key === 'formulation' ? 'text-center' : (key === 'materialCost' || key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
+                                    // isEdit
+                                    //     ?
+                                    //     <th key={key} className={`animate-zoomIn ${key == 'level' || key === 'formulation' || key == 'year' || key == 'month' ? 'text-center' : (key === 'materialCost' || key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
+                                    //                     whitespace-nowrap font-medium text-[20px] py-2 px-6 border-b border-gray-300`}>
+                                    //         {formatHeader(key, ['rm', 'total'])}
+                                    //     </th>
+                                    //     :
+                                    <th key={key} className={`animate-zoomIn ${key == 'level' || key === 'formulation' || key == 'year' || key == 'month' ? 'text-center' : (key === 'materialCost' || key === 'amount' || key === 'quantity' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
                                                         whitespace-nowrap font-medium text-[20px] py-2 px-6 border-b border-gray-300`}>
-                                            {formatHeader(key, ['rm', 'total'])}
-                                        </th>
-                                        :
-                                        <th key={key} className={`animate-zoomIn ${key == 'level' || key === 'formulation' ? 'text-center' : (key === 'materialCost' || key === 'amount' || key === 'rmCost' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
-                                                        whitespace-nowrap font-medium text-[20px] py-2 px-6 border-b border-gray-300`}>
-                                            {formatHeader(key, ['rm', 'total'])}
-                                        </th>
+                                        {formatHeader(key)}
+                                    </th>
                                 );
                             })}
                     </tr>
@@ -268,20 +261,26 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                                     .map(([key, value], colIndex) => {
                                         let textAlignClass = 'text-left';
                                         if (typeof value === 'number') textAlignClass = 'text-right';
-                                        if (key === 'factoryOverhead' || key === 'directLabor' || key === 'materialCost' || key === 'batchQty') textAlignClass = 'text-right';
-                                        if (key == 'level' || key == 'formulation') textAlignClass = 'text-center';
+                                        if (key === 'factoryOverhead' || key === 'directLabor' || key === 'materialCost' || key === 'batchQty' || key === 'quantity' || key === 'amount') textAlignClass = 'text-right';
+                                        if (key == 'level' || key == 'formulation' || key == 'year' || key == 'month') textAlignClass = 'text-center';
                                         // const isReadOnly =
                                         //     value === null ||
                                         //     (typeof value === 'string' && value.trim() === '');
 
                                         const isReadOnly = value === null;
-                                        const displayValue = isReadOnly
-                                            ? ''
-                                            : key == 'level' || key == 'formulation'
-                                                ? Number(value).toFixed(0)
-                                                : typeof value === 'number'
-                                                    ? Number(value).toFixed(2)
-                                                    : String(value);
+                                        let displayValue = '';
+
+                                        if (isReadOnly) {
+                                            displayValue = '';
+                                        } else if (key === 'level' || key === 'formulation' || key === 'year' || key === 'month') {
+                                            displayValue = Number(value).toFixed(0); // Display as integer without decimals
+                                        } else if (key === 'entryNumber' || key === 'glAccount' || key === 'journal') {
+                                            displayValue = String(Number(value).toFixed(0)); // Explicitly treat as string
+                                        } else if (typeof value === 'number') {
+                                            displayValue = Number(value).toFixed(2); // Display as number with 2 decimal places for all other numeric fields
+                                        } else {
+                                            displayValue = String(value); // Default to string conversion
+                                        }
 
                                         return (
                                             <td
@@ -317,8 +316,8 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                                     .map(([key, value], colIndex) => {
                                         let textAlignClass = 'text-left';
                                         if (typeof value === 'number') textAlignClass = 'text-right';
-                                        if (key === 'factoryOverhead' || key === 'directLabor' || key === 'materialCost' || key === 'batchQty') textAlignClass = 'text-right';
-                                        if (key == 'level' || key == 'formulation') textAlignClass = 'text-center';
+                                        if (key === 'factoryOverhead' || key === 'directLabor' || key === 'materialCost' || key === 'batchQty' || key === 'quantity' || key === 'amount') textAlignClass = 'text-right';
+                                        if (key == 'level' || key == 'formulation' || key == 'year' || key == 'month') textAlignClass = 'text-center';
                                         return (
                                             <td
                                                 key={key}
@@ -334,7 +333,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                                             >
                                                 <span className='w-auto'>
                                                     {
-                                                        key == 'level' || key == 'formulation'
+                                                        key == 'level' || key == 'formulation' || key == 'year' || key == 'month'
                                                             ?
                                                             value == null ? '' : String(value)
                                                             :
