@@ -24,7 +24,7 @@ class PasswordResetController extends Controller
             'created_at' => Carbon::now(),
         ]);
 
-        Mail::to($request->email)->send(new PasswordResetMail($token));
+        Mail::to($request->email)->send(new PasswordResetMail($token, $request->email));
 
         return response()->json(['message' => 'Password reset link sent!']);
     }
@@ -42,13 +42,15 @@ class PasswordResetController extends Controller
 
     public function resetPassword(Request $request)
     {
+
+        
         $request->validate([
             'token' => 'required',
-            'email' => 'required|email|exists:users,email',
-            'password' => 'required|string|confirmed|min:8',
+            'email' => 'required|email|exists:users,email_address',
+            'password' => 'required|string|confirmed',
         ]);
-
-        $resetRequest = DB::table('password_resets')
+        
+        $resetRequest = DB::table('password_resets_token')
             ->where('token', $request->token)
             ->where('email', $request->email)
             ->first();
@@ -57,11 +59,11 @@ class PasswordResetController extends Controller
             return response()->json(['message' => 'Invalid token or email'], 400);
         }
 
-        $user = User::where('email', $request->email)->first();
+        $user = User::where('email_address', $request->email)->first();
         $user->password = bcrypt($request->password);
         $user->save();
 
-        DB::table('password_resets')->where('email', $request->email)->delete();
+        DB::table('password_resets_token')->where('email', $request->email)->delete();
 
         return response()->json(['message' => 'Password successfully reset']);
     }

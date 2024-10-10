@@ -13,7 +13,7 @@ import Spinner from "@/components/loaders/Spinner";
 
 function LoginPage() {
   const router = useRouter();
-  const { setCurrentUser } = useUserContext();
+  const { currentUser, setCurrentUser } = useUserContext();
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -55,7 +55,7 @@ function LoginPage() {
 
         const user = await api.get('/user');
 
-        const currentUser = {
+        const currentUs = {
           userId: user.data.user_id,
           empNum: user.data.employee_number,
           name: user.data.first_name, // Can be full name if needed najud
@@ -64,7 +64,8 @@ function LoginPage() {
           displayPicture: user.data.display_picture
         }
 
-        setCurrentUser(currentUser);
+        setCurrentUser(currentUs);
+        console.log(currentUser?.email);
 
         setTimeout(() => {
           setIsLoading(false);

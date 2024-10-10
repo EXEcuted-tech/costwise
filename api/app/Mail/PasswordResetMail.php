@@ -7,20 +7,21 @@ use Illuminate\Mail\Mailable;
 class PasswordResetMail extends Mailable
 {
     public $token;
-
-    public function __construct($token)
+    public $email;
+    public function __construct($token, $email)
     {
         $this->token = $token;
+        $this->email = $email;
     }
 
     public function build()
     {
-        $resetUrl = config('app.url') . '/profile/' . $this->token;
+        $resetUrl = config('app.url') . '/pass-reset/' . $this->token . '?email=' . urlencode($this->email);
 
         return $this->subject('Password Reset Request')
             ->view('emails.passwordReset')
             ->with([
-                'resetUrl' => $resetUrl,
+                'resetLink' => $resetUrl,
             ]);
     }
 }
