@@ -374,4 +374,60 @@ class FodlController extends ApiController
             return $this->getResponse("An error occurred while deleting records.");
         }
     }
+
+    public static function deleteBulkFodlInFile($fodlIds, $file_id)
+    {
+        \DB::beginTransaction();
+
+        try {
+            $fodls = Fodl::whereIn('fodl_id', $fodlIds)->get();
+            dump("IN FODLS: {$fodls}");
+            foreach ($fodls as $fodl) {
+                $archivedFodlData = $fodl->toArray();
+                Fodl::on('archive_mysql')->create($archivedFodlData);
+
+                $files = File::where('file_id', $file_id)->get();
+
+                foreach ($files as $file) {
+                    $settings = json_decode($file->settings, true);
+
+                    if (isset($settings['fodls']) && is_array($settings['fodls'])) {
+                        $originalCount = count($settings['fodls']);
+
+                        $settings['fodls'] = array_filter($settings['fodls'], function ($fodlEntry) use ($fodl) {
+                            return $fodlEntry['fodl_id'] !== $fodl->fodl_id;
+                        });
+
+                        $newCount = count($settings['fodls']);
+
+                        if ($newCount < $originalCount) {
+                            $settings['fodls'] = array_values($settings['fodls']);
+                            $file->settings = json_encode($settings);
+                            $file->save();
+                        }
+                    }
+                }
+            }
+
+            \DB::table('finished_goods')
+                ->whereIn('fodl_id', $fodlIds)
+                ->update(['fodl_id' => null]);
+
+            $debug = Fodl::whereIn('fodl_id', $fodlIds)->delete();
+            dump($debug);
+            \DB::commit();
+
+            return [
+                'status' => 200,
+                'message' => 'FODL records deleted and archived successfully.'
+            ];
+        } catch (\Exception $e) {
+            \DB::rollBack();
+
+            return [
+                'status' => 500,
+                'message' => 'An error occurred while deleting records.'
+            ];
+        }
+    }
 }

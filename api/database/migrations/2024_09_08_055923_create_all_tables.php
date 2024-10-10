@@ -44,6 +44,7 @@ return new class extends Migration {
             $table->enum('file_type', ['master_file', 'transactional_file']);
             $table->longText('settings');
             $table->timestamps();
+            $table->index(['file_id']);
         });
 
         // Bill of Materials Table
@@ -52,6 +53,7 @@ return new class extends Migration {
             $table->string('bom_name', 255);
             $table->longText('formulations');
             $table->timestamps();
+            $table->index(['bom_id']);
         });
 
         // FODL Table
@@ -61,6 +63,7 @@ return new class extends Migration {
             $table->decimal('factory_overhead', 10, 2);
             $table->decimal('direct_labor', 10, 2);
             $table->unsignedInteger('monthYear');
+            $table->index(['fodl_id']);
         });
 
         // Finished Goods Table
@@ -77,6 +80,7 @@ return new class extends Migration {
             $table->boolean('is_least_cost')->default(false)->index();
             $table->unsignedInteger('monthYear');
             $table->foreign('fodl_id')->references('fodl_id')->on('fodl')->onDelete('cascade');
+            $table->index(['fg_id','fg_code','rm_cost','fodl_id']);
         });
 
         // Formulations Table
@@ -88,6 +92,7 @@ return new class extends Migration {
             $table->longText('material_qty_list');
             $table->timestamps();
             $table->foreign('fg_id')->references('fg_id')->on('finished_goods')->onDelete('cascade');
+            $table->index(['formulation_id','formula_code']);
         });
 
         // Material Table
@@ -98,6 +103,7 @@ return new class extends Migration {
             $table->decimal('material_cost', 10, 2);
             $table->string('unit', 10);
             $table->date('date');
+            $table->index(['material_id','material_code', 'material_cost']);
         });
 
         // Inventory Table
@@ -139,6 +145,7 @@ return new class extends Migration {
             $table->longText('settings');
             $table->foreign('material_id')->references('material_id')->on('materials')->onDelete('cascade');
             $table->foreign('fg_id')->references('fg_id')->on('finished_goods')->onDelete('cascade');
+            $table->index(['transaction_id','material_id','fg_id']);
         });
 
         Schema::create('models', function (Blueprint $table) {

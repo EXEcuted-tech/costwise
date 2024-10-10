@@ -85,17 +85,16 @@ class FileController extends ApiController
 
     public function delete(Request $request)
     {
-        $allowedColumns = ['file_id', 'file_type'];
-
+        $allowedColumns = ['file_id'];
         $col = $request->input('col');
-        $value = $request->input('value');
+        $value = $request->input('value'); //expected that this is file_id
 
         if (!in_array($col, $allowedColumns)) {
             $this->status = 400;
             return $this->getResponse("Invalid column specified.");
         }
 
-        try {
+        // try {
             $records = File::where($col, $value)->get();
 
             if ($records->isEmpty()) {
@@ -103,22 +102,93 @@ class FileController extends ApiController
                 return $this->getResponse("No records found to delete.");
             }
 
-            // if master files 
-            // pangitaon sa diay ang settings
-            // if transactional files
-            // pangitaon pud ang settings
-            // archive
-            // then delete each
-            File::on('archive_mysql')->create($records->first());
+            foreach ($records as $record) {
+                if ($record->file_type == 'transactional_file') {
+                    $settings = json_decode($record->settings, true);
+                    $transactionIds = $settings['transaction_ids'];
 
-            $records->delete();
+                    foreach ($transactionIds as $key => $transactionId) {
+                        $result = TransactionController::deleteTransaction($transactionId);
+                        if ($result) {
+                            unset($transactionIds[$key]);
+                        }
+                    }
+
+                    $settings['transaction_ids'] = array_values($transactionIds);
+                    $record->settings = json_encode($settings);
+                    $record->save();
+                } else if ($record->file_type == 'master_file') {
+                    $settings = json_decode($record->settings, true);
+
+                    if (isset($settings['fodls'])) {
+                        FodlController::deleteBulkFodlInFile($settings['fodls'], $value);
+                    }
+
+                    if (isset($settings['material_ids'])) {
+                        MaterialController::deleteBulkInFile($settings['material_ids'], $value);
+                    }
+
+                    // Assuming that what is on the formulations, are on the material sheets
+                    if (isset($settings['bom_ids'])) {
+                        foreach ($settings['bom_ids'] as $bomId) {
+                            $this->deleteFormulationByBOM($bomId);
+                        }
+                    }
+                }
+
+                File::on('archive_mysql')->create($record->toArray());
+            }
+
+            $records->each->delete();
 
             $this->status = 200;
             return $this->getResponse("Records successfully deleted.");
+        // } catch (\Exception $e) {
+        //     $this->status = 500;
+        //     return $this->getResponse($e->getMessage());
+        // }
+    }
+
+    public function deleteFormulationByBOM($bomId)
+    {
+        \DB::beginTransaction();
+
+        try {
+            $bom = Bom::findOrFail($bomId);
+
+            $formulationIds = json_decode($bom->formulations, true) ?? [];
+            $fgIds = Formulation::whereIn('formulation_id', $formulationIds)->pluck('fg_id')->toArray();
+
+            FormulationController::deleteBulkWithFGInFile($fgIds,$bomId);
+
+
+            // $remainingFormulations = Formulation::whereIn('formulation_id', $formulationIds)->get();
+
+            // foreach ($remainingFormulations as $formulation) {
+            //     $materialQtyList = json_decode($formulation->material_qty_list, true) ?? [];
+            //     $materialIds = array_column($materialQtyList, 'material_id');
+
+            //     $materialRequest = new Request([
+            //         'formulation_id' => $formulation->formulation_id,
+            //         'material_ids' => $materialIds
+            //     ]);
+
+            //     $materialDeletionResult = $this->deleteBulkWithMaterial($materialRequest);
+
+            //     if ($materialDeletionResult->getStatusCode() !== 200) {
+            //         throw new \Exception('Failed to delete Materials for Formulation ' . $formulation->formulation_id);
+            //     }
+            // }
+
+            Bom::on('archive_mysql')->create($bom->toArray());
+            $bom->delete();
+
+            \DB::commit();
+
+            return response()->json(['message' => 'BOM and associated data deleted successfully'], 200);
         } catch (\Exception $e) {
-            $this->status = 500;
-            $this->response['message'] = $e->getMessage();
-            return $this->getResponse();
+            \DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 
@@ -261,8 +331,19 @@ class FileController extends ApiController
                 continue;
             }
 
-            $material = Material::where('material_code', $itemCode)->first();
-            $fg = FinishedGood::where('fg_code', $itemCode)->first();
+            $dateOnly = Carbon::createFromFormat('n/j/y h:i A', $date)->format('Y-m-d');
+            $yearMonth = Carbon::createFromFormat('n/j/y h:i A', $date)->format('Ym');
+            $yearMonthInt = (int) $yearMonth;
+
+            $material = Material::where('material_code', $itemCode)
+                                ->where('material_cost', $amount)
+                                ->where('date', $dateOnly)
+                                ->first();
+
+            $fg = FinishedGood::where('fg_code', $itemCode)
+                              ->where('rm_cost', $amount)
+                              ->where('monthYear', $yearMonthInt)
+                              ->first();
 
             $materialId = $material->material_id ?? null;
             $finishedGoodId = $fg->fg_id ?? null;
@@ -271,8 +352,6 @@ class FileController extends ApiController
 
             $settings;
             if (!$material && (str_starts_with($itemCode, 'RM') || str_starts_with($itemCode, 'SA'))) {
-                $dateOnly = Carbon::createFromFormat('n/j/y h:i A', $date)->format('Y-m-d');
-
                 $newMaterial = Material::create([
                     'material_code' => $itemCode,
                     'material_desc' => $itemDesc,
@@ -287,9 +366,6 @@ class FileController extends ApiController
 
                 $materialId = $newMaterial->material_id;
             } else if (!$fg && !(str_starts_with($itemCode, 'EMULSION') || str_starts_with($itemCode, 'REWORK') || str_starts_with($itemCode, 'RM') || str_starts_with($itemCode, 'SA'))) {
-                $yearMonth = Carbon::createFromFormat('n/j/y h:i A', $date)->format('Ym');
-                $yearMonthInt = (int) $yearMonth;
-
                 $newFinishedGood = FinishedGood::create([
                     'fodl_id' => null,
                     'fg_code' => $itemCode,

@@ -586,23 +586,6 @@ const MasterFileContainer = (data: File) => {
           .filter(item => item.rowType === 'emulsion')
           .map(item => item.id);
 
-        if (finishedGoodIds.length > 0) {
-          try {
-            const deleteFgResponse = await api.post('/formulations/delete_fg', {
-              fg_ids: finishedGoodIds,
-              bom_id: bomId,
-            });
-
-            if (deleteFgResponse.data.status !== 200) {
-              setAlertMessages(['Failed to delete records.']);
-            } else {
-              setSuccessMessage("Finished Goods deleted successfully.");
-            }
-          } catch (deleteFgError) {
-            setAlertMessages(['An error occurred while deleting Finished Goods.']);
-          }
-        }
-
         if (materialIds.length > 0) {
           const groupedByFormulationId = materialIds.reduce((acc, curr) => {
             const { track_id, id } = curr;
@@ -625,7 +608,7 @@ const MasterFileContainer = (data: File) => {
             try {
               const deleteMaterialResponse = await api.post('/formulations/delete_material', payload);
               if (deleteMaterialResponse.data.status === 200) {
-                setSuccessMessage(`Materials for formulation_id ${formulation_id} deleted successfully.`);
+                setSuccessMessage(`Materials are deleted successfully.`);
               } else {
                 setAlertMessages([`Failed to delete materials for formulation_id ${formulation_id}.`]);
               }
@@ -644,11 +627,11 @@ const MasterFileContainer = (data: File) => {
                 });
               })
             );
-        
+
             const failedUpdates = updateEmulsionResponses.filter(
               response => response.data.status !== 200
             );
-        
+
             if (failedUpdates.length > 0) {
               setAlertMessages(['Failed to update some emulsions.']);
             } else {
@@ -656,6 +639,23 @@ const MasterFileContainer = (data: File) => {
             }
           } catch (error) {
             setAlertMessages(['An error occurred while updating emulsions.']);
+          }
+        }
+
+        if (finishedGoodIds.length > 0) {
+          try {
+            const deleteFgResponse = await api.post('/formulations/delete_fg', {
+              fg_ids: finishedGoodIds,
+              bom_id: bomId,
+            });
+
+            if (deleteFgResponse.data.status !== 200) {
+              setAlertMessages(['Failed to delete records.']);
+            } else {
+              setSuccessMessage("Finished Goods deleted successfully.");
+            }
+          } catch (deleteFgError) {
+            setAlertMessages(['An error occurred while deleting Finished Goods.']);
           }
         }
 

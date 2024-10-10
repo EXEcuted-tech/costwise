@@ -256,4 +256,65 @@ class MaterialController extends ApiController
             return $this->getResponse("An error occurred while deleting records.");
         }
     }
+
+    public static function deleteBulkInFile($materialIds, $file_id)
+    {
+        \DB::beginTransaction();
+
+        try {
+            $materials = Material::whereIn('material_id', $materialIds)->get();
+
+            if ($materials->isEmpty()) {
+                \DB::rollBack();
+                return [
+                    'status' => 404,
+                    'message' => 'No materials found to delete.'
+                ];
+            }
+
+            foreach ($materials as $material) {
+                $archivedMaterialData = $material->toArray();
+                Material::on('archive_mysql')->create($archivedMaterialData);
+            }
+
+            $files = File::where('file_id', $file_id)->get();
+
+            foreach ($files as $file) {
+                $settings = json_decode($file->settings, true);
+
+                if (isset($settings['material_ids']) && is_array($settings['material_ids'])) {
+                    $originalCount = count($settings['material_ids']);
+
+                    $settings['material_ids'] = array_filter($settings['material_ids'], function ($materialId) use ($materialIds) {
+                        return !in_array($materialId, $materialIds);
+                    });
+
+                    $newCount = count($settings['material_ids']);
+
+                    if ($newCount < $originalCount) {
+                        $settings['material_ids'] = array_values($settings['material_ids']); // Reindex the array
+                        $file->settings = json_encode($settings);
+                        $file->save();
+                    }
+                }
+            }
+
+            Material::whereIn('material_id', $materialIds)->delete();
+
+            \DB::commit();
+
+            return [
+                'status' => 200,
+                'message' => 'Materials have been successfully deleted and archived.'
+            ];
+        } catch (\Exception $e) {
+            \DB::rollBack();
+
+            return [
+                'status' => 500,
+                'message' => 'An error occurred while deleting records.'
+            ];
+        }
+    }
+
 }
