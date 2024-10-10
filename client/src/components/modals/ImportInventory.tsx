@@ -4,18 +4,19 @@ import { FaFileUpload } from "react-icons/fa";
 import { BsExclamationCircle } from 'react-icons/bs';
 import { FaFileCircleCheck, FaFileCircleXmark, FaRegFile } from "react-icons/fa6";
 import Alert from '../alerts/Alert';
+import api from '@/utils/api';
 
 interface ImportInventoryListProps { 
   onClose: () => void;
-  onConfirm: () => void;
 }
 
-const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, onConfirm, }) => {
+const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) => {
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
 
     const [file, setFile] = useState<File | null>(null);
-    const [fileName, setFileName] = useState<string>('inventory_file.xlsx');
+    const [fileName, setFileName] = useState<string>('');
+    const [fileNameWithExt, setFileNameWithExt] = useState<string>('');
     const [fileSize, setFileSize] = useState<number>(0);
     const [monthYear, setMonthYear] = useState<string>('');
 
@@ -33,15 +34,17 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, onCo
     };
 
     const handleFileUpload = (file: File) => {
-        if (!file.type.startsWith('xlsx/')) {
-            setAlertMessages(['Please select a valid xlsx file.']);
+        const validTypes = ['xlsx', 'xls', 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', 'application/vnd.ms-excel'];
+        if (!validTypes.includes(file.type)) {
+            setAlertMessages(['Please select a valid xlsx, xls, csv, or excel file.']);
             setAlertStatus('critical');
             return;
         }
         const fileSizeInMB = (file.size / (1024 * 1024)).toFixed(2);
 
         setFile(file);
-        setFileName(file.name);
+        setFileName(file.name.split('.').slice(0, -1).join('.'))
+        setFileNameWithExt(file.name);
         setFileSize(parseFloat(fileSizeInMB));
         const reader = new FileReader();
         reader.onload = () => {
@@ -71,7 +74,7 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, onCo
 
 
     //Import file
-    const handleConfirm = () => {
+    const handleConfirm = async () => {
         const newAlertMessages: string[] = [];
         setAlertStatus('critical');
 
@@ -82,14 +85,19 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, onCo
         // Check required fields
         if (!monthYear && !file) {
             newAlertMessages.push('Please select a file and month and year.');
+            setAlertMessages(newAlertMessages);
+            setAlertStatus('critical');
+            return;
         }
 
         if (!monthYear) {
             newAlertMessages.push('Please select a month and year.');
+            setAlertStatus('critical');
         }
 
         if (!file) {
             newAlertMessages.push('Please select a file.');
+            setAlertStatus('critical');
         }
 
         if (newAlertMessages.length > 0) {
@@ -98,17 +106,48 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, onCo
         }
         
         // Import file
+        try {
+            const accessToken = localStorage.getItem('access_token');
+            const formData = new FormData();
+
+            formData.append('month_year', monthYear);
+            formData.append('file_name', fileName);
+            formData.append('file_name_with_extension', fileNameWithExt);
+            if (file) {
+                formData.append('file', file);
+            }
+            
+            const response = await api.post('/inventory/upload', formData, {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                    'Content-Type': 'multipart/form-data'
+                }
+            });
+
+            if (response.data.message) {
+                setAlertMessages([response.data.message]);
+                setAlertStatus('success');
+            }
+            
+            window.location.reload();
+                    
+        } catch (error) {
+            console.error('Error importing file:', error);
+            setAlertMessages(['An error occurred while importing the file.']);
+            setAlertStatus('critical');
+        }
 
 
         // Reset form
         setFile(null);
         setFileName('');
+        setFileNameWithExt('');
         setFileSize(0);
         setMonthYear('');
     }
 
   return (
-    <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]'>
+    <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed bg-[rgba(0,0,0,0.5)] z-[1000]'>
         
         <div className='absolute top-0 right-0'>
             {alertMessages && alertMessages.map((msg, index) => (
@@ -123,7 +162,7 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, onCo
         <div className='flex'>
             <div className='flex group py-2 ml-8'> 
                     <BsExclamationCircle className='mt-3 text-[2em] text-[#c26565] hover:text-[#B22222] cursor-pointer hover:animate-shake-tilt transition-all duration-300 ease-in-out 4xl:text-[2em] 3xl:text-[1.8em] 2xl:text-[1.8em] xl:text-[1.6em]'/>
-                    <div className="absolute w-[240px] h-[48px] bg-[#FFD3D3] text-[1em] text-[#B22222] font-bold p-[10px] mt-1 left-[80px] text-center items-center rounded-lg drop-shadow-lg invisible opacity-0 transition-all duration-300 ease-in-out group-hover:visible group-hover:opacity-100 4xl:text-[1em] 4xl:h-[48px] 3xl:text-[1em] 3xl:h-[44px] 2xl:text-[0.8em] 2xl:h-[42px] xl:text-[0.8em] xl:h-[40px]">
+                    <div className="absolute w-[240px] h-[40px] bg-[#FFD3D3] text-[1em] text-[#B22222] font-bold p-[10px] mt-1 left-[80px] text-center items-center rounded-lg drop-shadow-lg invisible opacity-0 transition-all duration-300 ease-in-out group-hover:visible group-hover:opacity-100 4xl:text-[1em] 4xl:h-[43px] 3xl:text-[1em] 3xl:h-[30px] 2xl:text-[0.8em] 2xl:h-[42px] xl:text-[0.8em] xl:h-[40px]">
                             Fields with * are required.
                     </div>
             </div>
@@ -153,23 +192,50 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, onCo
                 <div className='flex flex-col items-center justify-center pt-5 pb-6 group-hover:scale-90 transition-all duration-300 ease-in-out'>
                     <p className="mb-2 text-lg text-gray-500"><span className="text-[#B22222] font-semibold underline">
                         Click to upload</span> or drag and drop inventory file.</p>
-                    <p className="text-base text-gray-500">Support: XLSX</p>
+                    <p className="text-base text-gray-500">Support: CSV, XLSX, XLS, Excel</p>
                 </div>
                 <input 
                     id="dropzone-file" 
                     type="file" 
                     className="hidden"
                     onChange={handleUpload}
-                    accept=".csv, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
+                    accept="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel"
                 />
             </label>
         </div>
 
-        <div className='flex flex-row justify-between px-[30px] mt-4 mb-6'>
-            {/* Month Selector */}
-            <div className='flex w-[50%] items-center'>
+        <div className='flex flex-row px-[30px] mt-4 mb-6'>         
+            {/* File Preview */}
+            <div className="flex flex-col w-[50%]">
                 <div className='flex flex-col'>
-                    <label className='text-[#5B5353] font-bold text-[22px] mb-3'>Month and Year</label>
+                    <label className='text-[#5B5353] font-bold text-[22px] mb-3'>Uploaded File <span className='text-[#B22222] ml-1 font-bold'>*</span></label>              
+                    <div className="relative w-full h-[2rem] p-6 flex items-center justify-start border-2 border-[#B3B3B3] rounded-xl hover:border-[#B22222] hover:bg-gray-100 transition-all duration-300 ease-in-out">
+                        <div className='flex w-full'>
+                            {fileName === '' ? (
+                                <>
+                                    <FaRegFile className='text-[#5B5353] text-[25px] mr-4'/>
+                                    <p className='italic mt-[2px]'>inventory_file.xlsx</p> 
+                                </>
+                            ) : file ? (
+                                <>
+                                    <FaFileCircleCheck className='text-[#35AD3E] text-[25px] mr-4'/>
+                                    <p className='font-semibold mt-[2px] w-full'>{fileNameWithExt}</p> 
+                                </>
+                            ) : 
+                                <>
+                                    <FaFileCircleXmark className='text-primary text-[25px] mr-4'/>
+                                    <p className='italic mt-[2px]'>File upload unsuccessful.</p> 
+                                </>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            {/* Month Selector */}
+            <div className='flex w-[50%] pl-7 items-center'>
+                <div className='flex flex-col'>
+                    <label className='text-[#5B5353] font-bold text-[22px] mb-3'>Month and Year <span className='text-[#B22222] ml-1 font-bold'>*</span></label>
                     <input 
                         type="month" 
                         className='w-[400px] h-[2rem] py-6 px-4 text-[17px] font-semibold border-2 border-[#B3B3B3] rounded-xl hover:border-[#B22222] hover:bg-gray-100 transition-all duration-300 ease-in-out'
@@ -178,32 +244,18 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, onCo
                     />
                 </div>
             </div>
-            
-            {/* File Preview */}
-            <div className="flex flex-col w-[50%] mr-auto">
-                <div className='flex flex-col'>
-                    <label className='text-[#5B5353] font-bold text-[22px] mb-3'>Uploaded File</label>              
-                    <div className="relative h-[2rem] p-6 flex items-center justify-start border-2 border-[#B3B3B3] rounded-xl hover:border-[#B22222] hover:bg-gray-100 transition-all duration-300 ease-in-out">
-                        <div className='flex mr-5'>
-                            <FaRegFile className='text-[#5B5353] text-[25px] mr-4' />
-                            <p className='font-semibold mr-3'>{fileName}</p>   
-                            <p className='text-[#929090]'>{fileSize} MB</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
         </div>
 
         {/* Buttons */}
-        <div className='mt-8 px-[30px] mb-8 flex flex-row justify-between'>
-          <div className="w-[46%] bg-white border-1 border-primary overflow-hidden text-primary flex items-center justify-center  cursor-pointer transition-all rounded-lg group"
+        <div className='mt-8 px-[30px] mb-8 flex flex-row'>
+          <div className="w-[50%] bg-white border-1 border-primary overflow-hidden text-primary flex items-center justify-center  cursor-pointer transition-all rounded-lg group"
             onClick={handleCloseModal}
           >
             <button className="text-[19px] font-black before:ease relative h-12 w-full overflow-hidden bg-white text-primary shadow-2xl transition-all hover:bg-[#FFD3D3] before:absolute before:right-0 before:top-0 before:h-12 before:w-20 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-white hover:before:-translate-x-40">
               <span className="relative z-10">Cancel</span>
             </button>
           </div>
-          <div className="w-[50%] bg-white border-1 border-primary overflow-hidden text-primary flex items-center justify-center cursor-pointer transition-all rounded-lg group"
+          <div className="w-[46%] ml-7 bg-white border-1 border-primary overflow-hidden text-primary flex items-center justify-center cursor-pointer transition-all rounded-lg group"
             >
             <button 
               className="text-[19px] font-black before:ease relative h-12 w-full overflow-hidden bg-primary text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-primary hover:before:-translate-x-40"

@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '@/components/header/Header';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { LuCircle } from "react-icons/lu";
@@ -12,6 +12,7 @@ import { CiImport } from "react-icons/ci";
 import { IoTrash } from 'react-icons/io5';
 import ImportInventoryList from '@/components/modals/ImportInventory';
 import ConfirmDelete from '@/components/modals/ConfirmDelete';
+import api from '@/utils/api';
 
 
 export interface InventoryProps {
@@ -26,22 +27,22 @@ export interface InventoryProps {
 
 const Inventory = () => {
     const { isOpen } = useSidebarContext();
-    const columnNames = ["Item Code", "Description", "Unit", "Purchased Qty", "Total Qty", "Usage Qty", "Status"];
-    const monthOptions = ["January 2024", "February 2024", "March 2024"];
+    const columnNames = ["Item Code", "Description", "Unit", "Purchased Qty", "Usage Qty", "Total Qty", "Status"];
 
+    const [alertMessages, setAlertMessages] = useState<string[]>([]);
+    const [alertStatus, setAlertStatus] = useState<string>('');
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [isMonthSelectorModalOpen, setMonthSelectorModalOpen] = useState(false);
     const [isImportInventoryListModalOpen, setImportInventoryListModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
+    const monthOptions = [""];
     const [selectedMonth, setSelectedMonth] = useState<string>(monthOptions[1]); // Default to February 2024
-
+    
     const currentIndex = monthOptions.indexOf(selectedMonth);
     const indexOfLastItem = currentPage * 8;
     const indexOfFirstItem = indexOfLastItem - 8;
-    const currentListPage = InventoryFakeData.slice(indexOfFirstItem, indexOfLastItem); //change to data
-
-
+    const currentListPage = InventoryFakeData.slice(indexOfFirstItem, indexOfLastItem);
 
     // Modals
     const openImportInventoryListModal = () => {
@@ -90,10 +91,15 @@ const Inventory = () => {
         setSelectedMonth(monthOptions[nextIndex]);
     };
 
-    // Import inventory file
-    const handleImport = () => {
-
-    }
+    // // Retrieve inventory list
+    //  useEffect(() => {
+    //     try {
+    //         const response = api.get('/api/inventory');
+    //         console.log(response);
+    //     } catch (error) {
+    //         console.error('Error retrieving inventory list:', error);
+    //     }
+    // }, []);
 
     return (
         <>
@@ -102,7 +108,7 @@ const Inventory = () => {
             }
 
             {isImportInventoryListModalOpen &&
-                <ImportInventoryList onClose={closeImportInventoryListModal} onConfirm={handleImport} />
+                <ImportInventoryList onClose={closeImportInventoryListModal} />
             }
 
             {isDeleteModalOpen && <ConfirmDelete subject={"inventory list"} onClose={closeDeleteModal}/>}
