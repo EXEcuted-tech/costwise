@@ -38,7 +38,10 @@ interface ProductCostChartProps {
   selectedHalf: string;
 }
 
-const ProductCostChart: React.FC<ProductCostChartProps> = ({ selectedYear = "2022", selectedHalf = "First" }) => {
+const ProductCostChart: React.FC<ProductCostChartProps> = ({
+  selectedYear,
+  selectedHalf,
+}) => {
   const [chartData, setChartData] = useState<any>(null);
   const [priceData, setPriceData] = useState<ChartDataEntry[]>([]);
 
@@ -58,10 +61,15 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({ selectedYear = "202
 
   const filterDataByYearAndHalf = () => {
     return priceData.filter((entry) => {
-      const [month, year] = entry.monthYear.split(" ");
+      const [month, year] = entry.monthYear.split(" ").map((item) => item.trim());
+      const monthIndex = new Date(`${month} 1, ${year}`).getMonth() + 1;
+      console.log("Year selected: ", selectedYear)
+      console.log("Half selected: ", selectedHalf)
+      console.log("Month Indices: ", monthIndex)
+
+
       if (year === selectedYear) {
-        const monthIndex = new Date(`${month} 1, ${year}`).getMonth() + 1;
-        if (selectedHalf === "first") {
+        if (selectedHalf === "First") {
           return monthIndex >= 1 && monthIndex <= 6;
         } else {
           return monthIndex >= 7 && monthIndex <= 12;
@@ -75,16 +83,25 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({ selectedYear = "202
     const prepareChartData = () => {
       const filteredData = filterDataByYearAndHalf();
 
+      console.log("This is filtered Data: ", filteredData)
+
       if (!filteredData || filteredData.length === 0) return;
+
       const labels = filteredData.map((entry) => entry.monthYear);
 
-      const costNames = Array.from(new Set(filteredData.flatMap(entry =>
-        entry.products.map(product => product.productName)
-      )));
+      const costNames = Array.from(
+        new Set(
+          filteredData.flatMap((entry) =>
+            entry.products.map((product) => product.productName)
+          )
+        )
+      );
 
       const datasets = costNames.map((costName, index) => {
-        const data = filteredData.map(entry => {
-          const product = entry.products.find(product => product.productName === costName);
+        const data = filteredData.map((entry) => {
+          const product = entry.products.find(
+            (product) => product.productName === costName
+          );
           return product ? product.cost : 0;
         });
 
@@ -105,8 +122,7 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({ selectedYear = "202
 
     prepareChartData();
   }, [priceData, selectedYear, selectedHalf]);
-
-  if (!chartData) return <p>Loading chart...</p>;
+  if (!chartData) return <p>Select Year Half Data...</p>;
 
   return (
     <div className="h-full w-full">
@@ -121,7 +137,7 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({ selectedYear = "202
             },
             title: {
               display: true,
-              text: "Cost per Month/Year",
+              text: `Cost per Month/Year (${selectedYear} - ${selectedHalf})`,
             },
           },
           scales: {
@@ -158,4 +174,3 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({ selectedYear = "202
 };
 
 export default ProductCostChart;
-

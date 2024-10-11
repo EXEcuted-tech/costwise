@@ -7,7 +7,7 @@ import { IoIosInformationCircle } from "react-icons/io";
 import ProductCost from "@/components/charts/LineChart";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import api from "@/utils/api";
-import TrainingModel from "./sketch";
+import TrainingModel from "../../components/model/sketch";
 import { prod } from "@tensorflow/tfjs";
 
 interface ProductEntry {
@@ -21,17 +21,17 @@ const ProjectedCostPage = () => {
   const { isOpen } = useSidebarContext();
   const [isActiveStart, setIsActiveStart] = useState(false);
   const [isActiveEnd, setIsActiveEnd] = useState(false);
-  const [activeStart, setActiveStart] = useState("2022");
-  const [activeEnd, setActiveEnd] = useState("First");
+  const [activeStart, setActiveStart] = useState("(Select Year)");
+  const [activeEnd, setActiveEnd] = useState("(Select Half)");
   const [activeFG, setActiveFG] = useState({
     product_num: 1,
     product_name: " ",
     cost: 0,
   });
   const [yearList, setyearList] = useState([
-    { year: 2022 },
-    { year: 2023 },
-    { year: 2024 },
+    { year: "2022" },
+    { year: "2023" },
+    { year: "2024" },
   ]);
   const [half, setHalf] = useState([{ half: "First" }, { half: "Second" }]);
 
@@ -165,7 +165,7 @@ const ProjectedCostPage = () => {
             <div className="flex text-[30px]  font-bold h-[10%] bg-white items-center justify-start border-b-2 pl-10">
               <p className="w-[95%] text-[#585858]">Graph</p>
             </div>
-            <div className="flex items-center justify-center h-[50%] w-[100%] bg-white p-2">
+            <div className="flex items-center justify-center h-[500px] lg:h-[50%] w-[100%] bg-white p-2">
               <ProductCost selectedYear={activeStart} selectedHalf={activeEnd} />
 
             </div>
