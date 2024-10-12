@@ -9,6 +9,7 @@ use App\Models\Formulation;
 use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 
 class FormulationController extends ApiController
 {
@@ -200,6 +201,102 @@ class FormulationController extends ApiController
         }
     }
 
+    public function upload(Request $request)
+    {
+        $file = $request->file('file');
+        $extension = $file->getClientOriginalExtension();
+
+        // $user = Auth::user();
+        // $userName = "{$user->first_name} {$user->last_name}";
+
+        if ($extension == 'xlsx') {
+            $this->processExcel($file->getRealPath());
+
+            $this->status = 200;
+            return $this->getResponse();
+        }
+
+        return response()->json(['error' => 'Unsupported file type'], 400);
+    }
+
+    private function processExcel($file)
+    {
+        $spreadsheet = IOFactory::load($file);
+        $worksheets = $spreadsheet->getAllSheets();
+
+        foreach ($worksheets as $worksheet) {
+            $data = $worksheet->toArray();
+            if (!empty($data)) {
+                $this->processFormulationSheet($data);
+            }
+        }
+    }
+
+    private function processFormulationSheet($data)
+    {
+        // Skip the header row
+        array_shift($data);
+
+        $formulaCode = null;
+        $finishedGood = null;
+        $fgResult = null;
+        $emulsion = null;
+        $materials = [];
+
+        $formulation = new Formulation();
+        foreach ($data as $row) {
+            if (!empty($row[0])) {
+                $formulaCode = $row[0];
+                $finishedGood = [
+                    'item_code' => $row[2],
+                    'description' => $row[3],
+                    'formulation' => $row[4],
+                    'batch_quantity' => floatval(str_replace(',', '', $row[5])),
+                    'unit' => $row[6]
+                ];
+
+                $fgResult = FinishedGood::create([
+                    'fg_code' => $finishedGood['item_code'],
+                    'fg_desc' => $finishedGood['description'],
+                    'formulation_no' => $finishedGood['formulation'],
+                    'total_batch_qty' => $finishedGood['batch_quantity'],
+                    'unit' => $finishedGood['unit'],
+                    'monthYear' => date('Ym')
+                ]);
+            } elseif (strtoupper($row[3]) === 'EMULSION') {
+                $emulsion = [
+                    'level' => $row[1],
+                    'batch_qty' => floatval(str_replace(',', '', $row[5])),
+                    'unit' => $row[6]
+                ];
+            } elseif (!empty($row[1]) && !empty($row[2])) {
+                $material = Material::where('material_code', $row[2])
+                    ->where('material_desc', $row[3])
+                    ->where('unit', $row[6])
+                    ->whereYear('date', date('Y'))
+                    ->whereMonth('date', date('m'))
+                    ->first();
+
+                if ($material) {
+                    $material_qty_list[] = [
+                        $material->material_id => [
+                            'level' => $row[1],
+                            'qty' => floatval(str_replace(',', '', $row[5]))
+                        ]
+                    ];
+                }
+            } elseif (empty($row[0]) && empty($row[1]) && empty($row[2]) && empty($row[3])) {
+                $formulation->formula_code = $formulaCode;
+                $formulation->fg_id = $fgResult->fg_id;
+                $formulation->emulsion = json_encode($emulsion);
+                $formulation->material_qty_list = json_encode($material_qty_list);
+                $formulation->save();
+                break;
+            }
+        }
+    }
+
+    
     public function updateEmulsion(Request $request)
     {
         $validator = Validator::make($request->all(), [

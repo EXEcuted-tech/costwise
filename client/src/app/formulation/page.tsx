@@ -21,6 +21,7 @@ import { Formulation } from '@/types/data';
 import { useDropzone } from 'react-dropzone';
 import * as XLSX from 'xlsx';
 import { formatMonthYear } from '@/utils/costwiseUtils';
+import Alert from '@/components/alerts/Alert';
 
 const FormulationPage = () => {
     const { isOpen } = useSidebarContext();
@@ -92,87 +93,96 @@ const FormulationPage = () => {
 
     const onDrop = useCallback(
         async (acceptedFiles: File[]) => {
-          setErrorMsg('');
-          setInfoMsg('');
-          setIsLoading(true);
-    
-          const uploadPromises = acceptedFiles.map(async (file) => {
-            return new Promise((resolve, reject) => {
-              const reader = new FileReader();
-    
-              reader.onload = async (e: ProgressEvent<FileReader>) => {
-                const data = e.target?.result;
-    
-                if (data && data instanceof ArrayBuffer) {
-                  const dataArray = new Uint8Array(data);
-                  const workbook = XLSX.read(dataArray, { type: 'array' });
-    
-                  const sheetNames = workbook.SheetNames;
-                  const requiredSheets = ['Production Transactions'];
-                  const hasRequiredSheets = requiredSheets.every(sheetName => sheetNames.includes(sheetName));
-    
-                  if (hasRequiredSheets) {
-                    const formData = new FormData();
-                    formData.append('file', file);
-                    formData.append('type', 'transactional');
-    
-                    try {
-                      const response = await api.post('/files/upload', formData);
-                      if (response.data.status == 200) {
-                        resolve(`Successfully uploaded ${file.name}`);
-                      } else {
-                        reject(`Failed to upload ${file.name}`);
-                      }
-                    } catch (error) {
-                      console.error(error);
-                      reject(`Failed to upload ${file.name}`);
-                    }
-                  } else {
-                    reject(`${file.name} does not contain the required sheets.`);
-                  }
-                } else {
-                  reject(`Error reading ${file.name}`);
-                }
-              };
-    
-              reader.onerror = () => {
-                reject(`Error reading ${file.name}`);
-              };
-    
-              reader.readAsArrayBuffer(file);
+            setErrorMsg('');
+            setInfoMsg('');
+            setIsLoading(true);
+
+            const uploadPromises = acceptedFiles.map(async (file) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+
+                    reader.onload = async (e: ProgressEvent<FileReader>) => {
+                        const data = e.target?.result;
+
+                        if (data && data instanceof ArrayBuffer) {
+                            const dataArray = new Uint8Array(data);
+                            const workbook = XLSX.read(dataArray, { type: 'array' });
+
+                            // const sheetNames = workbook.SheetNames;
+
+                            const formData = new FormData();
+                            formData.append('file', file);
+
+                            try {
+                                const response = await api.post('/formulations/upload', formData);
+                                if (response.data.status == 200) {
+                                    resolve(`Successfully uploaded the file!`);
+                                } else {
+                                    reject(`Failed to upload ${file.name}`);
+                                }
+                            } catch (error) {
+                                console.error(error);
+                                reject(`Failed to upload ${file.name}`);
+                            }
+                        } else {
+                            reject(`Error reading ${file.name}`);
+                        }
+                    };
+
+                    reader.onerror = () => {
+                        reject(`Error reading ${file.name}`);
+                    };
+
+                    reader.readAsArrayBuffer(file);
+                });
             });
-          });
-    
-          try {
-            const results = await Promise.all(uploadPromises);
-            setInfoMsg(results.join(', '));
-          } catch (errors) {
-            if (Array.isArray(errors)) {
-              setErrorMsg(errors.join(', '));
-            } else {
-              setErrorMsg('An error occurred during file upload');
+
+            try {
+                const results = await Promise.all(uploadPromises);
+                setInfoMsg(results.join(', '));
+            } catch (errors) {
+                if (Array.isArray(errors)) {
+                    setErrorMsg(errors.join(', '));
+                } else {
+                    setErrorMsg('An error occurred during file upload');
+                }
+            } finally {
+                setIsLoading(false);
             }
-          } finally {
-            setIsLoading(false);
-          }
         },
         []
-      );
-    
-      const { getRootProps, getInputProps, open } = useDropzone({
+    );
+
+    const { getRootProps, getInputProps, open } = useDropzone({
         onDrop,
         noClick: true,
         noKeyboard: true,
         multiple: true,
         accept: {
-          'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
-          'application/vnd.ms-excel': ['.xls'],
-          'text/csv': ['.csv'],
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+            'application/vnd.ms-excel': ['.xls'],
+            'text/csv': ['.csv'],
         },
-      });
+    });
 
     return (
         <>
+            <div className="absolute top-0 right-0">
+                {errorMsg != '' &&
+                    <Alert
+                        className="!relative"
+                        variant='critical'
+                        message={errorMsg}
+                        setClose={() => { setErrorMsg(''); }} />
+                }
+                {infoMsg != '' &&
+                    <Alert
+                        className="!relative"
+                        variant='success'
+                        message={infoMsg}
+                        setClose={() => { setInfoMsg(''); }} />
+                }
+            </div>
             <Header icon={HiClipboardList} title={"Formulations"} />
             {compareFormula && <CompareFormulaDialog setCompareFormula={setCompareFormula} />}
             {bomList && <BillOfMaterialsList setBOM={setBomList} />}
@@ -225,7 +235,7 @@ const FormulationPage = () => {
                                             <li className={`${isOpen ? 'pl-[6px] 3xl:pl-[15px]' : 'pl-[15px]'} flex items-center justify-left py-[5px] cursor-pointer hover:text-[#851313]`}
                                                 onClick={open}>
                                                 <BiSolidFile className='text-[20px] mr-[5px]' />
-                                                <p>Import File</p>
+                                                <p>Import Files</p>
                                             </li>
                                         </ul>
                                     </div>

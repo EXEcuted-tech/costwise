@@ -59,8 +59,9 @@ const FormulationContainer: React.FC<FormulationProps> = ({
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [successMessage, setSuccessMessage] = useState('');
 
-    const indexOfLastItem = currentPage * 8;
-    const indexOfFirstItem = indexOfLastItem - 8;
+    const itemsPerPage = 10;
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentListPage = filteredData.slice(indexOfFirstItem, indexOfLastItem);
 
     const router = useRouter();
@@ -185,7 +186,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                                 <div className='relative py-[1%]'>
                                     <PrimaryPagination
                                         data={filteredData}
-                                        itemsPerPage={8}
+                                        itemsPerPage={itemsPerPage}
                                         handlePageChange={handlePageChange}
                                         currentPage={currentPage}
                                     />
