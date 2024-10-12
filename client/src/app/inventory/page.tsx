@@ -2,28 +2,16 @@
 import React, { useEffect, useState } from 'react';
 import Header from '@/components/header/Header';
 import { useSidebarContext } from '@/contexts/SidebarContext';
-import { LuCircle } from "react-icons/lu";
 import { MdTrolley, MdCalendarToday } from "react-icons/md";
 import { IoIosArrowBack, IoIosArrowForward, IoIosSearch } from "react-icons/io";
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import MonthSelector from '@/components/modals/MonthSelector';
-import { HiOutlinePlus } from "react-icons/hi2";
 import { CiImport } from "react-icons/ci";
 import { IoTrash } from 'react-icons/io5';
 import ImportInventoryList from '@/components/modals/ImportInventory';
 import ConfirmDelete from '@/components/modals/ConfirmDelete';
 import api from '@/utils/api';
-
-
-export interface InventoryProps {
-    itemCode: String;
-    description: String;
-    unit: String;
-    cost: String;
-    status: String;
-    inStock: String;
-    qty: String;
-};
+import { InventoryType } from '@/types/data';
 
 const Inventory = () => {
     const { isOpen } = useSidebarContext();
@@ -35,14 +23,17 @@ const Inventory = () => {
     const [isMonthSelectorModalOpen, setMonthSelectorModalOpen] = useState(false);
     const [isImportInventoryListModalOpen, setImportInventoryListModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
+    const [searchTerm, setSearchTerm] = useState('');
 
     const monthOptions = [""];
-    const [selectedMonth, setSelectedMonth] = useState<string>(monthOptions[1]); // Default to February 2024
-    
+    const [selectedMonth, setSelectedMonth] = useState<string>(monthOptions[1]);
+    const [inventoryList, setInventoryList] = useState<InventoryType[]>([]);
+
     const currentIndex = monthOptions.indexOf(selectedMonth);
     const indexOfLastItem = currentPage * 8;
     const indexOfFirstItem = indexOfLastItem - 8;
-    const currentListPage = InventoryFakeData.slice(indexOfFirstItem, indexOfLastItem);
+    const currentListPage = inventoryList.slice(indexOfFirstItem, indexOfLastItem);
 
     // Modals
     const openImportInventoryListModal = () => {
@@ -91,15 +82,31 @@ const Inventory = () => {
         setSelectedMonth(monthOptions[nextIndex]);
     };
 
-    // // Retrieve inventory list
-    //  useEffect(() => {
-    //     try {
-    //         const response = api.get('/api/inventory');
-    //         console.log(response);
-    //     } catch (error) {
-    //         console.error('Error retrieving inventory list:', error);
-    //     }
-    // }, []);
+    // Retrieve inventory list
+     useEffect(() => {
+        const fetchInventory = async () => {
+            try {
+                const response = await api.get('/inventory');
+
+                setInventoryList(response.data);
+                console.log("RETREIVED INVENTORY LIST:", response.data);
+                setTimeout(() => {
+                    setIsLoading(false);
+                }, 1000);
+
+            } catch (error) {
+                setIsLoading(false);
+                setAlertMessages(["Error retrieving inventory list. Please try again later."]);
+                setAlertStatus("error");
+                console.error('Error retrieving inventory list:', error);
+            }
+        };
+        fetchInventory();
+    }, []);
+
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+    };
 
     return (
         <>
@@ -225,21 +232,21 @@ const Inventory = () => {
                                 {currentListPage.length > 0 ? (
                                     currentListPage.map((data, index) => (
                                         <tr key={index} className={`${isOpen ? '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[18px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[20px] 2xl:text-[20px] xl:text-[16px]'} text-[20px] text-black text-center border-b border-[#ACACAC] hover:bg-gray-50`}>
-                                            <td className='w-[10rem] py-4'>{data.itemCode}</td>
-                                            <td className='break-words'>{data.description}</td>
-                                            <td>{data.unit}</td>
-                                            <td className='w-[10%]'>{data.inStock}</td>
-                                            <td className=''>{data.qty}</td>
-                                            <td>{data.cost}</td>
+                                            <td className='w-[10rem] py-4'>a</td>
+                                            <td className='break-words'>a</td>
+                                            <td>a</td>
+                                            <td className='w-[10%]'>{data.purchased_qty}</td>
+                                            <td className=''>{data.usage_qty}</td>
+                                            <td>{data.total_qty}</td>
                                             <td>
                                                 <div className='flex justify-center'>
                                                     <p
-                                                        className={`${data.status === 'In Stock'
+                                                        className={`${data.stock_status === 'In Stock'
                                                             ? 'text-[#00930F] bg-[#9EE29E]'
                                                             : 'text-primary bg-[#F5BABA]'
                                                             } rounded-2xl w-[9rem]`}
                                                     >
-                                                        {data.status}
+                                                        {data.stock_status}
                                                     </p>
                                                 </div>
                                             </td>
@@ -259,7 +266,7 @@ const Inventory = () => {
                     {/* Footer */}
                     <div className="flex w-full justify-center h-[86px] rounded-b-xl border-[#868686]">
                         <PrimaryPagination
-                            data={InventoryFakeData} //change to data
+                            data={inventoryList}
                             itemsPerPage={8}
                             handlePageChange={handlePageChange}
                             currentPage={currentPage}
@@ -272,87 +279,3 @@ const Inventory = () => {
 };
 
 export default Inventory;
-
-const InventoryFakeData = [
-    {
-        itemCode: "FG-01",
-        description: "PACKAGING 4",
-        unit: "strd",
-        cost: "104.41",
-        status: "In Stock",
-        inStock: "20",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-02",
-        description: "FLAVOR 1",
-        unit: "kg",
-        cost: "118.97",
-        status: "In Stock",
-        inStock: "10",
-        qty: "20",
-    },
-    {
-        itemCode: "FG-03",
-        description: "SEASONING 2",
-        unit: "pcs",
-        cost: "228.90",
-        status: "Low Stock",
-        inStock: "5",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-04",
-        description: "MEAT MATERIAL 1",
-        unit: "kg",
-        cost: "257.00",
-        status: "In Stock",
-        inStock: "20",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-05",
-        description: "ADDITIVE 3",
-        unit: "g",
-        cost: "52.67",
-        status: "In Stock",
-        inStock: "20",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-06",
-        description: "PACKAGING 3",
-        unit: "strd",
-        cost: "274.00",
-        status: "In Stock",
-        inStock: "20",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-07",
-        description: "FLAVOR 2",
-        unit: "kg",
-        cost: "118.97",
-        status: "In Stock",
-        inStock: "20",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-08",
-        description: "SEASONING 3",
-        unit: "pcs",
-        cost: "295.11",
-        status: "Low Stock",
-        inStock: "10",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-08",
-        description: "SEASONING 3",
-        unit: "pcs",
-        cost: "295.11",
-        status: "Low Stock",
-        inStock: "10",
-        qty: "30",
-    },
-]

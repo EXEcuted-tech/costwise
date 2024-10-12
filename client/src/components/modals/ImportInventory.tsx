@@ -129,11 +129,11 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
                 setAlertStatus('success');
             }
             
-            window.location.reload();
+            setTimeout(function(){location.reload()}, 3000);
                     
-        } catch (error) {
+        } catch (error: any) {
             console.error('Error importing file:', error);
-            setAlertMessages(['An error occurred while importing the file.']);
+            setAlertMessages([error.response.data.message]);
             setAlertStatus('critical');
         }
 

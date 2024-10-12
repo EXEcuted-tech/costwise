@@ -19,5 +19,10 @@ class Inventory extends Model
         'total_qty',
     ];
 
-    public $timestamps = false;
+    public $timestamps = true;
+
+    public function material()
+    {
+        return $this->belongsTo(Material::class, 'material_id', 'material_id');
+    }
 }

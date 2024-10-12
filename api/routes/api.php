@@ -15,5 +15,5 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
     Route::delete('/logout',[AuthController::class,'logout']);
     Route::get('/user',[UserController::class,'getCurrentUser']);
     Route::post('/inventory/upload', [InventoryController::class, 'upload']);
-    Route::get('/inventory', [InventoryController::class, 'retrieveInventory']);
+    Route::get('/inventory', [InventoryController::class, 'retrieveAll']);
 });

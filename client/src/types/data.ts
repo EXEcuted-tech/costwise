@@ -10,3 +10,14 @@ export interface User {
     department?: string;
     employee_role?: string;
 }
+
+export interface InventoryType {
+    inventory_id: number;
+    material_id: number;
+    material_category: string;
+    stock_status: string;
+    purchased_qty: number;
+    usage_qty: number;
+    total_qty: number; 
+
+}
