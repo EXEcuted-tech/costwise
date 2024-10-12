@@ -1,6 +1,3 @@
-import Decimal from 'decimal.js';
-import internal from 'stream';
-
 export interface User {
     user_type: string;
     first_name: string;
@@ -60,6 +57,27 @@ export interface MaterialRecord extends Record<string, unknown> {
     materialCost: number;
 }
 
+export interface Formulation {
+    formulation_id: number;
+    fg_id: string;
+    formula_code: string;
+    finishedGood: FinishedGood;
+}
+
+export interface FinishedGood {
+    fg_id: number;
+    fodl_id: number;
+    fg_code: string;
+    fg_desc: string;
+    total_cost: number | null;
+    total_batch_qty: string;
+    rm_cost: number | null;
+    unit: string;
+    formulation_no: number;
+    is_least_cost: boolean;
+    monthYear: number; 
+}
+
 export interface FormulationRecord extends Record<string, unknown> {
     id?: number;
     rowType?: string;
@@ -71,12 +89,24 @@ export interface FormulationRecord extends Record<string, unknown> {
     formulation: string | null;
     batchQty: number | null;
     unit: string;
+    isLeastCost?: number;
+    cost?: number | null;
 }
 
 export interface BOM {
     bom_id: number;
-    bomName: string;
+    bomName?: string;
+    bom_name?: string;
     formulations: FormulationRecord[];
+}
+
+export interface Bom {
+    bom_id: number;
+    bom_name: string;
+    fg_name?:string;
+    formulations: string;
+    created_at: string;
+    updated_at: string;
 }
 
 export interface RemovedId {

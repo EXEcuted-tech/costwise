@@ -35,6 +35,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve', [FinishedGoodController::class, 'retrieve']);
         Route::get('retrieve_first', [FinishedGoodController::class, 'retrieveFirst']);
         Route::get('retrieve_batch', [FinishedGoodController::class, 'retrieveBatch']);
+        Route::post('create', [FinishedGoodController::class, 'create']);
         Route::post('update', [FinishedGoodController::class, 'update']);
     });
 
@@ -58,15 +59,21 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::prefix('/boms')->group(function () {
         Route::get('retrieve_all', [BomController::class, 'retrieveAll']);
         Route::get('retrieve', [BomController::class, 'retrieve']);
+        Route::get('retrieve_first', [BomController::class, 'retrieveFirst']);
         Route::get('retrieve_batch', [BomController::class, 'retrieveBatch']);
         Route::post('update_batch', [BomController::class, 'updateBatch']);
+        Route::post('delete', [BomController::class, 'delete']);
+        Route::post('create', [BomController::class, 'create']);
     });
 
     Route::prefix('/formulations')->group(function () {
         Route::get('retrieve_all', [FormulationController::class, 'retrieveAll']);
+        Route::get('retrieve_all_fg', [FormulationController::class, 'retrieveAllWithFG']);
         Route::get('retrieve', [FormulationController::class, 'retrieve']);
         Route::get('retrieve_batch', [FormulationController::class, 'retrieveBatch']);
+        Route::post('create', [FormulationController::class, 'create']);
         Route::post('update_emulsion', [FormulationController::class, 'updateEmulsion']);
+        Route::post('delete', [FormulationController::class, 'delete']);
         Route::post('delete_fg', [FormulationController::class, 'deleteBulkWithFg']);
         Route::post('delete_material', [FormulationController::class, 'deleteBulkWithMaterial']);
     });

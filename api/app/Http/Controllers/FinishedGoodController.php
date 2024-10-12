@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\FinishedGood;
+use App\Models\Fodl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 
@@ -215,6 +216,79 @@ class FinishedGoodController extends ApiController
             return $this->getResponse("An error occurred while updating the Finished Good.");
         }
     }
+
+    public function create(Request $request)
+    {
+        $rules = [
+            'fg_code' => 'required|string|exists:finished_goods,fg_code',
+            'fg_desc' => 'required|string|max:255',
+            'total_batch_qty' => 'required|numeric|min:0',
+            'unit' => 'required|string|max:50',
+            'formulation_no' => 'required|integer|min:1',
+        ];
+
+        $messages = [
+            'fg_code.required' => 'The finished good code is required.',
+            'fg_code.exists' => 'The specified finished good code does not exist.',
+            'fg_desc.required' => 'The finished good description is required.',
+            'total_batch_qty.required' => 'The total batch quantity is required.',
+            'total_batch_qty.numeric' => 'The total batch quantity must be a number.',
+            'unit.required' => 'The unit is required.',
+            'formulation_no.required' => 'The formulation number is required.',
+            'formulation_no.integer' => 'The formulation number must be an integer.',
+        ];
+
+        $validator = Validator::make($request->all(), $rules, $messages);
+
+        if ($validator->fails()) {
+            $this->status = 422;
+            $this->response['errors'] = $validator->errors();
+            return $this->getResponse("Incorrect/Lacking input details!");
+        }
+
+        $fg_code = $request->input('fg_code');
+        $fg_desc = $request->input('fg_desc');
+        $total_batch_qty = $request->input('total_batch_qty');
+        $unit = $request->input('unit');
+        $formulation_no = $request->input('formulation_no');
+
+        // try {
+        // $finishedGood = FinishedGood::where('fg_code', $fg_code)
+        //     ->where('fg_desc', $fg_desc)
+        //     ->where('total_batch_qty', $total_batch_qty)
+        //     ->where('unit', $unit)
+        //     ->where('formulation_no', $formulation_no)
+        //     ->first();
+
+        // if ($finishedGood) {
+        //     $this->status = 400;
+        //     return $this->getResponse("Finished Good exists!");
+        // }
+        $finishedGood = new FinishedGood();
+        $finishedGood->fg_code = $fg_code;
+        $finishedGood->fg_desc = $fg_desc;
+        $finishedGood->total_batch_qty = $total_batch_qty;
+        $finishedGood->unit = $unit;
+        $finishedGood->formulation_no = $formulation_no;
+        $finishedGood->monthYear = date('Ym');
+        $matchingFodl = Fodl::where('fg_code', $fg_code)
+            ->where('monthYear', $finishedGood->monthYear)
+            ->first();
+
+        $finishedGood->fodl_id = $matchingFodl?->fodl_id;
+
+        $finishedGood->save();
+
+        $this->status = 201;
+        $this->response['fg_id'] = $finishedGood->fg_id;
+        return $this->getResponse("Finished Good created successfully.");
+        // } catch (\Exception $e) {
+        //     $this->status = 500;
+        //     $this->response['message'] = $e->getMessage();
+        //     return $this->getResponse("An error occurred while updating the Finished Good.");
+        // }
+    }
+
     // public function updateBatch(Request $request)
     // {
     //     $rules = [

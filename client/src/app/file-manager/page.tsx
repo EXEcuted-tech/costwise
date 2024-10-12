@@ -92,69 +92,82 @@ const FileManagerPage = () => {
       setInfoMsg('');
       setUpload(false);
       setIsLoading(true);
-      const file = acceptedFiles[0];
-      const reader = new FileReader();
 
-      reader.onload = (e: ProgressEvent<FileReader>) => {
-        const data = e.target?.result;
+      const processFile = async (file: any) => {
+        const reader = new FileReader();
 
-        if (data && data instanceof ArrayBuffer) {
-          const dataArray = new Uint8Array(data);
-          const workbook = XLSX.read(dataArray, { type: 'array' });
+        return new Promise((resolve, reject) => {
+          reader.onload = async (e: ProgressEvent<FileReader>) => {
+            const data = e.target?.result;
 
-          const sheetNames = workbook.SheetNames;
+            if (data && data instanceof ArrayBuffer) {
+              const dataArray = new Uint8Array(data);
+              const workbook = XLSX.read(dataArray, { type: 'array' });
 
-          let hasRequiredSheets = false;
-          let bomSheets = [];
+              const sheetNames = workbook.SheetNames;
 
-          if (uploadType === 'master') {
-            const requiredSheets = ['FODL Cost', 'Material Cost'];
-            const bomSheetPattern = /^BOM/;
-            hasRequiredSheets = requiredSheets.every(sheetName => sheetNames.includes(sheetName));
-            bomSheets = sheetNames.filter(sheetName => bomSheetPattern.test(sheetName));
-          } else if (uploadType === 'transactional') {
-            const requiredSheets = ['Production Transactions'];
-            hasRequiredSheets = requiredSheets.every(sheetName => sheetNames.includes(sheetName));
-          }
+              let hasRequiredSheets = false;
+              let bomSheets = [];
 
-          console.log(hasRequiredSheets, uploadType);
-          if (
-            hasRequiredSheets &&
-            ((uploadType === 'master' && bomSheets.length > 0) || uploadType === 'transactional')
-          ) {
-            const formData = new FormData();
-            formData.append('file', file);
-            formData.append('type', uploadType);
+              if (uploadType === 'master') {
+                const requiredSheets = ['FODL Cost', 'Material Cost'];
+                const bomSheetPattern = /^BOM/;
+                hasRequiredSheets = requiredSheets.every(sheetName => sheetNames.includes(sheetName));
+                bomSheets = sheetNames.filter(sheetName => bomSheetPattern.test(sheetName));
+              } else if (uploadType === 'transactional') {
+                const requiredSheets = ['Production Transactions'];
+                hasRequiredSheets = requiredSheets.every(sheetName => sheetNames.includes(sheetName));
+              }
 
-            api
-              .post('/files/upload', formData)
-              .then((response) => {
-                // console.log("Went here");
-                if (response.data.status == 200) {
-                  setTimeout(() => {
-                    setIsLoading(false);
-                  }, 1000);
+              if (
+                hasRequiredSheets &&
+                ((uploadType === 'master' && bomSheets.length > 0) || uploadType === 'transactional')
+              ) {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('type', uploadType);
 
-                  setInfoMsg('Successfully uploaded the file!');
-                  fetchData();
+                try {
+                  const response = await api.post('/files/upload', formData);
+                  if (response.data.status === 200) {
+                    resolve(true);
+                  } else {
+                    reject(new Error('Upload failed'));
+                  }
+                } catch (error) {
+                  console.error(error);
+                  reject(error);
                 }
-              })
-              .catch((error) => {
-                console.error(error);
-              });
-          } else {
-            setErrorMsg('The Excel file does not contain the required sheets.')
-          }
-        } else {
-          console.error('Error: FileReader result is not an ArrayBuffer.');
-        }
+              } else {
+                reject(new Error('The Excel file does not contain the required sheets.'));
+              }
+            } else {
+              reject(new Error('Error: FileReader result is not an ArrayBuffer.'));
+            }
+          };
+
+          reader.onerror = (ex) => {
+            reject(ex);
+          };
+
+          reader.readAsArrayBuffer(file);
+        });
       };
 
-      reader.onerror = (ex) => {
-        console.error(ex);
-      };
-
-      reader.readAsArrayBuffer(file);
+      Promise.all(acceptedFiles.map(processFile))
+        .then((results) => {
+          const successCount = results.filter(Boolean).length;
+          setInfoMsg(`Successfully uploaded ${successCount} file(s)!`);
+          fetchData();
+        })
+        .catch((error) => {
+          setErrorMsg(error.message);
+        })
+        .finally(() => {
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1000);
+        });
     },
     [fetchData, uploadType]
   );
@@ -259,7 +272,7 @@ const FileManagerPage = () => {
             setClose={() => { setInfoMsg(''); }} />
         }
       </div>
-      {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" />}
+      {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" onProceed={() => {}} />}
       <Header icon={BsFolderFill} title={"File Manager"} />
       <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px] mt-[75px] 2xl:mt-[40px]' : 'px-[50px] mt-[36px]'} ml-[45px]`}>
         <div className='flex relative'>

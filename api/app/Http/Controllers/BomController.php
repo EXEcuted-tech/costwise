@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Models\Bom;
+use App\Models\FinishedGood;
 use App\Models\Formulation;
 use App\Models\Material;
 use Illuminate\Http\Request;
@@ -13,7 +14,21 @@ class BomController extends ApiController
     public function retrieveAll()
     {
         try {
-            $allRecords = Bom::all();
+            $allRecords = Bom::all()->map(function ($bom) {
+                $formulationIds = json_decode($bom->formulations);
+                if (!empty($formulationIds)) {
+                    $firstFormulationId = $formulationIds[0];
+                    $formulation = Formulation::find($firstFormulationId);
+                    if ($formulation) {
+                        $finishedGood = FinishedGood::find($formulation->fg_id);
+                        if ($finishedGood) {
+                            $bom->fg_name = $finishedGood->fg_desc;
+                        }
+                    }
+                }
+
+                return $bom;
+            });
             $this->status = 200;
             $this->response['data'] = $allRecords;
             return $this->getResponse();
@@ -58,6 +73,45 @@ class BomController extends ApiController
         }
     }
 
+    public function retrieveFirst(Request $request)
+    {
+        $allowedColumns = [
+            'bom_id',
+            'bom_name',
+            'formulations',
+        ];
+
+        $col = $request->query('col');
+        $value = $request->query('value');
+
+        if (!in_array($col, $allowedColumns)) {
+            $this->status = 400;
+            return $this->getResponse("Invalid column specified.");
+        }
+
+        try {
+            $record = Bom::where($col, $value)->first();
+
+            if (!$record) {
+                $this->status = 404;
+                return $this->getResponse("No record found.");
+            }
+
+            $formulationIds = json_decode($record->formulations);
+            $formulations = Formulation::whereIn('formulation_id', $formulationIds)->get();
+            $record->formulations = $formulations;
+
+            $this->status = 200;
+            $this->response['data'] = $record;
+            return $this->getResponse();
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = $e->getMessage();
+            return $this->getResponse();
+        }
+    }
+
+
     public function retrieveBatch(Request $request)
     {
         $allowedColumns = [
@@ -101,8 +155,7 @@ class BomController extends ApiController
     {
         $rules = [
             'materials' => 'required|array|min:1',
-            'materials.*.material_id' => 'required|integer|exists:materials,material_id',
-            'materials.*.material_code' => 'required|string|max:50',
+            'materials.*.material_id' => 'sometimes',
             'materials.*.unit' => 'required|string|max:10',
             'formulation_id' => 'required|integer|exists:formulations,formulation_id',
             'formula_code' => 'required|string|max:50',
@@ -113,8 +166,6 @@ class BomController extends ApiController
             'materials.array' => 'Materials must be an array.',
             'materials.min' => 'At least one material is required.',
             'materials.*.material_id.required' => 'Material ID is required.',
-            'materials.*.material_id.integer' => 'Material ID must be an integer.',
-            'materials.*.material_id.exists' => 'Material ID does not exist.',
             'materials.*.material_code.required' => 'Material code is required.',
             'materials.*.unit.required' => 'Material unit is required.',
             'formulation_id.required' => 'Formulation ID is required.',
@@ -151,20 +202,15 @@ class BomController extends ApiController
 
         // Update or Create Emulsion
         $emulsion = json_decode($formulation->emulsion, true); // Decode as associative array
-        if ($emulsion) {
-            if ($emulsion['level'] && $emulsion['batch_qty'] && $emulsion['unit']) {
-                $emulsion['level'] = $emulsionData['level'];
-                $emulsion['batch_qty'] = $emulsionData['batch_qty'];
-                $emulsion['unit'] = $emulsionData['unit'];
-            } else {
-                $emulsion = [
-                    'level' => $emulsionData['level'],
-                    'batch_qty' => $emulsionData['batch_qty'],
-                    'unit' => $emulsionData['unit'],
-                ];
-            }
-        } else if (empty(get_object_vars($emulsion))) {
+
+        if (empty($emulsionData)) {
             $emulsion = new \stdClass();
+        } else {
+            $emulsion = [
+                'level' => $emulsionData['level'],
+                'batch_qty' => number_format(floatval($emulsionData['batch_qty']), 2, '.', ''),
+                'unit' => $emulsionData['unit'],
+            ];
         }
 
         $updatedEmulsionJson = json_encode($emulsion);
@@ -197,16 +243,22 @@ class BomController extends ApiController
                 $existingCode = Material::where('material_code', $materialData['material_code'])->first();
 
                 if ($existingCode) {
-                    $this->status = 401;
-                    return $this->getResponse("Material code already exists.");
+                    $materialData['material_id'] = $existingCode->material_id;
                 } else {
-                    Material::create([
-                        'material_code' => $materialData['material_code'],
-                        'material_desc' => $materialData['material_desc'],
-                        'material_cost' => $materialData['material_cost'],
-                        'unit' => $materialData['unit'],
-                        'date' => $materialData['date'],
-                    ]);
+                    if ($materialData['material_desc'] == 'EMULSION') {
+                        continue;
+                    } else {
+                        $this->status = 404;
+                        return $this->getResponse("Material code does not exist.");
+                    }
+
+                    // Material::create([
+                    //     'material_code' => $materialData['material_code'],
+                    //     'material_desc' => $materialData['material_desc'],
+                    //     'material_cost' => $materialData['material_cost'],
+                    //     'unit' => $materialData['unit'],
+                    //     'date' => $materialData['date'],
+                    // ]);
                 }
             }
 
@@ -256,5 +308,115 @@ class BomController extends ApiController
         //     $this->response['error'] = $e->getMessage(); // Optionally include the error message
         //     return $this->getResponse();
         // }
+    }
+
+    public function delete(Request $request)
+    {
+        try {
+            \DB::beginTransaction();
+
+            $bomId = $request->input('bom_id');
+            $bom = Bom::findOrFail($bomId);
+
+            Bom::on('archive_mysql')->create($bom->toArray());
+            $bom->delete();
+
+            \DB::commit();
+
+            $this->status = 200;
+            $this->response['message'] = "BOM deleted and archived successfully.";
+            return $this->getResponse();
+        } catch (\Exception $e) {
+            \DB::rollBack();
+            $this->status = 500;
+            $this->response['message'] = "An error occurred while deleting the BOM.";
+            $this->response['error'] = $e->getMessage();
+            return $this->getResponse();
+        }
+    }
+    
+    public function create(Request $request)
+    {
+        try {
+            $validator = Validator::make($request->all(), [
+                'formulation_ids' => 'required|array',
+                'bom_name' => 'required|string|max:255',
+            ]);
+
+            if ($validator->fails()) {
+                $this->status = 400;
+                $this->response['errors'] = $validator->errors();
+                return $this->getResponse();
+            }
+
+            $formulationIds = $request->input('formulation_ids');
+            $bomName = $request->input('bom_name');
+
+            $bom = new Bom();
+            $bom->bom_name = $bomName;
+
+            $newFormulationIds = [];
+            $fgIds = [];
+            $monthYear = null;
+
+            foreach ($formulationIds as $formulationId) {
+                $existingBom = Bom::whereJsonContains('formulations', $formulationId)->first();
+                
+                if ($existingBom) {
+                    $existingFormulation = Formulation::findOrFail($formulationId);
+                   
+                    $existingFg = FinishedGood::findOrFail($existingFormulation->fg_id);
+                    $newFg = $existingFg->replicate();
+                    $newFg->save();
+                    
+                    $newFormulation = $existingFormulation->replicate();
+                    $newFormulation->fg_id = $newFg->fg_id;
+                    $newFormulation->save();
+                    
+                    $newFormulationIds[] = $newFormulation->formulation_id;
+                    $fgIds[] = $newFg->fg_id;
+                } else {
+                    $formulation = Formulation::findOrFail($formulationId);
+                    $newFormulationIds[] = $formulationId;
+                    $fgIds[] = $formulation->fg_id;
+                }
+
+                $fg = FinishedGood::findOrFail(end($fgIds));
+
+                if ($monthYear === null) {
+                    $monthYear = $fg->monthYear;
+                } elseif ($fg->monthYear !== $monthYear) {
+                    $this->status = 400;
+                    $this->response['message'] = "All FinishedGoods must have the same monthYear.";
+                    return $this->getResponse();
+                }
+            }
+
+            $bom->formulations = json_encode($newFormulationIds);
+
+            $leastCostFgId = FinishedGood::whereIn('fg_id', $fgIds)
+                ->orderBy('rm_cost', 'asc')
+                ->first()
+                ->fg_id;
+
+            FinishedGood::whereIn('fg_id', $fgIds)
+                ->update(['is_least_cost' => 0]);
+
+            FinishedGood::where('fg_id', $leastCostFgId)
+                ->update(['is_least_cost' => 1]);
+            
+            $bom->save();
+
+            $this->status = 201;
+            $this->response['message'] = "BOM created successfully.";
+            $this->response['data'] = $bom;
+            return $this->getResponse();
+
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = "An error occurred while creating the BOM.";
+            $this->response['error'] = $e->getMessage();
+            return $this->getResponse();
+        }
     }
 }

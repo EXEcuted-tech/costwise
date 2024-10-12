@@ -111,31 +111,24 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
 
         let indicesToRemove: number[] = [index];
 
-        // If the rowType is 'finishedGood', identify subsequent rows to remove
         if (rowType === 'finishedGood') {
-            // Iterate through the tableData starting from the next index
             for (let i = index + 1; i < tableData.length; i++) {
                 const currentRow = tableData[i];
                 if (currentRow.rowType === 'finishedGood') {
-                    // Stop if the next 'finishedGood' is encountered
                     break;
                 }
                 indicesToRemove.push(i);
             }
         }
 
-        // Sort indices in descending order to avoid index shifting issues when removing
         indicesToRemove.sort((a, b) => b - a);
 
-        // Collect the IDs and rowTypes of rows to be removed
         const rowsToRemove = indicesToRemove.map(i => tableData[i]);
 
-        // Remove the identified rows from tableData
         setTableData(prevData =>
             prevData.filter((_, i) => !indicesToRemove.includes(i))
         );
 
-        // Update removedBomIds with the removed rows
         if (setRemovedBomIds) {
             setRemovedBomIds(prevIds => {
                 const newRemoved = rowsToRemove.filter(

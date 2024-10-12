@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import { FaEye } from "react-icons/fa";
 import { FaPencilAlt } from "react-icons/fa";
@@ -11,6 +11,11 @@ import CompareFormulaContainer from './CompareFormulaContainer';
 import BOMListContainer from './BOMListContainer';
 import { FaFileCircleXmark } from "react-icons/fa6";
 import ConfirmDelete from '@/components/modals/ConfirmDelete';
+import api from '@/utils/api';
+import { Formulation, FormulationRecord } from '@/types/data';
+import Spinner from '@/components/loaders/Spinner';
+import Alert from '@/components/alerts/Alert';
+import { formatMonthYear } from '@/utils/costwiseUtils';
 
 export interface FormulationContainerProps {
     number: string;
@@ -32,48 +37,82 @@ export interface FormulationContainerProps {
 export interface FormulationProps {
     setView: React.Dispatch<React.SetStateAction<boolean>>;
     view: boolean;
+    setFilteredData: React.Dispatch<React.SetStateAction<Formulation[]>>;
+    filteredData: Formulation[];
+    isLoading: boolean;
+    currentPage: number;
+    handlePageChange: (e: React.ChangeEvent<unknown>, page: number) => void;
 }
 
-const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => {
-    const [currentPage, setCurrentPage] = useState<number>(1);
+const FormulationContainer: React.FC<FormulationProps> = ({
+    setView,
+    view,
+    filteredData,
+    isLoading,
+    currentPage,
+    handlePageChange,
+    setFilteredData
+}) => {
     const { edit, setEdit, viewFormulas, viewBOM } = useFormulationContext();
-    const [ deleteModal, setDeleteModal ] = useState(false);
-
-    const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
-        setCurrentPage(page);
-    };
+    const [deleteModal, setDeleteModal] = useState(false);
+    const [formulationToDelete, setFormulationToDelete] = useState<number | null>(null);
+    const [alertMessages, setAlertMessages] = useState<string[]>([]);
+    const [successMessage, setSuccessMessage] = useState('');
 
     const indexOfLastItem = currentPage * 8;
     const indexOfFirstItem = indexOfLastItem - 8;
-    const currentListPage = fakeFormulaData.slice(indexOfFirstItem, indexOfLastItem);
+    const currentListPage = filteredData.slice(indexOfFirstItem, indexOfLastItem);
+
     const router = useRouter();
 
-    const handleView = (data: FormulationContainerProps) => {
+    const handleView = (id: number) => {
         setEdit(false);
         setView(true);
-        const encodedData = encodeURIComponent(JSON.stringify(data));
-        router.push(`/formulation?data=${encodedData}`); //change to number later
+        router.push(`/formulation?id=${id}`);
     }
 
-    const handleEdit = (data: FormulationContainerProps) => {
+    const handleEdit = (id: number) => {
         setView(false);
         setEdit(true);
-        const encodedData = encodeURIComponent(JSON.stringify(data));
-        router.push(`/formulation?data=${encodedData}`); //change to number later
+        router.push(`/formulation?id=${id}`);
     }
 
-    const handleExport = (data: FormulationContainerProps) => {
+    const handleExport = (data: number) => {
 
     }
 
-    const handleDelete = (data: FormulationContainerProps) => {
+    const handleDeleteClick = (formulationId: number) => {
+        setFormulationToDelete(formulationId);
         setDeleteModal(true);
     }
 
+    const handleDelete = async () => {
+        if (formulationToDelete) {
+            try {
+                await api.post(`/formulations/delete`, { formulation_id: formulationToDelete });
+                const updatedList = filteredData.filter(item => item.formulation_id !== formulationToDelete);
+                setFilteredData(updatedList);
+                setSuccessMessage('Formulation deleted successfully');
+            } catch (error) {
+                setAlertMessages(prev => [...prev, 'Failed to delete formulation']);
+            } finally {
+                setDeleteModal(false);
+                setFormulationToDelete(null);
+            }
+        }
+    }
 
     return (
         <>
-            {deleteModal && <ConfirmDelete onClose={()=>setDeleteModal(false)} subject="formulation"/>}
+            <div className="absolute top-0 right-0">
+                {alertMessages && alertMessages.map((msg, index) => (
+                    <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+                        setAlertMessages(prev => prev.filter((_, i) => i !== index));
+                    }} />
+                ))}
+                {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+            </div>
+            {deleteModal && <ConfirmDelete onClose={() => setDeleteModal(false)} onProceed={handleDelete} subject="formulation" />}
             {(view || edit) ? <FormulationTable view={view} setView={setView} /> :
                 viewFormulas ? <CompareFormulaContainer /> :
                     viewBOM ? <BOMListContainer /> :
@@ -81,45 +120,58 @@ const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => 
                             <table className='w-full '>
                                 <thead className='border-b border-b-[#c4c4c4]'>
                                     <tr className='text-[#777777] font-bold text-[18px]'>
-                                        <th className='py-[10px] px-[15px] text-left'>NO.</th>
+                                        <th className='py-[10px] px-[15px] text-left'>FORMULA CODE</th>
                                         <th className='px-[15px] text-left'>ITEM CODE</th>
                                         <th className='px-[15px] text-left'>DESCRIPTION</th>
                                         <th className='px-[15px] text-left'>UNIT</th>
-                                        <th className='px-[15px] text-right'>BATCH QTY</th>
+                                        <th className='px-[15px] text-center'>FORMULATION NO.</th>
+                                        <th className='px-[15px] text-left'>MONTH-YEAR</th>
+                                        <th className='px-[15px] text-right'>BATCH QTY.</th>
                                         <th className='px-[15px] text-right'>COST</th>
                                         <th className='px-[15px]'>MANAGE</th>
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    {currentListPage.length > 0 &&
+                                    {isLoading ? (
+                                        <tr>
+                                            <td colSpan={9} className="text-center py-4">
+                                                <div className='min-h-[500px] flex justify-center items-center'>
+                                                    <Spinner />
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ) :
+                                        currentListPage.length > 0 &&
                                         (currentListPage.map((data, index) => (
                                             <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'}`}>
-                                                <td className='py-[15px] px-[15px]'>{data.number}</td>
-                                                <td className='px-[15px]'>{data.itemCode}</td>
-                                                <td className='px-[15px]'>{data.description}</td>
-                                                <td className='px-[15px]'>{data.unit}</td>
-                                                <td className='px-[15px] text-right'>{data.batchQty}</td>
-                                                <td className='px-[15px] text-right'>{data.cost}</td>
+                                                <td className='py-[15px] px-[15px]'>{data.formula_code}</td>
+                                                <td className='px-[15px]'>{data.finishedGood.fg_code}</td>
+                                                <td className='px-[15px]'>{data.finishedGood.fg_desc}</td>
+                                                <td className='px-[15px] text-left'>{data.finishedGood.unit}</td>
+                                                <td className='px-[15px] text-center'>{data.finishedGood.formulation_no}</td>
+                                                <td className='px-[15px] text-left'>{formatMonthYear(data.finishedGood.monthYear)}</td>
+                                                <td className='px-[15px] text-right'>{data.finishedGood.total_batch_qty}</td>
+                                                <td className='px-[15px] text-right'>{data.finishedGood.total_cost ?? 'N/A'}</td>
                                                 <td className='px-[15px]'>
                                                     <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
                                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
                                                                 cursor-pointer hover:bg-[#f7f7f7] rounded-l-[5px] transition-colors duration-200 ease-in-out'
-                                                            onClick={() => handleView(data)}>
+                                                            onClick={() => handleView(data.formulation_id)}>
                                                             <FaEye />
                                                         </div>
                                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
                                                                 cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'
-                                                            onClick={() => handleEdit(data)}>
+                                                            onClick={() => handleEdit(data.formulation_id)}>
                                                             <FaPencilAlt />
                                                         </div>
                                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
                                                                 cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'
-                                                            onClick={() => handleExport(data)}>
+                                                            onClick={() => handleExport(data.formulation_id)}>
                                                             <TiExport />
                                                         </div>
                                                         <div className='flex justify-center items-center h-full
                                                                 cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px] transition-colors duration-200 ease-in-out'
-                                                            onClick={() => handleDelete(data)}>
+                                                            onClick={() => handleDeleteClick(data.formulation_id)}>
                                                             <IoTrash />
                                                         </div>
                                                     </div>
@@ -128,17 +180,18 @@ const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => 
                                         )))}
                                 </tbody>
                             </table>
-                            {currentListPage.length > 0
+                            {!isLoading && currentListPage.length > 0
                                 ?
                                 <div className='relative py-[1%]'>
                                     <PrimaryPagination
-                                        data={fakeFormulaData}
+                                        data={filteredData}
                                         itemsPerPage={8}
                                         handlePageChange={handlePageChange}
                                         currentPage={currentPage}
                                     />
                                 </div>
                                 :
+                                !isLoading && currentListPage.length == 0 &&
                                 <div className='min-h-[350px] flex flex-col justify-center items-center p-12 font-semibold text-[#9F9F9F]'>
                                     <FaFileCircleXmark className='text-[75px]' />
                                     <p className='text-[30px]'>No File Found.</p>
@@ -151,90 +204,3 @@ const FormulationContainer: React.FC<FormulationProps> = ({ setView, view }) => 
 }
 
 export default FormulationContainer
-
-const fakeFormulaData: FormulationContainerProps[] = [
-    {
-        number: '34-222-V',
-        level: 0,
-        itemCode: 'FG-01',
-        description: 'HOTDOG1K',
-        unit: 'packs',
-        batchQty: 3164.00,
-        cost: 60.39,
-        formulations: [
-            { level: 1, itemCode: '', description: 'Emulsion', unit: 'kg', batchQty: 3164.00 },
-            { level: 2, itemCode: 'FG-01-A', description: 'Spices Blend', unit: 'kg', batchQty: 500.00 },
-            { level: 3, itemCode: 'FG-01-B', description: 'Meat Mix', unit: 'kg', batchQty: 1500.00 }
-        ]
-    },
-    {
-        number: '34-223-V',
-        level: 0,
-        itemCode: 'FG-01',
-        description: 'HOTDOG1K',
-        unit: 'kg',
-        batchQty: 3164.00,
-        cost: 59.61,
-        formulations: [
-            { level: 1, itemCode: 'FG-01', description: 'HOTDOG1K', unit: 'kg', batchQty: 3164.00 },
-            { level: 2, itemCode: 'FG-01-C', description: 'Casing Material', unit: 'kg', batchQty: 200.00 },
-            { level: 3, itemCode: 'FG-01-D', description: 'Preservatives', unit: 'kg', batchQty: 100.00 }
-        ]
-    },
-    {
-        number: '34-224-V',
-        level: 0,
-        itemCode: 'FG-01',
-        description: 'HOTDOG1K',
-        batchQty: 3164.00,
-        unit: 'kg',
-        cost: 56.93,
-        formulations: [
-            { level: 1, itemCode: 'FG-01', description: 'HOTDOG1K', batchQty: 3164.00, unit: 'kg' },
-            { level: 2, itemCode: 'FG-01-E', description: 'Flavor Enhancer', batchQty: 300.00, unit: 'kg' },
-            { level: 3, itemCode: 'FG-01-F', description: 'Coloring Agent', batchQty: 50.00, unit: 'kg' }
-        ]
-    },
-    {
-        number: '35-111-V',
-        level: 0,
-        itemCode: 'FG-02',
-        description: 'BEEF LOAF 100g',
-        batchQty: 12307.00,
-        unit: 'tin',
-        cost: 8.89,
-        formulations: [
-            { level: 1, itemCode: 'FG-02', description: 'BEEF LOAF 100g', batchQty: 12307.00, unit: 'tin' },
-            { level: 2, itemCode: 'FG-02-A', description: 'Seasoning Mix', batchQty: 700.00, unit: 'kg' },
-            { level: 3, itemCode: 'FG-02-B', description: 'Binding Agent', batchQty: 400.00, unit: 'kg' }
-        ]
-    },
-    {
-        number: '35-112-V',
-        level: 0,
-        itemCode: 'FG-02',
-        description: 'BEEF LOAF 100g',
-        batchQty: 12307.00,
-        unit: 'tin',
-        cost: 8.64,
-        formulations: [
-            { level: 1, itemCode: 'FG-02', description: 'BEEF LOAF 100g', batchQty: 12307.00, unit: 'tin' },
-            { level: 2, itemCode: 'FG-02-C', description: 'Meat Emulsion', batchQty: 600.00, unit: 'kg' },
-            { level: 3, itemCode: 'FG-02-D', description: 'Flavor Enhancer', batchQty: 200.00, unit: 'kg' }
-        ]
-    },
-    {
-        number: '35-113-V',
-        level: 0,
-        itemCode: 'FG-02',
-        description: 'BEEF LOAF 100g',
-        batchQty: 12307.00,
-        unit: 'tin',
-        cost: 8.75,
-        formulations: [
-            { level: 1, itemCode: 'FG-02', description: 'BEEF LOAF 100g', batchQty: 12307.00, unit: 'tin' },
-            { level: 2, itemCode: 'FG-02-E', description: 'Spice Blend', batchQty: 500.00, unit: 'kg' },
-            { level: 3, itemCode: 'FG-02-F', description: 'Preservative Mix', batchQty: 300.00, unit: 'kg' }
-        ]
-    }
-];

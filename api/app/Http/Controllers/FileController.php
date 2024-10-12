@@ -42,7 +42,7 @@ class FileController extends ApiController
     public function retrieveAll()
     {
         try {
-            $allRecords = File::all();
+            $allRecords = File::orderBy('created_at', 'desc')->get();
             $this->status = 200;
             $this->response['data'] = $allRecords;
             return $this->getResponse();
@@ -66,7 +66,7 @@ class FileController extends ApiController
         }
 
         try {
-            $records = File::where($col, $value)->get();
+            $records = File::where($col, $value)->orderBy('created_at', 'desc')->get();
 
             if ($records->isEmpty()) {
                 $this->status = 404;
@@ -95,54 +95,54 @@ class FileController extends ApiController
         }
 
         // try {
-            $records = File::where($col, $value)->get();
+        $records = File::where($col, $value)->get();
 
-            if ($records->isEmpty()) {
-                $this->status = 404;
-                return $this->getResponse("No records found to delete.");
-            }
+        if ($records->isEmpty()) {
+            $this->status = 404;
+            return $this->getResponse("No records found to delete.");
+        }
 
-            foreach ($records as $record) {
-                if ($record->file_type == 'transactional_file') {
-                    $settings = json_decode($record->settings, true);
-                    $transactionIds = $settings['transaction_ids'];
+        foreach ($records as $record) {
+            if ($record->file_type == 'transactional_file') {
+                $settings = json_decode($record->settings, true);
+                $transactionIds = $settings['transaction_ids'];
 
-                    foreach ($transactionIds as $key => $transactionId) {
-                        $result = TransactionController::deleteTransaction($transactionId);
-                        if ($result) {
-                            unset($transactionIds[$key]);
-                        }
-                    }
-
-                    $settings['transaction_ids'] = array_values($transactionIds);
-                    $record->settings = json_encode($settings);
-                    $record->save();
-                } else if ($record->file_type == 'master_file') {
-                    $settings = json_decode($record->settings, true);
-
-                    if (isset($settings['fodls'])) {
-                        FodlController::deleteBulkFodlInFile($settings['fodls'], $value);
-                    }
-
-                    if (isset($settings['material_ids'])) {
-                        MaterialController::deleteBulkInFile($settings['material_ids'], $value);
-                    }
-
-                    // Assuming that what is on the formulations, are on the material sheets
-                    if (isset($settings['bom_ids'])) {
-                        foreach ($settings['bom_ids'] as $bomId) {
-                            $this->deleteFormulationByBOM($bomId);
-                        }
+                foreach ($transactionIds as $key => $transactionId) {
+                    $result = TransactionController::deleteTransaction($transactionId);
+                    if ($result) {
+                        unset($transactionIds[$key]);
                     }
                 }
 
-                File::on('archive_mysql')->create($record->toArray());
+                $settings['transaction_ids'] = array_values($transactionIds);
+                $record->settings = json_encode($settings);
+                $record->save();
+            } else if ($record->file_type == 'master_file') {
+                $settings = json_decode($record->settings, true);
+
+                if (isset($settings['fodls'])) {
+                    FodlController::deleteBulkFodlInFile($settings['fodls'], $value);
+                }
+
+                if (isset($settings['material_ids'])) {
+                    MaterialController::deleteBulkInFile($settings['material_ids'], $value);
+                }
+
+                // Assuming that what is on the formulations, are on the material sheets
+                if (isset($settings['bom_ids'])) {
+                    foreach ($settings['bom_ids'] as $bomId) {
+                        $this->deleteFormulationByBOM($bomId);
+                    }
+                }
             }
 
-            $records->each->delete();
+            File::on('archive_mysql')->create($record->toArray());
+        }
 
-            $this->status = 200;
-            return $this->getResponse("Records successfully deleted.");
+        $records->each->delete();
+
+        $this->status = 200;
+        return $this->getResponse("Records successfully deleted.");
         // } catch (\Exception $e) {
         //     $this->status = 500;
         //     return $this->getResponse($e->getMessage());
@@ -159,7 +159,7 @@ class FileController extends ApiController
             $formulationIds = json_decode($bom->formulations, true) ?? [];
             $fgIds = Formulation::whereIn('formulation_id', $formulationIds)->pluck('fg_id')->toArray();
 
-            FormulationController::deleteBulkWithFGInFile($fgIds,$bomId);
+            FormulationController::deleteBulkWithFGInFile($fgIds, $bomId);
 
 
             // $remainingFormulations = Formulation::whereIn('formulation_id', $formulationIds)->get();
@@ -218,6 +218,7 @@ class FileController extends ApiController
 
             $this->processExcel($file->getRealPath(), $uploadType);
 
+            $this->calculateLeastCost($this->fileModel);
             File::create($this->fileModel);
 
             $this->status = 200;
@@ -336,14 +337,14 @@ class FileController extends ApiController
             $yearMonthInt = (int) $yearMonth;
 
             $material = Material::where('material_code', $itemCode)
-                                ->where('material_cost', $amount)
-                                ->where('date', $dateOnly)
-                                ->first();
+                ->where('material_cost', $amount)
+                ->where('date', $dateOnly)
+                ->first();
 
             $fg = FinishedGood::where('fg_code', $itemCode)
-                              ->where('rm_cost', $amount)
-                              ->where('monthYear', $yearMonthInt)
-                              ->first();
+                ->where('rm_cost', $amount)
+                ->where('monthYear', $yearMonthInt)
+                ->first();
 
             $materialId = $material->material_id ?? null;
             $finishedGoodId = $fg->fg_id ?? null;
@@ -533,6 +534,8 @@ class FileController extends ApiController
     {
         $formulations = [];
         $currentFormulation = [];
+        $rmCost = 0;
+        $totalCost = 0;
         unset($data[0]);
 
         foreach ($data as $key => $row) {
@@ -623,6 +626,103 @@ class FileController extends ApiController
             $settings['bom_ids'] = $existingBomIds;
             $this->fileModel['settings'] = json_encode($settings);
         }
+    }
+
+    private function calculateLeastCost($file)
+    {
+        $settings = json_decode($file['settings'], true);
+        $bomIds = $settings['bom_ids'] ?? [];
+    
+        foreach ($bomIds as $bomId) {
+            $bom = Bom::findOrFail($bomId);
+            $formulations = json_decode($bom->formulations, true);
+            $leastCost = PHP_FLOAT_MAX;
+            $leastCostFormulationId = null;
+
+            foreach ($formulations as $formulationId) {
+                $formulation = Formulation::findOrFail($formulationId);
+                
+                $finishedGood = FinishedGood::firstOrCreate(
+                    ['fg_id' => $formulation->fg_id],
+                );
+
+                $totalMaterialCost = $this->calculateFormulationCost($formulation) / $finishedGood->total_batch_qty;
+                $finishedGood->update(['rm_cost' => $totalMaterialCost]);
+
+                $fodl = FODL::where('fodl_id', $finishedGood->fodl_id)->first();
+                $totalCost = $totalMaterialCost + ($fodl->factory_overhead ?? 0) + ($fodl->direct_labor ?? 0);
+                $finishedGood->update(['total_cost' => $totalCost]);
+    
+                if ($totalMaterialCost < $leastCost) {
+                    $leastCost = $totalMaterialCost;
+                    $leastCostFormulationId = $formulationId;
+                }
+            }
+
+            if ($leastCostFormulationId) {
+                $leastCostFormulation = Formulation::findOrFail($leastCostFormulationId);
+                $leastCostFinishedGood = FinishedGood::where('fg_id', $leastCostFormulation->fg_id)->first();
+                
+                if ($leastCostFinishedGood) {
+                    $leastCostFinishedGood->update(['is_least_cost' => true]);
+                }
+            }
+        }
+    }
+    // private function calculateLeastCost($file)
+    // {
+    //     $settings = json_decode($file['settings'], true);
+
+    //     $bomIds = $settings['bom_ids'] ?? [];
+    //     $leastCost = PHP_FLOAT_MAX;
+
+    //     foreach ($bomIds as $bomId) {
+    //         $bom = Bom::findOrFail($bomId);
+    //         $formulations = json_decode($bom->formulations,true);
+
+            
+    //         foreach ($formulations as $formulationId) {
+    //             $formulation = Formulation::findOrFail($formulationId);
+    //             $rmCost = $this->calculateFormulationCost($formulation);
+    //             $finishedGood = FinishedGood::firstOrCreate(
+    //                 ['fg_id' => $formulation->fg_id],
+    //             );
+
+    //             $finishedGood->update(['rm_cost' => $rmCost]);
+    //             $leastCost = min($leastCost, $rmCost);
+    //         }
+    //     }
+
+    //     $leastCostFormulation = Formulation::whereIn('formulation_id', $formulations)
+    //         ->whereHas('finishedGood', function ($query) use ($leastCost) {
+    //             $query->where('rm_cost', $leastCost);
+    //         })
+    //         ->first();
+
+    //     if ($leastCostFormulation) {
+    //         $leastCostFinishedGood = $leastCostFormulation->finishedGood;
+    //         $leastCostFinishedGood->update(['is_least_cost' => true]);
+    //     }
+    // }
+
+    private function calculateFormulationCost($formulation)
+    {
+        $materialQtyList = json_decode($formulation->material_qty_list, true);
+
+        $totalCost = 0;
+
+        foreach ($materialQtyList as $item) {
+            foreach ($item as $materialId => $data) {
+                $material = Material::findOrFail($materialId);
+                $quantity = $data['qty'];
+                $materialCost = $material->material_cost;
+                $productCost = $materialCost * $quantity;
+
+                $totalCost += $productCost;
+            }
+        }
+
+        return $totalCost;
     }
 
     // private function processSummarySheet($data)

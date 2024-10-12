@@ -1,5 +1,6 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
+import Spinner from "@/components/loaders/Spinner";
 import { FormulationProvider, useFormulationContext } from "@/contexts/FormulationContext";
 import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
 import { Suspense, useEffect, useState } from "react";
@@ -12,7 +13,7 @@ export default function FormulationLayout({
   return (
     <SidebarProvider>
       <FormulationProvider>
-        <Suspense fallback={<div>Loading workspace...</div>}>
+        <Suspense fallback={<div className="flex justify-center items-center w-full h-screen"><Spinner/></div>}>
           <FormulationContent>
             {children}
           </FormulationContent>

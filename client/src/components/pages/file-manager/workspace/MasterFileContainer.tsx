@@ -519,18 +519,20 @@ const MasterFileContainer = (data: File) => {
 
           }
 
-          let emulsion = formulationData[1]?.description === 'EMULSION' ? formulationData[1] : null;
+          // let emulsion = formulationData[1]?.description === 'EMULSION' ? formulationData[1] : null;
 
-          if (!emulsion) {
-            const emulsions = formulationData.filter(item => item.description === 'EMULSION');
+          // if (!emulsion) {
+          //   const emulsions = formulationData.filter(item => item.description === 'EMULSION');
 
-            if (emulsions.length === 1) {
-              emulsion = emulsions[0];
-            }
-            else if (emulsions.length > 1) {
-              emulsion = formulationData[1];
-            }
-          }
+          //   if (emulsions.length === 1) {
+          //     emulsion = emulsions[0];
+          //   }
+          //   else if (emulsions.length > 1) {
+          //     emulsion = formulationData[1];
+          //   }
+          // }
+
+          let emulsion = formulationData.find(item => item.description === 'EMULSION');
 
           const transformedEmulsionData = emulsion
             ? {
@@ -540,7 +542,8 @@ const MasterFileContainer = (data: File) => {
             }
             : {};
 
-          const materials = formulationData.slice(2);
+          // const materials = formulationData.slice(2);
+          const materials = formulationData.filter(item => item.rowType === 'material');
 
           const transformedMaterialData = materials.map(item => ({
             material_id: item.id,

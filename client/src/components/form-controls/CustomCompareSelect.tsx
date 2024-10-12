@@ -1,10 +1,24 @@
-import React, { useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { AiOutlineDown } from 'react-icons/ai';
 import useOutsideClick from '@/hooks/useOutsideClick';
+import api from '@/utils/api';
+import { useFormulationContext } from '@/contexts/FormulationContext';
 
 interface CustomCompareSelectProps {
   setSelectedOptions: React.Dispatch<React.SetStateAction<string[]>>;
   selectedOptions: string[];
+}
+
+interface Option {
+  number: string;
+  description: string;
+  formulation_id: number;
+  monthYear: number;
+}
+
+interface SelectedOption {
+  text: string;
+  formulation_id: number;
 }
 
 const CustomCompareSelect: React.FC<CustomCompareSelectProps> = ({
@@ -14,44 +28,125 @@ const CustomCompareSelect: React.FC<CustomCompareSelectProps> = ({
   const ref = useOutsideClick(() => setIsDropdownOpen(false));
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const { setSelectedChoices, selectedChoices } = useFormulationContext();
+  const [options, setOptions] = useState<Option[]>([]);
 
-  const options = [
-    { number: '34-222-V', description: 'HOTDOG1K' },
-    { number: '34-223-V', description: 'HOTDOG1K' },
-    { number: '34-224-V', description: 'HOTDOG1K' },
-    { number: '35-111-V', description: 'BEEF LOAF 100g' },
-    { number: '35-112-V', description: 'BEEF LOAF 100g' },
-    { number: '35-113-V', description: 'BEEF LOAF 100g' },
-  ];
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
 
-  const handleOptionClick = (option: { number: string; description: string }) => {
+    try {
+      const response = await api.get('/formulations/retrieve_all_fg');
+      if (response.data.status === 200) {
+        const formulations = response.data.data;
+        const newOptions = formulations.map((formulation: any) => ({
+          number: formulation.formula_code,
+          description: formulation.finishedGood.fg_desc,
+          formulation_id: formulation.formulation_id,
+          monthYear: formulation.monthYear
+        }));
+        setOptions(newOptions);
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
+
+  const [selectedOptionObjects, setSelectedOptionObjects] = useState<SelectedOption[]>([]);
+
+  // ... existing fetchData function ...
+
+  const handleOptionClick = (option: Option) => {
     const optionText = `${option.description} (${option.number})`;
 
-    setSelectedOptions((prevOptions) => {
-      if (prevOptions.includes(optionText)) {
-        return prevOptions.filter(item => item !== optionText);
+    setSelectedOptionObjects((prevOptions) => {
+      const isSelected = prevOptions.some(item => item.formulation_id === option.formulation_id);
+      if (isSelected) {
+        return prevOptions.filter(item => item.formulation_id !== option.formulation_id);
       } else {
         if (prevOptions.length < 10) {
-          return [...prevOptions, optionText];
+          return [...prevOptions, { text: optionText, formulation_id: option.formulation_id }];
         } else {
           alert('You can only select up to 10 options.');
           return prevOptions;
         }
       }
     });
+
+    // Update setSelectedChoices based on the new selectedOptionObjects
+    setSelectedChoices((prev) => {
+      const updatedChoices = selectedOptionObjects.map(item => item.formulation_id);
+      if (updatedChoices.includes(option.formulation_id)) {
+        return updatedChoices.filter(id => id !== option.formulation_id);
+      } else if (updatedChoices.length < 10) {
+        return [...updatedChoices, option.formulation_id];
+      }
+      return prev;
+    });
     setInputValue('');
   };
+
+  // Update selectedOptions whenever selectedOptionObjects changes
+  useEffect(() => {
+    setSelectedOptions(selectedOptionObjects.map(item => item.text));
+  }, [selectedOptionObjects, setSelectedOptions]);
+
+  // const handleOptionClick = (option: Option) => {
+  //   const optionText = `${option.description} (${option.number})`;
+
+  //   setSelectedOptions((prevOptions) => {
+  //     if (prevOptions.includes(optionText)) {
+  //       setSelectedChoices(prev => prev.filter(id => id !== option.formulation_id));
+  //       return prevOptions.filter(item => item !== optionText);
+  //     } else {
+  //       if (prevOptions.length < 10) {
+  //         setSelectedChoices(prev => [...prev, option.formulation_id]);
+  //         return [...prevOptions, optionText];
+  //       } else {
+  //         alert('You can only select up to 10 options.');
+  //         return prevOptions;
+  //       }
+  //     }
+  //   });
+  //   setInputValue('');
+  // };
+
+  // const handleOptionClick = (option: { number: string; description: string }) => {
+  //   const optionText = `${option.description} (${option.number})`;
+
+  //   setSelectedOptions((prevOptions) => {
+  //     if (prevOptions.includes(optionText)) {
+  //       return prevOptions.filter(item => item !== optionText);
+  //     } else {
+  //       if (prevOptions.length < 10) {
+  //         return [...prevOptions, optionText];
+  //       } else {
+  //         alert('You can only select up to 10 options.');
+  //         return prevOptions;
+  //       }
+  //     }
+  //   });
+  //   setInputValue('');
+  // };
 
   const handleInputChange = (value: string) => {
     setInputValue(value);
     setIsDropdownOpen(true);
   };
 
-  const filteredOptions = options.filter(
-    (option) =>
-      option.description.toLowerCase().includes(inputValue.toLowerCase()) ||
-      option.number.toLowerCase().includes(inputValue.toLowerCase())
-  );
+  const filteredOptions = options
+    .filter(
+      (option) =>
+        option.description.toLowerCase().includes(inputValue.toLowerCase()) ||
+        option.number.toLowerCase().includes(inputValue.toLowerCase())
+    )
+    .sort((a, b) => a.monthYear - b.monthYear);
 
   return (
     <div ref={ref} className="relative w-full font-lato z-[1000]">
@@ -93,7 +188,7 @@ const CustomCompareSelect: React.FC<CustomCompareSelectProps> = ({
 
                   onClick={() => handleOptionClick(option)}>
                   <input type="checkbox"
-                    checked={selectedOptions.includes(`${option.description} (${option.number})`)}
+                    checked={selectedOptionObjects.some(item => item.formulation_id === option.formulation_id)}
                     className="before:content[''] peer relative h-5 w-5 cursor-pointer appearance-none rounded-md border border-[#686868] transition-all before:absolute before:top-2/4 before:left-2/4 before:block before:h-12 before:w-12 before:-translate-y-2/4 before:-translate-x-2/4 before:rounded-full before:bg-blue-gray-500 before:opacity-0 before:transition-opacity checked:border-[#3A7CA0] checked:bg-[#3A7CA0] checked:before:bg-gray-900 hover:before:opacity-10"
                     id="check" />
                   <span
