@@ -302,7 +302,7 @@ class FormulationController extends ApiController
 
     public function export(Request $request)
     {
-        // try {
+        try {
             $formulationId = $request->input('formulation_id');
             $data = Formulation::findOrFail($formulationId);
 
@@ -320,11 +320,11 @@ class FormulationController extends ApiController
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ])->deleteFileAfterSend(true);
 
-        // } catch (\Exception $e) {
-        //     $this->status = 500;
-        //     $this->response['message'] = "Export failed: " . $e->getMessage();
-        //     return $this->getResponse();
-        // }
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = "Export failed: " . $e->getMessage();
+            return $this->getResponse();
+        }
     }
 
     private function addFormulationSheet($spreadsheet, $data)
