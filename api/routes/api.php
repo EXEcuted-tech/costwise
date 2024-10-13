@@ -77,6 +77,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('delete_fg', [FormulationController::class, 'deleteBulkWithFg']);
         Route::post('delete_material', [FormulationController::class, 'deleteBulkWithMaterial']);
         Route::post('upload', [FormulationController::class, 'upload']);
+        Route::post('export', [FormulationController::class, 'export']);
     });
 
     Route::prefix('/transactions')->group(function () {

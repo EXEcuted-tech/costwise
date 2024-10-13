@@ -782,7 +782,7 @@ class FileController extends ApiController
     // EXPORTING PROCESS
     public function export(Request $request)
     {
-        try {
+        // try {
             $fileId = $request->input('file_id');
             $file = File::findOrFail($fileId);
 
@@ -804,11 +804,11 @@ class FileController extends ApiController
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ])->deleteFileAfterSend(true);
 
-        } catch (\Exception $e) {
-            $this->status = 500;
-            $this->response['message'] = "Export failed: " . $e->getMessage();
-            return $this->getResponse();
-        }
+        // } catch (\Exception $e) {
+        //     $this->status = 500;
+        //     $this->response['message'] = "Export failed: " . $e->getMessage();
+        //     return $this->getResponse();
+        // }
     }
 
     // public function exportAll(Request $request)
@@ -1125,7 +1125,7 @@ class FileController extends ApiController
             $fg = FinishedGood::find($formulationData['fg_id']);
 
             $sheet->setCellValue("A$row", $formulationData['formula_code']);
-            $sheet->getStyle("A$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+            $sheet->getStyle("A$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER);
             $sheet->getStyle("A$row")->getFont()->setBold(true);
 
             $sheet->getStyle("A$row:F$row")->getFill()->setFillType(Fill::FILL_SOLID);

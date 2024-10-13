@@ -7,9 +7,13 @@ use App\Models\FinishedGood;
 use App\Models\Fodl;
 use App\Models\Formulation;
 use App\Models\Material;
+use App\Models\File;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class FormulationController extends ApiController
 {
@@ -144,7 +148,7 @@ class FormulationController extends ApiController
             $materialCodes = array_column($request->input('materials'), 'material_code');
             $materialDescs = array_column($request->input('materials'), 'material_desc');
             $materialUnits = array_column($request->input('materials'), 'unit');
-            
+
             $currentDate = now();
             $existingMaterials = Material::whereIn('material_code', $materialCodes)
                 ->whereIn('material_desc', $materialDescs)
@@ -156,8 +160,8 @@ class FormulationController extends ApiController
                     return "{$item->material_code}|{$item->material_desc}|{$item->unit}";
                 })
                 ->toArray();
-            
-            $nonExistingMaterials = array_filter($request->input('materials'), function($material) use ($existingMaterials, $currentDate) {
+
+            $nonExistingMaterials = array_filter($request->input('materials'), function ($material) use ($existingMaterials, $currentDate) {
                 $key = $material['material_code'] . '|' . $material['material_desc'] . '|' . $material['unit'];
                 if (!isset($existingMaterials[$key])) {
                     return true;
@@ -185,7 +189,7 @@ class FormulationController extends ApiController
                     ];
                 }
             }
-            
+
             $formulation = new Formulation();
             $formulation->fg_id = $request->input('fg_id');
             $formulation->formula_code = $request->input('formula_code');
@@ -296,7 +300,107 @@ class FormulationController extends ApiController
         }
     }
 
-    
+    public function export(Request $request)
+    {
+        // try {
+            $formulationId = $request->input('formulation_id');
+            $data = Formulation::findOrFail($formulationId);
+
+            $spreadsheet = new Spreadsheet();
+
+            $this->addFormulationSheet($spreadsheet, $data);
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $fileName = "Formulation - " . date('Y-m-d') . ".xlsx";
+
+            $tempFile = tempnam(sys_get_temp_dir(), $fileName);
+            $writer->save($tempFile);
+
+            return response()->download($tempFile, $fileName, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ])->deleteFileAfterSend(true);
+
+        // } catch (\Exception $e) {
+        //     $this->status = 500;
+        //     $this->response['message'] = "Export failed: " . $e->getMessage();
+        //     return $this->getResponse();
+        // }
+    }
+
+    private function addFormulationSheet($spreadsheet, $data)
+    {
+        $sheet = $spreadsheet->createSheet();
+        $name = $data['formula_code'];
+        $sheet->setTitle("Formulation-{$name}");
+
+        $headers = ['Formula', 'Level', 'Item Code', 'Description', 'Formulation', 'Batch Quantity', 'unit'];
+        $sheet->fromArray($headers, NULL, 'A1');
+        $sheet->getStyle('A1:G1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->freezePane('A2');
+
+        $sheet->getColumnDimension('A')->setWidth(10);
+        $sheet->getColumnDimension('B')->setWidth(8.71);
+        $sheet->getColumnDimension('C')->setWidth(11.5);
+        $sheet->getColumnDimension('D')->setWidth(56.43);
+        $sheet->getColumnDimension('E')->setWidth(12.29);
+        $sheet->getColumnDimension('F')->setWidth(16.57);
+        $sheet->getColumnDimension('G')->setWidth(8.57);
+
+        $sheet->getStyle('A1:G1')->getFont()->setBold(true)->setSize(8)->setName('Open Sans');
+        $sheet->setAutoFilter('B1:G1');
+        $row = 2;
+        $formulationData = Formulation::find($data['formulation_id']);
+        $fg = FinishedGood::find($formulationData['fg_id']);
+
+        $sheet->setCellValue("A$row", $formulationData['formula_code']);
+        $sheet->getStyle("A$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->getStyle("A$row")->getFont()->setBold(true);
+
+        $sheet->getStyle("A$row:F$row")->getFill()->setFillType(Fill::FILL_SOLID);
+        $sheet->getStyle("A$row:F$row")->getFill()->getStartColor()->setRGB('DAEEF3');
+        $sheet->getStyle("A$row:G$row")->getFont()->setSize(8)->setName('Open Sans');
+
+        $sheet->setCellValue("C$row", $fg['fg_code']);
+        $sheet->setCellValue("D$row", $fg['fg_desc']);
+        $sheet->setCellValue("E$row", $fg['formulation_no']);
+        $sheet->setCellValue("F$row", $fg['total_batch_qty']);
+        $sheet->getStyle("F$row")->getNumberFormat()->setFormatCode('0.00');
+        $sheet->setCellValue("G$row", $fg['unit']);
+        $row++;
+
+        $emulsion = json_decode($formulationData->emulsion);
+        if (!empty(get_object_vars($emulsion))) {
+            $sheet->setCellValue("B$row", $emulsion->level);
+            $sheet->setCellValue("D$row", "EMULSION");
+            $sheet->setCellValue("F$row", $emulsion->batch_qty);
+            $sheet->getStyle("F$row")->getNumberFormat()->setFormatCode('0.00');
+            $sheet->setCellValue("G$row", $emulsion->unit);
+            $sheet->getStyle("B$row:G$row")->getFont()->setSize(8)->setName('Open Sans');
+            $row++;
+        }
+
+        $materialQtyList = json_decode($formulationData['material_qty_list'], true);
+        foreach ($materialQtyList as $materialEntry) {
+            foreach ($materialEntry as $materialId => $data) {
+                $level = is_array($data) && isset($data['level']) ? $data['level'] : null;
+                $qty = $data['qty'];
+
+                $material = Material::find($materialId);
+
+                if ($material) {
+                    $sheet->setCellValue("B$row", $level);
+                    $sheet->setCellValue("C$row", $material->material_code);
+                    $sheet->setCellValue("D$row", $material->material_desc);
+                    $sheet->setCellValue("F$row", $qty);
+                    $sheet->getStyle("F$row")->getNumberFormat()->setFormatCode('0.00');
+                    $sheet->setCellValue("G$row", $material->unit);
+                    $sheet->getStyle("B$row:G$row")->getFont()->setSize(8)->setName('Open Sans');
+                    $row++;
+                }
+            }
+        }
+    }
+
     public function updateEmulsion(Request $request)
     {
         $validator = Validator::make($request->all(), [
@@ -354,11 +458,23 @@ class FormulationController extends ApiController
             }
 
             $bom = Bom::whereRaw('JSON_CONTAINS(formulations, ?)', [$formulationId])->first();
-            
+
             if ($bom) {
                 $bomFormulations = json_decode($bom->formulations, true);
                 $bomFormulations = array_diff($bomFormulations, [$formulationId]);
                 $bom->formulations = json_encode(array_values($bomFormulations));
+                // if (empty($bomFormulations)) {
+                //     $removedBomId = $bom->bom_id;
+                //     $bom->delete();
+
+                //     $fileRecord = File::where('some_condition')->first();
+                //     if ($fileRecord) {
+                //         $settings = json_decode($fileRecord->settings, true);
+                //         $settings['bom_ids'] = array_diff($settings['bom_ids'], [$removedBomId]);
+                //         $fileRecord->settings = json_encode($settings);
+                //         $fileRecord->save();
+                //     }
+                // }
                 $bom->save();
             }
 
@@ -369,11 +485,18 @@ class FormulationController extends ApiController
             $formulation->delete();
 
             if ($finishedGood) {
+                $fodlID = $finishedGood->fodl_id;
                 $finishedGood->fodl_id = null;
-                $finishedGood->save();
                 $archivedFinishedGood = $finishedGood->toArray();
                 FinishedGood::on('archive_mysql')->insert($archivedFinishedGood);
                 Formulation::on('archive_mysql')->insert($archivedFormulation);
+                
+                $remainingFinishedGoods = FinishedGood::where('fodl_id', $fodlID)->count();
+
+                if ($remainingFinishedGoods === 1) {
+                    Fodl::where('fodl_id', $fodlID)->delete();
+                }
+
                 $finishedGood->delete();
             }
 

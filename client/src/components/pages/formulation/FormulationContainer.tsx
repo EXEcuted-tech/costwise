@@ -78,8 +78,28 @@ const FormulationContainer: React.FC<FormulationProps> = ({
         router.push(`/formulation?id=${id}`);
     }
 
-    const handleExport = (data: number) => {
+    const handleExport = async (id: number) => {
+        try {
+            const formulationId = id;
 
+            const response = await api.post('/formulations/export',
+                { formulation_id: formulationId },
+                { responseType: 'blob' }
+            );
+
+            console.log(response);
+            const url = window.URL.createObjectURL(new Blob([response.data]));
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `Formulation - ${formatMonthYear(Date.now())}.xlsx`; // Change the export name later
+            document.body.appendChild(a);
+            a.click();
+            a.remove();
+            window.URL.revokeObjectURL(url);
+
+        } catch (error) {
+            console.error('Export failed:', error);
+        }
     }
 
     const handleDeleteClick = (formulationId: number) => {
