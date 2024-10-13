@@ -7,6 +7,8 @@ import { IoTrash } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
 import { FaFileCircleXmark } from "react-icons/fa6";
 import { useFileManagerContext } from '@/contexts/FileManagerContext';
+import api from '@/utils/api';
+import { useUserContext } from '@/contexts/UserContext';
 interface FileTableComponentProps {
     fileData: FileTableProps[];
     isOpen: boolean;
@@ -14,6 +16,7 @@ interface FileTableComponentProps {
 
 const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
+    const { currentUser } = useUserContext();
     const { setDeleteModal } = useFileManagerContext();
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
@@ -26,7 +29,23 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen }) => {
 
     const handleView = (data: FileTableProps) => {
         const encodedData = encodeURIComponent(JSON.stringify(data));
-        router.push(`/file-manager/workspace?data=${encodedData}`); //change to number later
+        const auditData = {
+            userId: currentUser?.userId, 
+            action: 'crud'
+        };
+        if (currentUser) {
+        console.log('Current User ID:', currentUser?.userId);
+        } else {
+            console.log('Current User is not defined.', currentUser);
+        }
+        api.post('/logsaudit', auditData)
+        .then(response => {
+            console.log('Audit log created successfully:', response.data);
+        })
+        .catch(error => {
+            console.error('Error audit logs:', error);
+        });
+        // router.push(`/file-manager/workspace?data=${encodedData}`); //change to number later
     }
 
     const handleEdit = (data: FileTableProps) => {

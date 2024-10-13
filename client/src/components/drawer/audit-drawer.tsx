@@ -6,14 +6,22 @@ import { useState } from "react";
 import { MdClose } from "react-icons/md";
 import useOutsideClick from '@/hooks/useOutsideClick';
 
+enum ActionType {
+    General = 'general',
+    Crud = 'crud',
+    Import = 'import',
+    Export = 'export',
+    Stock = 'stock'
+}
+
 interface AuditDrawerProps {
     data: {
-        dateTimeAdded: string;
+        dateTimeAdded: Date;
         employeeName: string;
         employeeNo: string;
         userType: string;
         userEmail: string;
-        actionEvent: string;
+        actionEvent: ActionType;
         department: string;
     } | null;
 }
@@ -32,11 +40,11 @@ const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
         return date.toLocaleDateString(undefined, options);
     };
 
-    const formatTime = (dateTime: string) => {
-        const date = new Date(dateTime);
-        const options: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
-        return date.toLocaleTimeString(undefined, options);
-    };
+    // const formatTime = (dateTime: string) => {
+    //     const date = new Date(dateTime);
+    //     const options: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: 'numeric', second: 'numeric' };
+    //     return date.toLocaleTimeString(undefined, options);
+    // };
 
     return (
         <>
@@ -56,7 +64,7 @@ const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
             </div>
             <div className="flex flex-col gap-[3px] pb-[10px] font-bold">
                 <p className="text-[26px] font-black">Audit Log Details</p>
-                <p className="text-[18px] text-[#9B9B9B]">{data.employeeName} ‎ • ‎ {formatDate(data.dateTimeAdded)}</p>
+                <p className="text-[18px] text-[#9B9B9B]">{data.employeeName} ‎ • ‎ {formatDate(data.dateTimeAdded.toLocaleDateString())}</p>
             </div>
             <div className="flex flex-col border-2 text-[17px] p-5 rounded-[10px]">
                 <div className="flex text-[20px] font-bold items-center pb-[10px]">
@@ -91,7 +99,7 @@ const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
                 <hr className="border-t-[1px] border-[#989898]" />
                 <div className="flex py-[10px] items-center">
                     <p className="w-[50%]">Time</p>
-                    <p className="w-[50%] break-words leading-[20px] items-center">{formatTime(data.dateTimeAdded)}</p>
+                    <p className="w-[50%] break-words leading-[20px] items-center">{data.dateTimeAdded.toLocaleTimeString()}</p>
                 </div>
             </div>
         </div>
