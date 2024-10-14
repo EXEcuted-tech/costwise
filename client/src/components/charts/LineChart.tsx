@@ -61,12 +61,13 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
 
   const filterDataByYearAndHalf = () => {
     return priceData.filter((entry) => {
-      const [month, year] = entry.monthYear.split(" ").map((item) => item.trim());
+      const [month, year] = entry.monthYear
+        .split(" ")
+        .map((item) => item.trim());
       const monthIndex = new Date(`${month} 1, ${year}`).getMonth() + 1;
-      console.log("Year selected: ", selectedYear)
-      console.log("Half selected: ", selectedHalf)
-      console.log("Month Indices: ", monthIndex)
-
+      console.log("Year selected: ", selectedYear);
+      console.log("Half selected: ", selectedHalf);
+      console.log("Month Indices: ", monthIndex);
 
       if (year === selectedYear) {
         if (selectedHalf === "First") {
@@ -83,7 +84,7 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
     const prepareChartData = () => {
       const filteredData = filterDataByYearAndHalf();
 
-      console.log("This is filtered Data: ", filteredData)
+      console.log("This is filtered Data: ", filteredData);
 
       if (!filteredData || filteredData.length === 0) return;
 
