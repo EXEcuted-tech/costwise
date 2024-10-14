@@ -24,6 +24,6 @@ class File extends Model
     ];
 
     // protected $casts = [
-    //     'settings' => 'array', // Ensure 'settings' is cast to an array
+    //     'settings' => 'array',
     // ];
 }

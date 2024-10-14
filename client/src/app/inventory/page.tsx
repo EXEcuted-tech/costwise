@@ -15,7 +15,7 @@ import { InventoryType } from '@/types/data';
 
 const Inventory = () => {
     const { isOpen } = useSidebarContext();
-    const columnNames = ["Item Code", "Description", "Unit", "Purchased Qty", "Usage Qty", "Total Qty", "Status"];
+    const columnNames = ["Item Code", "Description", "Unit", "Purchased Qty", "Total Qty", "Usage Qty", "Status"];
 
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
@@ -81,6 +81,11 @@ const Inventory = () => {
         const nextIndex = (currentIndex + 1) % monthOptions.length;
         setSelectedMonth(monthOptions[nextIndex]);
     };
+
+    //Format numbers
+    const numberWithCommas = (x: number) => {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
 
     // Retrieve inventory list
      useEffect(() => {
@@ -235,9 +240,9 @@ const Inventory = () => {
                                             <td className='w-[10rem] py-4'>a</td>
                                             <td className='break-words'>a</td>
                                             <td>a</td>
-                                            <td className='w-[10%]'>{data.purchased_qty}</td>
-                                            <td className=''>{data.usage_qty}</td>
-                                            <td>{data.total_qty}</td>
+                                            <td className='w-[10%] text-right pr-6'>{numberWithCommas(data.purchased_qty)}</td>
+                                            <td className='text-right pr-6 font-semibold'>{numberWithCommas(data.total_qty)}</td>
+                                            <td className='text-right pr-6'>{numberWithCommas(data.usage_qty)}</td>
                                             <td>
                                                 <div className='flex justify-center'>
                                                     <p

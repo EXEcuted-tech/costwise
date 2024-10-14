@@ -133,9 +133,40 @@ class InventoryController extends ApiController
         $fileNameWithExt = $request->input('file_name_with_extension');
         $extension = $file->getClientOriginalExtension();
 
+        //Check if valid file
         if (strpos($fileName, "Inventory") === false) {
             $this->status = 400;
             return $this->getResponse("Invalid file. Please upload a valid inventory file.");
+        }
+
+        //Check if valid inventory file alrdy exists for the monthYear
+        $fileCategories = [
+            'MM',
+            'MA',
+            'CA',
+            'FI',
+            'PK',
+            'TC',
+        ];
+
+        try {
+            $inventoryFiles = File::where('file_type', 'inventory_file')->get();
+
+            foreach($inventoryFiles as $inventoryFile) {
+                $fileSettings = json_decode($inventoryFile->settings);
+                $existingFileName = $fileSettings->file_name;
+                $month_Year = $fileSettings->monthYear;
+
+                if ($month_Year === $uploadMonth->format('Y-m')) {
+                    foreach ($fileCategories as $category) {
+                        if (strpos($existingFileName, $category) !== false && strpos($fileName, $category) !== false) {
+                            throw new \Exception("{$category} Inventory file for the month of {$uploadMonth->format('Y-m')} already exists.");
+                        }
+                    }
+                }
+            }
+        } catch (\Exception $e) {
+            throw $e;
         }
 
         $user = Auth::user();
@@ -435,9 +466,7 @@ class InventoryController extends ApiController
 
     private function cleanNumericValue($value)
     {
-        // Remove any non-numeric characters except for the decimal point
         $cleaned = preg_replace('/[^0-9.]/', '', $value);
-        // Convert to float
         return floatval($cleaned);
     }
 }
