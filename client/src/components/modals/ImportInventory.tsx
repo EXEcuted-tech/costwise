@@ -41,18 +41,31 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
             return;
         }
         const fileSizeInMB = (file.size / (1024 * 1024)).toFixed(2);
-
         setFile(file);
         setFileName(file.name.split('.').slice(0, -1).join('.'))
         setFileNameWithExt(file.name);
-        setFileSize(parseFloat(fileSizeInMB));
-        const reader = new FileReader();
-        reader.onload = () => {
-            // setPreviewUrl(reader.result as string);
-        };
-        reader.readAsDataURL(file);
-        setAlertMessages(['Inventory file uploaded successfully.']);
-        setAlertStatus('success');
+
+        //Check if file is valid
+        if (file.name.toLowerCase().includes("inventory")) {
+            setFileSize(parseFloat(fileSizeInMB));
+            const reader = new FileReader();
+            reader.onload = () => {
+                // setPreviewUrl(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        
+            setAlertMessages(['Inventory file uploaded successfully.']);
+            setAlertStatus('success');
+
+        } else {            
+            setFile(null);
+            setFileName('');
+            setFileNameWithExt('');
+            setFileSize(0);
+            setAlertMessages(['File must be an inventory file.']);
+            setAlertStatus('critical');
+        }
+
     };
 
     const handleUpload = (event: ChangeEvent<HTMLInputElement>) => {

@@ -133,6 +133,11 @@ class InventoryController extends ApiController
         $fileNameWithExt = $request->input('file_name_with_extension');
         $extension = $file->getClientOriginalExtension();
 
+        if (strpos($fileName, "Inventory") === false) {
+            $this->status = 400;
+            return $this->getResponse("Invalid file. Please upload a valid inventory file.");
+        }
+
         $user = Auth::user();
         $userName = "{$user->first_name} {$user->middle_name} {$user->last_name}";
 
@@ -172,9 +177,8 @@ class InventoryController extends ApiController
     private function processExcel($filePath, $monthYear)
     {
         try {
-            Log::info("Processing Excel file for monthYear: {$monthYear}");
             $spreadsheet = IOFactory::load($filePath);
-            
+
             // Process each sheet
             $worksheets = [
                 'Purchases' => $spreadsheet->getSheetByName('Purchases'),
@@ -186,6 +190,7 @@ class InventoryController extends ApiController
             $inventoryData = $this->processInventorySheet($worksheets['Inventory']);
             $usagesData = $this->processUsagesSheet($worksheets['Usages']);
 
+            //Create inventory record
             $this->createInventoryRecords($purchasesData, $inventoryData, $usagesData);
 
         } catch (\Exception $e) {
@@ -200,6 +205,7 @@ class InventoryController extends ApiController
         $data = $worksheet->toArray();
         $headers = array_shift($data);
         $purchasesData = [];
+        $isMonthYearPresent = false;
 
         $defaultUnits = [
             'RM-MM' => 'kg',
@@ -231,6 +237,20 @@ class InventoryController extends ApiController
             'RM-NM-CA-VI-RE' => 'strd',
         ];
 
+        // //Check if monthYear is present in the date column
+        // foreach ($data as $row) {
+        //     if (strpos($row[0], $monthYear) !== false) {
+        //         $isMonthYearPresent = true;
+        //         break;
+        //     }
+        // }
+
+        // if (!$isMonthYearPresent) {
+        //     $this->status = 400;
+        //     return $this->getResponse("The selected Month/Year date is not present in the Inventory file.");
+        // }
+
+        // If present, process the data
         foreach ($data as $row) {
             $rowData = array_combine($headers, $row);
             $itemCode = $rowData['Item Code'];
