@@ -120,20 +120,20 @@ class FileController extends ApiController
             } else if ($record->file_type == 'master_file') {
                 $settings = json_decode($record->settings, true);
 
-                if (isset($settings['fodls'])) {
-                    FodlController::deleteBulkFodlInFile($settings['fodls'], $value);
-                }
-
-                if (isset($settings['material_ids'])) {
-                    MaterialController::deleteBulkInFile($settings['material_ids'], $value);
-                }
-
                 // Assuming that what is on the formulations, are on the material sheets
                 if (isset($settings['bom_ids'])) {
                     foreach ($settings['bom_ids'] as $bomId) {
                         $this->deleteFormulationByBOM($bomId);
                     }
                 }
+
+                // if (isset($settings['fodls'])) {
+                //     FodlController::deleteBulkFodlInFile($settings['fodls'], $value);
+                // }
+
+                // if (isset($settings['material_ids'])) {
+                //     MaterialController::deleteBulkInFile($settings['material_ids'], $value);
+                // }
             }
 
             File::on('archive_mysql')->create($record->toArray());
@@ -632,7 +632,7 @@ class FileController extends ApiController
     {
         $settings = json_decode($file['settings'], true);
         $bomIds = $settings['bom_ids'] ?? [];
-    
+
         foreach ($bomIds as $bomId) {
             $bom = Bom::findOrFail($bomId);
             $formulations = json_decode($bom->formulations, true);
@@ -641,7 +641,7 @@ class FileController extends ApiController
 
             foreach ($formulations as $formulationId) {
                 $formulation = Formulation::findOrFail($formulationId);
-                
+
                 $finishedGood = FinishedGood::firstOrCreate(
                     ['fg_id' => $formulation->fg_id],
                 );
@@ -652,7 +652,7 @@ class FileController extends ApiController
                 $fodl = FODL::where('fodl_id', $finishedGood->fodl_id)->first();
                 $totalCost = $totalMaterialCost + ($fodl->factory_overhead ?? 0) + ($fodl->direct_labor ?? 0);
                 $finishedGood->update(['total_cost' => $totalCost]);
-    
+
                 if ($totalMaterialCost < $leastCost) {
                     $leastCost = $totalMaterialCost;
                     $leastCostFormulationId = $formulationId;
@@ -662,7 +662,7 @@ class FileController extends ApiController
             if ($leastCostFormulationId) {
                 $leastCostFormulation = Formulation::findOrFail($leastCostFormulationId);
                 $leastCostFinishedGood = FinishedGood::where('fg_id', $leastCostFormulation->fg_id)->first();
-                
+
                 if ($leastCostFinishedGood) {
                     $leastCostFinishedGood->update(['is_least_cost' => true]);
                 }
@@ -680,7 +680,7 @@ class FileController extends ApiController
     //         $bom = Bom::findOrFail($bomId);
     //         $formulations = json_decode($bom->formulations,true);
 
-            
+
     //         foreach ($formulations as $formulationId) {
     //             $formulation = Formulation::findOrFail($formulationId);
     //             $rmCost = $this->calculateFormulationCost($formulation);
@@ -783,9 +783,57 @@ class FileController extends ApiController
     public function export(Request $request)
     {
         // try {
-            $fileId = $request->input('file_id');
-            $file = File::findOrFail($fileId);
+        $fileId = $request->input('file_id');
+        $file = File::findOrFail($fileId);
 
+        $spreadsheet = new Spreadsheet();
+
+        if ($file->file_type === 'master_file') {
+            $this->addMasterFileSheets($spreadsheet, $file);
+        } elseif ($file->file_type === 'transactional_file') {
+            $this->addTransactionalFileSheet($spreadsheet, $file);
+        }
+
+        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+        $fileName = $file->file_name_with_extension;
+
+        $tempFile = tempnam(sys_get_temp_dir(), $fileName);
+        $writer->save($tempFile);
+
+        return response()->download($tempFile, $fileName, [
+            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        ])->deleteFileAfterSend(true);
+
+        // } catch (\Exception $e) {
+        //     $this->status = 500;
+        //     $this->response['message'] = "Export failed: " . $e->getMessage();
+        //     return $this->getResponse();
+        // }
+    }
+
+    public function exportAll(Request $request)
+    {
+        // try {
+        $files = File::all();
+
+        if ($files->isEmpty()) {
+            return response()->json(['message' => 'No files to export'], 404);
+        }
+
+        $tempDir = sys_get_temp_dir() . '/exported_files_' . time();
+        if (!is_dir($tempDir)) {
+            if (!mkdir($tempDir, 0777, true) && !is_dir($tempDir)) {
+                throw new \RuntimeException(sprintf('Directory "%s" was not created', $tempDir));
+            }
+        }
+
+        $zip = new ZipArchive();
+        $zipFileName = $tempDir . '/exported_files.zip';
+        if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+            throw new \RuntimeException("Unable to open the zip file: $zipFileName");
+        }
+
+        foreach ($files as $file) {
             $spreadsheet = new Spreadsheet();
 
             if ($file->file_type === 'master_file') {
@@ -794,20 +842,23 @@ class FileController extends ApiController
                 $this->addTransactionalFileSheet($spreadsheet, $file);
             }
 
-            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
             $fileName = $file->file_name_with_extension;
 
-            $tempFile = tempnam(sys_get_temp_dir(), $fileName);
-            $writer->save($tempFile);
+            $tempFilePath = $tempDir . '/' . $fileName;
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $writer->save($tempFilePath);
 
-            return response()->download($tempFile, $fileName, [
-                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-            ])->deleteFileAfterSend(true);
+            $zip->addFile($tempFilePath, $fileName);
+        }
+
+        $zip->close();
+
+        return response()->download($zipFileName, 'exported_files.zip', [
+            'Content-Type' => 'application/zip',
+        ])->deleteFileAfterSend(true);
 
         // } catch (\Exception $e) {
-        //     $this->status = 500;
-        //     $this->response['message'] = "Export failed: " . $e->getMessage();
-        //     return $this->getResponse();
+        //     return response()->json(['message' => "Export failed: " . $e->getMessage()], 500);
         // }
     }
 
@@ -821,13 +872,17 @@ class FileController extends ApiController
     //         }
 
     //         $tempDir = sys_get_temp_dir() . '/exported_files_' . time();
-    //         if (!file_exists($tempDir)) {
-    //             mkdir($tempDir, 0777, true);
+    //         if (!is_dir($tempDir)) {
+    //             if (!mkdir($tempDir, 0777, true) && !is_dir($tempDir)) {
+    //                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $tempDir));
+    //             }
     //         }
 
     //         $zip = new ZipArchive();
     //         $zipFileName = $tempDir . '/exported_files.zip';
-    //         $zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+    //         if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+    //             throw new \RuntimeException("Unable to open the zip file: $zipFileName");
+    //         }
 
     //         foreach ($files as $file) {
     //             $spreadsheet = new Spreadsheet();
