@@ -142,7 +142,7 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
                 setAlertStatus('success');
             }
             
-            setTimeout(function(){location.reload()}, 3000);
+            setTimeout(function(){location.reload()}, 1000);
                     
         } catch (error: any) {
             console.error('Error importing file:', error);
@@ -205,7 +205,7 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
                 <div className='flex flex-col items-center justify-center pt-5 pb-6 group-hover:scale-90 transition-all duration-300 ease-in-out'>
                     <p className="mb-2 text-lg text-gray-500"><span className="text-[#B22222] font-semibold underline">
                         Click to upload</span> or drag and drop inventory file.</p>
-                    <p className="text-base text-gray-500">Support: CSV, XLSX, XLS, Excel</p>
+                    <p className="text-base text-gray-500">Support: XLSX, XLS, Excel</p>
                 </div>
                 <input 
                     id="dropzone-file" 

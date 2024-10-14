@@ -160,7 +160,7 @@ class InventoryController extends ApiController
             } catch (\Exception $e) {
                 $this->status = 400;
                 $this->response['message'] = $e->getMessage();
-                return $this->getResponse();
+                return $this->getResponse($this->response['message'], $this->status);
             }
 
             $settings['inventory_ids'] = $this->inventoryIds;
@@ -178,8 +178,21 @@ class InventoryController extends ApiController
     {
         try {
             $spreadsheet = IOFactory::load($filePath);
+            $requiredSheets = ['Purchases', 'Inventory', 'Usages'];
+            $missingSheets = [];
 
-            // Process each sheet
+            //Check for missing required sheets
+            foreach ($requiredSheets as $sheet) {
+                if ($spreadsheet->getSheetByName($sheet) === null) {
+                    $missingSheets[] = $sheet;
+                }
+            }
+
+            if (!empty($missingSheets)) {
+                throw new \Exception("Missing required sheets: " . implode(', ', $missingSheets));
+            }
+
+            //Process each sheet
             $worksheets = [
                 'Purchases' => $spreadsheet->getSheetByName('Purchases'),
                 'Inventory' => $spreadsheet->getSheetByName('Inventory'),
@@ -194,9 +207,7 @@ class InventoryController extends ApiController
             $this->createInventoryRecords($purchasesData, $inventoryData, $usagesData);
 
         } catch (\Exception $e) {
-            $this->status = 500;
-            $this->response['message'] = $e->getMessage();
-            return $this->getResponse();
+            throw $e;
         }
     }
 
@@ -237,18 +248,28 @@ class InventoryController extends ApiController
             'RM-NM-CA-VI-RE' => 'strd',
         ];
 
-        // //Check if monthYear is present in the date column
-        // foreach ($data as $row) {
-        //     if (strpos($row[0], $monthYear) !== false) {
-        //         $isMonthYearPresent = true;
-        //         break;
-        //     }
-        // }
+        //Check if monthYear is present in date column
+        foreach ($data as $row) {
+           if(!empty($row[0])) {
+            $carbonDate = Carbon::createFromFormat('m/d/Y', $row[0]);
 
-        // if (!$isMonthYearPresent) {
-        //     $this->status = 400;
-        //     return $this->getResponse("The selected Month/Year date is not present in the Inventory file.");
-        // }
+            if ($carbonDate) {
+                $rowMonthYear = $carbonDate->format('Y-m');
+                if ($rowMonthYear === $monthYear) {
+                    $isMonthYearPresent = true;
+                    break;
+                }
+            } else {
+                throw new \Exception("Invalid date format in the Inventory file.");
+            }
+           } else {
+                break;
+           }
+        }
+
+        if (!$isMonthYearPresent) {
+            throw new \Exception("The selected Month/Year date is not present in the Inventory file.");
+        }
 
         // If present, process the data
         foreach ($data as $row) {
