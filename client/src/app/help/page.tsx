@@ -1,15 +1,39 @@
-import Header from '@/components/header/Header'
+"use client"
+import Header from '@/components/header/Header';
 import { PiBookOpenText } from "react-icons/pi";
 import { FaCompass } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { GrHelpBook } from "react-icons/gr";
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+import getAll from "@/utils/article/getAll";
 
 const UserManualPage = () => {
+  const [sectionsEssentials, setSectionsEssentials] = useState([])
+  const [sectionsMG, setSectionsMG] = useState([])
+  const [sectionsGS, setSectionsGS] = useState([])
 
   const divShadows = {
     boxShadow: 'inset 0 0 10px rgba(0, 0, 0, 0.3)',
   }
+  useEffect(() => {
+    const fetchHeadings = async () => {
+      try {
+        const content = await getAll();
+        const partialContentE = JSON.parse(content[2].content)
+        const partialContentMG = JSON.parse(content[0].content)
+        const partialContentGS = JSON.parse(content[1].content)
+
+        setSectionsEssentials(partialContentE);
+        setSectionsMG(partialContentMG);
+        setSectionsGS(partialContentGS)
+      } catch (error) {
+        console.error('Error fetching article:', error);
+      }
+    };
+
+    fetchHeadings();
+  }, []);
 
   return (
     <div className='overflow-hidden bg-cover bg-center items-center justify-center bg-[#FFC24B] bg-opacity-20' style={{ backgroundImage: "url('/images/usermanbg.png')" }}>
@@ -52,15 +76,12 @@ const UserManualPage = () => {
                 <div className='text-[14px] xl:text-[16px] 2xl:text-[18px] 3xl:text-[20px] pt-[3%] 2xl:pt-[1%]'><p>Learn how to use Product Costing System.</p></div>
                 <div className='flex flex-col h-10% pl-[15%] 2xl:pl-[20px] pt-[10%] 3xl:pt-[10px] '>
                   <ul className='list-disc xl:text-[14px] 2xl:text-[16px] 3xl:text-[20px]'>
-                    <li>
-                      Lorem ipsum
-                    </li>
-                    <li>
-                      Lorem ipsum
-                    </li>
-                    <li>
-                      Lorem ipsum
-                    </li>
+                    {sectionsGS.slice(0, 3).map((section, index) => (
+                      <li key={index}>{section.heading}</li>
+                    ))}
+                    {sectionsGS.length > 3 && (
+                      <li>More articles available...</li>
+                    )}
                   </ul>
                 </div>
                 <div className='flex h-full justify-start items-end z-50'>
@@ -76,22 +97,19 @@ const UserManualPage = () => {
           <div className='flex  w-[33.33%] h-[120%] items-start justify-center mb-10'>
             <div className='flex flex-row h-[350px] bg-white w-[80%] rounded-xl  px-4 py-8 2xl:px-5 2xl:py-10 z-10' style={divShadows}>
               <div className='flex w-[20%] 2xl:w-[15%] items-start justify-center'>
-                <CgProfile className='text-[30px] 2xl:text-[40px] 3xl:text-[50px]' />
+                <GrHelpBook className='text-[30px] 2xl:text-[40px] 3xl:text-[50px]' />
               </div>
               <div className='flex flex-col pl-[5%] w-[80%] text-tertiary'>
                 <div className='text-[16px] xl:text-[18px] 2xl:text-[20px] 3xl:text-[24px] font-bold'><p>Essential features</p></div>
-                <div className='text-[14px] xl:text-[16px] 2xl:text-[18px] 3xl:text-[20px] pt-[3%] 2xl:pt-[1%]'><p>Learn how to use Product Costing System.</p></div>
+                <div className='text-[14px] xl:text-[16px] 2xl:text-[18px] 3xl:text-[20px] pt-[3%] 2xl:pt-[1%]'><p>Functionalities and processes in this system.</p></div>
                 <div className='flex flex-col h-10% pl-[15%] 2xl:pl-[20px] pt-[10%] 3xl:pt-[10px] '>
                   <ul className='list-disc xl:text-[14px] 2xl:text-[16px] 3xl:text-[20px]'>
-                    <li>
-                      Lorem ipsum
-                    </li>
-                    <li>
-                      Lorem ipsum
-                    </li>
-                    <li>
-                      Lorem ipsum
-                    </li>
+                    {sectionsEssentials.slice(0, 3).map((section, index) => (
+                      <li key={index}>{section.heading}</li>
+                    ))}
+                    {sectionsEssentials.length > 3 && (
+                      <li>More articles available...</li>
+                    )}
                   </ul>
                 </div>
                 <div className='flex h-full justify-start items-end'>
@@ -107,22 +125,19 @@ const UserManualPage = () => {
           <div className='flex w-[33.33%] h-[120%] mb-10'>
             <div className='flex flex-row h-[350px] bg-white w-[80%] rounded-xl px-4 py-8 2xl:px-5 2xl:py-10 z-10' style={divShadows}>
               <div className='flex w-[20%] 2xl:w-[15%] items-start justify-center '>
-                <GrHelpBook className='text-[30px] 2xl:text-[40px] 3xl:text-[50px]' />
+                <CgProfile className='text-[30px] 2xl:text-[40px] 3xl:text-[50px]' />
               </div>
               <div className='flex flex-col pl-[5%] w-[80%] text-tertiary'>
                 <div className='text-[16px] xl:text-[18px] 3xl:text-[24px] font-bold'><p>Managing your account</p></div>
-                <div className='text-[14px] xl:text-[16px] 2xl:text-[18px] 3xl:text-[20px] pt-[3%] 2xl:pt-[1%]'><p>Learn how to use Product Costing System.</p></div>
+                <div className='text-[14px] xl:text-[16px] 2xl:text-[18px] 3xl:text-[20px] pt-[3%] 2xl:pt-[1%]'><p>Account management and essentials.</p></div>
                 <div className='flex flex-col h-10% pl-[15%] 2xl:pl-[20px] pt-[10%] 3xl:pt-[10px] '>
                   <ul className='list-disc xl:text-[14px] 2xl:text-[16px] 3xl:text-[20px]'>
-                    <li>
-                      Lorem ipsum
-                    </li>
-                    <li>
-                      Lorem ipsum
-                    </li>
-                    <li>
-                      Lorem ipsum
-                    </li>
+                    {sectionsMG.slice(0, 3).map((section, index) => (
+                      <li key={index}>{section.heading}</li>
+                    ))}
+                    {sectionsMG.length > 3 && (
+                      <li>More articles available...</li>
+                    )}
                   </ul>
                 </div>
                 <div className='flex h-full justify-start items-end'>

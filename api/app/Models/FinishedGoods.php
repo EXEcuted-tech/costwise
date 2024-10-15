@@ -5,12 +5,13 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class File extends Model
+class FinishedGoods extends Model
 {
     use HasFactory;
 
-    protected $table = 'files';
-    protected $primaryKey = 'file_id';
+    protected $connection = 'archive_mysql';
+    protected $table = 'finished_goods';
+    protected $primaryKey = 'fg_id';
     protected $keyType = 'int';
     public $incrementing = true;
 
@@ -20,9 +21,12 @@ class File extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'file_type',
-        'settings',
-        'created_at',
-        'updated_at'
+        'fodl_id',
+        'fg_code',
+        'fg_desc',
+        'cost',
+        'monthYear'
     ];
+
+    public $timestamps = false;
 }

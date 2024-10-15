@@ -118,7 +118,7 @@ class AuthController extends ApiController
             $accessToken->expires_at = now()->addMinutes(15);
             $accessToken->save();
         }
-        
+
         $token->token = hash('sha256', $plainTextRefreshToken = Str::random(48));
         $token->expires_at = now()->addDays(30);
         $token->save();
