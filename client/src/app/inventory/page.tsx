@@ -25,20 +25,16 @@ const Inventory = () => {
     const [isImportInventoryListModalOpen, setImportInventoryListModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [searchTerm, setSearchTerm] = useState('');
 
     const [monthOptions, setMonthOptions] = useState<{ display: string; value: string }[]>([]);
     const [selectedMonth, setSelectedMonth] = useState<string>('');
     const [inventoryList, setInventoryList] = useState<InventoryType[][]>([]);
     const currentMonthInventory = inventoryList.find(monthData => monthData[0]?.month_year === selectedMonth) || [];
 
-    // Pagination
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [currentIndex, setCurrentIndex] = useState<number>(0);
-    const itemsPerPage = 8;
-    const indexOfLastItem = currentPage * itemsPerPage;
-    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-    const currentPageItems = currentMonthInventory.slice(indexOfFirstItem, indexOfLastItem);
+    // Search & Filter
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterCategory, setFilterCategory] = useState('');
+    const [filterStatus, setFilterStatus] = useState('');
 
     // Modals
     const openImportInventoryListModal = () => {
@@ -63,37 +59,6 @@ const Inventory = () => {
 
     const closeDeleteModal = () => {
         setIsDeleteModalOpen(false);
-    };
-
-    // Month Pagination
-    const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
-        setCurrentPage(page);
-    };
-
-    const handleMonthSelect = (month: string) => {
-        setSelectedMonth(month);
-        const newIndex = monthOptions.findIndex(option => option.value === month);
-        setCurrentIndex(newIndex);
-        setCurrentPage(1);
-        closeMonthSelectorModal();
-    };
-
-    const handlePreviousMonth = () => {
-        if (currentIndex > 0) {
-            const newIndex = currentIndex - 1;
-            setCurrentIndex(newIndex);
-            setSelectedMonth(monthOptions[newIndex].value);
-            setCurrentPage(1);
-        }
-    };
-    
-    const handleNextMonth = () => {
-        if (currentIndex < monthOptions.length - 1) {
-            const newIndex = currentIndex + 1;
-            setCurrentIndex(newIndex);
-            setSelectedMonth(monthOptions[newIndex].value);
-            setCurrentPage(1);
-        }
     };
 
     //Format numbers & monthYear
@@ -174,9 +139,75 @@ const Inventory = () => {
         }
     }, [monthOptions]);
 
+    // Search & Filter
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
+        setCurrentPage(1);
     };
+
+    const handleFilterCategory = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setFilterCategory(e.target.value);
+        setCurrentPage(1);
+    };
+
+    const handleFilterStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setFilterStatus(e.target.value);
+        setCurrentPage(1);
+    };
+
+    // Filter and search function
+    const filteredAndSearchedInventory = currentMonthInventory.filter((item) => {
+        const matchesSearch = item.material_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.material_desc.toLowerCase().includes(searchTerm.toLowerCase());
+            
+        const matchesCategory = filterCategory === '' || filterCategory === 'all' || 
+            item.material_category === filterCategory;
+            
+        const matchesStatus = filterStatus === '' || filterStatus === 'all' || 
+            (filterStatus === 'in-stock' && item.stock_status === 'In Stock') ||
+            (filterStatus === 'low-stock' && item.stock_status === 'Low Stock');
+    
+        return matchesSearch && matchesCategory && matchesStatus;
+    });
+
+    // Month Pagination
+    const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
+        setCurrentPage(page);
+        };
+    
+    const handleMonthSelect = (month: string) => {
+        setSelectedMonth(month);
+        const newIndex = monthOptions.findIndex(option => option.value === month);
+        setCurrentIndex(newIndex);
+        setCurrentPage(1);
+        closeMonthSelectorModal();
+    };
+    
+    const handlePreviousMonth = () => {
+        if (currentIndex > 0) {
+            const newIndex = currentIndex - 1;
+            setCurrentIndex(newIndex);
+            setSelectedMonth(monthOptions[newIndex].value);
+            setCurrentPage(1);
+        }
+    };
+        
+    const handleNextMonth = () => {
+        if (currentIndex < monthOptions.length - 1) {
+            const newIndex = currentIndex + 1;
+            setCurrentIndex(newIndex);
+            setSelectedMonth(monthOptions[newIndex].value);
+            setCurrentPage(1);
+        }
+    };
+
+    // Pagination
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [currentIndex, setCurrentIndex] = useState<number>(0);
+    const itemsPerPage = 8;
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentPageItems = filteredAndSearchedInventory.slice(indexOfFirstItem, indexOfLastItem);
 
     return (
         <>
@@ -249,12 +280,14 @@ const Inventory = () => {
                                 type="search"
                                 name="search"
                                 placeholder="Search here..."
+                                onChange={handleSearch}
                             />
                         </div>
 
                         <div className='flex mt-[0.8em] mr-4 ml-auto text-gray-400 gap-4'>
                             <select
                                 className={`${isOpen ? '4xl:w-[20rem] 3xl:w-[20rem] 2xl:w-[15rem] xl:w-[10rem]' : ''} bg-white h-8 w-[20rem] pl-3 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
+                                onChange={handleFilterCategory}
                             >
                                 <option selected value="" disabled hidden>Item Category</option>
                                 <option value="all">All</option>
@@ -270,6 +303,7 @@ const Inventory = () => {
 
                             <select
                                 className='bg-white h-8 w-[8rem] pl-3 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none'
+                                onChange={handleFilterStatus}
                             >
                                 <option selected value="" disabled hidden>Status</option>
                                 <option value="all">All</option>
@@ -353,7 +387,7 @@ const Inventory = () => {
                     {/* Footer */}
                     <div className="flex w-full justify-center h-[86px] rounded-b-xl border-[#868686]">
                         <PrimaryPagination
-                            data={currentMonthInventory}
+                            data={filteredAndSearchedInventory}
                             itemsPerPage={itemsPerPage}
                             handlePageChange={handlePageChange}
                             currentPage={currentPage}
