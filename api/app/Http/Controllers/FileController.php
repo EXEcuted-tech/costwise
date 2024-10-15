@@ -127,13 +127,13 @@ class FileController extends ApiController
                     }
                 }
 
-                // if (isset($settings['fodls'])) {
-                //     FodlController::deleteBulkFodlInFile($settings['fodls'], $value);
-                // }
+                if (isset($settings['fodls'])) {
+                    FodlController::deleteBulkFodlInFile($settings['fodls'], $value);
+                }
 
-                // if (isset($settings['material_ids'])) {
-                //     MaterialController::deleteBulkInFile($settings['material_ids'], $value);
-                // }
+                if (isset($settings['material_ids'])) {
+                    MaterialController::deleteBulkInFile($settings['material_ids'], $value);
+                }
             }
 
             File::on('archive_mysql')->create($record->toArray());

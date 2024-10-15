@@ -488,13 +488,23 @@ class FormulationController extends ApiController
                 $fodlID = $finishedGood->fodl_id;
                 $finishedGood->fodl_id = null;
                 $archivedFinishedGood = $finishedGood->toArray();
-                FinishedGood::on('archive_mysql')->insert($archivedFinishedGood);
-                Formulation::on('archive_mysql')->insert($archivedFormulation);
-                
+
+                unset($archivedFinishedGood['fg_id']);
+                $newArchivedFg = FinishedGood::on('archive_mysql')->create($archivedFinishedGood);
+
+                unset($archivedFormulation['formulation_id']);
+                $archivedFormulation['fg_id'] = $newArchivedFg->fg_id;
+                Formulation::on('archive_mysql')->create($archivedFormulation);
+
                 $remainingFinishedGoods = FinishedGood::where('fodl_id', $fodlID)->count();
 
                 if ($remainingFinishedGoods === 1) {
-                    Fodl::where('fodl_id', $fodlID)->delete();
+                    $fodl = Fodl::where('fodl_id', $fodlID)->first();
+
+                    if ($fodl) {
+                        Fodl::on('archive_mysql')->create($fodl->toArray());
+                        $fodl->delete();
+                    }
                 }
 
                 $finishedGood->delete();
@@ -575,11 +585,11 @@ class FormulationController extends ApiController
         })->toArray();
 
         if ($finishedGoodsToDelete->isNotEmpty()) {
-            FinishedGood::on('archive_mysql')->insert($archivedFinishedGoods);
+            FinishedGood::on('archive_mysql')->create($archivedFinishedGoods);
         }
 
         if ($formulationsToDelete->isNotEmpty()) {
-            Formulation::on('archive_mysql')->insert($archivedFormulations);
+            Formulation::on('archive_mysql')->create($archivedFormulations);
         }
 
         Formulation::whereIn('formulation_id', $formulationIds)->delete();
@@ -690,11 +700,11 @@ class FormulationController extends ApiController
             })->toArray();
 
             if ($finishedGoodsToDelete->isNotEmpty()) {
-                FinishedGood::on('archive_mysql')->insert($archivedFinishedGoods);
+                FinishedGood::on('archive_mysql')->create($archivedFinishedGoods);
             }
 
             if ($formulationsToDelete->isNotEmpty()) {
-                Formulation::on('archive_mysql')->insert($archivedFormulations);
+                Formulation::on('archive_mysql')->create($archivedFormulations);
             }
 
             Formulation::whereIn('formulation_id', $formulationIds)->delete();

@@ -381,7 +381,7 @@ class FodlController extends ApiController
 
         try {
             $fodls = Fodl::whereIn('fodl_id', $fodlIds)->get();
-            dump("IN FODLS: {$fodls}");
+
             foreach ($fodls as $fodl) {
                 $archivedFodlData = $fodl->toArray();
                 Fodl::on('archive_mysql')->create($archivedFodlData);
@@ -413,8 +413,7 @@ class FodlController extends ApiController
                 ->whereIn('fodl_id', $fodlIds)
                 ->update(['fodl_id' => null]);
 
-            $debug = Fodl::whereIn('fodl_id', $fodlIds)->delete();
-            dump($debug);
+            Fodl::whereIn('fodl_id', $fodlIds)->delete();
             \DB::commit();
 
             return [

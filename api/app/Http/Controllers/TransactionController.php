@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\File;
 use App\Models\FinishedGood;
 use App\Models\Fodl;
+use App\Models\Formulation;
 use App\Models\Material;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -144,7 +145,6 @@ class TransactionController extends ApiController
         return $this->getResponse('Transactions updated successfully!');
     }
 
-
     public static function deleteTransaction($transactionId)
     {
         $transaction = Transaction::find($transactionId);
@@ -156,18 +156,45 @@ class TransactionController extends ApiController
         if ($transaction->fg_id != null) {
             $fg = FinishedGood::find($transaction->fg_id);
             if ($fg) {
-                if (isset($fg['fodl_id']) && !Fodl::on('archive_mysql')->find($fg['fodl_id'])) {
-                    unset($fg['fodl_id']);
+                $otherReferences = Transaction::where('fg_id', $fg->fg_id)
+                    ->where('transaction_id', '!=', $transactionId)
+                    ->exists();
+
+                $formulationReferences = Formulation::where('fg_id', $fg->fg_id)->exists();
+
+                if (!$otherReferences && !$formulationReferences) {
+                    if (isset($fg['fodl_id']) && !Fodl::on('archive_mysql')->find($fg['fodl_id'])) {
+                        unset($fg['fodl_id']);
+                    }
+                    $fgData = $fg->toArray();
+                    unset($fgData['fg_id']);
+                    $newFg = FinishedGood::on('archive_mysql')->create($fgData);
+                    $transaction->fg_id = $newFg->fg_id;
+                    $fg->delete();
+                } else {
+                    $transaction->fg_id = null;
+                    $transaction->save();
                 }
-                FinishedGood::on('archive_mysql')->create($fg->toArray());
-                $fg->delete();
             }
         } else if ($transaction->material_id != null) {
             $material = Material::find($transaction->material_id);
             if ($material) {
-                Material::on('archive_mysql')->create($material->toArray());
-                // dd($debug);
-                $material->delete();
+                // Check if this material is referenced by other transactions or in master files
+                $otherReferences = Transaction::where('material_id', $material->material_id)
+                    ->where('transaction_id', '!=', $transactionId)
+                    ->exists();
+
+                $masterFileReferences = Formulation::whereRaw("JSON_CONTAINS(material_qty_list, '{\"" . $material->material_id . "\":{}}', '$')")
+                    ->exists();
+
+                if (!$otherReferences && !$masterFileReferences) {
+                    $newMaterial = Material::on('archive_mysql')->create($material->toArray());
+                    $transaction->material_id = $newMaterial->material_id;
+                    $material->delete();
+                } else {
+                    $transaction->material_id = null;
+                    $transaction->save();
+                }
             }
         }
 
@@ -176,25 +203,36 @@ class TransactionController extends ApiController
 
         return true;
     }
+    
     // public static function deleteTransaction($transactionId)
     // {
+    //     $transaction = Transaction::find($transactionId);
 
-    //         dump("In Delete Transaction {$transactionId}");
-    //         $transaction = Transaction::find($transactionId);
-    //         if($transaction->fg_id != null){
-    //             $fg = FinishedGood::find($transaction->fg_id)->first();
+    //     if (!$transaction) {
+    //         return false;
+    //     }
+
+    //     if ($transaction->fg_id != null) {
+    //         $fg = FinishedGood::find($transaction->fg_id);
+    //         if ($fg) {
     //             if (isset($fg['fodl_id']) && !Fodl::on('archive_mysql')->find($fg['fodl_id'])) {
-    //                 unset($fgs['fodl_id']);
+    //                 unset($fg['fodl_id']);
     //             }
     //             FinishedGood::on('archive_mysql')->create($fg->toArray());
     //             $fg->delete();
-    //         } else if($transaction->material_id != null){
-    //             $material = Material::find($transaction->material_id)->first();
+    //         }
+    //     } else if ($transaction->material_id != null) {
+    //         $material = Material::find($transaction->material_id);
+    //         if ($material) {
     //             Material::on('archive_mysql')->create($material->toArray());
+    //             // dd($debug);
     //             $material->delete();
     //         }
+    //     }
 
-    //         dump("Transaction Deleted: {$transaction}");
-    //         $transaction->delete();
+    //     Transaction::on('archive_mysql')->create($transaction->toArray());
+    //     $transaction->delete();
+
+    //     return true;
     // }
 }
