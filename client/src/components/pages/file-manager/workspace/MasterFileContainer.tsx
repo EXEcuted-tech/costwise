@@ -498,7 +498,9 @@ const MasterFileContainer = (data: File) => {
 
       const formulaArray = JSON.parse(bomResponse.data.data[0].formulations);
       if (bomResponse.data.status == 200) {
+        console.log(updatedData);
         const formulations = splitFormulations(updatedData, formulaArray);
+        console.log(formulations);
         //debug here add a console.log for formulations
         formulations.forEach(async ({ id, formulations }, index) => {
           const formulationData = formulations;
