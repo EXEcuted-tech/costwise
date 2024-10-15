@@ -4,8 +4,12 @@ import React, { useState } from 'react';
 import { IoClose } from "react-icons/io5";
 import { MdCalendarMonth } from "react-icons/md";
 
+interface MonthOption {
+    display: string;
+    value: string;
+}
 interface ModalProps {
-    months: string[];
+    months: MonthOption[];
     onClose: () => void;
     onMonthSelect: (month: string) => void;
 };
@@ -21,6 +25,7 @@ const MonthSelector:React.FC<ModalProps> = ({months, onClose, onMonthSelect}) =>
     const handleSelect = () => {
         if (selectedMonth) {
             onMonthSelect(selectedMonth);
+            onClose();
         }
         
     };
