@@ -304,12 +304,12 @@ class InventoryController extends ApiController
 
         //Check if valid inventory file alrdy exists for the monthYear
         $fileCategories = [
-            'MM',
-            'MA',
-            'CA',
-            'FI',
-            'PK',
-            'TC',
+            'MM', //Meat Material
+            'MA', //Meat Alternate
+            'CA', //Casing
+            'FI', //Food Ingredient
+            'PK', //Packaging
+            'TC', //Tin Can
         ];
 
         try {
@@ -414,6 +414,8 @@ class InventoryController extends ApiController
 
         $defaultUnits = [
             'RM-MM' => 'kg',
+            'SA' => 'kg',
+            'BP' => 'kg',
             'RM-NM-FI' => 'kg',
             'RM-NM-MA' => 'kg',
             'RM-NM-ME' => 'blks',
