@@ -1,5 +1,7 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
+import Spinner from "@/components/loaders/Spinner";
+import ProtectedRoute from "@/components/routes/ProtectedRoute";
 import { FileManagerProvider } from '@/contexts/FileManagerContext';
 import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
 import { Suspense, useEffect, useState } from "react";
@@ -10,15 +12,17 @@ export default function FileManagerLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
-      <FileManagerProvider>
-        <Suspense fallback={<div>Loading workspace...</div>}>
-          <FileManagerContent>
-            {children}
-          </FileManagerContent>
+    <ProtectedRoute>
+      <SidebarProvider>
+        <FileManagerProvider>
+        <Suspense fallback={<div className="flex justify-center items-center w-full h-screen"><Spinner/></div>}>
+            <FileManagerContent>
+              {children}
+            </FileManagerContent>
         </Suspense>
-      </FileManagerProvider>
-    </SidebarProvider>
+        </FileManagerProvider>
+      </SidebarProvider>
+    </ProtectedRoute>
   );
 }
 
