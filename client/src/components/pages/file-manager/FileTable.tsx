@@ -49,6 +49,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
             console.error('Error audit logs:', error);
         });
         // router.push(`/file-manager/workspace?id=${data.file_id}&type=${data.file_type}`);
+    }
 
     const handleEdit = (data: File) => {
         localStorage.setItem("edit", "true");
