@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\ArticleController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -30,6 +31,13 @@ Route::prefix('/fg')->group(function () {
 Route::prefix('/prediction')->group(function () {
     Route::post('/upload', [PredictionController::class, 'uploadPrediction']);
     Route::post('/data', [PredictionController::class, 'getPrediction']);
+});
+
+Route::prefix('/article')->group(function () {
+    Route::post('/upload', [ArticleController::class, 'uploadArticle']);
+    Route::post('/data', [ArticleController::class, 'getArticle']);
+    Route::post('/update', [ArticleController::class, 'updateArticle']);
+    Route::get('/all', [ArticleController::class, 'getAll']);
 });
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
