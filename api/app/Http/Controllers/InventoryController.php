@@ -11,6 +11,7 @@ use App\Models\File;
 use App\Models\Material;
 use Carbon\Carbon;
 use App\Models\Inventory;
+use Illuminate\Support\Facades\DB;
 
 class InventoryController extends ApiController
 {
@@ -112,6 +113,73 @@ class InventoryController extends ApiController
             $this->status = 500;
             $this->response['message'] = $e->getMessage();
             return $this->getResponse();
+        }
+    }
+
+    public function archiveInventoryList(Request $request)
+    {
+        $file = File::where('file_type', 'inventory_file')->get();
+
+        $inventoryIdList = $request->input('inventory_ids');
+        $materialIdList = $request->input('material_ids');
+        $inventoryMonthYear = $request->input('inventory_monthYear');
+
+        try {
+            //Connect to archive database
+            DB::beginTransaction();
+
+            //Insert non-existing material records for linking later
+            foreach ($materialIdList as $materialId) {
+                $material = Material::where('material_id', $materialId)->first();
+                Log::info("material", ['material' => $material]);
+
+                if ($material) {
+                    $existingMaterial = DB::connection('archive_mysql')->table('materials')->where('material_id', $materialId)->first();
+                    Log::info("existingMaterial", ['existingMaterial' => $existingMaterial]);
+                    if (!$existingMaterial) {
+                        $materialRecords = $material->toArray();
+                        DB::connection('archive_mysql')->table('materials')->insert($materialRecords);
+                    }
+                }
+            }
+
+            //Archive inventory records
+            foreach ($inventoryIdList as $inventoryId) {
+                $inventory = Inventory::where('inventory_id', $inventoryId)->first();
+
+                if ($inventory) {
+                    $inventoryRecords = $inventory->toArray();
+
+                    $inventoryRecords['created_at'] = $inventory->created_at->format('Y-m-d H:i:s');
+                    $inventoryRecords['updated_at'] = $inventory->updated_at->format('Y-m-d H:i:s');
+
+                    DB::connection('archive_mysql')->table('inventory')->insert($inventoryRecords);
+                    $inventory->delete();
+                }
+            }
+
+            //Archive inventory files w/ selected monthYear
+            foreach ($file as $file) {
+                $fileSettings = json_decode($file->settings);
+                $monthYear = $fileSettings->monthYear;
+
+                if ($monthYear === $inventoryMonthYear) {
+                    $inventoryFile = $file->toArray();
+
+                    $inventoryFile['created_at'] = $file->created_at->format('Y-m-d H:i:s');
+                    $inventoryFile['updated_at'] = $file->updated_at->format('Y-m-d H:i:s');
+
+                    DB::connection('archive_mysql')->table('files')->insert($inventoryFile);
+                    $file->delete();
+                }
+            }
+
+            DB::commit();
+
+            return response()->json(['message' => 'Inventory list deleted successfully']);
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
         }
     }
 

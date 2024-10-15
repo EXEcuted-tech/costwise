@@ -9,10 +9,11 @@ import MonthSelector from '@/components/modals/MonthSelector';
 import { CiImport } from "react-icons/ci";
 import { IoTrash } from 'react-icons/io5';
 import ImportInventoryList from '@/components/modals/ImportInventory';
-import ConfirmDelete from '@/components/modals/ConfirmDelete';
 import api from '@/utils/api';
 import { InventoryType } from '@/types/data';
 import Alert from '@/components/alerts/Alert';
+import ConfirmDeleteInventory from '@/components/modals/ConfirmDeleteInventory';
+import { Spinner } from '@nextui-org/react';
 
 const Inventory = () => {
     const { isOpen } = useSidebarContext();
@@ -95,7 +96,7 @@ const Inventory = () => {
         }
     };
 
-    //Format numbers
+    //Format numbers & monthYear
     const numberWithCommas = (x: number) => {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
@@ -122,8 +123,6 @@ const Inventory = () => {
                 if (response.data && response.data.data) {
                     const inventoryData = response.data.data;
 
-                    console.log("INITIAL INVENTORY DATA:", inventoryData);
-
                     if (Array.isArray(inventoryData)) {
                         const processedInventoryList = inventoryData.map(monthData => {
                             const inventoryItems = monthData.inventory_info.map((item: any) => {
@@ -139,7 +138,6 @@ const Inventory = () => {
                             return inventoryItems;
                         });
                         setInventoryList(processedInventoryList);
-                        console.log("PROCESSED INVENTORY LIST:", processedInventoryList);
 
                         //Set month options
                         const extractMonths = inventoryData.map((item: any) => item.month_year);
@@ -149,6 +147,8 @@ const Inventory = () => {
                         if (convertedMonths.length > 0 && !selectedMonth) {
                             setSelectedMonth(convertedMonths[0].value);
                         }
+
+                        setIsLoading(false);
 
                     } else {
                         setAlertMessages(['Error retrieving inventory lists.']);
@@ -161,6 +161,7 @@ const Inventory = () => {
             } catch (error) {
                 setAlertMessages(['Error retrieving inventory lists.']);
                 setAlertStatus('error');
+                setIsLoading(false);
             }
         };
         fetchInventoryLists();
@@ -187,7 +188,7 @@ const Inventory = () => {
                 <ImportInventoryList onClose={closeImportInventoryListModal} />
             }
 
-            {isDeleteModalOpen && <ConfirmDelete subject={"inventory list"} onClose={closeDeleteModal}/>}
+            {isDeleteModalOpen && <ConfirmDeleteInventory inventoryList={currentMonthInventory} monthYear={selectedMonth} onClose={closeDeleteModal}/>}
 
             <div className='absolute top-0 right-0'>
             {alertMessages && alertMessages.map((msg, index) => (
@@ -307,36 +308,44 @@ const Inventory = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentPageItems.length > 0 ? (
-                                    currentPageItems.map((data, index) => (
-                                        <tr key={index} className={`${isOpen ? '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[18px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[20px] 2xl:text-[20px] xl:text-[16px]'} text-[20px] text-black text-center border-b border-[#ACACAC] hover:bg-gray-50`}>
-                                            <td className='w-[18rem] py-4 text-left pl-8'>{data.material_code}</td>
-                                            <td className='break-words'>{data.material_desc}</td>
-                                            <td>{data.unit}</td>
-                                            <td className='w-[10%] text-right pr-6'>{numberWithCommas(data.purchased_qty)}</td>
-                                            <td className='text-right pr-6 font-semibold'>{numberWithCommas(data.total_qty)}</td>
-                                            <td className='text-right pr-6'>{numberWithCommas(data.usage_qty)}</td>
-                                            <td>
-                                                <div className='flex justify-center'>
-                                                    <p
-                                                        className={`${data.stock_status === 'In Stock'
-                                                            ? 'text-[#00930F] bg-[#9EE29E]'
-                                                            : 'text-primary bg-[#F5BABA]'
-                                                            } rounded-2xl w-[9rem]`}
-                                                    >
-                                                        {data.stock_status}
-                                                    </p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
+                                {isLoading ? (
                                     <tr>
-                                        <td colSpan={columnNames.length} className='text-center py-10 text-[#555555]'>
-                                            No items found.
+                                        <td colSpan={7} className="text-center py-6">
+                                            <Spinner color="danger" size="lg" label="Loading..." />
                                         </td>
                                     </tr>
-                                )}
+                                ) : currentPageItems.length > 0 ? (
+                                        currentPageItems.map((data, index) => (
+                                            <tr key={index} className={`${isOpen ? '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[18px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[20px] 2xl:text-[20px] xl:text-[16px]'} text-[20px] text-black text-center border-b border-[#ACACAC] hover:bg-gray-50`}>
+                                                <td className='w-[18rem] py-4 text-left pl-8'>{data.material_code}</td>
+                                                <td className='break-words'>{data.material_desc}</td>
+                                                <td>{data.unit}</td>
+                                                <td className='w-[10%] text-right pr-6'>{numberWithCommas(data.purchased_qty)}</td>
+                                                <td className='text-right pr-6 font-semibold'>{numberWithCommas(data.total_qty)}</td>
+                                                <td className='text-right pr-6'>{numberWithCommas(data.usage_qty)}</td>
+                                                <td>
+                                                    <div className='flex justify-center'>
+                                                        <p
+                                                            className={`${data.stock_status === 'In Stock'
+                                                                ? 'text-[#00930F] bg-[#9EE29E]'
+                                                                : 'text-primary bg-[#F5BABA]'
+                                                                } rounded-2xl w-[9rem]`}
+                                                        >
+                                                            {data.stock_status}
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={columnNames.length} className='text-center py-10 text-[#555555]'>
+                                                No items found.
+                                            </td>
+                                        </tr>
+                                    )
+                                    
+                                }
                             </tbody>
                         </table>
                     </div>

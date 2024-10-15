@@ -17,4 +17,5 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
     Route::post('/inventory/upload', [InventoryController::class, 'upload']);
     Route::get('/inventory', [InventoryController::class, 'retrieveAll']);
     Route::get('/inventory/lists', [InventoryController::class, 'retrieveInventoryList']);
+    Route::delete('/inventory/archive', [InventoryController::class, 'archiveInventoryList']);
 });
