@@ -15,6 +15,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
       const token = localStorage.getItem('accessToken');
 
       if (!token) {
+        console.log("Log you out on Protected Route 1:");
         removeTokens();
         router.push('/');
         return;
@@ -24,6 +25,7 @@ export default function ProtectedRoute({ children }: { children: React.ReactNode
         try {
           const refreshed = await refreshToken();
           if (!refreshed) {
+            console.log("Log you out on Protected Route 2:");
             removeTokens();
             router.push('/');
           }
