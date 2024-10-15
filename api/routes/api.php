@@ -16,4 +16,5 @@ Route::group(['middleware' => ['auth:sanctum']],function(){
     Route::get('/user',[UserController::class,'getCurrentUser']);
     Route::post('/inventory/upload', [InventoryController::class, 'upload']);
     Route::get('/inventory', [InventoryController::class, 'retrieveAll']);
+    Route::get('/inventory/lists', [InventoryController::class, 'retrieveInventoryList']);
 });

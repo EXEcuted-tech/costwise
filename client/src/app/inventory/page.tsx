@@ -12,6 +12,7 @@ import ImportInventoryList from '@/components/modals/ImportInventory';
 import ConfirmDelete from '@/components/modals/ConfirmDelete';
 import api from '@/utils/api';
 import { InventoryType } from '@/types/data';
+import Alert from '@/components/alerts/Alert';
 
 const Inventory = () => {
     const { isOpen } = useSidebarContext();
@@ -19,21 +20,24 @@ const Inventory = () => {
 
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
-    const [currentPage, setCurrentPage] = useState<number>(1);
     const [isMonthSelectorModalOpen, setMonthSelectorModalOpen] = useState(false);
     const [isImportInventoryListModalOpen, setImportInventoryListModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
     const [searchTerm, setSearchTerm] = useState('');
 
-    const monthOptions = [""];
-    const [selectedMonth, setSelectedMonth] = useState<string>(monthOptions[1]);
-    const [inventoryList, setInventoryList] = useState<InventoryType[]>([]);
+    const [monthOptions, setMonthOptions] = useState<{ display: string; value: string }[]>([]);
+    const [selectedMonth, setSelectedMonth] = useState<string>('');
+    const [inventoryList, setInventoryList] = useState<InventoryType[][]>([]);
+    const currentMonthInventory = inventoryList.find(monthData => monthData[0]?.month_year === selectedMonth) || [];
 
-    const currentIndex = monthOptions.indexOf(selectedMonth);
-    const indexOfLastItem = currentPage * 8;
-    const indexOfFirstItem = indexOfLastItem - 8;
-    const currentListPage = inventoryList.slice(indexOfFirstItem, indexOfLastItem);
+    // Pagination
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [currentIndex, setCurrentIndex] = useState<number>(0);
+    const itemsPerPage = 8;
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentPageItems = currentMonthInventory.slice(indexOfFirstItem, indexOfLastItem);
 
     // Modals
     const openImportInventoryListModal = () => {
@@ -67,19 +71,28 @@ const Inventory = () => {
 
     const handleMonthSelect = (month: string) => {
         setSelectedMonth(month);
+        const newIndex = monthOptions.findIndex(option => option.value === month);
+        setCurrentIndex(newIndex);
+        setCurrentPage(1);
         closeMonthSelectorModal();
     };
 
     const handlePreviousMonth = () => {
-        const currentIndex = monthOptions.indexOf(selectedMonth);
-        const previousIndex = (currentIndex - 1 + monthOptions.length) % monthOptions.length;
-        setSelectedMonth(monthOptions[previousIndex]);
+        if (currentIndex > 0) {
+            const newIndex = currentIndex - 1;
+            setCurrentIndex(newIndex);
+            setSelectedMonth(monthOptions[newIndex].value);
+            setCurrentPage(1);
+        }
     };
-
+    
     const handleNextMonth = () => {
-        const currentIndex = monthOptions.indexOf(selectedMonth);
-        const nextIndex = (currentIndex + 1) % monthOptions.length;
-        setSelectedMonth(monthOptions[nextIndex]);
+        if (currentIndex < monthOptions.length - 1) {
+            const newIndex = currentIndex + 1;
+            setCurrentIndex(newIndex);
+            setSelectedMonth(monthOptions[newIndex].value);
+            setCurrentPage(1);
+        }
     };
 
     //Format numbers
@@ -87,27 +100,78 @@ const Inventory = () => {
         return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
     }
 
+    const convertMonthYear = (monthYear: string[]): { display: string; value: string }[] => {
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August",
+             "September", "October", "November", "December"];
+        
+        return monthYear.map(date => {
+            const [year, monthNumber] = date.split('-');
+            const monthIndex = parseInt(monthNumber, 10) - 1;
+            return {
+                display: `${months[monthIndex]} ${year}`,
+                value: date
+            };
+        });
+    }
+
     // Retrieve inventory list
      useEffect(() => {
-        const fetchInventory = async () => {
+        const fetchInventoryLists = async () => {
             try {
-                const response = await api.get('/inventory');
+                const response = await api.get('/inventory/lists');
+                if (response.data && response.data.data) {
+                    const inventoryData = response.data.data;
 
-                setInventoryList(response.data);
-                console.log("RETREIVED INVENTORY LIST:", response.data);
-                setTimeout(() => {
-                    setIsLoading(false);
-                }, 1000);
+                    console.log("INITIAL INVENTORY DATA:", inventoryData);
 
+                    if (Array.isArray(inventoryData)) {
+                        const processedInventoryList = inventoryData.map(monthData => {
+                            const inventoryItems = monthData.inventory_info.map((item: any) => {
+                                const material = monthData.materials.find((m: any) => m.material_id === item.material_id);
+                                return {
+                                    ...item,
+                                    material_code: material?.material_code || '',
+                                    material_desc: material?.material_desc || '',
+                                    unit: material?.unit || '',
+                                    month_year: monthData.month_year
+                                };
+                            });
+                            return inventoryItems;
+                        });
+                        setInventoryList(processedInventoryList);
+                        console.log("PROCESSED INVENTORY LIST:", processedInventoryList);
+
+                        //Set month options
+                        const extractMonths = inventoryData.map((item: any) => item.month_year);
+                        const convertedMonths = convertMonthYear(extractMonths);
+                        setMonthOptions(convertedMonths);
+
+                        if (convertedMonths.length > 0 && !selectedMonth) {
+                            setSelectedMonth(convertedMonths[0].value);
+                        }
+
+                    } else {
+                        setAlertMessages(['Error retrieving inventory lists.']);
+                        setAlertStatus('error');
+                    }
+                } else {
+                    setAlertMessages(['No data retrieved.']);
+                    setAlertStatus('error');
+                }
             } catch (error) {
-                setIsLoading(false);
-                setAlertMessages(["Error retrieving inventory list. Please try again later."]);
-                setAlertStatus("error");
-                console.error('Error retrieving inventory list:', error);
+                setAlertMessages(['Error retrieving inventory lists.']);
+                setAlertStatus('error');
             }
         };
-        fetchInventory();
+        fetchInventoryLists();
     }, []);
+
+    useEffect(() => {
+        if (monthOptions.length > 0 && !selectedMonth) {
+            setSelectedMonth(monthOptions[0].value); 
+            setCurrentIndex(0);
+        }
+    }, [monthOptions]);
 
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
         setSearchTerm(e.target.value);
@@ -125,6 +189,14 @@ const Inventory = () => {
 
             {isDeleteModalOpen && <ConfirmDelete subject={"inventory list"} onClose={closeDeleteModal}/>}
 
+            <div className='absolute top-0 right-0'>
+            {alertMessages && alertMessages.map((msg, index) => (
+            <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
+                setAlertMessages(prev => prev.filter((_, i) => i !== index));
+            }} />
+                ))}
+            </div>
+
             <div className='w-full'>
                 <div>
                     <Header icon={MdTrolley} title="Inventory" />
@@ -141,7 +213,8 @@ const Inventory = () => {
                             <MdCalendarToday className='' />
                         </button>
 
-                        <p className="animate-appearance-in">{selectedMonth}</p>
+                        <p className="animate-appearance-in">
+                            {monthOptions.find(m => m.value === selectedMonth)?.display || ''}</p>
 
                         {/* Navigator Buttons */}
                         <div className='flex w-[8rem] ml-auto'>
@@ -234,12 +307,12 @@ const Inventory = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentListPage.length > 0 ? (
-                                    currentListPage.map((data, index) => (
+                                {currentPageItems.length > 0 ? (
+                                    currentPageItems.map((data, index) => (
                                         <tr key={index} className={`${isOpen ? '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[18px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[20px] 2xl:text-[20px] xl:text-[16px]'} text-[20px] text-black text-center border-b border-[#ACACAC] hover:bg-gray-50`}>
-                                            <td className='w-[10rem] py-4'>a</td>
-                                            <td className='break-words'>a</td>
-                                            <td>a</td>
+                                            <td className='w-[18rem] py-4 text-left pl-8'>{data.material_code}</td>
+                                            <td className='break-words'>{data.material_desc}</td>
+                                            <td>{data.unit}</td>
                                             <td className='w-[10%] text-right pr-6'>{numberWithCommas(data.purchased_qty)}</td>
                                             <td className='text-right pr-6 font-semibold'>{numberWithCommas(data.total_qty)}</td>
                                             <td className='text-right pr-6'>{numberWithCommas(data.usage_qty)}</td>
@@ -271,8 +344,8 @@ const Inventory = () => {
                     {/* Footer */}
                     <div className="flex w-full justify-center h-[86px] rounded-b-xl border-[#868686]">
                         <PrimaryPagination
-                            data={inventoryList}
-                            itemsPerPage={8}
+                            data={currentMonthInventory}
+                            itemsPerPage={itemsPerPage}
                             handlePageChange={handlePageChange}
                             currentPage={currentPage}
                         />

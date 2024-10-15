@@ -14,10 +14,13 @@ export interface User {
 export interface InventoryType {
     inventory_id: number;
     material_id: number;
+    material_code: string;
+    material_desc: string;
+    unit: string;
     material_category: string;
     stock_status: string;
     purchased_qty: number;
     usage_qty: number;
-    total_qty: number; 
-
+    total_qty: number;
+    month_year: string;
 }

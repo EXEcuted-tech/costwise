@@ -115,6 +115,101 @@ class InventoryController extends ApiController
         }
     }
 
+    //Retrieve all month/year from Files table
+    private function retrieveAllMonthYear()
+    {
+        try {
+            $inventoryFiles = File::where('file_type', 'inventory_file')->get();
+            $monthYearList = [];
+
+            foreach ($inventoryFiles as $inventoryFile) {
+                $fileSettings = json_decode($inventoryFile->settings);
+                $monthYear = $fileSettings->monthYear;
+
+                if (!in_array($monthYear, $monthYearList)) {
+                    $monthYearList[] = $monthYear;
+                }
+           }
+
+           if (!empty($monthYearList)) {
+                return $monthYearList;
+            } else {
+                throw new \Exception("No month/year data found.");
+            }
+        } catch (\Exception $e) {
+            throw $e;
+        }
+    }
+
+    public function retrieveInventoryList()
+    {
+        $inventoryFiles = File::where('file_type', 'inventory_file')->get();
+        $monthYearList = $this->retrieveAllMonthYear();
+        $inventoryList = [];
+
+
+        try {
+            foreach ($inventoryFiles as $inventoryFile) {
+
+                $fileSettings = json_decode($inventoryFile->settings);
+                $month_year = $fileSettings->monthYear;
+                $inventoryIds = $fileSettings->inventory_ids;
+                $inventoryInfo = Inventory::whereIn('inventory_id', $inventoryIds)->get();
+                $materialsList = $this->retrieveMaterials($inventoryIds);
+
+                $existingIndex = array_search($month_year, array_column($inventoryList, 'month_year'));
+
+                //If monthYear alrdy exists, merge inventory ids
+                if ($existingIndex !== false) {
+                    $inventoryList[$existingIndex]['inventory_ids'] = array_merge(
+                        $inventoryList[$existingIndex]['inventory_ids'],
+                        $inventoryIds);
+
+                    $inventoryList[$existingIndex]['inventory_ids'] = array_unique($inventoryList[$existingIndex]['inventory_ids']);
+
+                    $inventoryList[$existingIndex]['inventory_info'] = Inventory::whereIn('inventory_id', $inventoryList[$existingIndex]['inventory_ids'])->get();
+                    $inventoryList[$existingIndex]['materials'] = $this->retrieveMaterials($inventoryList[$existingIndex]['inventory_ids']);
+                } else {
+                    $inventoryInfo = Inventory::whereIn('inventory_id', $inventoryIds)->get();
+                    $materialsList = $this->retrieveMaterials($inventoryIds);
+
+                    $inventoryList[] = [
+                        'inventory_ids' => $inventoryIds,
+                        'materials' => $materialsList,
+                        'inventory_info' => $inventoryInfo,
+                        'month_year' => $month_year,
+                    ];
+                }
+
+                usort($inventoryList, function($a, $b) {
+                    return strcmp($b['month_year'], $a['month_year']);
+                });
+            }
+
+            if (!empty($inventoryList)) {
+                $this->status = 200;
+                $this->response['data'] = $inventoryList; //array
+                return $this->getResponse();
+            } else {
+                return $this->getResponse(['message' => "No inventory data found."], 404);
+            }
+        } catch (\Exception $e) {
+            return response()->json(['error' => $e->getMessage()], 500);
+        }
+    }
+
+    private function retrieveMaterials($inventoryIds)
+    {
+        try {
+            $materialIds = Inventory::whereIn('inventory_id', $inventoryIds)->pluck('material_id');
+            $materials = Material::whereIn('material_id', $materialIds)->get();
+
+            return $materials;
+        } catch (\Exception $e) {
+            throw $e;
+        }
+    }
+
     public function upload(Request $request)
     {
         $file = $request->file('file');
