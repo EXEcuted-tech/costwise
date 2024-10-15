@@ -380,6 +380,7 @@ class FodlController extends ApiController
         \DB::beginTransaction();
 
         try {
+
             $fodls = Fodl::whereIn('fodl_id', $fodlIds)->get();
 
             foreach ($fodls as $fodl) {

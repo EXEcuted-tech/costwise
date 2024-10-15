@@ -499,7 +499,7 @@ const MasterFileContainer = (data: File) => {
       const formulaArray = JSON.parse(bomResponse.data.data[0].formulations);
       if (bomResponse.data.status == 200) {
         const formulations = splitFormulations(updatedData, formulaArray);
-
+        //debug here add a console.log for formulations
         formulations.forEach(async ({ id, formulations }, index) => {
           const formulationData = formulations;
           const finishedGood = formulationData[0];
@@ -532,7 +532,7 @@ const MasterFileContainer = (data: File) => {
           //   }
           // }
 
-          let emulsion = formulationData.find(item => item.description === 'EMULSION');
+          let emulsion = formulationData.find(item => item.description.toLowerCase() === 'emulsion');
 
           const transformedEmulsionData = emulsion
             ? {
@@ -555,7 +555,7 @@ const MasterFileContainer = (data: File) => {
           }));
 
           const payload = {
-            emulsion: formulationData[1].description == 'EMULSION' ? transformedEmulsionData : {},
+            emulsion: transformedEmulsionData,
             materials: transformedMaterialData,
             formulation_id: id,
             formula_code: finishedGood.formula
@@ -563,7 +563,7 @@ const MasterFileContainer = (data: File) => {
           const saveResponse = await api.post('/boms/update_batch', payload);
           if (saveResponse.data.status == 200) {
             setIsLoading(false);
-            setSuccessMessage("FODL sheets saved successfully.");
+            setSuccessMessage("BOM Sheet saved successfully.");
           } else {
             setIsLoading(false);
             if (saveResponse.data.message) {

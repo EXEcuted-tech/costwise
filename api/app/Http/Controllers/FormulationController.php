@@ -700,15 +700,24 @@ class FormulationController extends ApiController
             })->toArray();
 
             if ($finishedGoodsToDelete->isNotEmpty()) {
-                FinishedGood::on('archive_mysql')->create($archivedFinishedGoods);
+                foreach ($archivedFinishedGoods as $finishedGood) {
+                    FinishedGood::on('archive_mysql')->create($finishedGood);
+                }
             }
 
             if ($formulationsToDelete->isNotEmpty()) {
-                Formulation::on('archive_mysql')->create($archivedFormulations);
+                foreach ($archivedFormulations as $formulation) {
+                    Formulation::on('archive_mysql')->create($formulation);
+                }
             }
 
-            Formulation::whereIn('formulation_id', $formulationIds)->delete();
-            FinishedGood::whereIn('fg_id', $fgIds)->delete();
+            $formulationsToDelete->each(function ($formulation) {
+                $formulation->delete();
+            });
+
+            $finishedGoodsToDelete->each(function ($finishedGood) {
+                $finishedGood->delete();
+            });
 
             return [
                 'status' => 200,

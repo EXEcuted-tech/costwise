@@ -94,7 +94,7 @@ class FileController extends ApiController
             return $this->getResponse("Invalid column specified.");
         }
 
-        // try {
+        try {
         $records = File::where($col, $value)->get();
 
         if ($records->isEmpty()) {
@@ -128,7 +128,8 @@ class FileController extends ApiController
                 }
 
                 if (isset($settings['fodls'])) {
-                    FodlController::deleteBulkFodlInFile($settings['fodls'], $value);
+                    $fodlIds = array_column($settings['fodls'], 'fodl_id');
+                    FodlController::deleteBulkFodlInFile($fodlIds, $value);
                 }
 
                 if (isset($settings['material_ids'])) {
@@ -143,10 +144,10 @@ class FileController extends ApiController
 
         $this->status = 200;
         return $this->getResponse("Records successfully deleted.");
-        // } catch (\Exception $e) {
-        //     $this->status = 500;
-        //     return $this->getResponse($e->getMessage());
-        // }
+        } catch (\Exception $e) {
+            $this->status = 500;
+            return $this->getResponse($e->getMessage());
+        }
     }
 
     public function deleteFormulationByBOM($bomId)
@@ -160,25 +161,6 @@ class FileController extends ApiController
             $fgIds = Formulation::whereIn('formulation_id', $formulationIds)->pluck('fg_id')->toArray();
 
             FormulationController::deleteBulkWithFGInFile($fgIds, $bomId);
-
-
-            // $remainingFormulations = Formulation::whereIn('formulation_id', $formulationIds)->get();
-
-            // foreach ($remainingFormulations as $formulation) {
-            //     $materialQtyList = json_decode($formulation->material_qty_list, true) ?? [];
-            //     $materialIds = array_column($materialQtyList, 'material_id');
-
-            //     $materialRequest = new Request([
-            //         'formulation_id' => $formulation->formulation_id,
-            //         'material_ids' => $materialIds
-            //     ]);
-
-            //     $materialDeletionResult = $this->deleteBulkWithMaterial($materialRequest);
-
-            //     if ($materialDeletionResult->getStatusCode() !== 200) {
-            //         throw new \Exception('Failed to delete Materials for Formulation ' . $formulation->formulation_id);
-            //     }
-            // }
 
             Bom::on('archive_mysql')->create($bom->toArray());
             $bom->delete();
