@@ -93,3 +93,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_fg_details', [CostCalcController::class, 'retrieveFGDetails']);
     });
 });
+
+
+Route::prefix('/training')->group(function () {
+    Route::post('upload', [FileController::class, 'uploadTrainingData']);
+    Route::get('/data', [FileController::class, 'getData']);
+});
