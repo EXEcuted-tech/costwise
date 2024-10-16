@@ -352,34 +352,4 @@ class FinishedGoodController extends ApiController
     //         return $this->getResponse("An error occurred while updating records.");
     //     }
     // }
-
-    public function retrieveMonthYearOptions()
-    {
-       try {
-            $monthYearOptions = FinishedGood::select('monthYear')
-                ->distinct()
-                ->orderBy('monthYear', 'desc')
-                ->pluck('monthYear')
-                ->toArray();
-
-            Log::info($monthYearOptions);
-
-            $formattedOptions = array_map(function($monthYear) {
-                return [
-                    'value' => $monthYear,
-                    'label' => DateHelper::formatMonthYear($monthYear)
-                ];
-            }, $monthYearOptions);
-
-            Log::info($formattedOptions);
-
-            $this->status = 200;
-            $this->response['data'] = $formattedOptions;
-            return $this->getResponse();
-       } catch (\Exception $e) {
-            $this->status = 500;
-            $this->response['message'] = $e->getMessage();
-            return $this->getResponse("An error occurred while retrieving the month and year options.");
-       }
-    }
 }

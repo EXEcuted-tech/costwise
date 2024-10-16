@@ -20,7 +20,7 @@ const CostCalculation =() => {
 
     const [monthYearOptions, setMonthYearOptions] = useState<{value: number, label: string}[]>([]);
     const [monthYear, setMonthYear] = useState<{value: number, label: string}>({value: 0, label: ''});
-    const [exportType, setExportType] = useState<string>('');
+    const [exportType, setExportType] = useState<string>('xlsx');
 
 
     const handleFGClick = (fg: React.SetStateAction<string>) => {
@@ -50,7 +50,7 @@ const CostCalculation =() => {
     useEffect(() => {
         const retrieveMonthYearOptions = async () => {
             try {
-                const response = await api.get('/finished_goods/retrieve_month_year_options');
+                const response = await api.get('/cost_calculation/retrieve_month_year_options');
                 if (response.status === 200) {
                     setMonthYearOptions(response.data.data);
                 }
@@ -124,7 +124,10 @@ const CostCalculation =() => {
                                 <option value="csv">CSV</option>
                             </select>
                             
-                        <button className='w-[40px] h-[45px] bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out px-[5px] rounded-r-md cursor-pointer'>
+                        <button 
+                            className='w-[40px] h-[45px] bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out px-[5px] rounded-r-md cursor-pointer'
+                            onClick={() =>  (exportType)}
+                            >
                             <MdDownloadForOffline className='text-white text-[30px] hover:animate-shake-tilt' />
                         </button>
                     </div>

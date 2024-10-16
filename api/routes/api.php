@@ -7,6 +7,7 @@ use App\Http\Controllers\FodlController;
 use App\Http\Controllers\FormulationController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\CostCalcController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -35,7 +36,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve', [FinishedGoodController::class, 'retrieve']);
         Route::get('retrieve_first', [FinishedGoodController::class, 'retrieveFirst']);
         Route::get('retrieve_batch', [FinishedGoodController::class, 'retrieveBatch']);
-        Route::get('retrieve_month_year_options', [FinishedGoodController::class, 'retrieveMonthYearOptions']);
         Route::post('create', [FinishedGoodController::class, 'create']);
         Route::post('update', [FinishedGoodController::class, 'update']);
     });
@@ -85,5 +85,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_batch', [TransactionController::class, 'retrieveBatch']);
         Route::post('update_batch', [TransactionController::class, 'updateBatch']);
         Route::post('delete_bulk', [TransactionController::class, 'deleteBulk']);
+    });
+
+    Route::prefix('/cost_calculation')->group(function () {
+        Route::get('retrieve_month_year_options', [CostCalcController::class, 'retrieveMonthYearOptions']);
     });
 });
