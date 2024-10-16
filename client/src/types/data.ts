@@ -133,3 +133,26 @@ export interface TransactionRecord {
     amount: number;
     unitCode: string;
 }
+
+export interface SpecificFinishedGood {
+    fg_id: number;
+    formulation_no: number;
+    code: string;
+    fg_desc: string;
+    batch_qty: number;
+    unit: string;
+    rm_cost: number;
+    total_cost: number;
+    components: Component[];
+}
+
+export interface Component {
+    level: number;
+    item_code: string;
+    description: string;
+    qty: number;
+    batch_quantity: number;
+    unit: string;
+    cost: number;
+    total_cost: number;
+}

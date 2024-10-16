@@ -89,5 +89,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('/cost_calculation')->group(function () {
         Route::get('retrieve_month_year_options', [CostCalcController::class, 'retrieveMonthYearOptions']);
+        Route::get('retrieve_fg', [CostCalcController::class, 'retrieveFGOptions']);
+        Route::get('retrieve_fg_details', [CostCalcController::class, 'retrieveFGDetails']);
     });
 });

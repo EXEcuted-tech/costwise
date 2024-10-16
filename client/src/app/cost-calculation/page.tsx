@@ -8,35 +8,35 @@ import { IoMdAdd } from "react-icons/io";
 import SpecificFG from '@/components/pages/cost-calculation/SpecificFG';
 import AllFG from '@/components/pages/cost-calculation/AllFG';
 import { useSidebarContext } from '@/contexts/SidebarContext';
-import { FinishedGood } from '@/types/data';
+import { SpecificFinishedGood, Component } from '@/types/data';
 import api from '@/utils/api';
 
 
 const CostCalculation =() => {
     const { isOpen } = useSidebarContext();
-
-    const [selectedFG, setSelectedFG] = useState('Specific-FG');
-    const [specificFGSheets, setSpecificFGSheets] = useState([{ id: 0 }]);
+    const [selectedFG, setSelectedFG] = useState<string>('Specific-FG');
+    const [alertMessages, setAlertMessages] = useState<string[]>([]);
+    const [alertStatus, setAlertStatus] = useState<string>('');
 
     const [monthYearOptions, setMonthYearOptions] = useState<{value: number, label: string}[]>([]);
     const [monthYear, setMonthYear] = useState<{value: number, label: string}>({value: 0, label: ''});
     const [exportType, setExportType] = useState<string>('xlsx');
-
+    const [sheets, setSheets] = useState<{id: number, data: SpecificFinishedGood | null}[]>([{ id: 0, data: null }]);
 
     const handleFGClick = (fg: React.SetStateAction<string>) => {
         setSelectedFG(fg);
     };
 
     const handleAddSheet = () => {
-        setSpecificFGSheets([...specificFGSheets, { id: specificFGSheets.length }]);
+        setSheets([...sheets, { id: sheets.length, data: null }]);
     };
 
     const handleRemoveSheet = (id: number) => {
-        setSpecificFGSheets(specificFGSheets.filter(sheet => sheet.id !== id));
+        setSheets(sheets.filter(sheet => sheet.id !== id));
     };
 
-    const handleExportType = (type: string) => {
-        setExportType(type);
+    const updateSheetData = (id: number, data: SpecificFinishedGood) => {
+        setSheets(sheets.map(sheet => sheet.id === id ? { ...sheet, data } : sheet));
     };
 
     const handleMonthYear = (value: string, label: string)  => {
@@ -46,19 +46,50 @@ const CostCalculation =() => {
         }
     };
 
+    const handleExport = async () => {
+        const sheetData = sheets.filter(sheet => sheet.data !== null).map(sheet => sheet.data);
+        if (sheetData.length === 0) {
+           setAlertMessages(["No sheets are selected"]);
+           setAlertStatus("error");
+           return;
+        }
+
+        try {
+            const response = await api.post('/cost_calculation/export', {
+                sheets: sheetData,
+                exportType: exportType,
+                monthYear: monthYear.value
+            });
+
+            if (response.status === 200) {
+                setAlertMessages(["Workbook exported successfully"]);
+                setAlertStatus("success");
+            } else {
+                setAlertMessages(["Error exporting workbook:", response.data.message]);
+                setAlertStatus("error");
+            }
+        } catch (error) {
+            console.error('Error exporting workbook:', error);
+            // Show an error alert
+        }
+    };
+
+    const retrieveMonthYearOptions = async () => {
+        try {
+            const response = await api.get('/cost_calculation/retrieve_month_year_options');
+            if (response.status === 200) {
+                setMonthYearOptions(response.data.data);
+            }
+        } catch (error) {
+            console.log(error);
+        }
+    };
+
     //Retrieve month and year options
     useEffect(() => {
-        const retrieveMonthYearOptions = async () => {
-            try {
-                const response = await api.get('/cost_calculation/retrieve_month_year_options');
-                if (response.status === 200) {
-                    setMonthYearOptions(response.data.data);
-                }
-            } catch (error) {
-                console.log(error);
-            }
-        }
         retrieveMonthYearOptions();
+
+        console.log("sheets: ", sheets);
     }, []);
 
     return (
@@ -71,7 +102,7 @@ const CostCalculation =() => {
                 <div className='w-[30rem] pb-8'>
                     {/* Date Range */}
                     <div className='flex'>
-                        <div className='text-[19px] mr-5 pt-4'>Month & Year</div>
+                        <div className='text-[19px] mr-5 pt-4'>Month & Year  <span className='text-[#B22222] ml-1 font-bold'>*</span></div>
                     </div>
                     <div className='mt-2'>
                         <BiCalendarEvent className='absolute text-[30px] text-[#6b6b6b82] mt-[6px] ml-2 z-[3]'/>
@@ -117,8 +148,8 @@ const CostCalculation =() => {
                         <select 
                             className='w-[95px] h-[45px] text-[21px] pl-[10px] text-[#000000] bg-white border-1 border-[#929090] rounded-l-md drop-shadow-md cursor-pointer'
                             name="fromDate"
-                            defaultValue="xlsx"
-                            onChange={(e) => handleExportType(e.target.value)}
+                            value={exportType}
+                            onChange={(e) => setExportType(e.target.value)}
                             >
                                 <option value="xlsx">XLSX</option>
                                 <option value="csv">CSV</option>
@@ -126,7 +157,7 @@ const CostCalculation =() => {
                             
                         <button 
                             className='w-[40px] h-[45px] bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out px-[5px] rounded-r-md cursor-pointer'
-                            onClick={() =>  (exportType)}
+                            onClick={handleExport}
                             >
                             <MdDownloadForOffline className='text-white text-[30px] hover:animate-shake-tilt' />
                         </button>
@@ -144,13 +175,18 @@ const CostCalculation =() => {
                     </div>
                 </div>
             </div>
-            
+
             <div>
-                {selectedFG === 'Specific-FG' && 
-                    specificFGSheets.map(sheet => (
-                        <SpecificFG key={sheet.id} id={sheet.id} removeSheet={handleRemoveSheet} isOpen={isOpen} monthYear={monthYear} exportType={exportType} />
-                    ))
-                }
+                {sheets.map(sheet => (
+                    <SpecificFG 
+                        key={sheet.id} 
+                        id={sheet.id} 
+                        removeSheet={handleRemoveSheet}
+                        updateSheetData={updateSheetData}
+                        isOpen={isOpen} 
+                        monthYear={monthYear}
+                    />
+                ))}
                 {/* {selectedFG === 'All-FG' && <AllFG title={FakeProdReportTitle} isOpen={isOpen} sheetData={FGSheetFakeData} />} */}
             </div>
         </div>
