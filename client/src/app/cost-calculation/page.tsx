@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '@/components/header/Header';
 import { BiSolidReport } from "react-icons/bi";
 import { BiCalendarEvent } from "react-icons/bi";
@@ -9,6 +9,7 @@ import SpecificFG from '@/components/pages/cost-calculation/SpecificFG';
 import AllFG from '@/components/pages/cost-calculation/AllFG';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { FinishedGood } from '@/types/data';
+import api from '@/utils/api';
 
 
 const CostCalculation =() => {
@@ -17,12 +18,10 @@ const CostCalculation =() => {
     const [selectedFG, setSelectedFG] = useState('Specific-FG');
     const [specificFGSheets, setSpecificFGSheets] = useState([{ id: 0 }]);
 
-    const [monthYear, setMonthYear] = useState('');
+    const [monthYearOptions, setMonthYearOptions] = useState<{value: number, label: string}[]>([]);
+    const [monthYear, setMonthYear] = useState<{value: number, label: string}>({value: 0, label: ''});
     const [exportType, setExportType] = useState<string>('');
 
-    const handleMonthYear = (date: string) => {
-        setMonthYear(date);
-    };
 
     const handleFGClick = (fg: React.SetStateAction<string>) => {
         setSelectedFG(fg);
@@ -39,6 +38,28 @@ const CostCalculation =() => {
     const handleExportType = (type: string) => {
         setExportType(type);
     };
+
+    const handleMonthYear = (value: string, label: string)  => {
+        const numericValue = parseInt(value, 10);
+        if (!isNaN(numericValue)) {
+            setMonthYear({value: numericValue, label: label});
+        }
+    };
+
+    //Retrieve month and year options
+    useEffect(() => {
+        const retrieveMonthYearOptions = async () => {
+            try {
+                const response = await api.get('/finished_goods/retrieve_month_year_options');
+                if (response.status === 200) {
+                    setMonthYearOptions(response.data.data);
+                }
+            } catch (error) {
+                console.log(error);
+            }
+        }
+        retrieveMonthYearOptions();
+    }, []);
 
     return (
         <div className='w-full'>
@@ -58,10 +79,14 @@ const CostCalculation =() => {
                             className='w-[220px] h-[45px] text-[21px] pl-[42px] pr-4 text-[#000000] bg-white border-1 border-[#929090] rounded-md drop-shadow-md cursor-pointer'
                             name="Month & Year"
                             defaultValue=""
-                            onChange={(e) => handleMonthYear(e.target.value)}
+                            onChange={(e) => handleMonthYear(e.target.value, e.target.options[e.target.selectedIndex].text)}
                             >
-                                <option value="Jan24">January 2024</option>
-                                <option value="Feb24">February 2024</option>
+                                <option value="" disabled>mm-yyyy</option>
+                                {monthYearOptions.map((option, index) => (
+                                    <option key={index} value={option.value}>
+                                        {option.label}
+                                    </option>
+                                ))}
                         </select>
                     </div>
                     {/* FG Selector */}

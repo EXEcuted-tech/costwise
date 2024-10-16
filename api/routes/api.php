@@ -35,6 +35,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve', [FinishedGoodController::class, 'retrieve']);
         Route::get('retrieve_first', [FinishedGoodController::class, 'retrieveFirst']);
         Route::get('retrieve_batch', [FinishedGoodController::class, 'retrieveBatch']);
+        Route::get('retrieve_month_year_options', [FinishedGoodController::class, 'retrieveMonthYearOptions']);
         Route::post('create', [FinishedGoodController::class, 'create']);
         Route::post('update', [FinishedGoodController::class, 'update']);
     });
