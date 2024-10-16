@@ -285,7 +285,8 @@ class FormulationController extends ApiController
                     $material_qty_list[] = [
                         $material->material_id => [
                             'level' => $row[1],
-                            'qty' => floatval(str_replace(',', '', $row[5]))
+                            'qty' => floatval(str_replace(',', '', $row[5])),
+                            'total_cost' => $material->material_cost * floatval(str_replace(',', '', $row[5]))
                         ]
                     ];
                 }

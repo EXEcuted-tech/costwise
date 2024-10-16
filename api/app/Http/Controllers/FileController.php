@@ -577,6 +577,7 @@ class FileController extends ApiController
                         $material->material_id => [
                             'level' => $materialLevel,
                             'qty' => $materialQty,
+                            'total_cost' => $material->material_cost * $materialQty,
                         ],
                     ];
                 }
