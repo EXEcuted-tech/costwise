@@ -86,3 +86,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('delete_bulk', [TransactionController::class, 'deleteBulk']);
     });
 });
+
+Route::prefix('/training')->group(function () {
+    Route::post('upload', [FileController::class, 'uploadTrainingData']);
+    Route::get('/data', [FileController::class, 'getData']);
+});

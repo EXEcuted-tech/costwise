@@ -16,6 +16,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\File;
 use App\Models\FinishedGood;
 use App\Models\Material;
+use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -95,55 +96,55 @@ class FileController extends ApiController
         }
 
         try {
-        $records = File::where($col, $value)->get();
+            $records = File::where($col, $value)->get();
 
-        if ($records->isEmpty()) {
-            $this->status = 404;
-            return $this->getResponse("No records found to delete.");
-        }
-
-        foreach ($records as $record) {
-            if ($record->file_type == 'transactional_file') {
-                $settings = json_decode($record->settings, true);
-                $transactionIds = $settings['transaction_ids'];
-
-                foreach ($transactionIds as $key => $transactionId) {
-                    $result = TransactionController::deleteTransaction($transactionId);
-                    if ($result) {
-                        unset($transactionIds[$key]);
-                    }
-                }
-
-                $settings['transaction_ids'] = array_values($transactionIds);
-                $record->settings = json_encode($settings);
-                $record->save();
-            } else if ($record->file_type == 'master_file') {
-                $settings = json_decode($record->settings, true);
-
-                // Assuming that what is on the formulations, are on the material sheets
-                if (isset($settings['bom_ids'])) {
-                    foreach ($settings['bom_ids'] as $bomId) {
-                        $this->deleteFormulationByBOM($bomId);
-                    }
-                }
-
-                if (isset($settings['fodls'])) {
-                    $fodlIds = array_column($settings['fodls'], 'fodl_id');
-                    FodlController::deleteBulkFodlInFile($fodlIds, $value);
-                }
-
-                if (isset($settings['material_ids'])) {
-                    MaterialController::deleteBulkInFile($settings['material_ids'], $value);
-                }
+            if ($records->isEmpty()) {
+                $this->status = 404;
+                return $this->getResponse("No records found to delete.");
             }
 
-            File::on('archive_mysql')->create($record->toArray());
-        }
+            foreach ($records as $record) {
+                if ($record->file_type == 'transactional_file') {
+                    $settings = json_decode($record->settings, true);
+                    $transactionIds = $settings['transaction_ids'];
 
-        $records->each->delete();
+                    foreach ($transactionIds as $key => $transactionId) {
+                        $result = TransactionController::deleteTransaction($transactionId);
+                        if ($result) {
+                            unset($transactionIds[$key]);
+                        }
+                    }
 
-        $this->status = 200;
-        return $this->getResponse("Records successfully deleted.");
+                    $settings['transaction_ids'] = array_values($transactionIds);
+                    $record->settings = json_encode($settings);
+                    $record->save();
+                } else if ($record->file_type == 'master_file') {
+                    $settings = json_decode($record->settings, true);
+
+                    // Assuming that what is on the formulations, are on the material sheets
+                    if (isset($settings['bom_ids'])) {
+                        foreach ($settings['bom_ids'] as $bomId) {
+                            $this->deleteFormulationByBOM($bomId);
+                        }
+                    }
+
+                    if (isset($settings['fodls'])) {
+                        $fodlIds = array_column($settings['fodls'], 'fodl_id');
+                        FodlController::deleteBulkFodlInFile($fodlIds, $value);
+                    }
+
+                    if (isset($settings['material_ids'])) {
+                        MaterialController::deleteBulkInFile($settings['material_ids'], $value);
+                    }
+                }
+
+                File::on('archive_mysql')->create($record->toArray());
+            }
+
+            $records->each->delete();
+
+            $this->status = 200;
+            return $this->getResponse("Records successfully deleted.");
         } catch (\Exception $e) {
             $this->status = 500;
             return $this->getResponse($e->getMessage());
@@ -1210,6 +1211,210 @@ class FileController extends ApiController
             }
 
             $row++;
+        }
+    }
+
+    public function uploadTrainingData(Request $request)
+    {
+        try {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'file_type' => 'required|string',
+                    'settings' => 'required|file|mimes:csv,txt|max:2048',
+                ]
+            );
+
+            if ($validator->fails()) {
+                $this->status = 401;
+                $this->response['error'] = $validator->errors();
+                return $this->getResponse("Incorrect input details.");
+            }
+
+            $validatedData = $validator->validated();
+
+            if ($request->hasFile('settings')) {
+                $file = $request->file('settings');
+
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $csvData = $this->processCsvData($file);
+
+                $fileData = [
+                    'file_type' => $validatedData['file_type'],
+                    'settings' => json_encode($csvData),
+                ];
+
+                $fileRecord = File::on(connection: 'archive_mysql')->create($fileData);
+                $this->status = 200;
+                $this->response['data'] = [
+                    'file_record' => $fileRecord,
+                    'csv_data' => $csvData,
+                ];
+                return $this->getResponse("File Successfully Uploaded");
+            }
+
+            $this->status = 400;
+            $this->response['message'] = "No file uploaded.";
+            return $this->getResponse("File upload failed.");
+        } catch (\Throwable $th) {
+            $this->status = $th->getCode() ?: 500;
+            $this->response['message'] = $th->getMessage();
+            return $this->getResponse();
+        }
+    }
+
+    private function processCsvData($file)
+    {
+        $parsedCostData = [];
+        $currentMonthYear = '';
+
+        if (($handle = fopen($file->getRealPath(), 'r')) !== false) {
+            fgetcsv($handle);
+            while (($data = fgetcsv($handle)) !== false) {
+                if (empty($data) || $data[0] === "Item Code") {
+                    continue;
+                }
+
+                if (!empty($data[0]) && empty($data[2])) {
+                    $currentMonthYear = $data[0];
+                } elseif (!empty($data[0]) && !empty($data[2])) {
+                    $productName = $data[1];
+                    $productCost = floatval($data[2]);
+
+                    $monthYearIndex = null;
+                    foreach ($parsedCostData as $index => $entry) {
+                        if ($entry['monthYear'] === $currentMonthYear) {
+                            $monthYearIndex = $index;
+                            break;
+                        }
+                    }
+
+                    if ($monthYearIndex === null) {
+                        $parsedCostData[] = [
+                            'monthYear' => $currentMonthYear,
+                            'products' => [
+                                [
+                                    'productName' => $productName,
+                                    'cost' => $productCost,
+                                ]
+                            ],
+                        ];
+                    } else {
+                        $parsedCostData[$monthYearIndex]['products'][] = [
+                            'productName' => $productName,
+                            'cost' => $productCost,
+                        ];
+                    }
+                }
+            }
+            fclose($handle);
+        }
+
+        return $parsedCostData;
+    }
+
+
+    public function getData()
+    {
+        try {
+            $file = File::on(connection: 'archive_mysql')->where('file_type', 'training_file')->get();
+
+            if (!$file) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Model not found.'
+                ], 404);
+            }
+
+            $this->status = 201;
+            $this->response['data'] = $file;
+            return $this->getResponse("File retrieved successfully.");
+        } catch (\Throwable $th) {
+            $this->status = $th->getCode();
+            $this->response['message'] = $th->getMessage();
+            return $this->getResponse();
+        }
+    }
+
+    private function addAllCostCalculationSheet($spreadsheet, $file)
+    {
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Production Transactions');
+        $headers = ['Year', 'Month', 'Date', 'Journal', 'Entry Number', 'Description', 'Project', 'GL Account', 'GL Description', 'Warehouse', 'Item Code', 'Item Description', 'Qty', 'Amount', 'Unit Code'];
+        $sheet->fromArray($headers, NULL, 'A1');
+        $dataRange = 'A1:O1';
+        $sheet->setAutoFilter($dataRange);
+
+        $sheet->getColumnDimension('A')->setWidth(7.71);
+        $sheet->getColumnDimension('B')->setWidth(8);
+        $sheet->getColumnDimension('C')->setWidth(19.14);
+        $sheet->getColumnDimension('D')->setWidth(9.43);
+        $sheet->getColumnDimension('E')->setWidth(15.38);
+        $sheet->getColumnDimension('F')->setWidth(26.38);
+        $sheet->getColumnDimension('G')->setWidth(22.38);
+        $sheet->getColumnDimension('H')->setWidth(19.38);
+        $sheet->getColumnDimension('I')->setWidth(30.38);
+        $sheet->getColumnDimension('J')->setWidth(11.14);
+        $sheet->getColumnDimension('K')->setWidth(19.29);
+        $sheet->getColumnDimension('L')->setWidth(21.29);
+        $sheet->getColumnDimension('M')->setWidth(11.57);
+        $sheet->getColumnDimension('N')->setWidth(11.57);
+        $sheet->getColumnDimension('O')->setWidth(9.57);
+
+        $settings = json_decode($file->settings, true);
+        if (isset($settings['transaction_ids'])) {
+            $transactionIds = $settings['transaction_ids'];
+
+            $row = 2;
+            foreach ($transactionIds as $transactionId) {
+                $transaction = Transaction::find($transactionId);
+                $settings = json_decode($transaction->settings, true);
+
+                $date = new DateTime($transaction->date);
+                $formattedDate = $date->format('m/d/y h:i A');
+
+                $sheet->setCellValue("A$row", $transaction->year);
+                $sheet->setCellValue("B$row", $transaction->month);
+                $sheet->setCellValue("C$row", $formattedDate);
+                $sheet->setCellValue("D$row", $transaction->journal);
+                $sheet->setCellValue("E$row", $transaction->entry_num);
+                $sheet->setCellValue("F$row", $transaction->trans_desc);
+                $sheet->setCellValue("G$row", $transaction->project);
+                $sheet->setCellValue("H$row", $transaction->gl_account);
+                $sheet->setCellValue("I$row", $transaction->gl_desc);
+                $sheet->setCellValue("J$row", $transaction->warehouse);
+
+                if ($transaction->material_id != null) {
+                    $material = Material::find($transaction->material_id);
+
+                    $sheet->setCellValue("K$row", $material->material_code);
+                    $sheet->setCellValue("L$row", $material->material_desc);
+                    $sheet->setCellValue("M$row", $settings['qty']);
+                    $sheet->setCellValue("N$row", $material->material_cost);
+                    $sheet->setCellValue("O$row", $material->unit);
+                }
+
+                if ($transaction->fg_id != null) {
+                    $fg = FinishedGood::find($transaction->fg_id);
+
+                    $sheet->setCellValue("K$row", $fg->fg_code);
+                    $sheet->setCellValue("L$row", $fg->fg_desc);
+                    $sheet->setCellValue("M$row", $fg->total_batch_qty);
+                    $sheet->setCellValue("N$row", $fg->rm_cost);
+                    $sheet->setCellValue("O$row", $fg->unit);
+                }
+
+                if ($transaction->material_id == null && $transaction->fg_id == null) {
+                    $sheet->setCellValue("K$row", $settings['item_code']);
+                    $sheet->setCellValue("L$row", $settings['item_desc']);
+                    $sheet->setCellValue("M$row", $settings['qty']);
+                    $sheet->setCellValue("N$row", $settings['amount']);
+                    $sheet->setCellValue("O$row", $settings['unit']);
+                }
+
+
+                $row++;
+            }
         }
     }
 }
