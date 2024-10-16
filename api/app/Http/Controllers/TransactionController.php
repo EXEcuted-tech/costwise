@@ -9,6 +9,7 @@ use App\Models\Formulation;
 use App\Models\Material;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends ApiController
@@ -85,18 +86,17 @@ class TransactionController extends ApiController
     {
         $validator = Validator::make($request->all(), [
             'transactions' => 'required|array',
-            'transactions.*.transaction_id' => 'required|integer|exists:transactions,transaction_id',
+            'transactions.*.transaction_id' => 'required|integer',
             'transactions.*.journal' => 'required|string',
-            'transactions.*.entry_num' => 'required|integer',
+            'transactions.*.entry_num' => 'required|string',
             'transactions.*.trans_desc' => 'required|string',
             'transactions.*.project' => 'required|string',
             'transactions.*.gl_account' => 'required|string',
             'transactions.*.gl_desc' => 'required|string',
             'transactions.*.warehouse' => 'required|string',
             'transactions.*.date' => 'required|date',
-            'transactions.*.month' => 'required|integer|min:1|max:12',
-            'transactions.*.year' => 'required|integer|min:1900|max:' . date('Y'),
-            'transactions.*.settings' => 'required|string',
+            'transactions.*.month' => 'required',
+            'transactions.*.year' => 'required',
         ]);
 
 
@@ -107,25 +107,63 @@ class TransactionController extends ApiController
         }
 
         $transactions = $request->input('transactions');
+        $fileId = $request->input('file_id');
 
         foreach ($transactions as $transactionData) {
+            $settings = [];
             $transaction = Transaction::find($transactionData['transaction_id']);
-
             if ($transaction) {
                 if ($transaction->material_id != null) {
                     $material = Material::find($transaction->material_id);
-                    dd($material);
+                    if ($material) {
+                        $material->update([
+                            'material_code' => $transactionData['item_code'] ?? $material->material_code,
+                            'material_desc' => $transactionData['item_desc'] ?? $material->material_desc,
+                            'material_cost' => $transactionData['amount'] ?? $material->material_cost,
+                            'unit' => $transactionData['unit_code'] ?? $material->unit,
+                        ]);
+                    }
+                    $settings = ['qty' => $transactionData['qty'] ?? 0];
                 }
 
                 if ($transaction->fg_id != null) {
+                    $fg = FinishedGood::find($transaction->fg_id);
+                    if ($fg) {
+                        $fg->update([
+                            'fg_code' => $transactionData['item_code'] ?? $fg->fg_code,
+                            'fg_desc' => $transactionData['item_desc'] ?? $fg->fg_desc,
+                            'rm_cost' => $transactionData['amount'] ?? $fg->rm_cost,
+                            'unit' => $transactionData['unit_code'] ?? $fg->unit,
+                        ]);
+                    }
+                    $settings = [];
+                }
 
+                if (!$transaction->material_id && !$transaction->fg_id) {
+                    $itemCode = $transactionData['item_code'] ?? '';
+                    $settings = [
+                        'item_code' => $itemCode,
+                        'item_desc' => $transactionData['item_desc'] ?? '',
+                        'qty' => $transactionData['qty'] ?? 0,
+                        'amount' => $transactionData['amount'] ?? 0,
+                        'unit' => $transactionData['unit_code'] ?? ''
+                    ];
+                }
+
+                if (empty($settings)) {
+                    $settings = new \stdClass();
+                }
+
+                $entryNum = $transactionData['entry_num'] ?? $transaction->entry_num;
+                if (is_numeric($entryNum)) {
+                    $entryNum = rtrim(rtrim($entryNum, '0'), '.');
                 }
 
                 $transaction->update([
                     'material_id' => $transactionData['material_id'] ?? $transaction->material_id,
                     'fg_id' => $transactionData['fg_id'] ?? $transaction->fg_id,
                     'journal' => $transactionData['journal'] ?? $transaction->journal,
-                    'entry_num' => $transactionData['entry_num'] ?? $transaction->entry_num,
+                    'entry_num' => $entryNum,
                     'trans_desc' => $transactionData['trans_desc'] ?? $transaction->trans_desc,
                     'project' => $transactionData['project'] ?? $transaction->project,
                     'gl_account' => $transactionData['gl_account'] ?? $transaction->gl_account,
@@ -134,10 +172,88 @@ class TransactionController extends ApiController
                     'date' => $transactionData['date'] ?? $transaction->date,
                     'month' => $transactionData['month'] ?? $transaction->month,
                     'year' => $transactionData['year'] ?? $transaction->year,
-                    'settings' => $transactionData['settings'] ?? $transaction->settings,
+                    'settings' => json_encode($settings) ?? $transaction->settings,
                 ]);
             } else {
-                // Create new record
+                if (!isset($transactionData['material_id']) && !isset($transactionData['fg_id'])) {
+                    $itemCode = $transactionData['item_code'] ?? '';
+                    if (str_starts_with($itemCode, 'RM') || str_starts_with($itemCode, 'SA')) {
+                        $existingMaterial = Material::where('material_code', $itemCode)->first();
+                        if ($existingMaterial) {
+                            $transactionData['material_id'] = $existingMaterial->material_id;
+                        } else {
+                            $newMaterial = Material::create([
+                                'material_code' => $itemCode,
+                                'material_desc' => $transactionData['item_desc'] ?? '',
+                                'material_cost' => $transactionData['amount'] ?? 0,
+                                'unit' => $transactionData['unit_code'] ?? '',
+                                'date' => $transactionData['date'] ? Carbon::parse($transactionData['date'])->format('Y-m-d') : now()->format('Y-m-d'),
+                            ]);
+                            $transactionData['material_id'] = $newMaterial->material_id;
+                        }
+                        $settings = ['qty' => $transactionData['qty'] ?? 0];
+                    } elseif (str_starts_with($itemCode, 'EMULSION') || str_starts_with($itemCode, 'REWORK')) {
+                        $settings = [
+                            'item_code' => $itemCode,
+                            'item_desc' => $transactionData['item_desc'] ?? '',
+                            'qty' => $transactionData['qty'] ?? 0,
+                            'amount' => $transactionData['amount'] ?? 0,
+                            'unit' => $transactionData['unit_code'] ?? ''
+                        ];
+                    } else {
+                        $existingFinishedGood = FinishedGood::where('fg_code', $itemCode)->first();
+                        if ($existingFinishedGood) {
+                            $transactionData['fg_id'] = $existingFinishedGood->fg_id;
+                        } else {
+                            $newFinishedGood = FinishedGood::create([
+                                'fodl_id' => null,
+                                'fg_code' => $itemCode,
+                                'fg_desc' => $transactionData['item_desc'] ?? '',
+                                'total_batch_qty' => $transactionData['qty'] ?? 0,
+                                'rm_cost' => $transactionData['amount'] ?? 0,
+                                'unit' => $transactionData['unit_code'] ?? '',
+                                'monthYear' => Carbon::parse($transactionData['date'] ?? now())->format('Ym')
+                            ]);
+                            $transactionData['fg_id'] = $newFinishedGood->fg_id;
+                        }
+                        $settings = [];
+                    }
+                } 
+
+                if (empty($settings)) {
+                    $settings = new \stdClass();
+                }
+
+                $entryNum = $transactionData['entry_num'] ?? null;
+                if (is_numeric($entryNum)) {
+                    $entryNum = rtrim(rtrim($entryNum, '0'), '.');
+                }
+
+                $transaction = Transaction::create([
+                    'material_id' => $transactionData['material_id'] ?? null,
+                    'fg_id' => $transactionData['fg_id'] ?? null,
+                    'journal' => $transactionData['journal'] ?? null,
+                    'entry_num' => $entryNum,
+                    'trans_desc' => $transactionData['trans_desc'] ?? null,
+                    'project' => $transactionData['project'] ?? null,
+                    'gl_account' => $transactionData['gl_account'] ?? null,
+                    'gl_desc' => $transactionData['gl_desc'] ?? null,
+                    'warehouse' => $transactionData['warehouse'] ?? null,
+                    'date' => $transactionData['date'] ?? null,
+                    'month' => $transactionData['month'] ?? null,
+                    'year' => $transactionData['year'] ?? null,
+                    'settings' => json_encode($settings ?? new \stdClass()),
+                ]);
+
+                $file = File::find($fileId);
+                if ($file) {
+                    $fileSettings = json_decode($file->settings, true);
+                    if (isset($fileSettings['transaction_ids'])) {
+                        $fileSettings['transaction_ids'][] = $transaction->transaction_id;
+                        $file->settings = json_encode($fileSettings);
+                        $file->save();
+                    }
+                }
             }
         }
 
@@ -203,7 +319,47 @@ class TransactionController extends ApiController
 
         return true;
     }
-    
+
+    public function deleteBulk(Request $request)
+    {
+        $transaction_ids = $request->input('transaction_ids');
+        $fileId = $request->input('file_id');
+
+        $file = File::find($fileId);
+        if ($file) {
+            $fileSettings = json_decode($file->settings, true);
+            if (isset($fileSettings['transaction_ids'])) {
+                $fileSettings['transaction_ids'] = array_diff($fileSettings['transaction_ids'], $transaction_ids);
+                $file->settings = json_encode($fileSettings);
+                $file->save();
+            }
+        } else {
+            $this->status = 404;
+            $this->response['message'] = "File not found.";
+            return $this->getResponse();
+        }
+
+        $deletedCount = 0;
+        foreach ($transaction_ids as $transactionId) {
+            if (self::deleteTransaction($transactionId)) {
+                $deletedCount++;
+            }
+        }
+
+        if ($deletedCount == count($transaction_ids)) {
+            $this->status = 200;
+            $this->response['message'] = "All transactions deleted successfully.";
+        } elseif ($deletedCount > 0) {
+            $this->status = 206;
+            $this->response['message'] = "$deletedCount out of " . count($transaction_ids) . " transactions deleted successfully.";
+        } else {
+            $this->status = 404;
+            $this->response['message'] = "No transactions were deleted.";
+        }
+
+        return $this->getResponse();
+    }
+
     // public static function deleteTransaction($transactionId)
     // {
     //     $transaction = Transaction::find($transactionId);

@@ -17,6 +17,21 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/refresh', [AuthController::class, 'refresh']);
 
+// Route::prefix('/files')->group(function () {
+//     Route::post('upload', [FileController::class, 'upload']);
+//     Route::get('retrieve_all', [FileController::class, 'retrieveAll']);
+//     Route::get('retrieve', [FileController::class, 'retrieve']);
+//     Route::post('delete', [FileController::class, 'delete']);
+//     Route::post('export', [FileController::class, 'export']);
+//     Route::post('export_all', [FileController::class, 'exportAll']);
+// });
+
+// Route::prefix('/transactions')->group(function () {
+//     Route::get('retrieve_batch', [TransactionController::class, 'retrieveBatch']);
+//     Route::post('update_batch', [TransactionController::class, 'updateBatch']);
+//     Route::post('delete_bulk', [TransactionController::class, 'deleteBulk']);
+// });
+
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [UserController::class, 'getCurrentUser']);

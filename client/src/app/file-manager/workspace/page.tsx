@@ -33,14 +33,13 @@ const WorkspacePage = () => {
         const fetchData = async () => {
             const id = searchParams.get('id');
             const type = searchParams.get('type');
-
             if (id && type) {
                 setIsLoading(true);
                 try {
                     const tabType = type === 'master_file' ? 'master files' : 'transactions';
                     const fileNumber = type === 'master_file' ? 1 : 2;
                     localStorage.setItem('wkspTab', tabType);
-
+                    console.log(localStorage.getItem('wkspTab'));
                     const data = await retrieveFileData(Number(id));
 
                     setFileType(fileNumber);
@@ -57,7 +56,7 @@ const WorkspacePage = () => {
         };
 
         fetchData();
-    }, [searchParams, setFileType]);
+    }, [searchParams, setFileType, setTab]);
 
 
     const retrieveFileData = async (id: number) => {
