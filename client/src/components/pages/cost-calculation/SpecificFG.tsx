@@ -23,16 +23,9 @@ const SpecificFG: React.FC<SpecificFGProps> = ({ id, removeSheet, isOpen, monthY
     const [alertStatus, setAlertStatus] = useState<string>('');
     const [isLoading, setIsLoading] = useState(true);
 
-    const [workbookName, setWorkbookName] = useState<string>('');
     const [selectedFG, setSelectedFG] = useState<{name: string, id: number}>({name: '', id: 0});
     const [selectedFGDetails, setSelectedFGDetails] = useState<SpecificFinishedGood[]>([]);
 
-    //Save workbook name
-    const createWorkbookName = () => {
-        const month = monthYear.label.split(' ')[0];
-        const year = monthYear.label.split(' ')[1];
-        setWorkbookName(`${month} ${year}_Cost Calculation Breakdown Report`);
-    }
 
     //Retrieve FG info
     const handleChange = async (selectedValue: {name: string, id: number}) => {

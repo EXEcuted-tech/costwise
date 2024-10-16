@@ -22,6 +22,7 @@ const CostCalculation =() => {
     const [monthYearOptions, setMonthYearOptions] = useState<{value: number, label: string}[]>([]);
     const [monthYear, setMonthYear] = useState<{value: number, label: string}>({value: 0, label: ''});
     const [FGOptions, setFGOptions] = useState<{name: string, id: number}[]>([]);
+    const [fileName, setFileName] = useState<string>('sample');
     const [exportType, setExportType] = useState<string>('xlsx');
     const [sheets, setSheets] = useState<{id: number, data: SpecificFinishedGood | null}[]>([{ id: 0, data: null }]);
 
@@ -74,6 +75,11 @@ const CostCalculation =() => {
         }
     };
 
+    //Save workbook name
+    const createFileName = () => {
+        setFileName(`${monthYear.label}_Cost Calculation Breakdown Report`);
+    }
+
     //Export 
     const handleExport = async () => {
         const sheetData = sheets.filter(sheet => sheet.data !== null).map(sheet => sheet.data);
@@ -83,14 +89,27 @@ const CostCalculation =() => {
            return;
         }
 
+        console.log("Sheet Data: ", sheetData);
+        console.log("File name: ", fileName);
+
         try {
             const response = await api.post('/cost_calculation/export', {
-                sheets: sheetData,
-                exportType: exportType,
-                monthYear: monthYear.value
-            });
+                selected_fg: selectedFG,
+                data: sheetData,
+                export_type: exportType,
+                file_name: fileName
+            }, { responseType: 'blob' });
 
             if (response.status === 200) {
+                const url = window.URL.createObjectURL(new Blob([response.data]));
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `${fileName}.xlsx`;
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+
                 setAlertMessages(["Workbook exported successfully"]);
                 setAlertStatus("success");
             } else {
@@ -114,32 +133,32 @@ const CostCalculation =() => {
         }
     };
 
-        //Retrieve FG options
-        const retrieveFGOptions = async (monthYear: number) => {
-            try {
-                const response = await api.get('/cost_calculation/retrieve_fg', 
-                    {params: {monthYear: monthYear}})
+    //Retrieve FG options
+    const retrieveFGOptions = async (monthYear: number) => {
+        try {
+            const response = await api.get('/cost_calculation/retrieve_fg', 
+                {params: {monthYear: monthYear}})
     
-                if (response.status === 200) {
-    
-                    setFGOptions(response.data.data.map((fg: SpecificFinishedGood) => ({name: fg.fg_desc, id: fg.fg_id})));
-                    console.log("FG Options: ", response.data.data);
-                } else {
-                    setAlertMessages([...alertMessages, 'Error retrieving FG options.']);
-                    setAlertStatus('critical');
-                }
-    
-            } catch (error) {
-                console.error('Error retrieving FG options:', error);
+            if (response.status === 200) {
+
+                setFGOptions(response.data.data.map((fg: SpecificFinishedGood) => ({name: fg.fg_desc, id: fg.fg_id})));
+                console.log("FG Options: ", response.data.data);
+            } else {
                 setAlertMessages([...alertMessages, 'Error retrieving FG options.']);
                 setAlertStatus('critical');
             }
+    
+        } catch (error) {
+            console.error('Error retrieving FG options:', error);
+            setAlertMessages([...alertMessages, 'Error retrieving FG options.']);
+            setAlertStatus('critical');
         }
+    }
     
 
     useEffect(() => {
         retrieveMonthYearOptions();
-
+        createFileName();
         if (monthYear) { 
             //user must select monthYear first before retrieving FG options
             retrieveFGOptions(monthYear.value);

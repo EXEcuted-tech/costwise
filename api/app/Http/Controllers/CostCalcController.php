@@ -139,4 +139,112 @@ class CostCalcController extends ApiController
         }
     }
 
+
+    //Exporting
+    public function export(Request $request)
+    {
+        $fileName = $request->input('file_name');
+        $data = $request->input('data');
+        $exportType = $request->input('export_type');
+        $selectedFG = $request->input('selected_fg');
+
+        $spreadsheet = new Spreadsheet();
+
+        //remove default
+        $spreadsheet->removeSheetByIndex(0);
+
+        if ($exportType === 'xlsx') {
+            if($selectedFG === 'Specific-FG') {
+                foreach ($data as $fg) {
+                    $this->addSpecifiedFGSheet($spreadsheet, $fg);
+                }
+            } else {
+                // $this->addAllFGSheet($spreadsheet, $data);
+            }
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $tempFile = tempnam(sys_get_temp_dir(), $fileName);
+            $writer->save($tempFile);
+
+            return response()->download($tempFile, $fileName, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+                'Content-Disposition' => 'attachment; filename="' . $fileName . '.xlsx"',
+            ])->deleteFileAfterSend(true);
+
+        } else if ($exportType === 'csv') {
+            // if($selectedFG === 'Specific-FG') {
+            //     $this->addSpecifiedFGSheet($spreadsheet, $data);
+            // } else {
+            //     // $this->addAllFGSheet($spreadsheet, $data);
+            // }
+        }
+
+    }
+
+    private function addSpecifiedFGSheet($spreadsheet, $data)
+    {
+        $sheet = $spreadsheet->createSheet();
+        $fg = $data;
+
+        $sheet->setTitle("{$fg['desc']}");
+
+        $headers = ["Formula", "Level", "Item Code", "Description", "Batch Qty", "Unit", "Cost", "Total Cost"];
+
+        $sheet->fromArray($headers, NULL, 'A1');
+        $sheet->getStyle('A1:H1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->freezePane('A2');
+
+        $sheet->getColumnDimension('A')->setWidth(10);
+        $sheet->getColumnDimension('B')->setWidth(8.71);
+        $sheet->getColumnDimension('C')->setWidth(11.5);
+        $sheet->getColumnDimension('D')->setWidth(56.43);
+        $sheet->getColumnDimension('E')->setWidth(12.29);
+        $sheet->getColumnDimension('F')->setWidth(12.29);
+
+        $sheet->getStyle('A1:H1')->getFont()->setBold(true)->setSize(8)->setName('Open Sans');
+        $sheet->setAutoFilter('B1:H1');
+
+        $row = 2;
+        //Add FG Row
+        $sheet->setCellValue("A$row", $fg['formulation_no']);
+        $sheet->setCellValue("B$row", 1);
+        $sheet->setCellValue("C$row", $fg['code']);
+        $sheet->setCellValue("D$row", $fg['desc']);
+        $sheet->setCellValue("E$row", $fg['batch_qty']);
+        $sheet->setCellValue("F$row", $fg['unit']);
+        $sheet->setCellValue("G$row", $fg['rm_cost']);
+        $sheet->setCellValue("H$row", $fg['total_cost']);
+
+        $sheet->getStyle("A$row:H$row")->getFill()->setFillType(Fill::FILL_SOLID);
+        $sheet->getStyle("A$row:H$row")->getFill()->getStartColor()->setRGB('FFEBEB');
+        $sheet->getStyle("A$row:H$row")->getFont()->setSize(8)->setName('Open Sans');
+        $row++;
+
+        // Add components
+        foreach ($fg['components'] as $component) {
+            $sheet->setCellValue("A$row", "");
+            $sheet->setCellValue("B$row", $component['level']);
+            $sheet->setCellValue("C$row", $component['item_code'] ?? "");
+
+            // Handle the special case for the first component (likely the emulsion)
+            if (!isset($component['description']) && isset($component['qty'])) {
+                $sheet->setCellValue("D$row", "EMULSION");
+                $sheet->setCellValue("E$row", $component['qty']);
+            } else {
+                $sheet->setCellValue("D$row", $component['description'] ?? "");
+                $sheet->setCellValue("E$row", $component['batch_quantity'] ?? "");
+            }
+
+            $sheet->setCellValue("F$row", $component['unit']);
+            $sheet->setCellValue("G$row", $component['cost'] ?? "");
+            $sheet->setCellValue("H$row", $component['total_cost'] ?? "");
+            $sheet->getStyle("A$row:H$row")->getFont()->setSize(8)->setName('Open Sans');
+            $row++;
+        }
+
+            // Apply number formatting
+            $sheet->getStyle('E2:E' . ($row - 1))->getNumberFormat()->setFormatCode('0.00');
+            $sheet->getStyle('G2:H' . ($row - 1))->getNumberFormat()->setFormatCode('0.00');
+        }
+
 }

@@ -91,6 +91,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_month_year_options', [CostCalcController::class, 'retrieveMonthYearOptions']);
         Route::get('retrieve_fg', [CostCalcController::class, 'retrieveFGOptions']);
         Route::get('retrieve_fg_details', [CostCalcController::class, 'retrieveFGDetails']);
+        Route::post('export', [CostCalcController::class, 'export']);
     });
 });
 
