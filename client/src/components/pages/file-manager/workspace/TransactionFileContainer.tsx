@@ -7,6 +7,7 @@ import { File, TransactionRecord } from '@/types/data';
 import api from '@/utils/api'
 import Alert from '@/components/alerts/Alert'
 import PrimaryPagination from '@/components/pagination/PrimaryPagination'
+import { useFileManagerContext } from '@/contexts/FileManagerContext'
 
 const TransactionFileContainer = (data: File) => {
   const [isEdit, setIsEdit] = useState(false);
@@ -14,22 +15,32 @@ const TransactionFileContainer = (data: File) => {
 
   const [transactionData, setTransactionData] = useState<TransactionRecord[]>([]);
   const [transactionsCount, setTransactionsCount] = useState(0);
-  
+
   const [showScrollMessage, setShowScrollMessage] = useState(true);
   const [alertMessages, setAlertMessages] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
   const [removedIds, setRemovedIds] = useState<number[]>([]);
 
   const [currentPage, setCurrentPage] = useState<number>(1);
+  const [addedRowsCount, setAddedRowsCount] = useState<number>(0);
+
+  const [itemsPerPage, setItemsPerPage] = useState(100);
+
   const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
-      setCurrentPage(page);
+    setCurrentPage(page);
   };
 
-  const itemsPerPage = 100;
-  // addedRowsCount
+  useEffect(() => {
+    setItemsPerPage(100 + addedRowsCount);
+  }, [addedRowsCount]);
+
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentListPage = transactionData.slice(indexOfFirstItem, indexOfLastItem);
+
+  // useEffect(() => {
+  //   setTransactionsCount(transactionData.length); // Update the count based on current data
+  // }, [transactionData]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -77,8 +88,16 @@ const TransactionFileContainer = (data: File) => {
           const settings = data.settings ? JSON.parse(data.settings) : {};
           validResults.push({
             id: data.transaction_id,
-            year: data.year,
+            track_id: data.material_id != null
+              ? data.material?.material_id
+              : data.fg_id != null
+                ? data.finished_good?.fg_id
+                : data.transaction_id,
+            rowType: data.material_id != null
+              ? 'material'
+              : data.fg_id != null ? 'finishedGood' : 'transaction',
             month: data.month,
+            year: data.year,
             date: data.date,
             journal: data.journal,
             entryNumber: data.entry_num,
@@ -128,7 +147,7 @@ const TransactionFileContainer = (data: File) => {
     // try {
     console.log(transactions);
     const hasEmptyEntry = transactions.some(item => {
-      console.log(item);
+      //console.log(item);
       return (
         (item.date === "" ||
           item.amount === "" ||
@@ -144,20 +163,23 @@ const TransactionFileContainer = (data: File) => {
           item.quantity === "" ||
           item.unitCode === "" ||
           item.date === "" ||
-          item.year === ""||
+          item.year === "" ||
           item.month === ""
         )
       );
     });
 
-    console.log(hasEmptyEntry);
+    // console.log(hasEmptyEntry);
     if (hasEmptyEntry) {
       setAlertMessages(['One or more entries are empty. Please fill in all required fields.']);
       return;
     }
 
+
     const transformedTransactions = transactions.map((item) => ({
       transaction_id: item.id,
+      material_id: item.rowType === 'material' ? item.track_id : null,
+      fg_id: item.rowType === 'finishedGood' ? item.track_id : null,
       journal: item.journal,
       entry_num: item.entryNumber,
       trans_desc: item.description,
@@ -168,56 +190,87 @@ const TransactionFileContainer = (data: File) => {
       date: item.date,
       month: item.month,
       year: item.year,
-      settings: item.settings
+      item_code: item.itemCode,
+      item_desc: item.itemDescription,
+      qty: parseFloat(item.quantity),
+      amount: parseFloat(item.amount),
+      unit_code: item.unitCode
     }));
 
     const payload = {
+      file_id: data.file_id,
       transactions: transformedTransactions,
     };
 
     console.log(payload);
-    // const saveResponse = await api.post('/materials/update_batch', payload);
+    try {
+      const saveResponse = await api.post('/transactions/update_batch', payload);
 
-    //   if (saveResponse.data.status === 200) {
-    //     setSuccessMessage('Material sheet saved successfully.');
+      if (saveResponse.data.status === 200) {
+        setSuccessMessage('Transaction sheet saved successfully.');
+      } else {
+        if (saveResponse.data.message) {
+          setAlertMessages([saveResponse.data.message]);
+        } else if (saveResponse.data.errors) {
+          setAlertMessages(saveResponse.data.errors);
+        }
+      }
+    } catch (error: any) {
+      if (error.response?.data?.message) {
+        setAlertMessages([error.response.data.message]);
+      } else if (error.response?.data?.errors) {
+        const errorMessages = [];
+        for (const key in error.response.data.errors) {
+          if (error.response.data.errors.hasOwnProperty(key)) {
+            errorMessages.push(...error.response.data.errors[key]);
+          }
+        }
+        setAlertMessages(errorMessages);
+      } else {
+        setAlertMessages(['An error occurred while saving the transaction. Please try again.']);
+      }
+    }
 
-    //     if (removedMaterialIds.length > 0) {
-    //       try {
-    //         const deletePayload = {
-    //           material_ids: removedMaterialIds,
-    //           file_id: data.file_id,
-    //         };
-    //         const deleteResponse = await api.post('/materials/delete_bulk', deletePayload);
+    if (removedIds.length > 0) {
+      try {
+        const deletePayload = {
+          transaction_ids: removedIds,
+          file_id: data.file_id,
+        };
 
-    //         if (deleteResponse.data.status === 200) {
-    //           setSuccessMessage('Material records deleted successfully.');
-    //           setRemovedFodlIds([]);
-    //         } else {
-    //           setAlertMessages(['Failed to bulk delete Material IDs.']);
-    //         }
-    //       } catch (deleteError) {
-    //         setAlertMessages(['An error occurred while deleting Material records.']);
-    //       }
-    //     }
-    //   } else {
-    //     const errorMsg = saveResponse.data.message || 'Failed to save material sheet.';
-    //     setAlertMessages([errorMsg]);
-    //   }
-    // } catch (error: any) {
-    //   if (error.response?.data?.message) {
-    //     setAlertMessages([error.response.data.message]);
-    //   } else if (error.response?.data?.errors) {
-    //     const errorMessages = [];
-    //     for (const key in error.response.data.errors) {
-    //       if (error.response.data.errors.hasOwnProperty(key)) {
-    //         errorMessages.push(...error.response.data.errors[key]);
-    //       }
-    //     }
-    //     setAlertMessages(errorMessages);
-    //   } else {
-    //     setAlertMessages(['Error saving Material sheet. Please try again.']);
-    //   }
-    // }
+        const deleteResponse = await api.post('/transactions/delete_bulk', deletePayload);
+
+        if (deleteResponse.data.status === 200) {
+          setSuccessMessage('Transaction/s deleted successfully.');
+          setRemovedIds([]);
+        } else {
+          setAlertMessages(['Failed to bulk delete Transactions.']);
+        }
+      } catch (error: any) {
+        if (error.response?.data?.message) {
+          setAlertMessages([error.response.data.message]);
+        } else if (error.response?.data?.errors) {
+          const errorMessages = [];
+          for (const key in error.response.data.errors) {
+            if (error.response.data.errors.hasOwnProperty(key)) {
+              errorMessages.push(...error.response.data.errors[key]);
+            }
+          }
+          setAlertMessages(errorMessages);
+        } else {
+          setAlertMessages(['An error occurred while saving the transaction. Please try again.']);
+        }
+      }
+    }
+
+
+    setTimeout(() => {
+      setAlertMessages([]);
+      // const updatedLastPage = Math.ceil(transactionData.length / itemsPerPage);
+      // setCurrentPage(updatedLastPage);
+    }, 25000);
+
+    // window.location.reload();
   };
 
   return (
@@ -261,12 +314,11 @@ const TransactionFileContainer = (data: File) => {
                   removedIds={removedIds}
                   setRemovedIds={setRemovedIds}
                   transactionCount={transactionsCount}
-                  setTransactionCount = {setTransactionsCount}
                 />
               </div>
             </div>
             {currentListPage.length > 0 &&
-              < div className='relative py-[1%]'>
+              <div className='relative py-[1%]'>
                 <PrimaryPagination
                   data={transactionData}
                   itemsPerPage={itemsPerPage}

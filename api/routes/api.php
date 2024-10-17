@@ -37,6 +37,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_batch', [FinishedGoodController::class, 'retrieveBatch']);
         Route::post('create', [FinishedGoodController::class, 'create']);
         Route::post('update', [FinishedGoodController::class, 'update']);
+        Route::post('update_or_create', [FinishedGoodController::class, 'updateOrCreate']);
     });
 
     Route::prefix('/fodls')->group(function () {
@@ -64,6 +65,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('update_batch', [BomController::class, 'updateBatch']);
         Route::post('delete', [BomController::class, 'delete']);
         Route::post('create', [BomController::class, 'create']);
+        Route::post('update_create_batch', [BomController::class, 'updateOrCreateBatch']);
     });
 
     Route::prefix('/formulations')->group(function () {
@@ -74,7 +76,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('create', [FormulationController::class, 'create']);
         Route::post('update_emulsion', [FormulationController::class, 'updateEmulsion']);
         Route::post('delete', [FormulationController::class, 'delete']);
-        Route::post('delete_fg', [FormulationController::class, 'deleteBulkWithFg']);
+        Route::post('delete_fg', [FormulationController::class, 'deleteBulkWithFG']);
         Route::post('delete_material', [FormulationController::class, 'deleteBulkWithMaterial']);
         Route::post('upload', [FormulationController::class, 'upload']);
         Route::post('export', [FormulationController::class, 'export']);

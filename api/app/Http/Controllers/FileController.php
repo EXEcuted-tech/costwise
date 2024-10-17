@@ -167,10 +167,13 @@ class FileController extends ApiController
 
             \DB::commit();
 
-            return response()->json(['message' => 'BOM and associated data deleted successfully'], 200);
+            $this->status = 200;
+            return $this->getResponse('BOM and associated data deleted successfully');
         } catch (\Exception $e) {
             \DB::rollBack();
-            return response()->json(['error' => $e->getMessage()], 500);
+            $this->status = 500;
+            $this->response['error'] = $e->getMessage();
+            return $this->getResponse();
         }
     }
 
@@ -200,14 +203,18 @@ class FileController extends ApiController
 
             $this->processExcel($file->getRealPath(), $uploadType);
 
-            $this->calculateLeastCost($this->fileModel);
+            if ($uploadType == 'master') {
+                $this->calculateLeastCost($this->fileModel);
+            }
             File::create($this->fileModel);
 
             $this->status = 200;
             return $this->getResponse();
         }
 
-        return response()->json(['error' => 'Unsupported file type'], 400);
+        $this->status = 400;
+        $this->response['error'] = 'Unsupported file type';
+        return $this->getResponse();
     }
 
     private function processExcel($file, $uploadType)
@@ -796,53 +803,65 @@ class FileController extends ApiController
 
     public function exportAll(Request $request)
     {
-        // try {
-        $files = File::all();
+        try {
+            $files = File::all();
 
-        if ($files->isEmpty()) {
-            return response()->json(['message' => 'No files to export'], 404);
-        }
-
-        $tempDir = sys_get_temp_dir() . '/exported_files_' . time();
-        if (!is_dir($tempDir)) {
-            if (!mkdir($tempDir, 0777, true) && !is_dir($tempDir)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $tempDir));
-            }
-        }
-
-        $zip = new ZipArchive();
-        $zipFileName = $tempDir . '/exported_files.zip';
-        if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-            throw new \RuntimeException("Unable to open the zip file: $zipFileName");
-        }
-
-        foreach ($files as $file) {
-            $spreadsheet = new Spreadsheet();
-
-            if ($file->file_type === 'master_file') {
-                $this->addMasterFileSheets($spreadsheet, $file);
-            } elseif ($file->file_type === 'transactional_file') {
-                $this->addTransactionalFileSheet($spreadsheet, $file);
+            if ($files->isEmpty()) {
+                return response()->json(['message' => 'No files to export'], 404);
             }
 
-            $fileName = $file->file_name_with_extension;
+            $zipFileName = storage_path('app/temp/exported_files_' . time() . '.zip');
+            $zip = new ZipArchive();
+            if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+                throw new \RuntimeException("Unable to create zip file");
+            }
 
-            $tempFilePath = $tempDir . '/' . $fileName;
-            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-            $writer->save($tempFilePath);
+            foreach ($files as $file) {
+                $spreadsheet = new Spreadsheet();
+    
+                if ($file->file_type === 'master_file') {
+                    $this->addMasterFileSheets($spreadsheet, $file);
+                } elseif ($file->file_type === 'transactional_file') {
+                    $this->addTransactionalFileSheet($spreadsheet, $file);
+                }
+    
+                $fileName = $file->file_name_with_extension;
+                $fileDate = new DateTime($file->created_at);
+                $folderName = $fileDate->format('Y_m');
 
-            $zip->addFile($tempFilePath, $fileName);
+                $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+                
+                // Write to a PHP output stream instead of a file
+                $tempStream = fopen('php://temp', 'r+');
+                $writer->save($tempStream);
+                
+                // Reset stream pointer
+                rewind($tempStream);
+                
+                // Add the stream content to the zip file
+                $zip->addFromString($folderName . '/' . $fileName, stream_get_contents($tempStream));
+                
+                // Close the stream
+                fclose($tempStream);
+            }
+
+            $zip->close();
+
+            // Add debug information
+            \Log::info('Zip file created: ' . $zipFileName);
+            \Log::info('Zip file size: ' . filesize($zipFileName) . ' bytes');
+
+            $response = response()->download($zipFileName, 'exported_files.zip', [
+                'Content-Type' => 'application/zip',
+            ])->deleteFileAfterSend(true);
+
+            return $response;
+
+        } catch (\Exception $e) {
+            \Log::error('Export failed: ' . $e->getMessage());
+            \Log::error('Stack trace: ' . $e->getTraceAsString());
+            return response()->json(['message' => "Export failed: " . $e->getMessage()], 500);
         }
-
-        $zip->close();
-
-        return response()->download($zipFileName, 'exported_files.zip', [
-            'Content-Type' => 'application/zip',
-        ])->deleteFileAfterSend(true);
-
-        // } catch (\Exception $e) {
-        //     return response()->json(['message' => "Export failed: " . $e->getMessage()], 500);
-        // }
     }
 
     // public function exportAll(Request $request)
