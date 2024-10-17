@@ -126,6 +126,13 @@ const config: Config = {
           '75%': { color: '#B22222' },
           '100%': { color: '#414141' },
         },
+        slide: {
+          "0%": { transform: "translateY(100%)", opacity: '0.1' },
+          "15%": { transform: "translateY(0)", opacity: '1' },
+          "30%": { transform: "translateY(0)", opacity: '1' },
+          "45%": { transform: "translateY(-100%)", opacity: '1' },
+          "100%": { transform: "translateY(-100%)", opacity: '0.1' },
+        },
       },
       animation: {
         'shrink-in': 'shrink-in 0.5s ease-in-out forwards',
@@ -146,6 +153,7 @@ const config: Config = {
         'border-pulse2': 'border-pulse2 3s infinite',
         'color-pulse': 'colorPulse 5s ease-in-out infinite',
         'color-pulse2': 'colorPulse2 10s ease-in-out infinite',
+        'slide': 'slide 2.5s linear infinite',
       },
       backgroundImage: {
         'virginia-mascot': "url('/images/virginia-mascot-bg.png')",

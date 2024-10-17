@@ -2,8 +2,12 @@ import React, { useRef, useState } from 'react';
 import { AiOutlineDown } from 'react-icons/ai';
 import { IoCalendarSharp } from "react-icons/io5";
 
-const CustomDatePicker = () => {
-  const [selectedDate, setSelectedDate] = useState('');
+interface CustomDatePickerProps {
+  selectedDate: string;
+  setSelectedDate: React.Dispatch<React.SetStateAction<string>>;
+}
+
+const CustomDatePicker: React.FC<CustomDatePickerProps> = ({ selectedDate, setSelectedDate }) => {
   const dateInputRef = useRef<HTMLInputElement>(null);
 
   const handleDateChange = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -16,6 +20,13 @@ const CustomDatePicker = () => {
     }
   };
 
+  const formattedDate = selectedDate &&
+    new Date(selectedDate).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: '2-digit',
+      day: '2-digit',
+      timeZone: 'UTC',
+    });
   return (
     <div className="relative w-full">
       <input
@@ -29,7 +40,7 @@ const CustomDatePicker = () => {
       <div className="relative">
         <input
           type="text"
-          value={selectedDate}
+          value={formattedDate}
           placeholder="Date Added"
           className="w-full pl-10 pr-10 bg-white border border-[#868686] text-[#5C5C5C] placeholder-[#B0B0B0] text-[15px] rounded-[5px] py-[3px] cursor-pointer"
           readOnly

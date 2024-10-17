@@ -32,7 +32,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({ id, removeSheet, isOpen, sheetD
     } as { [key: number]: string };
 
     const handleChange = (selectedValue: string) => {
-        console.log('Selected:', selectedValue);
+        // console.log('Selected:', selectedValue);
         // Add your logic here
       };
 

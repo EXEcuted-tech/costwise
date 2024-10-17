@@ -17,13 +17,67 @@ import { useFileManagerContext } from '@/contexts/FileManagerContext';
 import { useDropzone } from 'react-dropzone';
 import api from '@/utils/api';
 import * as XLSX from 'xlsx';
+import Alert from "@/components/alerts/Alert";
+import { File } from '@/types/data';
 
 const FileManagerPage = () => {
   const { isOpen } = useSidebarContext();
   const { deleteModal, setDeleteModal } = useFileManagerContext();
   const [tab, setTab] = useState('all');
   const [upload, setUpload] = useState(false);
+  const [uploadType, setUploadType] = useState('');
+  const [infoMsg, setInfoMsg] = useState('');
+  const [errorMsg, setErrorMsg] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [allData, setAllData] = useState<File[]>([]);
+  const [masterFileData, setMasterFileData] = useState<File[]>([]);
+  const [transactionData, setTransactionData] = useState<File[]>([]);
+
   const ref = useOutsideClick(() => setUpload(false));
+
+  const fetchData = useCallback(async () => {
+    setIsLoading(true);
+
+    try {
+      if (tab === 'all') {
+        const response = await api.get('/files/retrieve_all');
+        if (response.data.status === 200) {
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1000);
+          setAllData(response.data.data);
+        }
+      } else if (tab === 'masterfile') {
+        const response = await api.get('/files/retrieve', {
+          params: { col: 'file_type', value: 'master_file' },
+        });
+        if (response.data.status === 200) {
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1000);
+          setMasterFileData(response.data.data);
+        }
+      } else if (tab === 'transactionfile') {
+        const response = await api.get('/files/retrieve', {
+          params: { col: 'file_type', value: 'transactional_file' }, //will improve this to batch if needed
+        });
+        if (response.data.status === 200) {
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1000);
+          setTransactionData(response.data.data);
+        }
+      }
+    } catch (error) {
+      console.error('Error fetching data:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  }, [tab]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   useEffect(() => {
     const currentTab = localStorage.getItem('fileTab');
@@ -32,66 +86,92 @@ const FileManagerPage = () => {
     }
   }, []);
 
-  const [uploadType, setUploadType] = useState('');
-
   const onDrop = useCallback(
     (acceptedFiles: any[]) => {
-      const file = acceptedFiles[0];
-  
-      if (file.type === 'text/csv') {
-        // Handle CSV file
-        // ... (CSV handling code as before)
-      } else {
-        // Handle Excel file
+      setErrorMsg('');
+      setInfoMsg('');
+      setUpload(false);
+      setIsLoading(true);
+
+      const processFile = async (file: any) => {
         const reader = new FileReader();
-  
-        reader.onload = (e: ProgressEvent<FileReader>) => {
-          const data = e.target?.result;
-  
-          if (data && data instanceof ArrayBuffer) {
-            const dataArray = new Uint8Array(data);
-            const workbook = XLSX.read(dataArray, { type: 'array' });
-  
-            // Get the sheet names
-            const sheetNames = workbook.SheetNames;
-  
-            // Now you can check the sheet names
-            console.log('Sheet Names:', sheetNames);
-  
-            // Add your condition here to check for specific sheet names
-            if (sheetNames.includes('SUMMARY OF PRODUCT COSTING')) {
-              // Proceed with uploading the file
-              const formData = new FormData();
-              formData.append('file', file);
-              formData.append('type', uploadType);
-  
-              api
-                .post('/api/upload', formData)
-                .then((response) => {
-                  console.log("Response: ",response);
-                })
-                .catch((error) => {
+
+        return new Promise((resolve, reject) => {
+          reader.onload = async (e: ProgressEvent<FileReader>) => {
+            const data = e.target?.result;
+
+            if (data && data instanceof ArrayBuffer) {
+              const dataArray = new Uint8Array(data);
+              const workbook = XLSX.read(dataArray, { type: 'array' });
+
+              const sheetNames = workbook.SheetNames;
+
+              let hasRequiredSheets = false;
+              let bomSheets = [];
+
+              if (uploadType === 'master') {
+                const requiredSheets = ['FODL Cost', 'Material Cost'];
+                const bomSheetPattern = /^BOM/;
+                hasRequiredSheets = requiredSheets.every(sheetName => sheetNames.includes(sheetName));
+                bomSheets = sheetNames.filter(sheetName => bomSheetPattern.test(sheetName));
+              } else if (uploadType === 'transactional') {
+                const requiredSheets = ['Production Transactions'];
+                hasRequiredSheets = requiredSheets.every(sheetName => sheetNames.includes(sheetName));
+              }
+
+              if (
+                hasRequiredSheets &&
+                ((uploadType === 'master' && bomSheets.length > 0) || uploadType === 'transactional')
+              ) {
+                const formData = new FormData();
+                formData.append('file', file);
+                formData.append('type', uploadType);
+
+                try {
+                  const response = await api.post('/files/upload', formData);
+                  if (response.data.status === 200) {
+                    resolve(true);
+                  } else {
+                    reject(new Error('Upload failed'));
+                  }
+                } catch (error) {
                   console.error(error);
-                });
+                  reject(error);
+                }
+              } else {
+                reject(new Error('The Excel file does not contain the required sheets.'));
+              }
             } else {
-              // Handle the case where the required sheet is not present
-              alert('The Excel file does not contain the required sheets.');
+              reject(new Error('Error: FileReader result is not an ArrayBuffer.'));
             }
-          } else {
-            console.error('Error: FileReader result is not an ArrayBuffer.');
-          }
-        };
-  
-        reader.onerror = (ex) => {
-          console.error(ex);
-        };
-  
-        reader.readAsArrayBuffer(file);
-      }
+          };
+
+          reader.onerror = (ex) => {
+            reject(ex);
+          };
+
+          reader.readAsArrayBuffer(file);
+        });
+      };
+
+      Promise.all(acceptedFiles.map(processFile))
+        .then((results) => {
+          const successCount = results.filter(Boolean).length;
+          setInfoMsg(`Successfully uploaded ${successCount} file(s)!`);
+          fetchData();
+        })
+        .catch((error) => {
+          setErrorMsg(error.message);
+        })
+        .finally(() => {
+          setTimeout(() => {
+            setIsLoading(false);
+          }, 1000);
+        });
     },
-    [uploadType]
+    [fetchData, uploadType]
   );
-  
+
   const { getRootProps, getInputProps, open } = useDropzone({
     onDrop,
     noClick: true,
@@ -105,12 +185,94 @@ const FileManagerPage = () => {
 
   const handleUpload = (type: React.SetStateAction<string>) => {
     setUploadType(type);
-    open();
+    setShouldOpenDropzone(true);
+  };
+
+  const [shouldOpenDropzone, setShouldOpenDropzone] = useState(false);
+
+  useEffect(() => {
+    if (shouldOpenDropzone) {
+      open();
+      setShouldOpenDropzone(false);
+    }
+  }, [uploadType, shouldOpenDropzone, open]);
+
+  // const handleExportAll = async () => {
+  //   try {
+  //     const response = await api.post('/files/export_all', {}, {
+  //       responseType: 'blob',
+  //     });
+
+  //     const url = window.URL.createObjectURL(new Blob([response.data]));
+
+  //     const a = document.createElement('a');
+  //     a.href = url;
+  //     a.download = 'exported_files.zip';
+  //     document.body.appendChild(a);
+
+  //     a.click();
+
+  //     a.remove();
+  //     window.URL.revokeObjectURL(url);
+
+  //   } catch (error) {
+  //     console.error('Export all files failed:', error);
+  //   }
+  // };
+
+  const handleExportAll = async () => {
+    try {
+      const response = await api.post('/files/export_all', {}, {
+        responseType: 'blob',
+      });
+
+      // Check if the response is actually a blob
+      if (response.data instanceof Blob) {
+        // Check if the blob is not empty
+        if (response.data.size > 0) {
+          const url = window.URL.createObjectURL(response.data);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = 'exported_all_files.zip';
+          document.body.appendChild(a);
+          a.click();
+          a.remove();
+          window.URL.revokeObjectURL(url);
+        } else {
+          console.error('Received an empty zip file');
+          // Handle empty zip file (e.g., show an error message to the user)
+        }
+      } else {
+        // If it's not a blob, it might be an error response
+        const errorText = await response.data.text();
+        console.error('Export failed:', errorText);
+        // Handle error (e.g., show error message to the user)
+      }
+    } catch (error) {
+      console.error('Export all files failed:', error);
+      // Handle error (e.g., show error message to the user)
+    }
   };
 
   return (
     <>
-      {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" />}
+      <div className="absolute top-0 right-0">
+        {errorMsg != '' &&
+          <Alert
+            className="!relative"
+            variant='critical'
+            message={errorMsg}
+            setClose={() => { setErrorMsg(''); }} />
+        }
+        {infoMsg != '' &&
+          <Alert
+            className="!relative"
+            variant='success'
+            message={infoMsg}
+            setClose={() => { setInfoMsg(''); }} />
+        }
+      </div>
+      {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" onProceed={() => {}} />}
       <Header icon={BsFolderFill} title={"File Manager"} />
       <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px] mt-[75px] 2xl:mt-[40px]' : 'px-[50px] mt-[36px]'} ml-[45px]`}>
         <div className='flex relative'>
@@ -127,10 +289,12 @@ const FileManagerPage = () => {
             <button className='flex justify-center items-center bg-white border-1 border-[#D3D3D3] px-[10px] mr-[1%] drop-shadow rounded-[10px]
                             hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'>
               <VscExport className={`${isOpen ? 'text-[10.5px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`} />
-              <p className={`ml-[5px] font-bold ${isOpen ? 'hidden 2xl:block 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`}>
+              <p className={`ml-[5px] font-bold ${isOpen ? 'hidden 2xl:block 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`}
+                onClick={handleExportAll}>
                 Export All Files
               </p>
-              <p className={`ml-[5px] font-bold ${isOpen ? 'text-[10.5px] 2xl:hidden' : 'hidden'}`}>
+              <p className={`ml-[5px] font-bold ${isOpen ? 'text-[10.5px] 2xl:hidden' : 'hidden'}`}
+                onClick={handleExportAll}>
                 Export All
               </p>
             </button>
@@ -152,7 +316,7 @@ const FileManagerPage = () => {
                     </li>
                     <hr className='h-[2px] bg-primary opacity-50' />
                     <li className={`${isOpen ? 'px-1 2xl:px-3' : 'px-1 2xl:px-3'} flex cursor-pointer hover:text-[#851313] items-center my-[5px]`}
-                      onClick={() => handleUpload('transaction')}>
+                      onClick={() => handleUpload('transactional')}>
                       <BiFile className={`${isOpen ? 'text-[12px] 2xl:text-[18px] 3xl:text-[21px]' : 'text-[17px] 2xl:text-[21px]'} mr-1`} />
                       <p className={`${isOpen ? 'text-[10.5px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'} `}>Transaction</p>
                     </li>
@@ -163,7 +327,16 @@ const FileManagerPage = () => {
           </div>
         </div>
         <div>
-          <FileContainer tab={tab} isOpen={isOpen} />
+          {/* <FileContainer tab={tab} isOpen={isOpen} isLoading={isLoading} setIsLoading={setIsLoading} /> */}
+          <FileContainer
+            tab={tab}
+            isOpen={isOpen}
+            isLoading={isLoading}
+            setIsLoading={setIsLoading}
+            allData={allData}
+            masterFileData={masterFileData}
+            transactionData={transactionData}
+          />
         </div>
       </div>
     </>
