@@ -81,6 +81,7 @@ function LoginPage() {
 
         setCurrentUser(currentUs);
         console.log(currentUser?.email);
+        localStorage.setItem('currentUser', JSON.stringify(currentUs));
 
         setTimeout(() => {
           setIsLoading(false);

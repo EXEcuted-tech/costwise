@@ -12,6 +12,7 @@ import AuditDrawer from "@/components/drawer/audit-drawer";
 import PrimaryPagination from "@/components/pagination/PrimaryPagination";
 import api from "@/utils/api";
 import { useUserContext } from "@/contexts/UserContext";
+import Spinner from "@/components/loaders/Spinner";
 
 enum ActionType {
     General = 'general',
@@ -45,7 +46,8 @@ interface AuditLogPageProps {
 const AuditLogPage = () => {
     const { drawerOpen, setDrawerOpen } = useDrawerContext();
     const { isOpen, setIsOpen } = useSidebarContext();
-    const { currentUser } = useUserContext();
+    const { currentUser, setCurrentUser } = useUserContext();
+    const [isLoading, setIsLoading] = useState(true);
 
     const [selectedData, setSelectedData] = useState<AuditTableProps | null>(null);
     const toggleDrawer = () => setDrawerOpen(!drawerOpen);
@@ -66,9 +68,18 @@ const AuditLogPage = () => {
     const indexOfFirstItem = indexOfLastItem - 8;
     const currentListPage = auditLogs ? auditLogs.slice(indexOfFirstItem, indexOfLastItem) : [];
 
-    
+        
     useEffect(() => {
-        // console.log(currentUser);
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            try {
+                const parsedUser = JSON.parse(storedUser);
+                setCurrentUser(parsedUser);
+            } catch (error) {
+                console.error("Error parsing stored user:", error);
+            }
+        }
+        console.log(currentUser);
         const interval = setInterval(() => {
             const fetchData = async () => {
                 try {
@@ -87,6 +98,7 @@ const AuditLogPage = () => {
                         department: log.user.department
                     }));
                     setAuditLogs(logs);
+                    setIsLoading(false);
                 } catch (error: any) {
                     console.error("Failed to fetch audit logs:", error);
                 }
@@ -94,7 +106,7 @@ const AuditLogPage = () => {
             fetchData();
         }, 5000);
         return () => clearInterval(interval);
-    }, [currentUser]);
+    }, [setCurrentUser]);
 
     return (
         <div className={`w-full h-screen font-lato bg-background`}>
@@ -120,7 +132,7 @@ const AuditLogPage = () => {
                     </button>
                 </div>
                 {/* Table */}
-                <table className="w-full">
+                <table className='w-full'>
                     <thead>
                         <tr className="flex text-[18px] 4xl:text-[22px] p-[15px] 4xl:p-[20px] bg-primary text-white font-bold rounded-t-[20px] text-left">
                             <th className="w-[28%]">Timestamp</th>
@@ -131,7 +143,7 @@ const AuditLogPage = () => {
                     </thead>
                     <tbody>
                         {currentListPage.length > 0 ? currentListPage.map((auditLogs, index) => (
-                            <tr key={index} className={`flex w-full h-[74px] items-center text-[14px] 4xl:text-[18px] pl-[15px] 4xl:pl-[20px] py-[7px] 4xl:py-[10px] border-b border-x border-black border-opacity-[50%] bg-white ${index === currentListPage.length - 1 ? 'rounded-b-xl' : ''}`}>
+                            <tr key={index} className={`${isLoading? 'hidden' : 'flex w-full h-[74px] items-center text-[14px] 4xl:text-[18px] pl-[15px] 4xl:pl-[20px] py-[7px] 4xl:py-[10px] border-b border-x border-black border-opacity-[50%] bg-white'} ${index === currentListPage.length - 1 ? 'rounded-b-xl' : ''}`}>
                                 <td className="w-[27.5%]">
                                     {auditLogs.dateTimeAdded.toLocaleString()}
                                 </td>
@@ -149,15 +161,22 @@ const AuditLogPage = () => {
                             </tr>
                         )) :
                             (
-                                <tr className="border border-black border-opacity-[50%] rounded-b-xl py-[7px] 4xl:py-[10px]">
-                                    <td colSpan={4} className="text-center py-4">
-                                    No logs available
+                                <tr className="py-[7px] 4xl:py-[100px]">
+                                    <td colSpan={4} className='h-[74px] border-b border-x rounded-b-xl border-black border-opacity-[50%] bg-white flex justify-center items-center py-4'>
+                                    {isLoading ? 
+                                        (
+                                            <Spinner className="!size-[30px]" />
+                                        ) : 
+                                        (
+                                            <p>No logs available</p>
+                                        )
+                                    }
                                     </td>
                                 </tr>
                             )}
                     </tbody>
                 </table>
-                <div className='relative py-[1%]'>
+                <div className={`${isLoading? 'hidden': 'relative py-[1%]'}`}>
                     <PrimaryPagination
                         data={auditLogs}
                         itemsPerPage={8}
