@@ -97,9 +97,9 @@ const SpecificFG: React.FC<SpecificFGProps> = ({ id, removeSheet, isOpen, monthY
                         <tbody>
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={columnNames.length} className="text-center py-6">
+                                    <td colSpan={columnNames.length} className="text-center py-[14rem]">
                                         {/* <Spinner color="danger" size="lg" label="Loading..." /> */}
-                                        Select a finished good to create the cost calculation breakdown sheet.
+                                        No finished good selected. <br/> Select a finished good to create the cost calculation breakdown sheet.
                                     </td>
                                 </tr>
                             ) : selectedFGDetails ? (
@@ -112,7 +112,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({ id, removeSheet, isOpen, monthY
                                         <td className='text-right pr-12'>{selectedFGDetails[0].batch_qty}</td>
                                         <td>{selectedFGDetails[0].unit}</td>
                                         <td className='text-right pr-4'>{selectedFGDetails[0].rm_cost}</td>
-                                        <td className='text-right pr-7'>{selectedFGDetails[0].total_cost}</td>
+                                        <td className='text-right pr-7'>{parseFloat(selectedFGDetails[0].total_cost).toFixed(2)}</td>
                                     </tr>
 
                                     {/* Emulsion row */}
@@ -138,14 +138,14 @@ const SpecificFG: React.FC<SpecificFGProps> = ({ id, removeSheet, isOpen, monthY
                                             <td className='text-right pr-12'>{component.batch_quantity}</td>
                                             <td>{component.unit}</td>
                                             <td className='text-right pr-4'>{component.cost}</td>
-                                            <td className='text-right pr-7'>{component.total_cost}</td>
+                                            <td className='text-right pr-7'>{parseFloat(component.total_cost).toFixed(2)}</td>
                                         </tr>
                                     ))}
                                 </>
                             ) : (
                                 <tr>
                                     <td colSpan={columnNames.length} className="text-center py-6">
-                                        No finished good selected
+                                        No finished good selected. Select a finished good to create the cost calculation breakdown sheet.
                                     </td>
                                 </tr>
                             )}

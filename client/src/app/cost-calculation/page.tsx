@@ -75,7 +75,7 @@ const CostCalculation =() => {
         }
     };
 
-    //Save workbook name
+    //Save file name
     const createFileName = () => {
         setFileName(`${monthYear.label}_Cost Calculation Breakdown Report`);
     }
@@ -89,9 +89,6 @@ const CostCalculation =() => {
            return;
         }
 
-        console.log("Sheet Data: ", sheetData);
-        console.log("File name: ", fileName);
-
         try {
             const response = await api.post('/cost_calculation/export', {
                 selected_fg: selectedFG,
@@ -100,18 +97,19 @@ const CostCalculation =() => {
                 file_name: fileName
             }, { responseType: 'blob' });
 
-            if (response.status === 200) {
-                const url = window.URL.createObjectURL(new Blob([response.data]));
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = `${fileName}.xlsx`;
-                document.body.appendChild(a);
-                a.click();
-                a.remove();
-                window.URL.revokeObjectURL(url);
-
-                setAlertMessages(["Workbook exported successfully"]);
+            if (response.status === 200) {             
+                    const url = window.URL.createObjectURL(new Blob([response.data]));
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = `${fileName}.${exportType}`;
+                    document.body.appendChild(a);
+                    a.click();
+                    a.remove();
+                    window.URL.revokeObjectURL(url);
+                
+                setAlertMessages(["Report exported successfully."]);
                 setAlertStatus("success");
+
             } else {
                 setAlertMessages(["Error exporting workbook:", response.data.message]);
                 setAlertStatus("critical");
@@ -130,6 +128,8 @@ const CostCalculation =() => {
             }
         } catch (error) {
             console.log(error);
+            setAlertMessages(["Error retrieving month and year options."]);
+            setAlertStatus("critical");
         }
     };
 
@@ -140,9 +140,7 @@ const CostCalculation =() => {
                 {params: {monthYear: monthYear}})
     
             if (response.status === 200) {
-
                 setFGOptions(response.data.data.map((fg: SpecificFinishedGood) => ({name: fg.fg_desc, id: fg.fg_id})));
-                console.log("FG Options: ", response.data.data);
             } else {
                 setAlertMessages([...alertMessages, 'Error retrieving FG options.']);
                 setAlertStatus('critical');

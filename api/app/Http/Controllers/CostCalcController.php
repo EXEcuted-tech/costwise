@@ -98,7 +98,6 @@ class CostCalcController extends ApiController
                     'unit' => $emulsion->unit,
                 ];
             } else {
-                Log::info("No emulsion found");
                 $fgData['components'][] = []; //empty
             }
 
@@ -127,8 +126,6 @@ class CostCalcController extends ApiController
                 }
             }
 
-            Log::info("FINAL FG DATA: " . json_encode($fgData));
-
             $this->status = 200;
             $this->response['data'] = $fgData;
             return $this->getResponse();
@@ -150,7 +147,7 @@ class CostCalcController extends ApiController
 
         $spreadsheet = new Spreadsheet();
 
-        //remove default
+        //remove default worksheet
         $spreadsheet->removeSheetByIndex(0);
 
         if ($exportType === 'xlsx') {
@@ -172,11 +169,51 @@ class CostCalcController extends ApiController
             ])->deleteFileAfterSend(true);
 
         } else if ($exportType === 'csv') {
-            // if($selectedFG === 'Specific-FG') {
-            //     $this->addSpecifiedFGSheet($spreadsheet, $data);
-            // } else {
-            //     // $this->addAllFGSheet($spreadsheet, $data);
-            // }
+            if($selectedFG === 'Specific-FG') {
+                $headers = array (
+                    'Content-Type' => 'text/csv',
+                    'Content-Disposition' => 'attachment; filename="' . $fileName . '.csv"',
+                );
+
+                $callback = function() use ($data) {
+                    $handle = fopen('php://output', 'w');
+
+                    fputcsv($handle, ["Formula", "Level", "Item Code", "Description", "Batch Qty", "Unit", "Cost", "Total Cost"]);
+
+                    foreach ($data as $fg) {
+                        // Write FG row
+                        fputcsv($handle, [
+                            $fg['formulation_no'],
+                            1,
+                            $fg['code'],
+                            $fg['desc'],
+                            $fg['batch_qty'],
+                            $fg['unit'],
+                            $fg['rm_cost'],
+                            $fg['total_cost']
+                        ]);
+
+                        // Write component rows
+                        foreach ($fg['components'] as $component) {
+                            fputcsv($handle, [
+                                '',
+                                $component['level'] ?? '',
+                                $component['item_code'] ?? '',
+                                $component['description'] ?? 'EMULSION',
+                                $component['batch_quantity'] ?? $component['qty'] ?? '',
+                                $component['unit'] ?? '',
+                                $component['cost'] ?? '',
+                                $component['total_cost'] ?? ''
+                            ]);
+                        }
+                    }
+                    fclose($handle);
+                };
+
+                return response()->stream($callback, 200, $headers);
+            } else {
+                // $this->addAllFGSheet($spreadsheet, $data);
+            }
         }
 
     }
@@ -205,6 +242,7 @@ class CostCalcController extends ApiController
         $sheet->setAutoFilter('B1:H1');
 
         $row = 2;
+        
         //Add FG Row
         $sheet->setCellValue("A$row", $fg['formulation_no']);
         $sheet->setCellValue("B$row", 1);
@@ -226,7 +264,6 @@ class CostCalcController extends ApiController
             $sheet->setCellValue("B$row", $component['level']);
             $sheet->setCellValue("C$row", $component['item_code'] ?? "");
 
-            // Handle the special case for the first component (likely the emulsion)
             if (!isset($component['description']) && isset($component['qty'])) {
                 $sheet->setCellValue("D$row", "EMULSION");
                 $sheet->setCellValue("E$row", $component['qty']);
