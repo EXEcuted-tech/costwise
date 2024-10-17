@@ -81,6 +81,57 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
         setTableData([...tableData, emptyRow]);
     };
 
+    const addBomRow = () => {
+        const nextId = tableData.length > 0
+            ? Math.max(...tableData.map(row => (row.id as number) || 0)) + 1
+            : 1;
+        const addedData = tableData.filter(row => !initialData.some(initialRow => initialRow.id === row.id));
+        const hasEndIdentifier = addedData.some(row => row.rowType === 'endIdentifier');
+
+
+        if (!hasEndIdentifier) {
+            const endIdentifierRow = {
+                id: 0,
+                rowType: 'endIdentifier',
+                formula: null,
+                level: null,
+                itemCode: null,
+                description: null,
+                formulation: null,
+                batchQty: null,
+                unit: null
+            };
+
+            const finishedGoodRow = {
+                id: 0,
+                rowType: 'finishedGood',
+                formula: 'RWD-XXX',
+                level: null,
+                itemCode: tableData[0].itemCode,
+                description: tableData[0].description,
+                formulation: '',
+                batchQty: '',
+                unit: ''
+            };
+
+            setTableData([...tableData, endIdentifierRow, finishedGoodRow]);
+        } else {
+            const formulationRow = {
+                id: 0,
+                rowType: 'material',
+                formula: null,
+                level: '',
+                itemCode: '',
+                description: '',
+                formulation: null,
+                batchQty: '',
+                unit: ''
+            };
+
+            setTableData([...tableData, formulationRow]);
+        }
+    };
+
     const removeRow = (index: number) => {
         setRowToRemove({ index });
         setConfirmDialog(true);
@@ -157,7 +208,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                                 existing.id === removed.id &&
                                 existing.rowType === removed.rowType &&
                                 existing.track_id === removed.track_id
-                        )
+                        ) && removed.id > 0
                 ).map(removed => ({ id: removed.id, rowType: removed.rowType, track_id: removed.track_id }));
 
                 return [...prevIds, ...newRemoved];
@@ -204,7 +255,9 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                     <div className={`h-[40px] animate-zoomIn fixed flex items-center ${isTransaction ? 'left-[20px]' : 'left-[40px]'}`}>
                         <div className='flex justify-end my-[10px] mr-[10px]'>
                             <button className='hover:bg-[#961e1e] h-[35px] flex items-center justify-center font-medium text-[18px] text-white rounded-[10px] px-[15px] w-[135px] bg-primary transition-colors delay-50 duration-[1000] ease-in'
-                                onClick={addRow}>
+                                onClick={
+                                    bomId ? addBomRow : addRow
+                                }>
                                 <HiOutlinePlus className='mr-[5px]' />
                                 Add Row
                             </button>

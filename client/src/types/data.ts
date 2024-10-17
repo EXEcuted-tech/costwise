@@ -85,10 +85,10 @@ export interface FormulationRecord extends Record<string, unknown> {
     formula: string | null;
     level: string | null;
     itemCode: string | null;
-    description: string;
+    description: string | null;
     formulation: string | null;
     batchQty: number | null;
-    unit: string;
+    unit: string | null;
     isLeastCost?: number;
     cost?: number | null;
 }

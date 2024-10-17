@@ -167,10 +167,13 @@ class FileController extends ApiController
 
             \DB::commit();
 
-            return response()->json(['message' => 'BOM and associated data deleted successfully'], 200);
+            $this->status = 200;
+            return $this->getResponse('BOM and associated data deleted successfully');
         } catch (\Exception $e) {
             \DB::rollBack();
-            return response()->json(['error' => $e->getMessage()], 500);
+            $this->status = 500;
+            $this->response['error'] = $e->getMessage();
+            return $this->getResponse();
         }
     }
 
@@ -200,14 +203,18 @@ class FileController extends ApiController
 
             $this->processExcel($file->getRealPath(), $uploadType);
 
-            $this->calculateLeastCost($this->fileModel);
+            if ($uploadType == 'master') {
+                $this->calculateLeastCost($this->fileModel);
+            }
             File::create($this->fileModel);
 
             $this->status = 200;
             return $this->getResponse();
         }
 
-        return response()->json(['error' => 'Unsupported file type'], 400);
+        $this->status = 400;
+        $this->response['error'] = 'Unsupported file type';
+        return $this->getResponse();
     }
 
     private function processExcel($file, $uploadType)

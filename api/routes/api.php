@@ -17,21 +17,6 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/refresh', [AuthController::class, 'refresh']);
 
-// Route::prefix('/files')->group(function () {
-//     Route::post('upload', [FileController::class, 'upload']);
-//     Route::get('retrieve_all', [FileController::class, 'retrieveAll']);
-//     Route::get('retrieve', [FileController::class, 'retrieve']);
-//     Route::post('delete', [FileController::class, 'delete']);
-//     Route::post('export', [FileController::class, 'export']);
-//     Route::post('export_all', [FileController::class, 'exportAll']);
-// });
-
-// Route::prefix('/transactions')->group(function () {
-//     Route::get('retrieve_batch', [TransactionController::class, 'retrieveBatch']);
-//     Route::post('update_batch', [TransactionController::class, 'updateBatch']);
-//     Route::post('delete_bulk', [TransactionController::class, 'deleteBulk']);
-// });
-
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [UserController::class, 'getCurrentUser']);
@@ -52,6 +37,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_batch', [FinishedGoodController::class, 'retrieveBatch']);
         Route::post('create', [FinishedGoodController::class, 'create']);
         Route::post('update', [FinishedGoodController::class, 'update']);
+        Route::post('update_or_create', [FinishedGoodController::class, 'updateOrCreate']);
     });
 
     Route::prefix('/fodls')->group(function () {
@@ -79,6 +65,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('update_batch', [BomController::class, 'updateBatch']);
         Route::post('delete', [BomController::class, 'delete']);
         Route::post('create', [BomController::class, 'create']);
+        Route::post('update_create_batch', [BomController::class, 'updateOrCreateBatch']);
     });
 
     Route::prefix('/formulations')->group(function () {
@@ -89,7 +76,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('create', [FormulationController::class, 'create']);
         Route::post('update_emulsion', [FormulationController::class, 'updateEmulsion']);
         Route::post('delete', [FormulationController::class, 'delete']);
-        Route::post('delete_fg', [FormulationController::class, 'deleteBulkWithFg']);
+        Route::post('delete_fg', [FormulationController::class, 'deleteBulkWithFG']);
         Route::post('delete_material', [FormulationController::class, 'deleteBulkWithMaterial']);
         Route::post('upload', [FormulationController::class, 'upload']);
         Route::post('export', [FormulationController::class, 'export']);
