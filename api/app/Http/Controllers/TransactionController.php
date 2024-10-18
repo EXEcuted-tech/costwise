@@ -57,15 +57,27 @@ class TransactionController extends ApiController
 
             $result = $transactions->map(function ($transaction) {
                 $relatedData = [];
+                $decodedSettings = json_decode($transaction->settings);
 
                 if (!is_null($transaction->material_id)) {
                     $material = Material::find($transaction->material_id);
                     $relatedData['material'] = $material?->toArray();
+                    $relatedData['material']['material_cost'] = $material->material_cost * $decodedSettings->qty;
                 }
 
                 if (!is_null($transaction->fg_id)) {
                     $finishedGood = FinishedGood::find($transaction->fg_id);
                     $relatedData['finished_good'] = $finishedGood?->toArray();
+                    $relatedData['finished_good']['rm_cost'] = $finishedGood->rm_cost * $finishedGood->total_batch_qty;
+                }
+
+                if (is_null($transaction->material_id) && is_null($transaction->fg_id)) {
+                    $newAmount = ($decodedSettings->amount ?? 0) * ($decodedSettings->qty ?? 1);
+
+                    $updatedSettings = $decodedSettings;
+                    $updatedSettings->amount = $newAmount;
+
+                    $transaction->settings = json_encode($updatedSettings);
                 }
 
                 return array_merge($transaction->toArray(), $relatedData);
@@ -119,7 +131,7 @@ class TransactionController extends ApiController
                         $material->update([
                             'material_code' => $transactionData['item_code'] ?? $material->material_code,
                             'material_desc' => $transactionData['item_desc'] ?? $material->material_desc,
-                            'material_cost' => $transactionData['amount'] ?? $material->material_cost,
+                            'material_cost' => $transactionData['amount'] / $transactionData['qty'] ?? $material->material_cost,
                             'unit' => $transactionData['unit_code'] ?? $material->unit,
                         ]);
                     }
@@ -132,7 +144,7 @@ class TransactionController extends ApiController
                         $fg->update([
                             'fg_code' => $transactionData['item_code'] ?? $fg->fg_code,
                             'fg_desc' => $transactionData['item_desc'] ?? $fg->fg_desc,
-                            'rm_cost' => $transactionData['amount'] ?? $fg->rm_cost,
+                            'rm_cost' => $transactionData['amount'] / $transactionData['qty'] ?? $fg->rm_cost,
                             'unit' => $transactionData['unit_code'] ?? $fg->unit,
                         ]);
                     }
@@ -145,7 +157,7 @@ class TransactionController extends ApiController
                         'item_code' => $itemCode,
                         'item_desc' => $transactionData['item_desc'] ?? '',
                         'qty' => $transactionData['qty'] ?? 0,
-                        'amount' => $transactionData['amount'] ?? 0,
+                        'amount' => $transactionData['amount'] / $transactionData['qty'] ?? 0,
                         'unit' => $transactionData['unit_code'] ?? ''
                     ];
                 }
@@ -185,7 +197,7 @@ class TransactionController extends ApiController
                             $newMaterial = Material::create([
                                 'material_code' => $itemCode,
                                 'material_desc' => $transactionData['item_desc'] ?? '',
-                                'material_cost' => $transactionData['amount'] ?? 0,
+                                'material_cost' => $transactionData['amount']/$transactionData['qty'] ?? 0,
                                 'unit' => $transactionData['unit_code'] ?? '',
                                 'date' => $transactionData['date'] ? Carbon::parse($transactionData['date'])->format('Y-m-d') : now()->format('Y-m-d'),
                             ]);
@@ -197,7 +209,7 @@ class TransactionController extends ApiController
                             'item_code' => $itemCode,
                             'item_desc' => $transactionData['item_desc'] ?? '',
                             'qty' => $transactionData['qty'] ?? 0,
-                            'amount' => $transactionData['amount'] ?? 0,
+                            'amount' => $transactionData['amount']/$transactionData['qty'] ?? 0,
                             'unit' => $transactionData['unit_code'] ?? ''
                         ];
                     } else {
@@ -210,7 +222,7 @@ class TransactionController extends ApiController
                                 'fg_code' => $itemCode,
                                 'fg_desc' => $transactionData['item_desc'] ?? '',
                                 'total_batch_qty' => $transactionData['qty'] ?? 0,
-                                'rm_cost' => $transactionData['amount'] ?? 0,
+                                'rm_cost' => $transactionData['amount']/$transactionData['qty'] ?? 0,
                                 'unit' => $transactionData['unit_code'] ?? '',
                                 'monthYear' => Carbon::parse($transactionData['date'] ?? now())->format('Ym')
                             ]);
@@ -218,7 +230,7 @@ class TransactionController extends ApiController
                         }
                         $settings = [];
                     }
-                } 
+                }
 
                 if (empty($settings)) {
                     $settings = new \stdClass();

@@ -326,12 +326,12 @@ class FileController extends ApiController
             $yearMonthInt = (int) $yearMonth;
 
             $material = Material::where('material_code', $itemCode)
-                ->where('material_cost', $amount)
+                ->where('material_cost', $amount/$qty)
                 ->where('date', $dateOnly)
                 ->first();
 
             $fg = FinishedGood::where('fg_code', $itemCode)
-                ->where('rm_cost', $amount)
+                ->where('rm_cost', $amount/$qty)
                 ->where('monthYear', $yearMonthInt)
                 ->first();
 
@@ -345,7 +345,7 @@ class FileController extends ApiController
                 $newMaterial = Material::create([
                     'material_code' => $itemCode,
                     'material_desc' => $itemDesc,
-                    'material_cost' => $amount,
+                    'material_cost' => $amount/$qty,
                     'unit' => $unit,
                     'date' => $dateOnly
                 ]);
@@ -361,7 +361,7 @@ class FileController extends ApiController
                     'fg_code' => $itemCode,
                     'fg_desc' => $itemDesc,
                     'total_batch_qty' => $qty,
-                    'rm_cost' => $amount,
+                    'rm_cost' => $amount/$qty,
                     'unit' => $unit,
                     'monthYear' => $yearMonthInt
                 ]);
@@ -375,7 +375,7 @@ class FileController extends ApiController
                     'item_code' => $itemCode,
                     'item_desc' => $itemDesc,
                     'qty' => $qty,
-                    'amount' => $amount,
+                    'amount' => $amount/$qty,
                     'unit' => $unit
                 ];
             }
