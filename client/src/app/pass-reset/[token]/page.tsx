@@ -31,7 +31,7 @@ const PasswordReset: React.FC<PasswordResetProps> = ({ setDialog }) => {
         console.log(email);
         console.log(password);
         console.log(passwordConfirmation);
-      const response = await api.post('/password/reset' , {
+      const response = await api.post('/password-reset/reset' , {
         token: token as string,
         email: email,
         password,

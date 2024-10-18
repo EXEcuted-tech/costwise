@@ -16,7 +16,7 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
     e.preventDefault();
     try {
 
-      const response = await api.post('/password/email', { email });
+      const response = await api.post('/password-reset/email', { email });
       const respo = "Success!";
       console.log(respo);
       

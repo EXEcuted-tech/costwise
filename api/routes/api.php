@@ -24,9 +24,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::put('/user/update', [UserController::class, 'editUserInfo']);
     
     Route::prefix('/password-reset')->group(function () {
-        Route::post('/email', [PasswordResetController::class, 'sendResetLinkEmail']);
-        Route::get('/{token}', [PasswordResetController::class, 'verifyToken']);
-        Route::post('/reset', [PasswordResetController::class, 'resetPassword']);
+        Route::post('email', [PasswordResetController::class, 'sendResetLinkEmail']);
+        Route::get('{token}', [PasswordResetController::class, 'verifyToken']);
+        Route::post('reset', [PasswordResetController::class, 'resetPassword']);
     });
 
     Route::prefix('/files')->group(function () {
