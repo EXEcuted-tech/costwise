@@ -34,6 +34,7 @@ return new class extends Migration {
             $table->increments('log_id');
             $table->unsignedInteger('user_id');
             $table->enum('action', ['general', 'crud', 'import', 'export', 'stock']);
+            $table->string('description', 255);
             $table->timestamp('timestamp')->useCurrent();
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
         });
