@@ -106,7 +106,7 @@ const AddFormulationPage = () => {
                 setAlertMessages([fgResponse.data.message]);
             }
 
-            let emulsion = formulaData.find(item => item.description.toLowerCase() === 'emulsion');
+            let emulsion = formulaData.find(item => item.description?.toLowerCase() === 'emulsion');
 
             const transformedEmulsionData = emulsion
                 ? {
@@ -117,7 +117,7 @@ const AddFormulationPage = () => {
                 : {};
 
             const materials = formulaData.filter(item => 
-                item.description.toLowerCase() !== 'emulsion' && 
+                item.description?.toLowerCase() !== 'emulsion' && 
                 item.level !== null && 
                 item.level !== '' && 
                 !item.formulation
@@ -268,7 +268,7 @@ const AddFormulationPage = () => {
                                                     <input
                                                         type="text"
                                                         onChange={(e) => handleInputChange(0, 'description', e.target.value)}
-                                                        value={formulaData[0]?.description}
+                                                        value={formulaData[0]?.description || ''}
                                                         className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
                                                     />
                                                 ) : (
@@ -304,7 +304,7 @@ const AddFormulationPage = () => {
                                                     <input
                                                         type="text"
                                                         onChange={(e) => handleInputChange(0, 'unit', e.target.value)}
-                                                        value={formulaData[0]?.unit}
+                                                        value={formulaData[0]?.unit || ''}
                                                         className={`w-full text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[110px]`}
                                                     />
                                                 ) : (
@@ -333,7 +333,7 @@ const AddFormulationPage = () => {
                                                         <span>{item.level || ''}</span>
                                                     )}
                                                 </td>
-                                                {item.description.toLowerCase() !== 'emulsion' ? (
+                                                {item.description?.toLowerCase() !== 'emulsion' ? (
                                                     <td className='px-6 text-left'>
                                                         {add ? (
                                                             <input
@@ -352,7 +352,7 @@ const AddFormulationPage = () => {
                                                         <input
                                                             type="text"
                                                             onChange={(e) => handleInputChange(index + 1, 'description', e.target.value)}
-                                                            value={item.description}
+                                                            value={item.description || ''}
                                                             className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
                                                         />
                                                     ) : (
@@ -383,7 +383,7 @@ const AddFormulationPage = () => {
                                                         <input
                                                             type="text"
                                                             onChange={(e) => handleInputChange(index + 1, 'unit', e.target.value)}
-                                                            value={item.unit}
+                                                            value={item.unit || ''}
                                                             className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[100px]"
                                                         />
                                                     ) : (
