@@ -5,12 +5,15 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class File extends Model
+class MaterialCosts extends Model
 {
-    use HasFactory;
+    use  HasFactory;
+    //=====================
+    //  Will Be Replaced
+    //=====================
 
-    protected $table = 'files';
-    protected $primaryKey = 'file_id';
+    protected $table = 'models';
+    protected $primaryKey = 'model_id';
     protected $keyType = 'int';
     public $incrementing = true;
 
@@ -20,11 +23,9 @@ class File extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'file_type',
-        'settings',
+        'model_name',
+        'model_data',
+        'created_at',
+        'updated_at'
     ];
-
-    // protected $casts = [
-    //     'settings' => 'array', // Ensure 'settings' is cast to an array
-    // ];
 }
