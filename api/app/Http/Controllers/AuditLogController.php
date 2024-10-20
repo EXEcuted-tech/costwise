@@ -42,10 +42,23 @@ class AuditLogController extends Controller
             $middleInitial = $user->middle_name ? substr($user->middle_name, 0, 1) . '.' : '';
             $lastName = $user->last_name;
 
+            if($action == 'general'){
+                switch($act){
+                    case "create":
+                        $description = "$firstName $middleInitial $lastName created a new user.";
+                        break;
+                    case "edit":
+                        break;
+                    default:
+                        $description = "";
+                        break;
+                }
+            }
+
             if($action == 'crud'){
                 switch($act){
                     case "view":
-                        $description = "$firstName $middleInitial $lastName viewed $fileName.xlsx";
+                        $description = "$firstName $middleInitial $lastName viewed $fileName.xlsx.";
                         break;
                     case "edit":
                         $description = "Franz Ondiano edited $fileName";
