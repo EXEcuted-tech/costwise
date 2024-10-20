@@ -861,7 +861,7 @@ class FileController extends ApiController
 
     public function exportAll(Request $request)
     {
-        try {
+        // try {
             $files = File::all();
     
             if ($files->isEmpty()) {
@@ -908,19 +908,19 @@ class FileController extends ApiController
                 'Content-Type' => 'application/zip',
             ])->deleteFileAfterSend(true);
     
-        } catch (\Exception $e) {
-            // Clean up temporary files in case of an error
-            $tempFiles = glob(sys_get_temp_dir() . '/excel_*');
-            foreach ($tempFiles as $tempFile) {
-                if (is_file($tempFile)) {
-                    unlink($tempFile);
-                }
-            }
+        // } catch (\Exception $e) {
+        //     // Clean up temporary files in case of an error
+        //     $tempFiles = glob(sys_get_temp_dir() . '/excel_*');
+        //     foreach ($tempFiles as $tempFile) {
+        //         if (is_file($tempFile)) {
+        //             unlink($tempFile);
+        //         }
+        //     }
     
-            $this->status = 500;
-            $this->response['message'] = "Export failed: " . $e->getMessage();
-            return $this->getResponse();
-        }
+        //     $this->status = 500;
+        //     $this->response['message'] = "Export failed: " . $e->getMessage();
+        //     return $this->getResponse();
+        // }
     }
 
     private function addMasterFileSheets($spreadsheet, $file)
