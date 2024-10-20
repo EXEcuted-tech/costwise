@@ -210,7 +210,8 @@ const FileManagerPage = () => {
         const url = window.URL.createObjectURL(response.data);
         const a = document.createElement('a');
         a.href = url;
-        a.download = 'exported_files.zip';
+        const currentDate = new Date().toISOString().split('T')[0];
+        a.download = `Costwise_ExportedFiles_${currentDate}.zip`;
         document.body.appendChild(a);
         a.click();
         a.remove();
