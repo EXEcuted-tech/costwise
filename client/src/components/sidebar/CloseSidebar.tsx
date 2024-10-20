@@ -13,6 +13,7 @@ import { useUserContext } from '@/contexts/UserContext';
 import api from '@/utils/api';
 import config from '@/server/config';
 import { removeTokens } from '@/utils/removeTokens';
+import { useNotificationContext } from '@/contexts/NotificationContext';
 
 interface IconClosedConfig {
   iconName: string;
@@ -28,6 +29,7 @@ const CloseSidebar: React.FC = () => {
   const path = usePath();
   const router = useRouter();
   const { currentUser } = useUserContext();
+  const { hasNewNotifications } = useNotificationContext();
 
   const handleLogout = async () => {
     await removeTokens();
@@ -94,6 +96,9 @@ const CloseSidebar: React.FC = () => {
               {!isAdmin
                 ?
                 (userDefaultMenu.map(({ iconName, className, tooltip, route }, index) => {
+                  if(iconName === 'FaBell' && hasNewNotifications){
+                    iconName = 'MdNotificationsActive';
+                  }
                   const IconComponent = iconMap[iconName];
                   return (
                     <Tooltip
@@ -123,7 +128,7 @@ const CloseSidebar: React.FC = () => {
                           <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
                             'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
                             'my-[13px] hover:text-[#FFD3D3]'}`}>
-                            <IconComponent className={className} />
+                            <IconComponent className={`${iconName === 'MdNotificationsActive' && hasNewNotifications && 'animate-shake-infinte'} ${className}`} />
                           </li>
                         </Link>
                       }
@@ -132,6 +137,9 @@ const CloseSidebar: React.FC = () => {
                 }))
                 :
                 (adminDefaultMenu.map(({ iconName, className, tooltip, route, routes }, index) => {
+                  if(iconName === 'FaBell' && hasNewNotifications){
+                    iconName = 'MdNotificationsActive';
+                  }
                   const IconComponent = iconMap[iconName];
                   const isRoute = routes?.some(e => e === path);
                   return tooltip !== 'More' ? (
@@ -161,7 +169,7 @@ const CloseSidebar: React.FC = () => {
                           <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
                             'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
                             'my-[13px] hover:text-[#FFD3D3]'}`}>
-                            <IconComponent className={className} />
+                            <IconComponent className={`${iconName === 'MdNotificationsActive' && hasNewNotifications && 'animate-shake-infinte'} ${className}`} />
                           </li>
                         </Link>
                       }

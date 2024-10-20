@@ -11,6 +11,12 @@ interface FormulationContextProps {
   viewFormulas: boolean;
   setViewBOM: React.Dispatch<React.SetStateAction<boolean>>;
   viewBOM: boolean;
+  setSelectedBomId: React.Dispatch<React.SetStateAction<number>>;
+  selectedBomId: number;
+  selectedChoices: number[];
+  setSelectedChoices: React.Dispatch<React.SetStateAction<number[]>>;
+  bomName: string;
+  setBomName: React.Dispatch<React.SetStateAction<string>>;
 }
 
 export const useFormulationContext = () => {
@@ -26,9 +32,12 @@ export const FormulationProvider = ({ children }: { children: ReactNode }) => {
   const [add, setAdd] = useState(false);
   const [viewFormulas, setViewFormulas] = useState(false);
   const [viewBOM, setViewBOM] = useState(false);
+  const [selectedBomId, setSelectedBomId] = useState<number>(0);
+  const [selectedChoices, setSelectedChoices] = useState<number[]>([]);
+  const [bomName, setBomName] = useState<string>('');
 
   return (
-    <FormulationContext.Provider value={{ edit, setEdit, add, setAdd, viewFormulas, setViewFormulas, setViewBOM, viewBOM }}>
+    <FormulationContext.Provider value={{ edit, setEdit, add, setAdd, viewFormulas, setViewFormulas, setViewBOM, viewBOM, setSelectedBomId, selectedBomId, selectedChoices, setSelectedChoices, bomName, setBomName }}>
       {children}
     </FormulationContext.Provider>
   );

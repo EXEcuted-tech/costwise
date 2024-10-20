@@ -22,7 +22,9 @@ class File extends Model
     protected $fillable = [
         'file_type',
         'settings',
-        'created_at',
-        'updated_at'
     ];
+
+    // protected $casts = [
+    //     'settings' => 'array', // Ensure 'settings' is cast to an array
+    // ];
 }

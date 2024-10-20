@@ -7,7 +7,7 @@ import { removeTokens } from './removeTokens';
 export const isTokenExpired = (): boolean => {
     const expiresAt = localStorage.getItem('tokenExpiresAt');
     if (!expiresAt) return false;
-    console.log("Went Here", expiresAt, isAfter(new Date(), parseISO(expiresAt)));
+    // console.log("Went Here", expiresAt, isAfter(new Date(), parseISO(expiresAt)));
     return isAfter(new Date(), parseISO(expiresAt));
 };
 
@@ -25,12 +25,14 @@ export const refreshToken = async (): Promise<boolean> => {
             localStorage.setItem('refreshToken', refresh_token);
             localStorage.setItem('tokenExpiresAt', access_token_expiration);
         } else {
+            console.log("Log you out on Protected Route 3:");
             await removeTokens();
             window.location.href = '/'; 
         }
 
         return true;
     } catch (error) {
+        console.log("Log you out on Protected Route 4:");
         await removeTokens();
         window.location.href = '/'; 
         return false;

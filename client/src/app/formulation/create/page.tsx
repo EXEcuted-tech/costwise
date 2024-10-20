@@ -1,38 +1,46 @@
 "use client"
-import { useRouter, useSearchParams } from 'next/navigation';
-import React, { useEffect, useState } from 'react'
-import { FormulationContainerProps } from '@/components/pages/formulation/FormulationContainer';
+import { useRouter } from 'next/navigation';
+import React, { useState } from 'react'
+import { FormulationRecord } from '@/types/data';
 import { IoIosArrowRoundBack, IoIosSave } from 'react-icons/io';
-import { formatHeader } from '@/utils/costwiseUtils';
 import { HiOutlinePlus } from 'react-icons/hi2';
 import { IoTrash } from 'react-icons/io5';
 import { useFormulationContext } from '@/contexts/FormulationContext';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { HiClipboardList } from 'react-icons/hi';
 import Header from '@/components/header/Header';
+import api from '@/utils/api';
+import Alert from '@/components/alerts/Alert';
+import ButtonSpinner from '@/components/loaders/ButtonSpinner';
 
 const AddFormulationPage = () => {
-    const [fileData, setFileData] = useState<FormulationContainerProps>(
+    const [formulaData, setFormulaData] = useState<FormulationRecord[]>([
         {
-            number: '34-222-V',
-            level: 0,
+            formula: '34-222-V',
+            level: '',
             itemCode: 'FG-01',
             description: 'HOTDOG1K',
+            formulation: '',
             batchQty: 0,
-            unit: 'unit',
-            cost: 0,
-            formulations: [
-                { level: 0, itemCode: '', description: 'Emulsion', batchQty: 0, unit: 'kg' },
-            ]
+            unit: 'kg',
+        },
+        {
+            formula: '',
+            level: '1',
+            itemCode: '',
+            description: 'EMULSION',
+            formulation: '',
+            batchQty: 0,
+            unit: 'kg',
         }
-    );
+    ]);
+    const [removedRows, setRemovedRows] = useState<FormulationRecord[]>([]);
+    const [alertMessages, setAlertMessages] = useState<string[]>([]);
+    const [successMessage, setSuccessMessage] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
     const { isOpen } = useSidebarContext();
-    const { setAdd } = useFormulationContext();
+    const { add, setAdd } = useFormulationContext();
     const router = useRouter();
-
-    useEffect(() => {
-
-    }, []);
 
     const handleBack = () => {
         setAdd(false);
@@ -40,62 +48,140 @@ const AddFormulationPage = () => {
     }
 
     const addRow = () => {
-        if (fileData) {
-            const emptyRow: FormulationContainerProps = {
-                number: '',
-                level: 0, // Set default values as needed
-                itemCode: '',
-                description: '',
-                batchQty: 0,
-                unit: '',
-                cost: 0,
-                formulations: []
-            };
-
-            setFileData({
-                ...fileData,
-                formulations: [...(fileData.formulations || []), emptyRow], // Append the new row to the formulations array
-            });
-        }
+        const newRow: FormulationRecord = {
+            formula: '',
+            level: '',
+            itemCode: '',
+            description: '',
+            formulation: '',
+            batchQty: 0,
+            unit: '',
+        };
+        setFormulaData([...formulaData, newRow]);
     };
 
     const removeRow = (index: number) => {
-        if (fileData) {
-            const updatedFormulations = fileData.formulations?.filter((_, i) => i !== index) || [];
+        if (index === 0) return; // Prevent removing the first row
+        const updatedData = formulaData.filter((_, i) => i !== index);
+        setFormulaData(updatedData);
+    };
 
-            setFileData({
-                ...fileData,
-                formulations: updatedFormulations,
-            });
+    const handleInputChange = (index: number, key: keyof FormulationRecord, value: string | number) => {
+        const updatedData = [...formulaData];
+        updatedData[index] = {
+            ...updatedData[index],
+            [key]: value
+        };
+        setFormulaData(updatedData);
+    };
+
+    const onSave = async () => {
+        const hasEmptyRow = formulaData.some(row =>
+            !row.description ||
+            (row.batchQty === null || row.batchQty <= 0) ||
+            !row.unit
+        );
+
+        if (hasEmptyRow) {
+            setAlertMessages(prev => [...prev, 'Please fill in all fields!']);
+            setIsLoading(false);
+            return;
         }
-    };
 
-    const handleInputChange = (key: keyof FormulationContainerProps, value: string | number) => {
-        setFileData((prevData) => {
-            return {
-                ...prevData,
-                [key]: value
-            };
-        });
-    };
+        setIsLoading(true);
+        try {
+            const finishedGood = formulaData[0];
 
-    const handleFormulationInputChange = (index: number, key: keyof FormulationContainerProps['formulations'][0], value: string | number) => {
-        setFileData((prevData) => {
-            const updatedFormulations = [...prevData.formulations];
-            updatedFormulations[index] = {
-                ...updatedFormulations[index],
-                [key]: value
+            let fgRow = {
+                fg_code: finishedGood.itemCode,
+                fg_desc: finishedGood.description,
+                total_batch_qty: finishedGood.batchQty,
+                unit: finishedGood.unit,
+                formulation_no: parseInt(finishedGood.formulation ?? '0', 10),
             };
 
-            return {
-                ...prevData,
-                formulations: updatedFormulations
+            const fgResponse = await api.post('/finished_goods/create', fgRow);
+
+            if (fgResponse.data.status !== 201) {
+                setAlertMessages([fgResponse.data.message]);
+            }
+
+            let emulsion = formulaData.find(item => item.description?.toLowerCase() === 'emulsion');
+
+            const transformedEmulsionData = emulsion
+                ? {
+                    level: emulsion.level,
+                    batch_qty: emulsion.batchQty,
+                    unit: emulsion.unit
+                }
+                : {};
+
+            const materials = formulaData.filter(item => 
+                item.description?.toLowerCase() !== 'emulsion' && 
+                item.level !== null && 
+                item.level !== '' && 
+                !item.formulation
+            );
+
+            const transformedMaterialData = materials.map(item => ({
+                material_code: item.itemCode,
+                material_desc: item.description,
+                unit: item.unit,
+                level: item.level,
+                batchQty: item.batchQty,
+            }));
+
+            console.log(transformedMaterialData);
+
+            const payload = {
+                fg_id: fgResponse.data.fg_id,
+                formula_code: finishedGood.formula,
+                emulsion: emulsion ? transformedEmulsionData : {},
+                materials: transformedMaterialData,
             };
-        });
+
+
+            const saveResponse = await api.post('/formulations/create', payload);
+
+            if (saveResponse.data.status === 200) {
+                setIsLoading(false);
+                setSuccessMessage("Formulation created successfully.");
+                setAdd(false);
+            } else {
+                setIsLoading(false);
+                if (saveResponse.data.message) {
+                    setAlertMessages([saveResponse.data.message]);
+                } else if (saveResponse.data.errors) {
+                    setAlertMessages(saveResponse.data.errors);
+                }
+            }
+
+            setSuccessMessage("Formulation saved successfully.");
+
+            setAdd(false);
+        } catch (error: any) {
+            setIsLoading(false);
+            if (error.response?.data?.message) {
+                setAlertMessages([error.response.data.message]);
+            } else if (error.response?.data?.errors) {
+                const errorMessages = Object.values(error.response.data.errors).flat() as string[];
+                setAlertMessages(errorMessages);
+            } else {
+                setAlertMessages(['Error saving Formulation. Please try again.']);
+            }
+        }
     };
 
     return (
         <>
+            <div className="absolute top-0 right-0">
+                {alertMessages && alertMessages.map((msg, index) => (
+                    <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+                        setAlertMessages(prev => prev.filter((_, i) => i !== index));
+                    }} />
+                ))}
+                {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+            </div>
             <Header icon={HiClipboardList} title={"Formulations"} />
             <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
                 <div className='bg-white rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[25px]'>
@@ -108,136 +194,207 @@ const AddFormulationPage = () => {
                     </div>
                     <hr className='border-[#ACACAC]' />
                     <div className='flex w-full items-center'>
-                        <div className='w-full flex justify-end'>
-                            <div className='my-[10px] mr-[10px] flex justify-end'>
-                                <button className={`text-[18px] hover:bg-[#961e1e] transition-colors duration-250 ease-in-out h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-primary`}
-                                    onClick={addRow}>
-                                    <HiOutlinePlus className='mr-[5px]' />
-                                    Add Row
-                                </button>
+                        {add && (
+                            <div className='w-full flex justify-end'>
+                                <div className='my-[10px] mr-[10px] flex justify-end'>
+                                    <button className={`text-[18px] hover:bg-[#961e1e] transition-colors duration-250 ease-in-out h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-primary`}
+                                        onClick={addRow}>
+                                        <HiOutlinePlus className='mr-[5px]' />
+                                        Add Row
+                                    </button>
+                                </div>
+                                <div className='flex justify-end my-[10px]'>
+                                    <button className={`flex text-[18px] hover:bg-[#00780c] transition-colors duration-250 ease-in-out h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F]`}
+                                        onClick={onSave}>
+                                        <div className="flex items-center transition-opacity duration-300 ease-in-out">
+                                            {isLoading ? (
+                                                <ButtonSpinner className='!size-[20px] mr-[2px] opacity-100'/>
+                                            ) : (
+                                                <IoIosSave className='mr-[5px] opacity-100' />
+                                            )}
+                                            <span>
+                                                Save
+                                            </span>
+                                        </div>
+                                    </button>
+                                </div>
                             </div>
-                            <div className='flex justify-end my-[10px]'>
-                                <button className={`text-[18px] hover:bg-[#00780c] transition-colors duration-250 ease-in-out h-[35px] flex items-center justify-center font-medium text-white rounded-[10px] px-[15px] w-[135px] bg-[#00930F]`}
-                                    onClick={() => {
-                                        setAdd(false);
-                                    }}>
-                                    <IoIosSave className='mr-[5px]' />
-                                    Save
-                                </button>
-                            </div>
-                        </div>
+                        )}
                     </div>
                     <div className='rounded-[5px] border border-[#656565] overflow-x-auto'>
                         <table className='table-auto w-full border-collapse'>
                             <thead>
                                 <tr>
-                                    {fileData && Object.keys(fileData).map((key) => {
-                                        let textAlignClass = 'text-left';
-                                        if (key === 'level') {
-                                            textAlignClass = 'text-center';
-                                        } else if (key === 'batchQty') {
-                                            textAlignClass = 'text-right';
-                                        }
-
-                                        return (
-                                            (key != 'formulations' && key != 'cost') &&
-                                            <th key={key} className={`${textAlignClass} animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}>
-                                                {formatHeader(key)}{key == 'batchQty' && '.'}
-                                            </th>
-                                        );
-                                    })}
+                                    <th className='text-left animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Formula</th>
+                                    <th className='text-center animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Level</th>
+                                    <th className='text-left animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Item Code</th>
+                                    <th className='text-left animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Description</th>
+                                    <th className='text-center animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Formulation</th>
+                                    <th className='text-right animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Batch Qty</th>
+                                    <th className='text-left animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Unit</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                {fileData && (
+                                {formulaData && (
                                     <>
                                         <tr className='animate-zoomIn text-center font-bold text-black text-[18px] border-b border-[#ACACAC]'>
-                                            <td className='py-[10px] px-6 text-left'>{fileData.number}</td>
+                                            <td className='py-[10px] px-6 text-left'>
+                                                {add ? (
+                                                    <input
+                                                        type="text"
+                                                        onChange={(e) => handleInputChange(0, 'formula', e.target.value)}
+                                                        value={formulaData[0]?.formula || ''}
+                                                        className={`text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[160px]`}
+                                                    />
+                                                ) : (
+                                                    <span>{formulaData[0]?.formula || ''}</span>
+                                                )}
+                                            </td>
                                             <td></td>
-                                            <td>
-                                                <input
-                                                    type="text"
-                                                    onChange={(e) => handleInputChange('itemCode', e.target.value)}
-                                                    value={fileData.itemCode}
-                                                    className={`mx-[5px] text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
-                                                />
+                                            <td className='px-6 text-left'>
+                                                {add ? (
+                                                    <input
+                                                        type="text"
+                                                        onChange={(e) => handleInputChange(0, 'itemCode', e.target.value)}
+                                                        value={formulaData[0]?.itemCode || ''}
+                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                    />
+                                                ) : (
+                                                    <span className='text-left'>{formulaData[0]?.itemCode || ''}</span>
+                                                )}
                                             </td>
-                                            <td>
-                                                <input
-                                                    type="text"
-                                                    onChange={(e) => handleInputChange('description', e.target.value)}
-                                                    value={fileData.description}
-                                                    className={`mx-[5px] text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
-                                                />
+                                            <td className='px-6 text-left'>
+                                                {add ? (
+                                                    <input
+                                                        type="text"
+                                                        onChange={(e) => handleInputChange(0, 'description', e.target.value)}
+                                                        value={formulaData[0]?.description || ''}
+                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                    />
+                                                ) : (
+                                                    <span>{formulaData[0]?.description}</span>
+                                                )}
                                             </td>
-                                            <td>
-                                                <input
-                                                    type="text"
-                                                    onChange={(e) => handleInputChange('batchQty', e.target.value)}
-                                                    value={fileData.batchQty}
-                                                    className={`mx-[5px] text-right animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
-                                                />
+                                            <td className='px-6 text-center'>
+                                                {add ? (
+                                                    <input
+                                                        type="text"
+                                                        onChange={(e) => handleInputChange(0, 'formulation', e.target.value)}
+                                                        value={formulaData[0]?.formulation || ''}
+                                                        className={`mx-[5px] text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[80px]`}
+                                                    />
+                                                ) : (
+                                                    <span>{formulaData[0]?.formulation || ''}</span>
+                                                )}
                                             </td>
-                                            <td>
-                                                <input
-                                                    type="text"
-                                                    onChange={(e) => handleInputChange('unit', e.target.value)}
-                                                    value={fileData.unit}
-                                                    className={`mx-[5px] text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
-                                                />
+                                            <td className='px-6 text-right'>
+                                                {add ? (
+                                                    <input
+                                                        type="text"
+                                                        onChange={(e) => handleInputChange(0, 'batchQty', e.target.value)}
+                                                        value={Number(formulaData[0]?.batchQty).toFixed(2) ?? ''}
+                                                        className={`text-right animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                    />
+                                                ) : (
+                                                    <span>{Number(formulaData[0]?.batchQty).toFixed(2) ?? ''}</span>
+                                                )}
+                                            </td>
+                                            <td className='px-6 text-left'>
+                                                {add ? (
+                                                    <input
+                                                        type="text"
+                                                        onChange={(e) => handleInputChange(0, 'unit', e.target.value)}
+                                                        value={formulaData[0]?.unit || ''}
+                                                        className={`w-full text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[110px]`}
+                                                    />
+                                                ) : (
+                                                    <span>{formulaData[0]?.unit}</span>
+                                                )}
                                             </td>
                                         </tr>
 
-                                        {fileData.formulations?.map((formulation, index) => (
-                                            <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'} animate-zoomIn text-center font-medium text-[#6B6B6B] text-[18px]`}>
+                                        {formulaData.slice(1).map((item, index) => (
+                                            <tr key={index + 1} className={`${(index + 1) % 2 === 1 && 'bg-[#FCF7F7]'} animate-zoomIn text-center font-medium text-[#6B6B6B] text-[18px]`}>
                                                 <td className='flex justify-center items-center py-[15px]'>
-                                                    <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-300 ease-in-out"
-                                                        onClick={() => removeRow(index)} />
+                                                    {add ? (
+                                                        <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-300 ease-in-out"
+                                                            onClick={() => removeRow(index + 1)} />
+                                                    ):(<td></td>)}
                                                 </td>
-                                                <td className='py-[10px]'>
-                                                    <input
-                                                        type="text"
-                                                        onChange={(e) => handleFormulationInputChange(index, 'level', parseInt(e.target.value))}
-                                                        value={formulation.level}
-                                                        className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
-                                                    />
+                                                <td className='text-center px-6 py-[10px]'>
+                                                    {add ? (
+                                                        <input
+                                                            type="text"
+                                                            onChange={(e) => handleInputChange(index + 1, 'level', e.target.value)}
+                                                            value={item.level || ''}
+                                                            className="w-full text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[60px]"
+                                                        />
+                                                    ) : (
+                                                        <span>{item.level || ''}</span>
+                                                    )}
+                                                </td>
+                                                {item.description?.toLowerCase() !== 'emulsion' ? (
+                                                    <td className='px-6 text-left'>
+                                                        {add ? (
+                                                            <input
+                                                                type="text"
+                                                                onChange={(e) => handleInputChange(index + 1, 'itemCode', e.target.value)}
+                                                                value={item.itemCode || ''}
+                                                                className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                            />
+                                                        ) : (
+                                                            <span>{item.itemCode || ''}</span>
+                                                        )}
+                                                    </td>
+                                                ) : <td></td>}
+                                                <td className='px-6 text-left'>
+                                                    {add ? (
+                                                        <input
+                                                            type="text"
+                                                            onChange={(e) => handleInputChange(index + 1, 'description', e.target.value)}
+                                                            value={item.description || ''}
+                                                            className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                        />
+                                                    ) : (
+                                                        <span>{item.description}</span>
+                                                    )}
                                                 </td>
                                                 <td>
-                                                    <input
-                                                        type="text"
-                                                        onChange={(e) => handleFormulationInputChange(index, 'itemCode', e.target.value)}
-                                                        value={formulation.itemCode}
-                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
-                                                    />
                                                 </td>
-                                                <td>
-                                                    <input
-                                                        type="text"
-                                                        onChange={(e) => handleFormulationInputChange(index, 'description', e.target.value)}
-                                                        value={formulation.description}
-                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
-                                                    />
+                                                <td className='px-6 text-right'>
+                                                    {add ? (
+                                                        <input
+                                                            type="text"
+                                                            onChange={(e) => {
+                                                                const value = e.target.value;
+                                                                if (value === '' || /^\d*\.?\d*$/.test(value)) {
+                                                                    handleInputChange(index + 1, 'batchQty', value);
+                                                                }
+                                                            }}
+                                                            value={item.batchQty !== undefined && item.batchQty !== null ? Number(item.batchQty).toFixed(2) : ''}
+                                                            className="w-full text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                        />
+                                                    ) : (
+                                                        <span>{item.batchQty !== undefined && item.batchQty !== null ? Number(item.batchQty).toFixed(2) : ''}</span>
+                                                    )}
                                                 </td>
-                                                <td>
-                                                    <input
-                                                        type="text"
-                                                        onChange={(e) => handleFormulationInputChange(index, 'batchQty', parseFloat(e.target.value))}
-                                                        value={formulation.batchQty}
-                                                        className="text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
-                                                    />
-                                                </td>
-                                                <td>
-                                                    <input
-                                                        type="text"
-                                                        onChange={(e) => handleFormulationInputChange(index, 'unit', e.target.value)}
-                                                        value={formulation.unit}
-                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
-                                                    />
+                                                <td className='px-6 text-left'>
+                                                    {add ? (
+                                                        <input
+                                                            type="text"
+                                                            onChange={(e) => handleInputChange(index + 1, 'unit', e.target.value)}
+                                                            value={item.unit || ''}
+                                                            className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[100px]"
+                                                        />
+                                                    ) : (
+                                                        <span>{item.unit}</span>
+                                                    )}
                                                 </td>
                                             </tr>
                                         ))}
                                     </>
                                 )}
+
                             </tbody>
                         </table>
                     </div>
