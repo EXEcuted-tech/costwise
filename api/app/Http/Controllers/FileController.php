@@ -861,7 +861,7 @@ class FileController extends ApiController
 
     public function exportAll(Request $request)
     {
-        try {
+        // try {
             $files = File::all();
 
             if ($files->isEmpty()) {
@@ -908,11 +908,11 @@ class FileController extends ApiController
 
             return $response;
 
-        } catch (\Exception $e) {
-            $this->status = 500;
-            $this->response['message'] = "Export failed: " . $e->getMessage();
-            return $this->getResponse();
-        }
+        // } catch (\Exception $e) {
+        //     $this->status = 500;
+        //     $this->response['message'] = "Export failed: " . $e->getMessage();
+        //     return $this->getResponse();
+        // }
     }
 
     private function addMasterFileSheets($spreadsheet, $file)
