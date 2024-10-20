@@ -27,11 +27,12 @@ class ApiController extends Controller
 
     public function getResponse($customMessage = null)
     {
-        $this->response['status'] = $this->status ?? 200;
-        $this->response['message'] = $customMessage ?? $this->getMessage($this->status);
+        $status = is_numeric($this->status) ? (int)$this->status : 500;
+        $this->response['status'] = $status;
+        $this->response['message'] = $customMessage ?? $this->getMessage($status);
 
         // $finalResponse = array_merge($this->response, $additionalFields);
-        return response()->json($this->response, $this->status);
+        return response()->json($this->response, $status);
     }
 
     private function getMessage($status)
