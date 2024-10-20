@@ -72,6 +72,10 @@ class AuditLogController extends Controller
                 }
             }
 
+            if($action == 'import'){
+                $description = "$firstName $middleInitial $lastName imported $fileName.xlsx.";
+            }
+
             $this->logAudit($userId, $action, $description);
             return response()->json(['message' => 'User details updated and audit log created successfully'], 200);
         } catch (\Exception $e) {

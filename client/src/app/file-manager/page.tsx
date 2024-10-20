@@ -19,6 +19,7 @@ import api from '@/utils/api';
 import * as XLSX from 'xlsx';
 import Alert from "@/components/alerts/Alert";
 import { File } from '@/types/data';
+import { useUserContext } from '@/contexts/UserContext';
 
 const FileManagerPage = () => {
   const { isOpen } = useSidebarContext();
@@ -33,6 +34,7 @@ const FileManagerPage = () => {
   const [masterFileData, setMasterFileData] = useState<File[]>([]);
   const [transactionData, setTransactionData] = useState<File[]>([]);
   const { fileToDelete, setFileToDelete } = useFileManagerContext();
+  const { currentUser } = useUserContext();
 
   const ref = useOutsideClick(() => setUpload(false));
 
@@ -100,7 +102,7 @@ const FileManagerPage = () => {
         return new Promise((resolve, reject) => {
           reader.onload = async (e: ProgressEvent<FileReader>) => {
             const data = e.target?.result;
-
+            const fileName = file.name; 
             if (data && data instanceof ArrayBuffer) {
               const dataArray = new Uint8Array(data);
               const workbook = XLSX.read(dataArray, { type: 'array' });
@@ -131,6 +133,30 @@ const FileManagerPage = () => {
                 try {
                   const response = await api.post('/files/upload', formData);
                   if (response.data.status === 200) {
+                    // await api.post('/audit/log', {
+                    //   userId: currentUser?.userId,
+                    //   action: 'import',
+                    //   fileName: fileName
+                    // });
+
+                    const auditData = {
+                      userId: currentUser?.userId,
+                      action: 'import',
+                      fileName: fileName
+                    };
+                    if (currentUser) {
+                    console.log('Current User ID:', currentUser?.userId);
+                    } else {
+                        console.log('Current User is not defined.', currentUser);
+                    }
+                    api.post('/auditlogs/logsaudit', auditData)
+                    .then(response => {
+                        console.log('Audit log created successfully:', response.data);
+                    })
+                    .catch(error => {
+                        console.error('Error audit logs:', error);
+                    });
+
                     resolve(true);
                   } else {
                     reject(new Error('Upload failed'));
