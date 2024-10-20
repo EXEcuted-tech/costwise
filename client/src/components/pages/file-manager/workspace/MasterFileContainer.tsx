@@ -275,10 +275,10 @@ const MasterFileContainer = (data: File) => {
                 formula: null,
                 level: null,
                 itemCode: null,
-                description: "",
+                description: null,
                 formulation: null,
                 batchQty: null,
-                unit: ""
+                unit: null
               };
               currentFormulations.push(emptyFodlRecord);
             }
@@ -479,12 +479,21 @@ const MasterFileContainer = (data: File) => {
   };
 
   const onSaveBOMSheet = async (updatedData: any, bomId: number) => {
-    // console.log(updatedData);
-    // const hasEmptyEntry = updatedData.some(item => {
-    //   return (
 
-    //   );
-    // });
+    const hasEmptyEntry = updatedData.some((item: { description: any; batchQty: string | null | undefined; unit: any; rowType: string; }) => {
+      return (
+        item.rowType !== 'endIdentifier' && (
+          !item.description ||
+          item.batchQty === undefined || item.batchQty === null || item.batchQty === '' ||
+          !item.unit
+        )
+      );
+    });
+
+    if (hasEmptyEntry) {
+      setAlertMessages(['One or more entries are empty. Please fill in all required fields.']);
+      return;
+    }
 
     // if (hasEmptyEntry) {
     //   setAlertMessages(['One or more entries are empty. Please fill in all required fields.']);
@@ -500,9 +509,29 @@ const MasterFileContainer = (data: File) => {
       if (bomResponse.data.status == 200) {
         const formulations = splitFormulations(updatedData, formulaArray);
         //debug here add a console.log for formulations
+        const firstRowData = updatedData[0];
+        const firstRowItemCode = firstRowData?.itemCode;
+        const firstRowDescription = firstRowData?.description;
+
+        console.log("Outside", formulations);
         formulations.forEach(async ({ id, formulations }, index) => {
+          console.log("Inside", formulations);
           const formulationData = formulations;
+          console.log(formulationData);
           const finishedGood = formulationData[0];
+
+          if (!finishedGood ||
+            !('formula' in finishedGood) ||
+            !('itemCode' in finishedGood) ||
+            !('description' in finishedGood) ||
+            !('formulation' in finishedGood) ||
+            !('batchQty' in finishedGood) ||
+            !('unit' in finishedGood) ||
+            finishedGood.itemCode !== firstRowItemCode ||
+            finishedGood.description !== firstRowDescription) {
+            setAlertMessages(['The first row is not a valid finished good or does not match the expected item code and description. Please check your data.']);
+            return;
+          }
 
           let fgRow = {
             fg_id: finishedGood.id,
@@ -513,12 +542,18 @@ const MasterFileContainer = (data: File) => {
             formulation_no: parseInt(finishedGood.formulation ?? '0', 10),
           };
 
-          const fgResponse = await api.post('/finished_goods/update', fgRow);
+          const fgResponse = await api.post('/finished_goods/update_or_create', fgRow);
 
           if (fgResponse.data.status !== 200) {
 
           }
 
+          const nextData = formulationData[1];
+
+          if (!nextData) {
+            setAlertMessages(['There is no data after the finished good row. Please check your formulation data.']);
+            return;
+          }
           // let emulsion = formulationData[1]?.description === 'EMULSION' ? formulationData[1] : null;
 
           // if (!emulsion) {
@@ -532,7 +567,7 @@ const MasterFileContainer = (data: File) => {
           //   }
           // }
 
-          let emulsion = formulationData.find(item => item.description.toLowerCase() === 'emulsion');
+          let emulsion = formulationData.find(item => item.description?.toLowerCase() === 'emulsion');
 
           const transformedEmulsionData = emulsion
             ? {
@@ -554,13 +589,16 @@ const MasterFileContainer = (data: File) => {
             batchQty: item.batchQty,
           }));
 
+          console.log(fgResponse.data.data);
           const payload = {
+            bom: bomId,
             emulsion: transformedEmulsionData,
             materials: transformedMaterialData,
             formulation_id: id,
-            formula_code: finishedGood.formula
+            formula_code: finishedGood.formula,
+            fg_id: fgResponse.data.data.fg_id
           };
-          const saveResponse = await api.post('/boms/update_batch', payload);
+          const saveResponse = await api.post('/boms/update_create_batch', payload);
           if (saveResponse.data.status == 200) {
             setIsLoading(false);
             setSuccessMessage("BOM Sheet saved successfully.");
@@ -704,19 +742,12 @@ const MasterFileContainer = (data: File) => {
       console.error('Error: ids is not an array.');
       throw new Error('The "ids" argument must be an array of numbers.');
     }
-    data.forEach((item, index) => {
-      const isSeparator =
-        item.formula === null &&
-        item.level === null &&
-        item.itemCode === null &&
-        item.description === "" &&
-        item.formulation === null &&
-        item.batchQty === null &&
-        item.unit === "";
 
-      if (isSeparator) {
+    data.forEach((item) => {
+      if (item.rowType === 'endIdentifier') {
+        console.log("Here", item);
         if (currentFormulation.length > 0) {
-          formulations.push(currentFormulation);
+          formulations.push([...currentFormulation, item]);
           currentFormulation = [];
         }
       } else {
@@ -728,19 +759,19 @@ const MasterFileContainer = (data: File) => {
       formulations.push(currentFormulation);
     }
 
-    if (ids.length !== formulations.length) {
-      console.warn(
-        `The number of IDs (${ids.length}) does not match the number of formulations (${formulations.length}).`
-      );
-      const minLength = Math.min(ids.length, formulations.length);
-      return formulations.slice(0, minLength).map((formulation, index) => ({
-        id: ids[index],
-        formulations: formulation,
-      }));
-    }
+    // if (ids.length !== formulations.length) {
+    //   console.warn(
+    //     `The number of IDs (${ids.length}) does not match the number of formulations (${formulations.length}).`
+    //   );
+    //   const minLength = Math.min(ids.length, formulations.length);
+    //   return formulations.slice(0, minLength).map((formulation, index) => ({
+    //     id: ids[index],
+    //     formulations: formulation,
+    //   }));
+    // }
 
     const mappedFormulations = formulations.map((formulation, index) => ({
-      id: ids[index],
+      id: ids[index] !== undefined ? ids[index] : 0,
       formulations: formulation,
     }));
 
@@ -764,7 +795,8 @@ const MasterFileContainer = (data: File) => {
         {!isLoading ?
           <div className='overflow-auto'>
             {/* FODL Costing */}
-            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
+            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'
+              id="fodl-cost">
               <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>FODL COST</h1>
               {isEdit['A'] ?
                 <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin' />
@@ -788,7 +820,8 @@ const MasterFileContainer = (data: File) => {
             </div>
 
             {/* Material Cost */}
-            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
+            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'
+              id="material-cost">
               <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>MATERIAL COST</h1>
               {isEdit['B'] ?
                 <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin' />
@@ -817,7 +850,8 @@ const MasterFileContainer = (data: File) => {
               return (
                 <div key={bom.bom_id} className='mb-8'>
                   {/* BOM Header */}
-                  <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
+                  <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'
+                    id={`bom-${bom.bom_id}`} >
                     <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px] uppercase'>{bom.bomName}</h1>
                     {isEdit[editKey] ?
                       <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin' />

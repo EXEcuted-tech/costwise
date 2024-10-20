@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
+use Illuminate\Support\Facades\Log;
 
 class AuthController extends ApiController
 {
@@ -18,7 +19,7 @@ class AuthController extends ApiController
             $validator = Validator::make(
                 $request->all(),
                 [
-                    'employee_number' => 'required',
+                    'employee_number' => 'required|unique:users',
                     'user_type' => 'required',
                     'first_name' => 'required',
                     'last_name' => 'required',
@@ -27,7 +28,8 @@ class AuthController extends ApiController
                     'department' => 'required',
                     'phone_number' => 'required|regex:/^(\+?[0-9]{1,4})?\s?-?[0-9]{10}$/',
                     'position' => 'required',
-                    'sys_role' => 'required'
+                    'sys_role' => 'required|json',
+                    'display_picture' => 'required|image|mimes:jpeg,png,jpg|max:2048',
                 ]
             );
 
@@ -39,15 +41,27 @@ class AuthController extends ApiController
 
             $validatedData = $validator->validated();
             $validatedData['password'] = Hash::make($request->password);
+            $validatedData['sys_role'] = $request->sys_role;
 
             $user = User::create($validatedData);
             // $accessToken = $user->createToken('authToken')->plainTextToken;
+
+            //Profile picture upload
+            if ($request->hasFile('display_picture')) {
+                try {
+                    $path = $request->file('display_picture')->store('profile_pictures', 'public');
+                    $user->display_picture = $path;
+                    $user->save();
+                } catch (\Throwable $th) {
+                    throw $th;
+                    }
+                }
 
             $this->status = 200;
             // $this->response['token'] = $accessToken;
             return $this->getResponse("User created successfully!");
         } catch (\Throwable $th) {
-            $this->status = $th->getCode();
+            $this->status = $th->getCode() ?: 500;
             $this->response['message'] = $th->getMessage();
             return $this->getResponse();
         }
@@ -118,7 +132,7 @@ class AuthController extends ApiController
             $accessToken->expires_at = now()->addMinutes(15);
             $accessToken->save();
         }
-        
+
         $token->token = hash('sha256', $plainTextRefreshToken = Str::random(48));
         $token->expires_at = now()->addDays(30);
         $token->save();

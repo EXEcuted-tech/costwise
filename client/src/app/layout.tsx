@@ -2,6 +2,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { UserProvider } from "@/contexts/UserContext";
+import { NotificationProvider } from "@/contexts/NotificationContext";
 
 export default function RootLayout({
   children,
@@ -11,7 +12,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <UserProvider>
-        <body>{children}</body>
+        <NotificationProvider>
+          <body>{children}</body>
+        </NotificationProvider>
       </UserProvider>
     </html>
   );
