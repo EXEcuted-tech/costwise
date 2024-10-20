@@ -809,7 +809,6 @@ class FileController extends ApiController
             $files = File::all();
     
             if ($files->isEmpty()) {
-                \Log::info('No files to export');
                 return response()->json(['message' => 'No files to export'], 404);
             }
     
@@ -834,8 +833,6 @@ class FileController extends ApiController
                     $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
                     $settings = json_decode($file->settings, true);
                     $fileName = $settings['file_name_with_extension'];
-                    
-                    \Log::info("Processing file: " . $fileName);
     
                     $tempFile = tempnam(sys_get_temp_dir(), $fileName);
                     $writer->save($tempFile);
@@ -844,36 +841,13 @@ class FileController extends ApiController
                     $folderName = $fileDate->format('Y_m');
     
                     $zipPath = $folderName . '/' . $fileName;
-                    if ($zip->addFile($tempFile, $zipPath)) {
-                        \Log::info("Added file to zip: " . $zipPath);
-                    } else {
-                        \Log::error("Failed to add file to zip: " . $zipPath);
-                    }
-    
-                    // Verify the file was added
-                    if ($zip->locateName($zipPath) === false) {
-                        \Log::error("File not found in zip after adding: " . $zipPath);
-                    } else {
-                        \Log::info("File verified in zip: " . $zipPath);
-                    }
-    
-                    \Log::info("Temp file size: " . filesize($tempFile) . " bytes");
+                    $zip->addFile($tempFile, $zipPath);
                 } catch (\Exception $e) {
-                    
+                    // Handle individual file export errors
                 }
             }
     
             $zip->close();
-    
-            $zipCheck = new ZipArchive();
-            if ($zipCheck->open($zipFilePath) === TRUE) {
-                for ($i = 0; $i < $zipCheck->numFiles; $i++) {
-                    $stat = $zipCheck->statIndex($i);
-                }
-                $zipCheck->close();
-            } else {
-                
-            }
     
             return Response::download($zipFilePath, $zipFileName, ['Content-Type' => 'application/zip'])
                 ->deleteFileAfterSend(true);
