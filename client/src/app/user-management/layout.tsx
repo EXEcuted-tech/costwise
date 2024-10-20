@@ -1,5 +1,6 @@
 "use client";
 import MainLayout from "@/components/layouts/MainLayout";
+import ProtectedRoute from "@/components/routes/ProtectedRoute";
 import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
 
 export default function UserManagementLayout({
@@ -8,12 +9,14 @@ export default function UserManagementLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ProtectedRoute>
     <SidebarProvider>
       <div className="w-full flex font-lato">
         <MainLayout/>
         <MainContent>{children}</MainContent>
       </div>
     </SidebarProvider>
+    </ProtectedRoute>
   );
 }
 

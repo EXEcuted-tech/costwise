@@ -20,7 +20,13 @@ Route::post('/refresh', [AuthController::class, 'refresh']);
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/logout', [AuthController::class, 'logout']);
     Route::get('/user', [UserController::class, 'getCurrentUser']);
-
+    Route::get('/users',[UserController::class,'getAllUsers']);
+  
+     Route::prefix('/user')->group(function () {
+        Route::post('update/{id}',[UserController::class,'updateUser']);
+        Route::delete('archive/{id}', [UserController::class, 'archiveUser']);
+    });
+  
     Route::prefix('/files')->group(function () {
         Route::post('upload', [FileController::class, 'upload']);
         Route::get('retrieve_all', [FileController::class, 'retrieveAll']);
@@ -88,3 +94,4 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('delete_bulk', [TransactionController::class, 'deleteBulk']);
     });
 });
+
