@@ -1,7 +1,12 @@
 import React from 'react';
 
+interface MonthOption {
+    display: string;
+    value: string;
+}
+
 interface CustomMonthSelectorProps {
-    months: string[];
+    months: MonthOption[];
     onMonthSelect: (month: string) => void;
 };
 
@@ -20,8 +25,8 @@ const CustomMonthSelector:React.FC<CustomMonthSelectorProps> = ({months, onMonth
                         onChange={handleMonthChange}
                         className='min-w-[150px] flex-grow outline-none focus:ring-0 border-none pr-4 pl-1'>
                             <option selected value="" disabled hidden>Choose month...</option>
-                            {months.map((data, index) => (
-                                <option key={index} value={data} className=''>{data}</option>
+                            {months.map((month, index) => (
+                                <option key={index} value={month.value} className=''>{month.display}</option>
                             ))}
                     </select>
                 </div>
