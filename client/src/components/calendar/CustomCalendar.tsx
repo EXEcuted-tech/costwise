@@ -40,8 +40,8 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
     const daysArray = Array.from({ length: numberOfDays }, (_, i) => i + 1);
 
     return (
-        <div className={`bg-white rounded-lg shadow-lg overflow-hidden ${className}`}>
-            <div className="bg-primary text-center p-[10px] flex justify-between items-center">
+        <div className={`bg-white dark:bg-[#3C3C3C] rounded-lg shadow-lg overflow-hidden ${className}`}>
+            <div className="bg-primary dark:bg-[#8B0000] text-center p-[10px] flex justify-between items-center">
                 <span className={`${isOpen ? 'text-[12px] 2xl:text-[15px] 3xl:text-[22px]' : 'text-[16px] 2xl:text-[22px] 3xl:text-[28px]' } flex items-center ml-[15px] text-white font-bold`}>
                     <BsCalendarDateFill className='text-white mr-[6px]' />
                     {monthNames[currentMonth]} {currentYear}
@@ -63,7 +63,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
             </div>
             <div className={`${isOpen ? 'text-[10px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'} grid grid-cols-7 gap-2 text-center px-4 pt-4`}>
                 {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-                    <span key={day} className="font-bold text-gray-600">
+                    <span key={day} className="font-bold text-gray-600 dark:text-gray-200">
                         {day}
                     </span>
                 ))}
@@ -72,7 +72,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
                 {daysArray.map((day) => (
                     <span
                         key={day}
-                        className="text-[12px] 2xl:text-[16px] py-2 hover:bg-gray-200 font-medium rounded-full transition-colors cursor-pointer"
+                        className="text-[12px] 2xl:text-[16px] py-2 hover:bg-gray-200 dark:text-white font-medium rounded-full transition-colors cursor-pointer"
                     >
                         {day}
                     </span>

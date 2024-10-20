@@ -21,6 +21,9 @@ const LineChart: React.FC<LineChartProps> = ({className}) => {
         const dataset1Data = [10, 25, 13, 18, 30, 25];
         const dataset2Data = [20, 15, 28, 22, 10, 15];
 
+        const bodyClass = window.document.body.classList;
+        const isDarkMode = bodyClass.contains('dark');
+        
         chartInstanceRef.current = new Chart(ctx, {
           type: 'line',
           data: {
@@ -54,7 +57,10 @@ const LineChart: React.FC<LineChartProps> = ({className}) => {
                     weight: 'bold',
                     family: 'Arial',
                   },
-                  color: '#B22222',
+                  color: isDarkMode ? '#FFFFFF' : '#B22222',
+                },
+                ticks: {
+                  color: isDarkMode ? '#FFFFFF' : '#000000',
                 },
               },
               y: {
@@ -66,9 +72,19 @@ const LineChart: React.FC<LineChartProps> = ({className}) => {
                     weight: 'bold',
                     family: 'Arial',
                   },
-                  color: '#B22222',
+                  color: isDarkMode ? '#FFFFFF' : '#B22222',
                 },
                 beginAtZero: true,
+                ticks: {
+                  color: isDarkMode ? '#FFFFFF' : '#000000',
+                },
+              },
+            },
+            plugins: {
+              legend: {
+                labels: {
+                  color: isDarkMode ? '#FFFFFF' : '#000000',
+                },
               },
             },
           },
@@ -84,7 +100,7 @@ const LineChart: React.FC<LineChartProps> = ({className}) => {
   }, []);
 
   return (
-    <div className={`relative flex flex-grow justify-center items-center px-0 2xl:px-2 py-4 ${className}`}>
+    <div className={`relative flex flex-grow justify-center items-center px-0 2xl:px-2 py-4 dark:text-white ${className}`}>
       <canvas ref={chartRef} />
     </div>
   );

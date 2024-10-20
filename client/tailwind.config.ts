@@ -120,12 +120,24 @@ const config: Config = {
           '50%': { color: '#2e2e2e' },
           '100%': { color: '#414141' },
         },
+        colorPulseDark: {
+          '0%': { color: '#FFFFFF' },
+          '50%': { color: '#E0E0E0' },
+          '100%': { color: '#FFFFFF' },
+        },
         colorPulse2: {
           '0%': { color: '#414141' },
           '25%': { color: '#2e2e2e' },
           '50%': { color: '#B22222' },
           '75%': { color: '#B22222' },
           '100%': { color: '#414141' },
+        },
+        colorPulseDark2: {
+          '0%': { color: '#FFFFFF' },
+          '25%': { color: '#E0E0E0' },
+          '50%': { color: '#B22222' },
+          '75%': { color: '#B22222' },
+          '100%': { color: '#FFFFFF' },
         },
         slide: {
           "0%": { transform: "translateY(100%)", opacity: '0.1' },
@@ -155,6 +167,8 @@ const config: Config = {
         'border-pulse2': 'border-pulse2 3s infinite',
         'color-pulse': 'colorPulse 5s ease-in-out infinite',
         'color-pulse2': 'colorPulse2 10s ease-in-out infinite',
+        'color-pulse-dark': 'colorPulseDark 5s ease-in-out infinite',
+        'color-pulse-dark2': 'colorPulseDark2 10s ease-in-out infinite',
         'slide': 'slide 2.5s linear infinite',
       },
       backgroundImage: {
