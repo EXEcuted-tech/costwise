@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\DateHelper;
+use App\Models\File;
 use App\Models\FinishedGood;
 use App\Models\Fodl;
 use App\Models\Formulation;
@@ -28,7 +29,7 @@ class CostCalcController extends ApiController
                 ->pluck('monthYear')
                 ->toArray();
 
-            $formattedOptions = array_map(function($monthYear) {
+            $formattedOptions = array_map(function ($monthYear) {
                 return [
                     'value' => $monthYear,
                     'label' => DateHelper::formatMonthYear($monthYear)
@@ -151,12 +152,12 @@ class CostCalcController extends ApiController
         $spreadsheet->removeSheetByIndex(0);
 
         if ($exportType === 'xlsx') {
-            if($selectedFG === 'Specific-FG') {
+            if ($selectedFG === 'Specific-FG') {
                 foreach ($data as $fg) {
                     $this->addSpecifiedFGSheet($spreadsheet, $fg);
                 }
             } else {
-                // $this->addAllFGSheet($spreadsheet, $data);
+                $this->addAllFGSheet($spreadsheet, $data);
             }
 
             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
@@ -167,15 +168,14 @@ class CostCalcController extends ApiController
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
                 'Content-Disposition' => 'attachment; filename="' . $fileName . '.xlsx"',
             ])->deleteFileAfterSend(true);
-
         } else if ($exportType === 'csv') {
-            if($selectedFG === 'Specific-FG') {
-                $headers = array (
+            if ($selectedFG === 'Specific-FG') {
+                $headers = array(
                     'Content-Type' => 'text/csv',
                     'Content-Disposition' => 'attachment; filename="' . $fileName . '.csv"',
                 );
 
-                $callback = function() use ($data) {
+                $callback = function () use ($data) {
                     $handle = fopen('php://output', 'w');
 
                     fputcsv($handle, ["Formula", "Level", "Item Code", "Description", "Batch Qty", "Unit", "Cost", "Total Cost"]);
@@ -215,7 +215,6 @@ class CostCalcController extends ApiController
                 // $this->addAllFGSheet($spreadsheet, $data);
             }
         }
-
     }
 
     private function addSpecifiedFGSheet($spreadsheet, $data)
@@ -242,7 +241,7 @@ class CostCalcController extends ApiController
         $sheet->setAutoFilter('B1:H1');
 
         $row = 2;
-        
+
         //Add FG Row
         $sheet->setCellValue("A$row", $fg['formulation_no']);
         $sheet->setCellValue("B$row", 1);
@@ -279,9 +278,113 @@ class CostCalcController extends ApiController
             $row++;
         }
 
-            // Apply number formatting
-            $sheet->getStyle('E2:E' . ($row - 1))->getNumberFormat()->setFormatCode('0.00');
-            $sheet->getStyle('G2:H' . ($row - 1))->getNumberFormat()->setFormatCode('0.00');
-        }
+        // Apply number formatting
+        $sheet->getStyle('E2:E' . ($row - 1))->getNumberFormat()->setFormatCode('0.00');
+        $sheet->getStyle('G2:H' . ($row - 1))->getNumberFormat()->setFormatCode('0.00');
+    }
 
+    // public function getAllFGExport(Request $request)
+    // {
+    //     // Validate request inputs
+    //     $validator = Validator::make(
+    //         $request->all(),
+    //         [
+    //             'file_type' => 'required|string',
+    //             'settings' => 'required|array',
+    //         ]
+    //     );
+
+    //     if ($validator->fails()) {
+    //         return response()->json([
+    //             'status' => 401,
+    //             'error' => $validator->errors(),
+    //             'message' => "Incorrect input details."
+    //         ], 401);
+    //     }
+
+    //     $validatedData = $validator->validated();
+
+    //     // Create file entry in the database
+    //     $file = File::create([
+    //         'file_type' => $validatedData['file_type'],
+    //         'settings' => json_encode($validatedData['settings']),
+    //     ]);
+
+    //     $spreadsheet = new Spreadsheet();
+
+    //     // Adding data to the spreadsheet (implementation of addAllFinishedGoodsSummary is assumed)
+    //     $this->addAllFinishedGoodsSummary($spreadsheet, $file);
+
+    //     // File handling and export logic based on file type
+    //     $tempDir = sys_get_temp_dir(); // Define temp directory for file handling
+    //     $fileName = $file->file_type === 'xlsx' ? 'exported_files.xlsx' : 'exported_files.csv';
+    //     $tempFilePath = $tempDir . '/' . $fileName;
+
+    //     if ($request->export_type === 'xlsx') {
+    //         // Create XLSX file
+    //         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    //         $writer->save($tempFilePath);
+    //     } else if ($file->file_type === 'csv') {
+    //         // Create CSV file (you can customize CSV writing as needed)
+    //         $writer = new \PhpOffice\PhpSpreadsheet\Writer\Csv($spreadsheet);
+    //         $writer->save($tempFilePath);
+    //     }
+
+    //     // Zip the file
+    //     $zip = new ZipArchive();
+    //     $zipFileName = $tempDir . '/exported_files.zip';
+    //     if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+    //         throw new \RuntimeException("Unable to open zip file: $zipFileName");
+    //     }
+
+    //     // Add file to the zip archive
+    //     $zip->addFile($tempFilePath, $fileName);
+    //     $zip->close();
+
+    //     // Download the zip file and clean up
+    //     return response()->download($zipFileName, 'exported_files.zip', [
+    //         'Content-Type' => 'application/zip',
+    //         'Content-Disposition' => 'attachment; filename="exported_files.zip"',
+    //     ])->deleteFileAfterSend(true);
+    // }
+
+
+    private function addAllFGSheet($spreadsheet, $file)
+    {
+        $sheet = $spreadsheet->getActiveSheet();
+        $sheet->setTitle('Cost Calculation Summary');
+
+        $headers = ['Item Code', 'Item Description', 'RM Cost', 'Factory Overhead', 'Direct Labor', 'TOTAL'];
+        $sheet->fromArray($headers, NULL, 'A1');
+        $dataRange = 'A1:F1';
+        $sheet->setAutoFilter($dataRange);
+
+        $sheet->getColumnDimension('A')->setWidth(15);
+        $sheet->getColumnDimension('B')->setWidth(25);
+        $sheet->getColumnDimension('C')->setWidth(12);
+        $sheet->getColumnDimension('D')->setWidth(15);
+        $sheet->getColumnDimension('E')->setWidth(15);
+        $sheet->getColumnDimension('F')->setWidth(12);
+
+        $settings = json_decode($file->settings, true);
+
+        $row = 2;
+        foreach ($settings as $fg) {
+            $fgCode = $fg['fg_code'];
+            $fgDesc = $fg['fg_desc'];
+            $rmCost = $fg['rm_cost'];
+            $factoryOverhead = $fg['factory_overhead'];
+            $directLabor = $fg['direct_labor'];
+            $totalCost = $fg['total_cost'];
+
+            $sheet->setCellValue("A$row", $fgCode);
+            $sheet->setCellValue("B$row", $fgDesc);
+            $sheet->setCellValue("C$row", $rmCost);
+            $sheet->setCellValue("D$row", $factoryOverhead);
+            $sheet->setCellValue("E$row", $directLabor);
+            $sheet->setCellValue("F$row", $totalCost);
+
+            $row++;
+        }
+    }
 }

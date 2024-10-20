@@ -16,6 +16,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\File;
 use App\Models\FinishedGood;
 use App\Models\Material;
+use GuzzleHttp\Promise\Create;
 use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
@@ -800,6 +801,7 @@ class FileController extends ApiController
         // try {
         $files = File::all();
 
+
         if ($files->isEmpty()) {
             return response()->json(['message' => 'No files to export'], 404);
         }
@@ -1334,88 +1336,6 @@ class FileController extends ApiController
             $this->status = $th->getCode();
             $this->response['message'] = $th->getMessage();
             return $this->getResponse();
-        }
-    }
-
-    private function addAllCostCalculationSheet($spreadsheet, $file)
-    {
-        $sheet = $spreadsheet->getActiveSheet();
-        $sheet->setTitle('Production Transactions');
-        $headers = ['Year', 'Month', 'Date', 'Journal', 'Entry Number', 'Description', 'Project', 'GL Account', 'GL Description', 'Warehouse', 'Item Code', 'Item Description', 'Qty', 'Amount', 'Unit Code'];
-        $sheet->fromArray($headers, NULL, 'A1');
-        $dataRange = 'A1:O1';
-        $sheet->setAutoFilter($dataRange);
-
-        $sheet->getColumnDimension('A')->setWidth(7.71);
-        $sheet->getColumnDimension('B')->setWidth(8);
-        $sheet->getColumnDimension('C')->setWidth(19.14);
-        $sheet->getColumnDimension('D')->setWidth(9.43);
-        $sheet->getColumnDimension('E')->setWidth(15.38);
-        $sheet->getColumnDimension('F')->setWidth(26.38);
-        $sheet->getColumnDimension('G')->setWidth(22.38);
-        $sheet->getColumnDimension('H')->setWidth(19.38);
-        $sheet->getColumnDimension('I')->setWidth(30.38);
-        $sheet->getColumnDimension('J')->setWidth(11.14);
-        $sheet->getColumnDimension('K')->setWidth(19.29);
-        $sheet->getColumnDimension('L')->setWidth(21.29);
-        $sheet->getColumnDimension('M')->setWidth(11.57);
-        $sheet->getColumnDimension('N')->setWidth(11.57);
-        $sheet->getColumnDimension('O')->setWidth(9.57);
-
-        $settings = json_decode($file->settings, true);
-        if (isset($settings['transaction_ids'])) {
-            $transactionIds = $settings['transaction_ids'];
-
-            $row = 2;
-            foreach ($transactionIds as $transactionId) {
-                $transaction = Transaction::find($transactionId);
-                $settings = json_decode($transaction->settings, true);
-
-                $date = new DateTime($transaction->date);
-                $formattedDate = $date->format('m/d/y h:i A');
-
-                $sheet->setCellValue("A$row", $transaction->year);
-                $sheet->setCellValue("B$row", $transaction->month);
-                $sheet->setCellValue("C$row", $formattedDate);
-                $sheet->setCellValue("D$row", $transaction->journal);
-                $sheet->setCellValue("E$row", $transaction->entry_num);
-                $sheet->setCellValue("F$row", $transaction->trans_desc);
-                $sheet->setCellValue("G$row", $transaction->project);
-                $sheet->setCellValue("H$row", $transaction->gl_account);
-                $sheet->setCellValue("I$row", $transaction->gl_desc);
-                $sheet->setCellValue("J$row", $transaction->warehouse);
-
-                if ($transaction->material_id != null) {
-                    $material = Material::find($transaction->material_id);
-
-                    $sheet->setCellValue("K$row", $material->material_code);
-                    $sheet->setCellValue("L$row", $material->material_desc);
-                    $sheet->setCellValue("M$row", $settings['qty']);
-                    $sheet->setCellValue("N$row", $material->material_cost);
-                    $sheet->setCellValue("O$row", $material->unit);
-                }
-
-                if ($transaction->fg_id != null) {
-                    $fg = FinishedGood::find($transaction->fg_id);
-
-                    $sheet->setCellValue("K$row", $fg->fg_code);
-                    $sheet->setCellValue("L$row", $fg->fg_desc);
-                    $sheet->setCellValue("M$row", $fg->total_batch_qty);
-                    $sheet->setCellValue("N$row", $fg->rm_cost);
-                    $sheet->setCellValue("O$row", $fg->unit);
-                }
-
-                if ($transaction->material_id == null && $transaction->fg_id == null) {
-                    $sheet->setCellValue("K$row", $settings['item_code']);
-                    $sheet->setCellValue("L$row", $settings['item_desc']);
-                    $sheet->setCellValue("M$row", $settings['qty']);
-                    $sheet->setCellValue("N$row", $settings['amount']);
-                    $sheet->setCellValue("O$row", $settings['unit']);
-                }
-
-
-                $row++;
-            }
         }
     }
 }

@@ -146,6 +146,17 @@ export interface SpecificFinishedGood {
     components: Component[];
 }
 
+export interface AllFinishedGood {
+  fg_id: number;
+  fodl_id: number;
+  fg_code: string;
+  fg_desc: string;
+  rm_cost: string;
+  factory_overhead: string;
+  direct_labor: string;
+  total_cost: string;
+}
+
 export interface Component {
     level: number;
     item_code: string;
