@@ -6,6 +6,7 @@ use App\Http\Controllers\FinishedGoodController;
 use App\Http\Controllers\FodlController;
 use App\Http\Controllers\FormulationController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -86,5 +87,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_batch', [TransactionController::class, 'retrieveBatch']);
         Route::post('update_batch', [TransactionController::class, 'updateBatch']);
         Route::post('delete_bulk', [TransactionController::class, 'deleteBulk']);
+    });
+
+    Route::prefix('/notifications')->group(function () {
+        Route::get('new', [NotificationController::class, 'getNewNotifications']);
+        Route::get('retrieve', [NotificationController::class, 'retrieve']);
+        Route::get('retrieve_unread', [NotificationController::class, 'retrieveUnread']);
     });
 });
