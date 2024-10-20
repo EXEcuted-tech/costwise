@@ -19,8 +19,6 @@ import api from '@/utils/api';
 import * as XLSX from 'xlsx';
 import Alert from "@/components/alerts/Alert";
 import { File } from '@/types/data';
-import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
 
 const FileManagerPage = () => {
   const { isOpen } = useSidebarContext();
