@@ -7,6 +7,7 @@ use App\Http\Controllers\FodlController;
 use App\Http\Controllers\FormulationController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\SystemController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -107,5 +108,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieveAll', [InventoryController::class, 'retrieveAll']);
         Route::get('lists', [InventoryController::class, 'retrieveInventoryList']);
         Route::delete('archive', [InventoryController::class, 'archiveInventoryList']);
+    });
+
+    Route::prefix('/system')->group(function () {
+        Route::get('retrieve_data', [SystemController::class, 'retrieveData']);
     });
 });

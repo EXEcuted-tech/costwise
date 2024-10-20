@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Header from '@/components/header/Header';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
@@ -11,6 +11,7 @@ import { IoMdAdd, IoIosSearch } from "react-icons/io";
 import ReleaseNoteTile from '@/components/pages/system-maintenance/ReleaseNoteTile';
 import CreateReleaseNotes from '@/components/modals/CreateReleaseNotes';
 import EditReleaseNotes from '@/components/modals/EditReleaseNotes';
+import api from '@/utils/api';
 
 
 export interface SystemMaintenanceProps {
@@ -26,78 +27,136 @@ const SystemMaintenance = () => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [createNotes, setCreateNotes] = useState(false);
     const [editNotes, setEditNotes] = useState(false);
+    const [storage, setStorage] = useState<any>(null);
+    const [totalFiles, setTotalFiles] = useState<number>(0);
+    const [fileTypes, setFileTypes] = useState<any>(null);
 
+    useEffect(() => {
+        const fetchSystemData = async () => {
+            try {
+                const response = await api.get('/system/retrieve_data');
+                setStorage(response.data.storage);
+                setTotalFiles(response.data.total_files);
+                setFileTypes(response.data.file_types);
+            } catch (error) {
+                console.error('Error fetching system data:', error);
+            }
+        };
+
+        fetchSystemData();
+    }, []);
 
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
     };
 
-
     const indexOfLastItem = currentPage * 4;
     const indexOfFirstItem = indexOfLastItem - 4;
     const currentListPage = ReleaseNotesFakeData.slice(indexOfFirstItem, indexOfLastItem);
+
+    const handleViewDatabase = () => {
+        const phpMyAdminUrl = process.env.NEXT_PUBLIC_PHPMYADMIN_URL || 'http://localhost/phpmyadmin';
+        window.open(phpMyAdminUrl, '_blank');
+    };
 
     return (
         <div className='w-full h-screen bg-background'>
             <div>
                 <Header icon={GrSystem} title="System Maintenance" />
             </div>
-            {createNotes && <CreateReleaseNotes setCreateNotes={setCreateNotes}/>}
-            {editNotes && <EditReleaseNotes setEditNotes={setEditNotes}/>}
+            {createNotes && <CreateReleaseNotes setCreateNotes={setCreateNotes} />}
+            {editNotes && <EditReleaseNotes setEditNotes={setEditNotes} />}
             <div className='ml-[45px]'>
                 {/* Info Tiles */}
                 <div className='flex mx-16 mt-12 mb-9 gap-[5rem] justify-center'>
                     {/* Database Storage */}
-                    
-                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]' } flex flex-col p-4 h-[17rem] bg-white rounded-lg drop-shadow-lg`}>
+
+                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]'} flex flex-col p-4 h-[17rem] bg-white rounded-lg drop-shadow-lg`}>
                         <div className='flex flex-col mb-8'>
                             <div className='flex'>
-                                <span className='text-[38px] mr-2'>128</span>
-                                <span className='text-[30px] pt-2'>GB</span>
-                                <AiFillDatabase className='text-[60px] ml-auto mr-3 text-gray-200'/>
+                                <span className='text-[38px] mr-2'>{storage?.total.split(' ')[0]}</span>
+                                <span className='text-[30px] pt-2'>{storage?.total.split(' ')[1]}</span>
+                                <AiFillDatabase className='text-[60px] ml-auto mr-3 text-gray-200' />
                             </div>
                             <span className='text-[23px] font-light'>Database Storage</span>
                         </div>
 
                         <div className='flex flex-col'>
                             <div className='w-full h-[1.5rem] bg-gray-100 rounded-full'>
-                                <div className='w-[20%] h-[1.5rem] bg-[#DD8383] rounded-full'></div>
+                                <div className='h-[1.5rem] bg-[#DD8383] rounded-full' style={{ width: `${(parseFloat(storage?.used.split(' ')[0]) / parseFloat(storage?.total.split(' ')[0])) * 100}%` }}></div>
                             </div>
-                            <span className='text-[17px] pt-1 pl-1 font-light'>20gb used</span>
+                            <span className='text-[17px] pt-1 pl-1 font-light'>{storage?.used || '0 GB'} used</span>
                         </div>
-
-                        <button className='w-[9rem] text-[16px] mt-6 border border-[#9290905b] font-light bg-white shadow-lg rounded-lg'>View Database</button>
+                        <button className='w-[9rem] text-[16px] mt-6 border border-[#9290905b] font-light bg-white shadow-lg rounded-lg'
+                            onClick={handleViewDatabase}>View Database</button>
                     </div>
 
                     {/* Files */}
-                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]' } flex flex-col p-4 h-[17rem] bg-white rounded-lg drop-shadow-lg`}>
+                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]'} flex flex-col p-4 h-[17rem] bg-white rounded-lg drop-shadow-lg`}>
                         <div className='flex flex-col mb-8'>
                             <div className='flex'>
-                                <span className='text-[38px] mr-2'>50</span>
+                                <span className='text-[38px] mr-2'>{totalFiles || '0'}</span>
                                 <span className='text-[30px] pt-2'>FILES</span>
-                                <PiFilesFill className='text-[60px] ml-auto mr-3 text-gray-200'/>
+                                <PiFilesFill className='text-[60px] ml-auto mr-3 text-gray-200' />
                             </div>
                             <span className='text-[23px] font-light'>Total No. of Files</span>
                         </div>
 
                         <div className='flex flex-col'>
                             <div className='flex w-full h-[1.5rem] bg-gray-100 rounded-full'>
-                                <div className='w-[20%] h-[1.5rem] bg-[hsl(0,57%,69%)] rounded-l-full'></div>
-                                <div className='w-[30%] h-[1.5rem] bg-[#9EE29E]'></div>
-                                <div className='w-[30%] h-[1.5rem] bg-[#B6CDFF] rounded-r-full'></div>
+                                {fileTypes && Object.entries(fileTypes).map(([type, count], index, array) => {
+                                    if ((count as number) > 0) {
+                                        const width = ((count as number) / totalFiles) * 100;
+                                        const isFirst = index === 0;
+                                        const isLast = index === array.length - 1;
+                                        let bgColor;
+                                        switch (type) {
+                                            case 'master_file':
+                                                bgColor = 'hsl(0,57%,69%)';
+                                                break;
+                                            case 'transactional_file':
+                                                bgColor = '#9EE29E';
+                                                break;
+                                            case 'inventory_file':
+                                                bgColor = '#B6CDFF';
+                                                break;
+                                            case 'training_file':
+                                                bgColor = '#FFE135';
+                                                break;
+                                            default:
+                                                bgColor = 'gray';
+                                        }
+                                        return (
+                                            <div
+                                                key={type}
+                                                className={`h-[1.5rem] ${isFirst ? 'rounded-l-full' : ''} ${isLast ? 'rounded-r-full' : ''}`}
+                                                style={{ width: `${width}%`, backgroundColor: bgColor }}
+                                            ></div>
+                                        );
+                                    }
+                                    return null;
+                                })}
                             </div>
-                            <div className='flex flex-col p-3'>
-                                <div className='flex'>
-                                    <div className='w-4 h-4 mt-1 mr-2 bg-[#DD8383] rounded-full'></div>
-                                    <span className='text-[17px] font-light'>Material-Cost</span>
+                            <div className='flex mt-[5px] p-3'>
+                                <div className='w-[50%]'>
+                                    <div className='flex'>
+                                        <div className='w-4 h-4 mt-1 mr-2 bg-[#DD8383] rounded-full'></div>
+                                        <span className='text-[17px] font-light'>Master Files</span>
+                                    </div>
+                                    <div className='flex'>
+                                        <div className='w-4 h-4 mt-1 mr-2 bg-[#9EE29E] rounded-full'></div>
+                                        <span className='text-[17px] font-light'>Transactions</span>
+                                    </div>
                                 </div>
-                                <div className='flex'>
-                                    <div className='w-4 h-4 mt-1 mr-2 bg-[#9EE29E] rounded-full'></div>
-                                    <span className='text-[17px] font-light'>Transactions</span>
-                                </div>
-                                <div className='flex'>
-                                    <div className='w-4 h-4 mt-1 mr-2 bg-[#B6CDFF] rounded-full'></div>
-                                    <span className='text-[17px] font-light'>Inventory</span>
+                                <div className='w-[50%]'>
+                                    <div className='flex'>
+                                        <div className='w-4 h-4 mt-1 mr-2 bg-[#B6CDFF] rounded-full'></div>
+                                        <span className='text-[17px] font-light'>Inventory</span>
+                                    </div>
+                                    <div className='flex'>
+                                        <div className='w-4 h-4 mt-1 mr-2 bg-[#FFE135] rounded-full'></div>
+                                        <span className='text-[17px] font-light'>Training Files</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -105,18 +164,18 @@ const SystemMaintenance = () => {
                 </div>
 
                 {/* Release Notes */}
-                <div className={`${isOpen ? 'mx-9 2xl:mx-16' : 'mx-16' } flex flex-col h-[31rem] bg-white rounded-lg drop-shadow-md`}>
+                <div className={`${isOpen ? 'mx-9 2xl:mx-16' : 'mx-16'} flex flex-col h-[31rem] bg-white rounded-lg drop-shadow-md`}>
                     {/* Header */}
                     <div className='flex w-full h-[4rem] px-4 py-3 font-medium bg-white border border-[#9290906c] drop-shadow-md rounded-t-lg'>
                         <IoGitNetworkOutline className='text-[32px] text-gray-500 mt-1 mr-3' />
                         <span className='text-[28px] text-[#5B5353]'>Release Notes</span>
-                        <button className={`${isOpen ? 'ml-2 2xl:ml-5' : 'ml-5' } w-[2rem] h-[2rem] text-[25px] mt-1 px-[3px] text-gray-500 border border-[#9290905b] bg-white drop-shadow-md rounded-lg`} onClick={()=>setCreateNotes(true)}><IoMdAdd /></button>
+                        <button className={`${isOpen ? 'ml-2 2xl:ml-5' : 'ml-5'} w-[2rem] h-[2rem] text-[25px] mt-1 px-[3px] text-gray-500 border border-[#9290905b] bg-white drop-shadow-md rounded-lg`} onClick={() => setCreateNotes(true)}><IoMdAdd /></button>
                         <div className="mt-[3px] ml-auto text-gray-600">
                             <div className='flex absolute text-[1.3em] text-gray-400 mt-[0.3rem] ml-3'>
                                 <IoIosSearch />
                             </div>
                             <input
-                            
+
                                 className={`${isOpen ? 'w-[20rem]' : 'w-[20rem]'} bg-white h-8 px-5 pl-9 text-[1.1em] border border-[#9290906c] rounded-lg focus:outline-none`}
                                 type="search"
                                 name="search"
@@ -126,9 +185,9 @@ const SystemMaintenance = () => {
                     </div>
 
                     {/* Main Content Area */}
-                    <div className={`${isOpen ? 'px-10' : 'px-16' } w-full h-[21rem] mt-6`}>
+                    <div className={`${isOpen ? 'px-10' : 'px-16'} w-full h-[21rem] mt-6`}>
                         {currentListPage.map((note, index) => (
-                            <ReleaseNoteTile 
+                            <ReleaseNoteTile
                                 key={index}
                                 date={note.date}
                                 title={note.title}
@@ -161,7 +220,7 @@ const ReleaseNotesFakeData = [
         title: "Projected costing algorithm",
         author: "Michael Huang"
     },
-    
+
     {
         date: "December 3, 2023",
         title: "Calculation fix for recipe formulation",
@@ -191,7 +250,7 @@ const ReleaseNotesFakeData = [
         title: "Projected costing algorithm",
         author: "Michael Huang"
     },
-    
+
     {
         date: "November 3, 2022",
         title: "Calculation fix for recipe formulation",
@@ -215,5 +274,5 @@ const ReleaseNotesFakeData = [
         title: "Responsivenes fixes",
         author: "Hannah Angelica Galve"
     },
-    
+
 ]
