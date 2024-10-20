@@ -203,8 +203,6 @@ const CostCalculation = () => {
         params: { monthYear: monthYear },
       });
 
-      console.log("All Finished Goods: ", response.data.data);
-
       if (response.status === 200) {
         setAllFGData(response.data.data);
       } else {
@@ -222,12 +220,11 @@ const CostCalculation = () => {
     retrieveMonthYearOptions();
     createFileName();
     if (monthYear) {
-      retrieveAllFG(monthYear.value);
       retrieveFGOptions(monthYear.value);
+      retrieveAllFG(monthYear.value);
     } else {
       setFGOptions([]);
     }
-    console.log("sheets: ", sheets);
   }, [sheets, monthYear]);
 
   return (
