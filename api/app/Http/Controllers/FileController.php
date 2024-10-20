@@ -803,124 +803,117 @@ class FileController extends ApiController
         // }
     }
 
+    // public function exportAll(Request $request)
+    // {
+    //     try {
+    //         $files = File::all();
+    
+    //         if ($files->isEmpty()) {
+    //             return response()->json(['message' => 'No files to export'], 404);
+    //         }
+    
+    //         $zip = new ZipArchive();
+    //         $zipFileName = 'exported_files_' . time() . '.zip';
+    //         $zipFilePath = storage_path('app/temp/' . $zipFileName);
+    
+    //         if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
+    //             throw new \RuntimeException("Unable to create zip file");
+    //         }
+    
+    //         foreach ($files as $file) {
+    //             try {
+    //                 $spreadsheet = new Spreadsheet();
+    
+    //                 if ($file->file_type === 'master_file') {
+    //                     $this->addMasterFileSheets($spreadsheet, $file);
+    //                 } elseif ($file->file_type === 'transactional_file') {
+    //                     $this->addTransactionalFileSheet($spreadsheet, $file);
+    //                 }
+                    
+    //                 $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+    //                 $settings = json_decode($file->settings, true);
+    //                 $fileName = $settings['file_name_with_extension'];
+    
+    //                 $tempFile = tempnam(sys_get_temp_dir(), $fileName);
+    //                 $writer->save($tempFile);
+    
+    //                 $fileDate = new DateTime($file->created_at);
+    //                 $folderName = $fileDate->format('Y_m');
+    
+    //                 $zipPath = $folderName . '/' . $fileName;
+    //                 $zip->addFile($tempFile, $zipPath);
+    //             } catch (\Exception $e) {
+    //                 // Handle individual file export errors
+    //             }
+    //         }
+    
+    //         $zip->close();
+    
+    //         return Response::download($zipFilePath, $zipFileName, ['Content-Type' => 'application/zip'])
+    //             ->deleteFileAfterSend(true);
+    
+    //     } catch (\Exception $e) {
+    //         $this->status = 500;
+    //         $this->response['message'] = "Export failed: " . $e->getMessage();
+    //         return $this->getResponse();
+    //     }
+    // }
+
     public function exportAll(Request $request)
     {
         try {
             $files = File::all();
-    
+
             if ($files->isEmpty()) {
                 return response()->json(['message' => 'No files to export'], 404);
             }
-    
+
+            $zipFileName = storage_path('app/temp/exported_files_' . time() . '.zip');
             $zip = new ZipArchive();
-            $zipFileName = 'exported_files_' . time() . '.zip';
-            $zipFilePath = storage_path('app/temp/' . $zipFileName);
-    
-            if ($zip->open($zipFilePath, ZipArchive::CREATE) !== TRUE) {
+            if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
                 throw new \RuntimeException("Unable to create zip file");
             }
-    
+
             foreach ($files as $file) {
-                try {
-                    $spreadsheet = new Spreadsheet();
-    
-                    if ($file->file_type === 'master_file') {
-                        $this->addMasterFileSheets($spreadsheet, $file);
-                    } elseif ($file->file_type === 'transactional_file') {
-                        $this->addTransactionalFileSheet($spreadsheet, $file);
-                    }
-                    
-                    $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-                    $settings = json_decode($file->settings, true);
-                    $fileName = $settings['file_name_with_extension'];
-    
-                    $tempFile = tempnam(sys_get_temp_dir(), $fileName);
-                    $writer->save($tempFile);
-    
-                    $fileDate = new DateTime($file->created_at);
-                    $folderName = $fileDate->format('Y_m');
-    
-                    $zipPath = $folderName . '/' . $fileName;
-                    $zip->addFile($tempFile, $zipPath);
-                } catch (\Exception $e) {
-                    // Handle individual file export errors
+                $spreadsheet = new Spreadsheet();
+
+                if ($file->file_type === 'master_file') {
+                    $this->addMasterFileSheets($spreadsheet, $file);
+                } elseif ($file->file_type === 'transactional_file') {
+                    $this->addTransactionalFileSheet($spreadsheet, $file);
                 }
+
+                $settings = json_decode($file->settings, true);
+                $fileName = $settings['file_name_with_extension'];
+                $fileDate = new DateTime($file->created_at);
+                $folderName = $fileDate->format('Y_m');
+
+                $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+
+                $tempStream = fopen('php://temp', 'r+');
+                $writer->save($tempStream);
+
+                rewind($tempStream);
+
+                $zip->addFromString($folderName . '/' . $fileName, stream_get_contents($tempStream));
+
+                fclose($tempStream);
             }
-    
+
             $zip->close();
-    
-            return Response::download($zipFilePath, $zipFileName, ['Content-Type' => 'application/zip'])
-                ->deleteFileAfterSend(true);
-    
+
+            $response = response()->download($zipFileName, 'exported_files.zip', [
+                'Content-Type' => 'application/zip',
+            ])->deleteFileAfterSend(true);
+
+            return $response;
+
         } catch (\Exception $e) {
             $this->status = 500;
             $this->response['message'] = "Export failed: " . $e->getMessage();
             return $this->getResponse();
         }
     }
-
-    // public function exportAll(Request $request)
-    // {
-    //     try {
-    //         $files = File::all();
-
-    //         if ($files->isEmpty()) {
-    //             return response()->json(['message' => 'No files to export'], 404);
-    //         }
-
-    //         $zipFileName = storage_path('app/temp/exported_files_' . time() . '.zip');
-    //         $zip = new ZipArchive();
-    //         if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-    //             throw new \RuntimeException("Unable to create zip file");
-    //         }
-
-    //         foreach ($files as $file) {
-    //             $spreadsheet = new Spreadsheet();
-
-    //             if ($file->file_type === 'master_file') {
-    //                 $this->addMasterFileSheets($spreadsheet, $file);
-    //             } elseif ($file->file_type === 'transactional_file') {
-    //                 $this->addTransactionalFileSheet($spreadsheet, $file);
-    //             }
-
-    //             $fileName = $file->file_name_with_extension;
-    //             $fileDate = new DateTime($file->created_at);
-    //             $folderName = $fileDate->format('Y_m');
-
-    //             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-
-    //             // Write to a PHP output stream instead of a file
-    //             $tempStream = fopen('php://temp', 'r+');
-    //             $writer->save($tempStream);
-
-    //             // Reset stream pointer
-    //             rewind($tempStream);
-
-    //             // Add the stream content to the zip file
-    //             $zip->addFromString($folderName . '/' . $fileName, stream_get_contents($tempStream));
-
-    //             // Close the stream
-    //             fclose($tempStream);
-    //         }
-
-    //         $zip->close();
-
-    //         // Add debug information
-    //         \Log::info('Zip file created: ' . $zipFileName);
-    //         \Log::info('Zip file size: ' . filesize($zipFileName) . ' bytes');
-
-    //         $response = response()->download($zipFileName, 'exported_files.zip', [
-    //             'Content-Type' => 'application/zip',
-    //         ])->deleteFileAfterSend(true);
-
-    //         return $response;
-
-    //     } catch (\Exception $e) {
-    //         \Log::error('Export failed: ' . $e->getMessage());
-    //         \Log::error('Stack trace: ' . $e->getTraceAsString());
-    //         return response()->json(['message' => "Export failed: " . $e->getMessage()], 500);
-    //     }
-    // }
 
     private function addMasterFileSheets($spreadsheet, $file)
     {
