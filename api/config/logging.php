@@ -52,6 +52,12 @@ return [
 
     'channels' => [
 
+        'console' => [
+            'driver' => 'single',
+            'path' => 'php://stdout', // Use 'php://stderr' for stderr
+            'level' => 'debug',
+        ],
+        
         'stack' => [
             'driver' => 'stack',
             'channels' => explode(',', env('LOG_STACK', 'single')),
