@@ -117,15 +117,15 @@ const Inventory = () => {
 
                     } else {
                         setAlertMessages(['Error retrieving inventory lists.']);
-                        setAlertStatus('error');
+                        setAlertStatus('critical');
                     }
                 } else {
                     setAlertMessages(['No data retrieved.']);
-                    setAlertStatus('error');
+                    setAlertStatus('critical');
                 }
             } catch (error) {
                 setAlertMessages(['Error retrieving inventory lists.']);
-                setAlertStatus('error');
+                setAlertStatus('critical');
                 setIsLoading(false);
             }
         };
@@ -270,13 +270,13 @@ const Inventory = () => {
                     </div>
 
                     {/* Search Area */}
-                    <div className='flex w-full h-[3.5rem] bg-[#F3F3F3] border-solid border-b border-[#868686]'>
-                        <div className="mt-[0.8em] ml-7 text-gray-400">
-                            <div className='flex absolute text-[1.3em] mt-[0.3rem] ml-3'>
+                    <div className='flex gap-2 items-center justify-between w-full h-[3.5rem] bg-[#F3F3F3] border-solid border-b border-[#868686] px-4'>
+                        <div className="text-gray-400 grow max-w-[30rem]">
+                            <div className='absolute text-[1.3em] mt-[0.3rem] ml-3'>
                                 <IoIosSearch />
                             </div>
                             <input
-                                className={`${isOpen ? '4xl:w-[30rem] 3xl:w-[25rem] 2xl:w-[20rem] xl:w-[12rem]' : '4xl:w-[30rem] 3xl:w-[30rem] 2xl:w-[30rem] xl:w-[15rem]'} w-[30rem] bg-white h-8  px-5 pl-9 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
+                                className={`${isOpen ? '4xl:w-[30rem] 3xl:w-[25rem] 2xl:w-[20rem] xl:w-[12rem]' : 'w-full'} bg-white h-8  px-5 pl-9 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
                                 type="search"
                                 name="search"
                                 placeholder="Search here..."
@@ -284,9 +284,9 @@ const Inventory = () => {
                             />
                         </div>
 
-                        <div className='flex mt-[0.8em] mr-4 ml-auto text-gray-400 gap-4'>
+                        <div className='flex text-gray-400 gap-3 2xl:gap-4'>
                             <select
-                                className={`${isOpen ? '4xl:w-[20rem] 3xl:w-[20rem] 2xl:w-[15rem] xl:w-[10rem]' : ''} bg-white h-8 w-[20rem] pl-3 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
+                                className={`${isOpen ? '4xl:w-[20rem] 3xl:w-[20rem] 2xl:w-[15rem] xl:w-[10rem]' : ''} bg-white h-8 2xl:w-[20rem] pl-3 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
                                 onChange={handleFilterCategory}
                             >
                                 <option selected value="" disabled hidden>Item Category</option>
@@ -335,7 +335,7 @@ const Inventory = () => {
                             <thead>
                                 <tr>
                                     {columnNames.map((columnName, index) => (
-                                        <th key={index} className={`${isOpen ? '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[18px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[20px] 2xl:text-[20px] xl:text-[16px]'} text-[20px] text-center animate-zoomIn whitespace-nowrap font-bold  text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}>
+                                        <th key={index} className={`${isOpen ? '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[18px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[20px] 2xl:text-[20px] xl:text-[14px]'} text-[20px] text-center animate-zoomIn whitespace-nowrap font-bold  text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}>
                                             {columnName}
                                         </th>
                                     ))}

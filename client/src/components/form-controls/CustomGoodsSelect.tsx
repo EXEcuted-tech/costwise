@@ -35,8 +35,8 @@ const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placehol
         value={selectedOption}
         onChange={handleChange}
         className={`
-          ${isOpen ? 'pl-0 xl:text-[21px] 2xl:text-[26px] 3xl:text-[26px] 4xl:text-[26px]' : 'pl-2'}
-          pr-2 bg-transparent uppercase cursor-pointer appearance-none truncate focus:outline-none
+          ${isOpen ? 'pl-0 xl:text-[21px] 2xl:text-[26px] 3xl:text-[26px] 4xl:text-[26px]' : 'xl:text-[18px] 2xl:text-[26px]'}
+          bg-transparent uppercase cursor-pointer appearance-none truncate focus:outline-none px-2
         `}
         style={{
           width: `${computedWidth}px`,
@@ -51,7 +51,7 @@ const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placehol
           </option>
         ))}
       </select>
-      <div className="pointer-events-none absolute right-0 flex items-center px-2 text-white">
+      <div className="pointer-events-none flex items-center text-white">
         <svg className="fill-current h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
           <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
         </svg>

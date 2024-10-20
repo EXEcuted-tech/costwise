@@ -192,14 +192,14 @@ const ProjectedCostPage = () => {
 
     return (
         <div
-            className="overflow-auto overflow-x-hidden h-full bg-cover bg-center items-center justify-center bg-background bg-opacity-20"
+            className="overflow-x-hidden bg-cover bg-center items-center justify-center bg-background bg-opacity-20"
         >
             <div>
                 <Header icon={MdOutlineAnalytics} title={"Projected Costing"} />
             </div>
             <div className="w-full ml-[60px] pr-[45px] h-full 2xl:h-[90vh] flex flex-col items-start justify-start pt-[15px] py-[15px]">
                 <p className="text-[30px] text-tertiary">Equipment Costs</p>
-                <div className="flex flex-row h-[10%] w-full items-start justify-start flex-wrap">
+                <div className="flex flex-row h-[10%] w-full items-start justify-start flex-wrap mb-[70px]">
                     {/* Dropdown List Start*/}
                     <div className="min-w-[200px] relative mt-[15px] text-[16px]">
                         <div

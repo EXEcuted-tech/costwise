@@ -82,7 +82,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({ id, removeSheet, isOpen, sheetD
                                     {groupedData[numericKey].map((data, index) => (
                                         <tr key={index}
                                             className={`text-[#6B6B6B]
-                                            ${isOpen ? 'xl:text-[16px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[20px]' : ' xl:text-[16px] 2xl:text-[20px] 3xl:text-[20px] 4xl:text-[20px] text-[20px]'}
+                                            ${isOpen ? 'xl:text-[16px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[20px]' : ' xl:text-[14px] 2xl:text-[20px] 3xl:text-[20px] 4xl:text-[20px] text-[20px]'}
                                             ${data.itemType === 1 ? 'font-bold' : ''} `}
                                         >
                                             <td className='text-center px-6 py-2'>{data.no}</td>
