@@ -6,6 +6,7 @@ use App\Http\Controllers\FinishedGoodController;
 use App\Http\Controllers\FodlController;
 use App\Http\Controllers\FormulationController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,10 +20,10 @@ Route::post('/refresh', [AuthController::class, 'refresh']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', [UserController::class, 'getCurrentUser']);
     Route::get('/users',[UserController::class,'getAllUsers']);
   
      Route::prefix('/user')->group(function () {
+        Route::get('', [UserController::class, 'getCurrentUser']);
         Route::post('update/{id}',[UserController::class,'updateUser']);
         Route::delete('archive/{id}', [UserController::class, 'archiveUser']);
     });
@@ -93,5 +94,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('update_batch', [TransactionController::class, 'updateBatch']);
         Route::post('delete_bulk', [TransactionController::class, 'deleteBulk']);
     });
-});
 
+    Route::prefix('/notifications')->group(function () {
+        Route::get('new', [NotificationController::class, 'getNewNotifications']);
+        Route::get('retrieve', [NotificationController::class, 'retrieve']);
+        Route::get('retrieve_unread', [NotificationController::class, 'retrieveUnread']);
+    });
+});

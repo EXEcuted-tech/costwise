@@ -1,14 +1,40 @@
 "use client"
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import CloseSidebar from '../sidebar/CloseSidebar'
 import Image from 'next/image';
 import hotdog from '@/assets/hotdog.png';
 import OpenSidebar from '../sidebar/OpenSidebar';
 import { useSidebarContext } from '@/contexts/SidebarContext';
+import api from '@/utils/api';
+import { useNotificationContext } from '@/contexts/NotificationContext';
 
 const MainLayout = () => {
   const { isOpen, setIsOpen } = useSidebarContext();
+  const { setHasNewNotifications } = useNotificationContext();
 
+  useEffect(() => {
+    let lastCheckedAt = new Date().toISOString();
+    const checkForNewNotifications = async () => {
+      try {
+        const response = await api.get('/notifications/new', {
+          params: { last_checked_at: lastCheckedAt }
+        });
+        
+        if (response.data.data.length > 0) {
+          setHasNewNotifications(true);
+        }
+        
+        lastCheckedAt = new Date().toISOString();
+      } catch (error) {
+        console.error('Error checking for notifications:', error);
+      }
+    };
+
+    const intervalId = setInterval(checkForNewNotifications, 30000); // Check every 30 seconds
+
+    return () => clearInterval(intervalId);
+  }, [setHasNewNotifications]);
+  
   return (
     <div className='flex !font-lato'>
       <div
