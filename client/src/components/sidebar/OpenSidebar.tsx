@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import api from '@/utils/api';
 import config from '@/server/config';
 import { removeTokens } from '@/utils/removeTokens';
+import { useNotificationContext } from '@/contexts/NotificationContext';
 
 export interface IconOpenConfig {
   iconName: string;
@@ -22,6 +23,7 @@ export interface IconOpenConfig {
 
 const OpenSidebar: React.FC = () => {
   const { isAdmin } = useSidebarContext();
+  const { hasNewNotifications } = useNotificationContext();
   const [isMore, setIsMore] = useState(false);
   const path = usePath();
   const router = useRouter();
@@ -84,6 +86,9 @@ const OpenSidebar: React.FC = () => {
               {!isAdmin
                 ?
                 (userDefaultMenu.map(({ iconName, className, menuName, route }, index) => {
+                  if(iconName === 'FaBell' && hasNewNotifications){
+                    iconName = 'MdNotificationsActive';
+                  }
                   const IconComponent = iconMap[iconName];
                   return (
                     <>
@@ -106,7 +111,7 @@ const OpenSidebar: React.FC = () => {
                               : 'my-[14px] 2xl:my-[11px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
                               }`}
                           >
-                            <IconComponent className={`${className} justify-center`} />
+                            <IconComponent className={`${className} ${iconName === 'MdNotificationsActive' && 'animate-shake-infinte'} justify-center`} />
                             <p className='font-lato ml-[8px] text-[20px] 2xl:text-[25px]'>{menuName}</p>
                           </li>
                         </Link>
@@ -116,6 +121,9 @@ const OpenSidebar: React.FC = () => {
                 }))
                 :
                 (adminDefaultMenu.map(({ iconName, className, menuName, route, routes }, index) => {
+                  if(iconName === 'FaBell' && hasNewNotifications){
+                    iconName = 'MdNotificationsActive';
+                  }
                   const IconComponent = iconMap[iconName];
                   const isRoute = routes?.some(e => e === path);
                   return menuName !== 'More' ? (
@@ -141,7 +149,7 @@ const OpenSidebar: React.FC = () => {
                               : 'my-[14px] 2xl:my-[11px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
                               }`}
                           >
-                            <IconComponent className={`${className} ml-[5px] 2xl:ml-0 justify-center`} />
+                            <IconComponent className={`${className} ${iconName === 'MdNotificationsActive' && 'animate-shake-infinte'} ml-[5px] 2xl:ml-0 justify-center`} />
                             <p className='font-lato ml-[8px] text-[20px] 2xl:text-[25px]'>{menuName}</p>
                           </li>
                         </Link>

@@ -12,6 +12,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
 use DateTime;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use App\Models\File;
 use App\Models\FinishedGood;
@@ -25,6 +26,7 @@ use PhpOffice\PhpSpreadsheet\Style\Color;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\NumberFormat;
 use ZipArchive;
+use Illuminate\Support\Facades\Response;
 
 class FileController extends ApiController
 {
@@ -169,10 +171,13 @@ class FileController extends ApiController
 
             \DB::commit();
 
-            return response()->json(['message' => 'BOM and associated data deleted successfully'], 200);
+            $this->status = 200;
+            return $this->getResponse('BOM and associated data deleted successfully');
         } catch (\Exception $e) {
             \DB::rollBack();
-            return response()->json(['error' => $e->getMessage()], 500);
+            $this->status = 500;
+            $this->response['error'] = $e->getMessage();
+            return $this->getResponse();
         }
     }
 
@@ -184,6 +189,14 @@ class FileController extends ApiController
         $extension = $file->getClientOriginalExtension();
         $fileNameWithExtension = $file->getClientOriginalName();
         $fileNameWithoutExtension = pathinfo($fileNameWithExtension, PATHINFO_FILENAME);
+
+        $baseFileName = pathinfo($fileNameWithExtension, PATHINFO_FILENAME);
+        $counter = 1;
+        while (File::where('settings->file_name', $fileNameWithoutExtension)->exists()) {
+            $fileNameWithoutExtension = $baseFileName . " ({$counter})";
+            $fileNameWithExtension = $fileNameWithoutExtension . '.' . $extension;
+            $counter++;
+        }
 
         $user = Auth::user();
         $userName = "{$user->first_name} {$user->last_name}";
@@ -202,14 +215,18 @@ class FileController extends ApiController
 
             $this->processExcel($file->getRealPath(), $uploadType);
 
-            $this->calculateLeastCost($this->fileModel);
+            if ($uploadType == 'master') {
+                $this->calculateLeastCost($this->fileModel);
+            }
             File::create($this->fileModel);
 
             $this->status = 200;
             return $this->getResponse();
         }
 
-        return response()->json(['error' => 'Unsupported file type'], 400);
+        $this->status = 400;
+        $this->response['error'] = 'Unsupported file type';
+        return $this->getResponse();
     }
 
     private function processExcel($file, $uploadType)
@@ -321,12 +338,12 @@ class FileController extends ApiController
             $yearMonthInt = (int) $yearMonth;
 
             $material = Material::where('material_code', $itemCode)
-                ->where('material_cost', $amount)
+                ->where('material_cost', $amount / $qty)
                 ->where('date', $dateOnly)
                 ->first();
 
             $fg = FinishedGood::where('fg_code', $itemCode)
-                ->where('rm_cost', $amount)
+                ->where('rm_cost', $amount / $qty)
                 ->where('monthYear', $yearMonthInt)
                 ->first();
 
@@ -340,7 +357,7 @@ class FileController extends ApiController
                 $newMaterial = Material::create([
                     'material_code' => $itemCode,
                     'material_desc' => $itemDesc,
-                    'material_cost' => $amount,
+                    'material_cost' => $amount / $qty,
                     'unit' => $unit,
                     'date' => $dateOnly
                 ]);
@@ -356,7 +373,7 @@ class FileController extends ApiController
                     'fg_code' => $itemCode,
                     'fg_desc' => $itemDesc,
                     'total_batch_qty' => $qty,
-                    'rm_cost' => $amount,
+                    'rm_cost' => $amount / $qty,
                     'unit' => $unit,
                     'monthYear' => $yearMonthInt
                 ]);
@@ -370,7 +387,7 @@ class FileController extends ApiController
                     'item_code' => $itemCode,
                     'item_desc' => $itemDesc,
                     'qty' => $qty,
-                    'amount' => $amount,
+                    'amount' => $amount / $qty,
                     'unit' => $unit
                 ];
             }
@@ -767,59 +784,10 @@ class FileController extends ApiController
     // EXPORTING PROCESS
     public function export(Request $request)
     {
-        // try {
-        $fileId = $request->input('file_id');
-        $file = File::findOrFail($fileId);
+        try {
+            $fileId = $request->input('file_id');
+            $file = File::findOrFail($fileId);
 
-        $spreadsheet = new Spreadsheet();
-
-        if ($file->file_type === 'master_file') {
-            $this->addMasterFileSheets($spreadsheet, $file);
-        } elseif ($file->file_type === 'transactional_file') {
-            $this->addTransactionalFileSheet($spreadsheet, $file);
-        }
-
-        $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-        $fileName = $file->file_name_with_extension;
-
-        $tempFile = tempnam(sys_get_temp_dir(), $fileName);
-        $writer->save($tempFile);
-
-        return response()->download($tempFile, $fileName, [
-            'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
-        ])->deleteFileAfterSend(true);
-
-        // } catch (\Exception $e) {
-        //     $this->status = 500;
-        //     $this->response['message'] = "Export failed: " . $e->getMessage();
-        //     return $this->getResponse();
-        // }
-    }
-
-    public function exportAll(Request $request)
-    {
-        // try {
-        $files = File::all();
-
-
-        if ($files->isEmpty()) {
-            return response()->json(['message' => 'No files to export'], 404);
-        }
-
-        $tempDir = sys_get_temp_dir() . '/exported_files_' . time();
-        if (!is_dir($tempDir)) {
-            if (!mkdir($tempDir, 0777, true) && !is_dir($tempDir)) {
-                throw new \RuntimeException(sprintf('Directory "%s" was not created', $tempDir));
-            }
-        }
-
-        $zip = new ZipArchive();
-        $zipFileName = $tempDir . '/exported_files.zip';
-        if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-            throw new \RuntimeException("Unable to open the zip file: $zipFileName");
-        }
-
-        foreach ($files as $file) {
             $spreadsheet = new Spreadsheet();
 
             if ($file->file_type === 'master_file') {
@@ -828,76 +796,87 @@ class FileController extends ApiController
                 $this->addTransactionalFileSheet($spreadsheet, $file);
             }
 
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
             $fileName = $file->file_name_with_extension;
 
-            $tempFilePath = $tempDir . '/' . $fileName;
-            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-            $writer->save($tempFilePath);
+            $tempFile = tempnam(sys_get_temp_dir(), $fileName);
+            $writer->save($tempFile);
 
-            $zip->addFile($tempFilePath, $fileName);
+            return response()->download($tempFile, $fileName, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ])->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = "Export failed: " . $e->getMessage();
+            return $this->getResponse();
         }
-
-        $zip->close();
-
-        return response()->download($zipFileName, 'exported_files.zip', [
-            'Content-Type' => 'application/zip',
-        ])->deleteFileAfterSend(true);
-
-        // } catch (\Exception $e) {
-        //     return response()->json(['message' => "Export failed: " . $e->getMessage()], 500);
-        // }
     }
 
-    // public function exportAll(Request $request)
-    // {
-    //     try {
-    //         $files = File::all();
+    public function exportAll(Request $request)
+    {
+        try {
+            $files = File::all();
 
-    //         if ($files->isEmpty()) {
-    //             return response()->json(['message' => 'No files to export'], 404);
-    //         }
+            if ($files->isEmpty()) {
+                return response()->json(['message' => 'No files to export'], 404);
+            }
 
-    //         $tempDir = sys_get_temp_dir() . '/exported_files_' . time();
-    //         if (!is_dir($tempDir)) {
-    //             if (!mkdir($tempDir, 0777, true) && !is_dir($tempDir)) {
-    //                 throw new \RuntimeException(sprintf('Directory "%s" was not created', $tempDir));
-    //             }
-    //         }
+            $zipDir = storage_path('app/temp');
+            if (!file_exists($zipDir)) {
+                mkdir($zipDir, 0755, true);
+            }
 
-    //         $zip = new ZipArchive();
-    //         $zipFileName = $tempDir . '/exported_files.zip';
-    //         if ($zip->open($zipFileName, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-    //             throw new \RuntimeException("Unable to open the zip file: $zipFileName");
-    //         }
+            $zipFileName = 'exported_files_' . time() . '.zip';
+            $zipFilePath = storage_path("app/temp/$zipFileName");
 
-    //         foreach ($files as $file) {
-    //             $spreadsheet = new Spreadsheet();
+            $zip = new ZipArchive();
+            if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+                throw new \RuntimeException("Unable to create zip file");
+            }
 
-    //             if ($file->file_type === 'master_file') {
-    //                 $this->addMasterFileSheets($spreadsheet, $file);
-    //             } elseif ($file->file_type === 'transactional_file') {
-    //                 $this->addTransactionalFileSheet($spreadsheet, $file);
-    //             }
+            foreach ($files as $file) {
+                $spreadsheet = new Spreadsheet();
 
-    //             $fileName = $file->file_name_with_extension;
+                if ($file->file_type === 'master_file') {
+                    $this->addMasterFileSheets($spreadsheet, $file);
+                } elseif ($file->file_type === 'transactional_file') {
+                    $this->addTransactionalFileSheet($spreadsheet, $file);
+                }
 
-    //             $tempFilePath = $tempDir . '/' . $fileName;
-    //             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
-    //             $writer->save($tempFilePath);
+                $settings = json_decode($file->settings, true);
+                $fileName = $settings['file_name_with_extension'];
+                $fileDate = new DateTime($file->created_at);
+                $folderName = $fileDate->format('Y_m');
 
-    //             $zip->addFile($tempFilePath, $fileName);
-    //         }
+                $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+                $tempFile = tempnam(sys_get_temp_dir(), 'excel_');
+                $writer->save($tempFile);
 
-    //         $zip->close();
+                $zip->addFile($tempFile, $folderName . '/' . $fileName);
 
-    //         return response()->download($zipFileName, 'exported_files.zip', [
-    //             'Content-Type' => 'application/zip',
-    //         ])->deleteFileAfterSend(true);
+                $spreadsheet->disconnectWorksheets();
+                unset($spreadsheet);
+                gc_collect_cycles();
+            }
 
-    //     } catch (\Exception $e) {
-    //         return response()->json(['message' => "Export failed: " . $e->getMessage()], 500);
-    //     }
-    // }
+            $zip->close();
+
+            return response()->download($zipFilePath, $zipFileName, [
+                'Content-Type' => 'application/zip',
+            ])->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            $tempFiles = glob(sys_get_temp_dir() . '/excel_*');
+            foreach ($tempFiles as $tempFile) {
+                if (is_file($tempFile)) {
+                    unlink($tempFile);
+                }
+            }
+
+            $this->status = 500;
+            $this->response['message'] = "Export failed: " . $e->getMessage();
+            return $this->getResponse();
+        }
+    }
 
     private function addMasterFileSheets($spreadsheet, $file)
     {

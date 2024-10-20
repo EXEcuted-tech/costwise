@@ -1,14 +1,18 @@
 export interface User {
+    user_id: number;
     user_type: string;
+    password: string;
     first_name: string;
     middle_name?: string; // Optional fields
     last_name: string;
     email_address: string;
     employee_number?: string;
     employee_suffix?: string;
-    phone?: string;
+    phone_number?: string;
     department?: string;
-    employee_role?: string;
+    position?: string;
+    display_picture?: string;
+    sys_role: number[];
 }
 
 export interface File {
@@ -85,10 +89,10 @@ export interface FormulationRecord extends Record<string, unknown> {
     formula: string | null;
     level: string | null;
     itemCode: string | null;
-    description: string;
+    description: string | null;
     formulation: string | null;
     batchQty: number | null;
-    unit: string;
+    unit: string | null;
     isLeastCost?: number;
     cost?: number | null;
 }
@@ -166,4 +170,17 @@ export interface Component {
     unit: string;
     cost: number;
     total_cost: number;
+}
+export interface InventoryType {
+    inventory_id: number;
+    material_id: number;
+    material_code: string;
+    material_desc: string;
+    unit: string;
+    material_category: string;
+    stock_status: string;
+    purchased_qty: number;
+    usage_qty: number;
+    total_qty: number;
+    month_year: string;
 }

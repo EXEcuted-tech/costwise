@@ -1,11 +1,15 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useMemo } from 'react'
 import { AiOutlineSearch } from 'react-icons/ai';
 import { BiSolidFile } from "react-icons/bi";
 import { IoClose } from "react-icons/io5";
 import CustomDatePicker from '../form-controls/CustomDatePicker';
 import CustomSelect from '../form-controls/CustomSelect';
 import { useSidebarContext } from '@/contexts/SidebarContext';
-import { FileTableProps } from '../pages/file-manager/FileContainer';
+import api from '@/utils/api';
+import { File, FileSettings } from '@/types/data';
+import { FaFileCircleXmark } from 'react-icons/fa6';
+import Spinner from '@/components/loaders/Spinner';
+import { useRouter } from 'next/navigation';
 
 interface ChooseFileProps {
   dialogType: number;
@@ -16,15 +20,84 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
   const { isOpen } = useSidebarContext();
   const [selectedOption, setSelectedOption] = useState('all');
   const [chosen, setChosen] = useState('');
-  const [fileData, setFileData] = useState<FileTableProps[]>([]);
+  const [fileData, setFileData] = useState<File[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [selectedDate, setSelectedDate] = useState('');
+  const [chosenFileId, setChosenFileId] = useState(0);
+  const [chosenFileType, setChosenFileType] = useState('');
+  const router = useRouter();
 
   useEffect(() => {
-    let file = selectedOption === 'all' ? fakeFileAllData : selectedOption === 'masterfile' ? fakeFileMasterData : fakeFileTransactionData;
-    if(dialogType==1){
-      file = fakeFileMasterData;
-    }
-    setFileData(file);
-  }, [selectedOption])
+    const fetchData = async () => {
+      setIsLoading(true);
+      try {
+        let response;
+
+        if (selectedOption === 'all') {
+          response = await api.get('/files/retrieve_all');
+        } else if (selectedOption === 'masterfile') {
+          response = await api.get('/files/retrieve', {
+            params: { col: 'file_type', value: 'master_file' },
+          });
+        } else if (selectedOption === 'transactions') {
+          response = await api.get('/files/retrieve', {
+            params: { col: 'file_type', value: 'transactional_file' },
+          });
+        }
+
+        if (response && response.data.status === 200) {
+          setFileData(response.data.data);
+        }
+      } catch (error) {
+        console.error('Error fetching data:', error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, [selectedOption]);
+
+  const processedFileData = useMemo(() => {
+    return fileData.map((file) => {
+      try {
+        const settings = JSON.parse(file.settings);
+        return {
+          ...file,
+          fileName: settings.file_name || '',
+          addedBy: settings.user || '',
+        };
+      } catch (error) {
+        console.error('Error parsing settings JSON:', error);
+        return { ...file, fileName: '', addedBy: '' };
+      }
+    });
+  }, [fileData]);
+
+  const filteredData = processedFileData.filter((file) => {
+    const searchTermLower = searchTerm.toLowerCase();
+    const matchesSearch = (
+      file.fileName.toLowerCase().includes(searchTermLower) ||
+      file.addedBy.toLowerCase().includes(searchTermLower) ||
+      file.file_type.toLowerCase().includes(searchTermLower)
+    );
+
+    const matchesDate = !selectedDate || (file.created_at && file.created_at.startsWith(selectedDate));
+
+    return matchesSearch && matchesDate;
+  });
+
+  const handleSetFile = (fileName: string, id:number, type:string) => {
+    setChosen(fileName);
+    setChosenFileId(id);
+    setChosenFileType(type);
+  };
+
+  const handleChooseFile = () => {
+    console.log(chosenFileId, chosenFileType);
+    router.push(`/file-manager/workspace?id=${chosenFileId}&type=${chosenFileType}`);
+  };
 
   return (
     <>
@@ -54,6 +127,8 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
                 type="text"
                 className="w-full pl-[35px] pr-[5px] bg-white border border-[#868686] placeholder-text-[#B0B0B0] text-[#5C5C5C] text-[15px] rounded-[5px] py-[3px]"
                 placeholder="Search here..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
                 required
               />
             </div>
@@ -66,14 +141,13 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
               </div>
             }
             <div className={`w-[20%] 2xl:w-[18%] relative`}>
-              <CustomDatePicker />
+              <CustomDatePicker selectedDate={selectedDate} setSelectedDate={setSelectedDate} />
             </div>
           </div>
 
           {/* Table */}
           <div className='overflow-auto h-[645px]'>
             <table className='w-full'>
-              {/* <thead className={` ${isOpen && 'text-[14px] 2xl:text-[16px]'} sticky top-0 bg-white border-[0.6px] border-y-[#868686] text-left font-bold text-[#868686]`}> */}
               <thead className={`
                 ${isOpen && 'text-[14px] 2xl:text-[16px]'} 
                 sticky top-0 
@@ -103,31 +177,72 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
                   <th className=''>Added By</th>
                 </tr>
               </thead>
-              <tbody>
-                {fileData.length > 0
-                  ? (fileData.map((data, index) => (
-                    <tr key={index} className={`${chosen == data.fileName && 'bg-[#DFEFFD]'} cursor-pointer hover:bg-[#DFEFFD]
-                        ${index !== fileData.length - 1 && 'border-b-[0.3px] border-[#d9d9d9] '}`}
-                      onClick={() => setChosen(data.fileName)}>
-                      <td className={`${isOpen ? 'pl-[20px] 2xl:pl-[46px]' : 'pl-[46px]'} py-2`}>
-                        <p className={`${isOpen ? 'text-[16px] 2xl:text-[18px]' : 'text-[18px]'} text-primary`}>{data.fileLabel}</p>
-                        <p className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}italic text-[#868686]`}>{data.fileName}</p>
-                      </td>
-                      <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{data.fileType}</td>
-                      <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{data.dateAdded}</td>
-                      <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{data.addedBy}</td>
-                    </tr>
-                  )))
-                  : (
-                    <p>No File.</p>
-                  )}
-              </tbody>
+              {isLoading ? (
+                <tbody>
+                  <tr>
+                    <td colSpan={4}>
+                      <div className="flex justify-center items-center h-[550px]">
+                        <Spinner />
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              ) : (
+                <tbody>
+                  {filteredData.length > 0
+                    ? (filteredData.map((data, index) => {
+                      let settings: FileSettings;
+                      try {
+                        settings = JSON.parse(data.settings);
+                      } catch (error) {
+                        console.error('Error parsing settings:', error);
+                        settings = {} as FileSettings;
+                      }
+
+                      const fileLabel = settings.file_name;
+                      const fileName = settings.file_name_with_extension;
+                      const fileType = data.file_type == 'master_file' ? 'Master File' : 'Transactional File';
+                      const dateAdded = data.created_at &&
+                        new Date(data.created_at).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: '2-digit',
+                          day: '2-digit',
+                          timeZone: 'UTC',
+                        });
+                      const addedBy = settings.user;
+                      return (
+                        <tr key={index} className={`${chosen == fileName && 'bg-[#DFEFFD]'} cursor-pointer hover:bg-[#DFEFFD]
+                          ${index !== filteredData.length - 1 && 'border-b-[0.3px] border-[#d9d9d9] '}`}
+                          onClick={() => handleSetFile(fileName,data.file_id,data.file_type)}>
+                          <td className={`${isOpen ? 'pl-[20px] 2xl:pl-[46px]' : 'pl-[46px]'} py-2`}>
+                            <p className={`${isOpen ? 'text-[16px] 2xl:text-[18px]' : 'text-[18px]'} text-primary`}>{fileLabel}</p>
+                            <p className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}italic text-[#868686]`}>{fileName}</p>
+                          </td>
+                          <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{fileType}</td>
+                          <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{dateAdded}</td>
+                          <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{addedBy}</td>
+                        </tr>
+                      )
+                    }))
+                    : (
+                      <tr>
+                        <td colSpan={4} className='text-center'>
+                          <div className='min-h-[550px] flex flex-col justify-center items-center p-12 font-semibold text-[#9F9F9F]'>
+                            <FaFileCircleXmark className='text-[75px]' />
+                            <p className='text-[30px]'>No File Found.</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                </tbody>
+              )}
             </table>
           </div>
 
           {/* Button */}
           <div className='border-t-1 border-[#d9d9d9] flex justify-center py-[20px]'>
-            <div className="relative inline-flex bg-white overflow-hidden text-primary flex items-center justify-center rounded-[30px] cursor-pointer transition-all rounded group">
+            <div className="relative inline-flex bg-white overflow-hidden text-primary flex items-center justify-center rounded-[30px] cursor-pointer transition-all rounded group"
+              onClick={handleChooseFile}>
               <button className="text-[22px] font-bold before:ease relative px-[30px] py-[2px] h-full w-full overflow-hidden bg-primary text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-primary hover:before:-translate-x-40">
                 <span className="relative z-10">Choose File</span>
               </button>
@@ -140,92 +255,3 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
 }
 
 export default ChooseFileDialog
-
-const fakeFileAllData: FileTableProps[] = [
-  {
-    fileLabel: 'Bom and Cost 1',
-    fileName: 'Bom_Cost_1.csv',
-    fileType: 'Master File',
-    dateAdded: '07/01/2024',
-    addedBy: 'Alice Smith'
-  },
-  {
-    fileLabel: 'Transactional File',
-    fileName: 'Transaction_1.csv',
-    fileType: 'Transaction',
-    dateAdded: '07/02/2024',
-    addedBy: 'Bob Johnson'
-  },
-  {
-    fileLabel: 'Bom and Cost 2',
-    fileName: 'Bom_Cost_2.csv',
-    fileType: 'Master File',
-    dateAdded: '07/03/2024',
-    addedBy: 'Carol White'
-  },
-  {
-    fileLabel: 'Transactional File',
-    fileName: 'Transaction_2.csv',
-    fileType: 'Transaction',
-    dateAdded: '07/04/2024',
-    addedBy: 'David Browning'
-  },
-  {
-    fileLabel: 'Bom and Cost 3',
-    fileName: 'Bom_Cost_3.csv',
-    fileType: 'Master File',
-    dateAdded: '07/05/2024',
-    addedBy: 'Eva Davis'
-  },
-  {
-    fileLabel: 'Transactional File',
-    fileName: 'Transaction_3.csv',
-    fileType: 'Transaction',
-    dateAdded: '07/06/2024',
-    addedBy: 'Frank Miller'
-  },
-  {
-    fileLabel: 'Bom and Cost 4',
-    fileName: 'Bom_Cost_4.csv',
-    fileType: 'Master File',
-    dateAdded: '07/07/2024',
-    addedBy: 'Grace Wilson'
-  },
-  {
-    fileLabel: 'Transactional File',
-    fileName: 'Transaction_4.csv',
-    fileType: 'Transaction',
-    dateAdded: '07/08/2024',
-    addedBy: 'Henry Moore'
-  },
-  {
-    fileLabel: 'Bom and Cost 5',
-    fileName: 'Bom_Cost_5.csv',
-    fileType: 'Master File',
-    dateAdded: '07/09/2024',
-    addedBy: 'Ivy Taylor'
-  },
-  {
-    fileLabel: 'Transactional File',
-    fileName: 'Transaction_5.csv',
-    fileType: 'Transaction',
-    dateAdded: '07/10/2024',
-    addedBy: 'Jack Anderson'
-  }
-];
-
-const fakeFileMasterData = [
-  { fileLabel: 'Bom and Cost 1', fileName: 'Bom_Cost_1.csv', fileType: 'Master File', dateAdded: '12/01/2024', addedBy: 'Alice Smith' },
-  { fileLabel: 'Bom and Cost 2', fileName: 'Bom_Cost_2.csv', fileType: 'Master File', dateAdded: '12/02/2024', addedBy: 'Bob Johnson' },
-  { fileLabel: 'Bom and Cost 3', fileName: 'Bom_Cost_3.csv', fileType: 'Master File', dateAdded: '12/03/2024', addedBy: 'Carol White' },
-  { fileLabel: 'Bom and Cost 4', fileName: 'Bom_Cost_4.csv', fileType: 'Master File', dateAdded: '12/04/2024', addedBy: 'David Brown' },
-  { fileLabel: 'Bom and Cost 5', fileName: 'Bom_Cost_5.csv', fileType: 'Master File', dateAdded: '12/05/2024', addedBy: 'Eva Davis' },
-];
-
-const fakeFileTransactionData = [
-  { fileLabel: 'Transactional File 1', fileName: 'Transaction_1.csv', fileType: 'Transaction', dateAdded: '12/06/2024', addedBy: 'Frank Miller' },
-  { fileLabel: 'Transactional File 2', fileName: 'Transaction_2.csv', fileType: 'Transaction', dateAdded: '12/07/2024', addedBy: 'Grace Wilson' },
-  { fileLabel: 'Transactional File 3', fileName: 'Transaction_3.csv', fileType: 'Transaction', dateAdded: '12/08/2024', addedBy: 'Henry Moore' },
-  { fileLabel: 'Transactional File 4', fileName: 'Transaction_4.csv', fileType: 'Transaction', dateAdded: '12/09/2024', addedBy: 'Ivy Taylor' },
-  { fileLabel: 'Transactional File 5', fileName: 'Transaction_5.csv', fileType: 'Transaction', dateAdded: '12/10/2024', addedBy: 'Jack Anderson' },
-];

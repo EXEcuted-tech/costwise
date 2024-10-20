@@ -219,9 +219,9 @@ const CostCalculation = () => {
   useEffect(() => {
     retrieveMonthYearOptions();
     createFileName();
-    if (monthYear) {
-      retrieveFGOptions(monthYear.value);
+    if (monthYear.value !== 0) {
       retrieveAllFG(monthYear.value);
+      retrieveFGOptions(monthYear.value);
     } else {
       setFGOptions([]);
     }

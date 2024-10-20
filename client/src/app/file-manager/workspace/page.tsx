@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import Header from '@/components/header/Header'
 import { BsFolderFill } from "react-icons/bs";
-import { IoIosArrowRoundBack } from "react-icons/io";
+import { IoIosArrowBack, IoIosArrowRoundBack } from "react-icons/io";
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import WorkspaceTabs from '@/components/pages/file-manager/workspace/WorkspaceTabs';
 import NoFile from '@/components/pages/file-manager/workspace/NoFile';
@@ -20,6 +20,7 @@ const WorkspacePage = () => {
     const [fileData, setFileData] = useState<File | null>(null);
     const [isEmpty, setIsEmpty] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
+    const [bomSheets, setBomSheets] = useState<number[]>([]);
 
     const { isOpen } = useSidebarContext();
     const router = useRouter();
@@ -33,16 +34,15 @@ const WorkspacePage = () => {
         const fetchData = async () => {
             const id = searchParams.get('id');
             const type = searchParams.get('type');
-
             if (id && type) {
                 setIsLoading(true);
                 try {
                     const tabType = type === 'master_file' ? 'master files' : 'transactions';
                     const fileNumber = type === 'master_file' ? 1 : 2;
                     localStorage.setItem('wkspTab', tabType);
-
                     const data = await retrieveFileData(Number(id));
-
+                    const settings = JSON.parse(data[0].settings);
+                    setBomSheets(settings.bom_ids || []);
                     setFileType(fileNumber);
                     setTab(tabType);
                     setIsEmpty(false);
@@ -57,8 +57,7 @@ const WorkspacePage = () => {
         };
 
         fetchData();
-    }, [searchParams, setFileType]);
-
+    }, [searchParams, setFileType, setTab]);
 
     const retrieveFileData = async (id: number) => {
         try {
@@ -86,37 +85,76 @@ const WorkspacePage = () => {
     }
 
     return (
-        <div className=''>
-            <Header icon={BsFolderFill} title={"File Manager"} style={''} />
-            <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[40px] ml-[45px]`}>
-                <div className='bg-white flex items-center px-[20px] py-[10px] rounded-t-[10px] drop-shadow'>
-                    <IoIosArrowRoundBack className='text-primary text-[40px] mr-[15px] hover:text-[#D13131] transition-colors duration-300 ease-in-out cursor-pointer'
-                        onClick={redirectBack} />
-                    <h1 className='font-bold text-[28px] text-primary'>Workspace</h1>
-                </div>
-                <div>
-                    <WorkspaceTabs
-                        tab={tab}
-                        setTab={setTab}
-                        isOpen={isOpen}
-                        isEmpty={isEmpty}
-                        setIsEmpty={setIsEmpty} />
-                </div>
-            </div>
-            <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
-                {isLoading ? (
-                    <div className='flex flex-col justify-center items-center bg-white rounded-[10px] drop-shadow text-white h-[660px] mx-auto'>
-                        <Spinner />
+        <>
+            {/* Navigation Pane */}
+            {fileType === 1 && (
+                <div className="fixed right-[-105px] hover:right-0 top-[30%] transform -translate-y-1/2 z-[950] transition-all ease-in-out duration-300">
+                    <div className="flex items-center mb-4 bg-white p-4 rounded-l-lg shadow-md">
+                        <IoIosArrowBack className="text-2xl text-primary cursor-pointer mr-5" />
+                        <span className="font-semibold text-primary">Navigation</span>
                     </div>
-                ) : (
-                    <>
-                        {fileType === 0 && <NoFile />}
-                        {fileType === 1 && fileData && <MasterFileContainer {...fileData} />}
-                        {fileType === 2 && fileData && <TransactionFileContainer {...fileData} />}
-                    </>
-                )}
+                    <ul className="fixed right-[-15px] bg-white rounded-l-lg shadow-md p-4">
+                        <li>
+                            <a
+                                href="#fodl-cost"
+                                className="block py-2 text-gray-600 hover:text-primary"
+                            >
+                                FODL Sheet
+                            </a>
+                        </li>
+                        <li>
+                            <a
+                                href="#material-cost"
+                                className="block py-2 text-gray-600 hover:text-primary"
+                            >
+                                Material Sheet
+                            </a>
+                        </li>
+                        {bomSheets.map((bomId, index) => (
+                            <li key={bomId}>
+                                <a
+                                    href={`#bom-${bomId}`}
+                                    className="block py-2 text-gray-600 hover:text-primary"
+                                >
+                                    BOM Sheet {index + 1}
+                                </a>
+                            </li>
+                        ))}
+                    </ul>
+                </div>
+            )}
+            <div id='scroll-style'>
+                <Header icon={BsFolderFill} title={"File Manager"} style={''} />
+                <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[40px] ml-[45px]`}>
+                    <div className='bg-white flex items-center px-[20px] py-[10px] rounded-t-[10px] drop-shadow'>
+                        <IoIosArrowRoundBack className='text-primary text-[40px] mr-[15px] hover:text-[#D13131] transition-colors duration-300 ease-in-out cursor-pointer'
+                            onClick={redirectBack} />
+                        <h1 className='font-bold text-[28px] text-primary'>Workspace</h1>
+                    </div>
+                    <div>
+                        <WorkspaceTabs
+                            tab={tab}
+                            setTab={setTab}
+                            isOpen={isOpen}
+                            isEmpty={isEmpty}
+                            setIsEmpty={setIsEmpty} />
+                    </div>
+                </div>
+                <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
+                    {isLoading ? (
+                        <div className='flex flex-col justify-center items-center bg-white rounded-[10px] drop-shadow text-white h-[660px] mx-auto'>
+                            <Spinner />
+                        </div>
+                    ) : (
+                        <>
+                            {fileType === 0 && <NoFile />}
+                            {fileType === 1 && fileData && <MasterFileContainer {...fileData} />}
+                            {fileType === 2 && fileData && <TransactionFileContainer {...fileData} />}
+                        </>
+                    )}
+                </div>
             </div>
-        </div>
+        </>
     )
 }
 
