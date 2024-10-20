@@ -146,6 +146,7 @@ const config: Config = {
         'pop-out': 'pop-out 0.2s ease-out forwards',
         'shake': 'shake 0.9s cubic-bezier(0.04, 0.04, 0.04, 0.04)',
         'shake-tilt': 'shake-tilt 1s ease-in-out',
+        'shake-infinte': 'shake-tilt 1s ease-in-out infinite',
         'zoomIn': 'zoomIn 0.4s ease-in-out',
         'zoomOut': 'zoomOut 0.4s ease-in-out',
         'zoom-in': 'zoom-in 0.4s ease-in-out',

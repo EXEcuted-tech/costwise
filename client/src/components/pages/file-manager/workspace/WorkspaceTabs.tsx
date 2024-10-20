@@ -19,7 +19,7 @@ const WorkspaceTabs: React.FC<WkspTabProps> = ({ tab, setTab, isOpen, isEmpty, s
             localStorage.setItem("wkspTab", tabValue);
         } else {
             var currentTab = localStorage.getItem("wkspTab");
-            // console.log("Current Tab: ", currentTab, tabValue);
+            console.log("Current Tab: ", currentTab, tabValue);
             if (currentTab != tabValue) {
                 setConfirmDialog(true);
             }

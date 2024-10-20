@@ -285,7 +285,8 @@ class FormulationController extends ApiController
                     $material_qty_list[] = [
                         $material->material_id => [
                             'level' => $row[1],
-                            'qty' => floatval(str_replace(',', '', $row[5]))
+                            'qty' => floatval(str_replace(',', '', $row[5])),
+                            'total_cost' => $material->material_cost * floatval(str_replace(',', '', $row[5]))
                         ]
                     ];
                 }
@@ -585,11 +586,15 @@ class FormulationController extends ApiController
         })->toArray();
 
         if ($finishedGoodsToDelete->isNotEmpty()) {
-            FinishedGood::on('archive_mysql')->create($archivedFinishedGoods);
+            foreach ($archivedFinishedGoods as $finishedGood) {
+                FinishedGood::on('archive_mysql')->create($finishedGood);
+            }
         }
 
         if ($formulationsToDelete->isNotEmpty()) {
-            Formulation::on('archive_mysql')->create($archivedFormulations);
+            foreach ($archivedFormulations as $formulation) {
+                Formulation::on('archive_mysql')->create($formulation);
+            }
         }
 
         Formulation::whereIn('formulation_id', $formulationIds)->delete();

@@ -2,13 +2,99 @@
 import ToggleButton from '@/components/button/ToggleButton'
 import Header from '@/components/header/Header'
 import { DateSection } from '@/components/pages/notification/DateSection';
+import { NotificationItemProps } from '@/components/pages/notification/NotificationItem';
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
-import { SetStateAction, useState } from 'react';
+import api from '@/utils/api';
+import { format, formatDistanceToNow, isThisWeek, isToday, isYesterday, parseISO } from 'date-fns';
+import { SetStateAction, useEffect, useState } from 'react';
 import { FaBell } from "react-icons/fa";
 
 const NotificationPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 3;
+
+    const [notifications, setNotifications] = useState({});
+    const [hasNewNotifications, setHasNewNotifications] = useState(false);
+    const [isOnlyShowUnread, setIsOnlyShowUnread] = useState(false);
+
+    const getIconForAction = (action: string | number) => {
+        // Map actions to icons
+        const actionIcons = {
+            general: 'general',
+            // Add more mappings as needed
+        } as Record<string, string>;
+        return actionIcons[action as keyof typeof actionIcons] || 'bell';
+    };
+
+    const getMainTextForAction = (action: string | number) => {
+        // Map actions to main text
+        const actionTexts = {
+            general: 'General',
+            // Add more mappings as needed
+        } as Record<string, string>;
+        return actionTexts[action as keyof typeof actionTexts] || 'Notification';
+    };
+
+    const formatTime = (date: Date) => {
+        if (isToday(date)) {
+            return formatDistanceToNow(date, { addSuffix: true });
+        }
+        return format(date, 'MMM d, h:mm a');
+    };
+
+    useEffect(() => {
+        const categorizeNotifications = (notifications: any[]) => {
+            const categorized: Record<string, any[]> = {};
+
+            notifications.forEach(notification => {
+                const date = parseISO(notification.timestamp);
+                let category;
+
+                if (isToday(date)) {
+                    category = 'TODAY';
+                } else if (isYesterday(date)) {
+                    category = 'YESTERDAY';
+                } else if (isThisWeek(date)) {
+                    category = 'THIS WEEK';
+                } else {
+                    category = 'OLDER';
+                }
+
+                if (!categorized[category]) {
+                    categorized[category] = [];
+                }
+
+                categorized[category].push({
+                    id: notification.log_id,
+                    icon: getIconForAction(notification.action),
+                    mainText: getMainTextForAction(notification.action),
+                    subText: notification.description,
+                    time: formatTime(date),
+                    isRead: notification.read
+                });
+            });
+
+            return categorized;
+        };
+
+        const fetchNotifications = async () => {
+            try {
+                const response = await api.get('/notifications/retrieve', {
+                    params: {
+                        col: 'user_id',
+                        val: 1 // TODO: get user id from context
+                    }
+                });
+                const categorizedNotifications = categorizeNotifications(response.data.data);
+                setNotifications(categorizedNotifications);
+                setHasNewNotifications(false);
+            } catch (error) {
+                console.error('Error fetching notifications:', error);
+            }
+        };
+
+        fetchNotifications();
+    }, [hasNewNotifications]);
 
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: SetStateAction<number>) => {
         setCurrentPage(page);
@@ -19,8 +105,71 @@ const NotificationPage = () => {
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentDateSections = dateEntries.slice(indexOfFirstItem, indexOfLastItem)
 
-    const handleToggle = (state: boolean) => {
-        // console.log('Toggle state:', state);
+    const handleToggle = async (state: boolean) => {
+        setIsOnlyShowUnread(state);
+
+        const categorizeNotifications = (notifications: any[]) => {
+            const categorized: Record<string, any[]> = {};
+
+            notifications.forEach(notification => {
+                const date = parseISO(notification.timestamp);
+                let category;
+
+                if (isToday(date)) {
+                    category = 'TODAY';
+                } else if (isYesterday(date)) {
+                    category = 'YESTERDAY';
+                } else if (isThisWeek(date)) {
+                    category = 'THIS WEEK';
+                } else {
+                    category = 'OLDER';
+                }
+
+                if (!categorized[category]) {
+                    categorized[category] = [];
+                }
+
+                categorized[category].push({
+                    id: notification.log_id,
+                    icon: getIconForAction(notification.action),
+                    mainText: getMainTextForAction(notification.action),
+                    subText: notification.description,
+                    time: formatTime(date),
+                    isRead: notification.read
+                });
+            });
+
+            return categorized;
+        };
+
+        try {
+            if (isOnlyShowUnread) {
+                const response = await api.get('/notifications/retrieve_unread', {
+                    params: {
+                        col1: 'user_id',
+                        val1: 1, // TODO: get user id from context
+                        col2: 'read',
+                        val2: 0
+                    }
+                });
+
+                const categorizedNotifications = categorizeNotifications(response.data.data);
+                setNotifications(categorizedNotifications);
+            } else {
+                const response = await api.get('/notifications/retrieve', {
+                    params: {
+                        col: 'user_id',
+                        val: 1 // TODO: get user id from context
+                    }
+                });
+                const categorizedNotifications = categorizeNotifications(response.data.data);
+                setNotifications(categorizedNotifications);
+                setHasNewNotifications(false);
+            }
+            setHasNewNotifications(false);
+        } catch (error) {
+            console.error('Error fetching notifications:', error);
+        }
     };
 
     return (
@@ -38,8 +187,8 @@ const NotificationPage = () => {
                                 <DateSection
                                     key={date}
                                     date={date}
-                                    notifications={dateNotifications}
-                                    showMarkAllRead={currentPage === 1 && index === 0}
+                                    notifications={dateNotifications as NotificationItemProps[]}
+                                // showMarkAllRead={currentPage === 1 && index === 0}
                                 />
                                 {index !== currentDateSections.length - 1 &&
                                     <div className='flex justify-center w-full'>

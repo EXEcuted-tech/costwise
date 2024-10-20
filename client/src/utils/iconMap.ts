@@ -3,7 +3,7 @@ import { RiDashboard2Fill, RiFormula } from 'react-icons/ri';
 import { BsFillFolderFill } from 'react-icons/bs';
 import { BiSolidReport } from 'react-icons/bi';
 import { GiMoneyStack, GiBookmarklet } from 'react-icons/gi';
-import { MdOutlineInventory, MdOutlineQuestionMark, MdLogout, MdMoreHoriz } from 'react-icons/md';
+import { MdOutlineInventory, MdOutlineQuestionMark, MdLogout, MdMoreHoriz, MdNotificationsActive } from 'react-icons/md';
 import { GoHistory } from 'react-icons/go';
 import { FaBell } from "react-icons/fa";
 import { ImUsers } from "react-icons/im";
@@ -33,5 +33,6 @@ export const iconMap: IconMap = {
   GiBookmarklet,
   FaFile,
   BiSolidFile,
-  BiFile
+  BiFile,
+  MdNotificationsActive
 };

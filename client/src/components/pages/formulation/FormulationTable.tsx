@@ -221,7 +221,7 @@ const FormulationTable: React.FC<{
                 if (emulsionIndex !== -1) {
                     let emulsionBatchQty = 0;
                     for (let i = 1; i < emulsionIndex; i++) {
-                        if (!updated[i].description.toUpperCase().startsWith('PACKAGING')) {
+                        if (!updated[i].description?.toUpperCase().startsWith('PACKAGING')) {
                             console.log(updated[i].description);
                             emulsionBatchQty += Number(updated[i].batchQty) || 0;
                         }
@@ -532,7 +532,7 @@ const FormulationTable: React.FC<{
                                                                 <input
                                                                     type="text"
                                                                     onChange={(e) => handleInputChange(0, 'description', e.target.value)}
-                                                                    value={formulaData[0]?.description}
+                                                                    value={formulaData[0]?.description || ''}
                                                                     className={`text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
                                                                 />
                                                             </td>
@@ -556,7 +556,7 @@ const FormulationTable: React.FC<{
                                                                 <input
                                                                     type="text"
                                                                     onChange={(e) => handleInputChange(0, 'unit', e.target.value)}
-                                                                    value={formulaData[0]?.unit}
+                                                                    value={formulaData[0]?.unit || ''}
                                                                     className={`w-full text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[110px]`}
                                                                 />
                                                             </td>
@@ -576,7 +576,7 @@ const FormulationTable: React.FC<{
                                                                         className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[60px]"
                                                                     />
                                                                 </td>
-                                                                {item.description.toLowerCase() !== 'emulsion' ? (
+                                                                {item.description?.toLowerCase() !== 'emulsion' ? (
                                                                     <td className='px-6 text-left'>
                                                                         <input
                                                                             type="text"
@@ -590,7 +590,7 @@ const FormulationTable: React.FC<{
                                                                     <input
                                                                         type="text"
                                                                         onChange={(e) => handleInputChange(index + 1, 'description', e.target.value)}
-                                                                        value={item.description}
+                                                                        value={item.description || ''}
                                                                         className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
                                                                     />
                                                                 </td>
@@ -613,7 +613,7 @@ const FormulationTable: React.FC<{
                                                                     <input
                                                                         type="text"
                                                                         onChange={(e) => handleInputChange(index + 1, 'unit', e.target.value)}
-                                                                        value={item.unit}
+                                                                        value={item.unit || ''}
                                                                         className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[100px]"
                                                                     />
                                                                 </td>

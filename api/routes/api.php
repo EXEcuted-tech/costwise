@@ -6,6 +6,7 @@ use App\Http\Controllers\FinishedGoodController;
 use App\Http\Controllers\FodlController;
 use App\Http\Controllers\FormulationController;
 use App\Http\Controllers\MaterialController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TransactionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -19,8 +20,14 @@ Route::post('/refresh', [AuthController::class, 'refresh']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/logout', [AuthController::class, 'logout']);
-    Route::get('/user', [UserController::class, 'getCurrentUser']);
-
+    Route::get('/users',[UserController::class,'getAllUsers']);
+  
+     Route::prefix('/user')->group(function () {
+        Route::get('', [UserController::class, 'getCurrentUser']);
+        Route::post('update/{id}',[UserController::class,'updateUser']);
+        Route::delete('archive/{id}', [UserController::class, 'archiveUser']);
+    });
+  
     Route::prefix('/files')->group(function () {
         Route::post('upload', [FileController::class, 'upload']);
         Route::get('retrieve_all', [FileController::class, 'retrieveAll']);
@@ -37,6 +44,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_batch', [FinishedGoodController::class, 'retrieveBatch']);
         Route::post('create', [FinishedGoodController::class, 'create']);
         Route::post('update', [FinishedGoodController::class, 'update']);
+        Route::post('update_or_create', [FinishedGoodController::class, 'updateOrCreate']);
     });
 
     Route::prefix('/fodls')->group(function () {
@@ -64,6 +72,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('update_batch', [BomController::class, 'updateBatch']);
         Route::post('delete', [BomController::class, 'delete']);
         Route::post('create', [BomController::class, 'create']);
+        Route::post('update_create_batch', [BomController::class, 'updateOrCreateBatch']);
     });
 
     Route::prefix('/formulations')->group(function () {
@@ -74,7 +83,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('create', [FormulationController::class, 'create']);
         Route::post('update_emulsion', [FormulationController::class, 'updateEmulsion']);
         Route::post('delete', [FormulationController::class, 'delete']);
-        Route::post('delete_fg', [FormulationController::class, 'deleteBulkWithFg']);
+        Route::post('delete_fg', [FormulationController::class, 'deleteBulkWithFG']);
         Route::post('delete_material', [FormulationController::class, 'deleteBulkWithMaterial']);
         Route::post('upload', [FormulationController::class, 'upload']);
         Route::post('export', [FormulationController::class, 'export']);
@@ -84,5 +93,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_batch', [TransactionController::class, 'retrieveBatch']);
         Route::post('update_batch', [TransactionController::class, 'updateBatch']);
         Route::post('delete_bulk', [TransactionController::class, 'deleteBulk']);
+    });
+
+    Route::prefix('/notifications')->group(function () {
+        Route::get('new', [NotificationController::class, 'getNewNotifications']);
+        Route::get('retrieve', [NotificationController::class, 'retrieve']);
+        Route::get('retrieve_unread', [NotificationController::class, 'retrieveUnread']);
     });
 });
