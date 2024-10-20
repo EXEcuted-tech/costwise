@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ApiController;
 use App\Http\Controllers\BomController;
+use App\Http\Controllers\EventController;
 use App\Http\Controllers\FinishedGoodController;
 use App\Http\Controllers\FodlController;
 use App\Http\Controllers\FormulationController;
@@ -46,6 +47,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('create', [FinishedGoodController::class, 'create']);
         Route::post('update', [FinishedGoodController::class, 'update']);
         Route::post('update_or_create', [FinishedGoodController::class, 'updateOrCreate']);
+        Route::get('average_cost', [FinishedGoodController::class, 'getAverageCost']);
     });
 
     Route::prefix('/fodls')->group(function () {
@@ -63,6 +65,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_batch', [MaterialController::class, 'retrieveBatch']);
         Route::post('update_batch', [MaterialController::class, 'updateBatch']);
         Route::post('delete_bulk', [MaterialController::class, 'deleteBulk']);
+        Route::get('material_cost_utilization', [MaterialController::class, 'getMaterialCostUtilization']);
     });
 
     Route::prefix('/boms')->group(function () {
@@ -94,6 +97,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_batch', [TransactionController::class, 'retrieveBatch']);
         Route::post('update_batch', [TransactionController::class, 'updateBatch']);
         Route::post('delete_bulk', [TransactionController::class, 'deleteBulk']);
+        Route::get('total_production_cost', [TransactionController::class, 'getTotalProductionCost']);
     });
 
     Route::prefix('/notifications')->group(function () {
@@ -107,5 +111,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieveAll', [InventoryController::class, 'retrieveAll']);
         Route::get('lists', [InventoryController::class, 'retrieveInventoryList']);
         Route::delete('archive', [InventoryController::class, 'archiveInventoryList']);
+    });
+
+    Route::prefix('/events')->group(function () {
+        Route::post('create', [EventController::class, 'create']);
+        Route::get('retrieve', [EventController::class, 'retrieve']);
+        Route::post('update', [EventController::class, 'update']);
+        Route::post('delete', [EventController::class, 'delete']);
     });
 });

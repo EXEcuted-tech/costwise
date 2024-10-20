@@ -2,7 +2,7 @@
 import React, { useEffect, useState } from 'react'
 import Header from '@/components/header/Header'
 import { BsFolderFill } from "react-icons/bs";
-import { IoIosArrowBack, IoIosArrowRoundBack } from "react-icons/io";
+import { IoIosArrowBack, IoIosArrowRoundBack, IoIosArrowForward } from "react-icons/io";
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import WorkspaceTabs from '@/components/pages/file-manager/workspace/WorkspaceTabs';
 import NoFile from '@/components/pages/file-manager/workspace/NoFile';
@@ -21,6 +21,7 @@ const WorkspacePage = () => {
     const [isEmpty, setIsEmpty] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
     const [bomSheets, setBomSheets] = useState<number[]>([]);
+    const [isHovered, setIsHovered] = useState(false);
 
     const { isOpen } = useSidebarContext();
     const router = useRouter();
@@ -88,9 +89,17 @@ const WorkspacePage = () => {
         <>
             {/* Navigation Pane */}
             {fileType === 1 && (
-                <div className="fixed right-[-105px] hover:right-0 top-[30%] transform -translate-y-1/2 z-[950] transition-all ease-in-out duration-300">
+                <div 
+                    className="fixed right-[-105px] hover:right-0 top-[30%] transform -translate-y-1/2 z-[950] transition-all ease-in-out duration-300"
+                    onMouseEnter={() => setIsHovered(true)}
+                    onMouseLeave={() => setIsHovered(false)}
+                >
                     <div className="flex items-center mb-4 bg-white p-4 rounded-l-lg shadow-md">
-                        <IoIosArrowBack className="text-2xl text-primary cursor-pointer mr-5" />
+                        {isHovered ? (
+                            <IoIosArrowForward className="text-2xl text-primary cursor-pointer mr-5" />
+                        ) : (
+                            <IoIosArrowBack className="text-2xl text-primary cursor-pointer mr-5" />
+                        )}
                         <span className="font-semibold text-primary">Navigation</span>
                     </div>
                     <ul className="fixed right-[-15px] bg-white rounded-l-lg shadow-md p-4">

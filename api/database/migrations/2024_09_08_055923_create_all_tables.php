@@ -159,6 +159,19 @@ return new class extends Migration {
             $table->timestamps();
             $table->foreign('material_id')->references('material_id')->on('materials')->onDelete('cascade');
         });
+
+        // Events Table
+        Schema::create('events', function (Blueprint $table) {
+            $table->id();
+            $table->unsignedBigInteger('user_id');
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->date('event_date');
+            $table->time('start_time')->nullable();
+            $table->time('end_time')->nullable();
+            $table->timestamps();
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+        });
     }
 
     /**
@@ -177,5 +190,6 @@ return new class extends Migration {
         Schema::dropIfExists('audit_logs');
         Schema::dropIfExists('users');
         Schema::dropIfExists('transactions');
+        Schema::dropIfExists('events');
     }
 };

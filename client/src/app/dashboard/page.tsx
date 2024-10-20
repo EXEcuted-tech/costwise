@@ -9,10 +9,56 @@ import { FaCircleArrowDown, FaCircleArrowUp, FaArrowTrendUp } from "react-icons/
 import { PiPackageFill } from "react-icons/pi";
 import LineChart from '@/components/pages/dashboard/LineChart';
 import UserActivity, { UserActivityProps } from '@/components/pages/dashboard/UserActivity';
-import CostTable from '@/components/pages/dashboard/CostTable';
+import { useEffect, useState } from 'react';
+import api from '@/utils/api';
 
 const DashboardPage = () => {
   const { isOpen, isAdmin } = useSidebarContext();
+  const [averageCost, setAverageCost] = useState(0);
+  const [fgPercentageChange, setFgPercentageChange] = useState(0);
+  const [fgTrend, setFgTrend] = useState('');
+  const [totalProductionCost, setTotalProductionCost] = useState('');
+  const [productCostPercentageChange, setProductCostPercentageChange] = useState(0);
+  const [productCostTrend, setProductCostTrend] = useState('');
+  const [lastUpdate, setLastUpdate] = useState('');
+  const [materialCost, setMaterialCost] = useState(0);
+  const [materialCostPercentageChange, setMaterialCostPercentageChange] = useState(0);
+  const [materialCostTrend, setMaterialCostTrend] = useState('');
+
+  useEffect(() => {
+    fetchAverageCost();
+    fetchTotalProductionCost();
+    fetchMaterialCostUtilization();
+    setLastUpdate(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
+  }, []);
+
+  const fetchAverageCost = async () => {
+    const response = await api.get('/finished_goods/average_cost');
+    console.log(response.data);
+    setAverageCost(parseFloat(response.data.average_cost));
+    setFgPercentageChange(response.data.percentage_change);
+    setFgTrend(response.data.trend);
+  };
+
+  const fetchTotalProductionCost = async () => {
+    const response = await api.get('/transactions/total_production_cost');
+    console.log(response.data);
+    const formattedCost = Number(response.data.total_production_cost).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+    setTotalProductionCost(formattedCost);
+    setProductCostPercentageChange(response.data.percentage_change);
+    setProductCostTrend(response.data.trend);
+  };
+
+  const fetchMaterialCostUtilization = async () => {
+    const response = await api.get('/materials/material_cost_utilization');
+    console.log(response.data);
+    setMaterialCost(response.data.material_cost_utilization);
+    setMaterialCostPercentageChange(response.data.percentage_change);
+    setMaterialCostTrend(response.data.trend);
+  };
 
   return (
     <div className={`${isOpen ? 'px-[10px] 2xl:px-[25px]' : 'px-[25px]'} bg-background mt-[30px] ml-[45px]`}>
@@ -40,7 +86,7 @@ const DashboardPage = () => {
           <div className={`${isOpen ? 'min-h-[316px]' : 'min-h-[304px]'} bg-white rounded-b-[10px] drop-shadow-lg px-[40px] py-[20px]`}>
             <div className='flex items-center'>
               <IoMdClock className='text-[25px] 2xl:text-[28px] 3xl:text-[32px] text-[#C6C6C6] mr-[5px]' />
-              <h2 className='text-[#C6C6C6] font-light text-[20px]'>Last Update: <span className='italic'>2:15 AM</span></h2>
+              <h2 className='text-[#C6C6C6] font-light text-[20px]'>Last Update: <span className='italic'>{lastUpdate}</span></h2>
             </div>
             <div className='my-[30px] 3xl:my-[20px] flex justify-between'>
               <div className='w-[20%] flex flex-col items-center'>
@@ -49,11 +95,14 @@ const DashboardPage = () => {
                 </div>
                 <div>
                   <div className='flex items-center mr-[-20px] justify-end'>
-                    <FaCircleArrowDown className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#CD3939] mr-[5px] ' />
-                    <p className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#CD3939] font-semibold'>-40%</p>
+                    {productCostTrend === 'decreased' && <FaCircleArrowDown className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#CD3939] mr-[5px]' />}
+                    {productCostTrend === 'increased' && <FaCircleArrowUp className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#039300] mr-[5px]' />}
+                    <p className={`text-[10px] 2xl:text-[12px] 3xl:text-[16px] ${productCostTrend === 'decreased' ? 'text-[#CD3939]' : 'text-[#039300]'} font-semibold`}>
+                      {productCostPercentageChange ? `${productCostTrend === 'decreased' ? '-' : '+'}${productCostPercentageChange}%` : '‎'}
+                    </p>
                   </div>
                   <div className='flex flex-col items-center'>
-                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary'>₱10,200,000</h1>
+                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary'>₱{totalProductionCost}</h1>
                     <p className='italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]'>Total Production Cost</p>
                   </div>
                 </div>
@@ -64,12 +113,33 @@ const DashboardPage = () => {
                 </div>
                 <div>
                   <div className='flex items-center mr-[-20px] justify-end'>
-                    <FaCircleArrowDown className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#CD3939] mr-[5px]' />
-                    <p className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#CD3939] font-semibold'>-23%</p>
+                    {fgTrend === 'decreased' && <FaCircleArrowDown className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#CD3939] mr-[5px]' />}
+                    {fgTrend === 'increased' && <FaCircleArrowUp className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#039300] mr-[5px]' />}
+                    <p className={`text-[10px] 2xl:text-[12px] 3xl:text-[16px] ${fgTrend === 'decreased' ? 'text-[#CD3939]' : 'text-[#039300]'} font-semibold`}>
+                      {fgPercentageChange ? `${fgTrend === 'decreased' ? '-' : '+'}${fgPercentageChange}%` : '‎'}
+                    </p>
                   </div>
                   <div className='flex flex-col items-center'>
-                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary'>₱35.50</h1>
+                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary'>₱{averageCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
                     <p className='italic text-center font-medium text-[12px] 3xl:text-[14px] text-[#969696]'>Average Cost Per Product</p>
+                  </div>
+                </div>
+              </div>
+              <div className='w-[20%] flex flex-col items-center'>
+                <div className='animate-border-pulse2 w-24 h-24 flex p-4 justify-center items-center rounded-full border-2 border-white bg-primary drop-shadow-lg relative'>
+                  <GiMoneyStack className='text-white text-[68px] hover:animate-shake-tilt' />
+                </div>
+                <div>
+                  <div className='flex items-center mr-[-20px] justify-end'>
+                    {materialCostTrend === 'decreased' && <FaCircleArrowDown className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#CD3939] mr-[5px]' />}
+                    {materialCostTrend === 'increased' && <FaCircleArrowUp className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#039300] mr-[5px]' />}
+                    <p className={`text-[10px] 2xl:text-[12px] 3xl:text-[16px] ${materialCostTrend === 'decreased' ? 'text-[#CD3939]' : 'text-[#039300]'} font-semibold`}>
+                      {materialCostPercentageChange ? `${materialCostTrend === 'decreased' ? '-' : '+'}${materialCostPercentageChange}%` : '‎'}
+                    </p>
+                  </div>
+                  <div className='flex flex-col items-center'>
+                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary'>₱{materialCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
+                    <p className='italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]'>Material Cost Utilization</p>
                   </div>
                 </div>
               </div>
@@ -85,21 +155,6 @@ const DashboardPage = () => {
                   <div className='flex flex-col items-center'>
                     <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary'>5%</h1>
                     <p className='italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]'>Recent Cost Trend</p>
-                  </div>
-                </div>
-              </div>
-              <div className='w-[20%] flex flex-col items-center'>
-                <div className='animate-border-pulse2 w-24 h-24 flex p-4 justify-center items-center rounded-full border-2 border-white bg-primary drop-shadow-lg relative'>
-                  <GiMoneyStack className='text-white text-[68px] hover:animate-shake-tilt' />
-                </div>
-                <div>
-                  <div className='flex items-center mr-[-20px] justify-end'>
-                    <FaCircleArrowUp className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#039300] mr-[5px]' />
-                    <p className='text-[10px] 2xl:text-[12px] 3xl:text-[16px] text-[#039300] font-semibold'>0%</p>
-                  </div>
-                  <div className='flex flex-col items-center'>
-                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary'>₱50,000</h1>
-                    <p className='italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]'>Budget Variance</p>
                   </div>
                 </div>
               </div>

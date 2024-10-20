@@ -14,9 +14,10 @@ interface FileTableComponentProps {
     fileData: File[];
     isOpen: boolean;
     isLoading: boolean;
+    setIsLoading: (value: boolean) => void;
 }
 
-const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoading }) => {
+const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoading, setIsLoading }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const { setDeleteModal, setFileToDelete } = useFileManagerContext();
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
@@ -41,6 +42,8 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
         try {
             const fileId = data.file_id;
 
+            setIsLoading(true);
+
             const response = await api.post('/files/export',
                 { file_id: fileId },
                 { responseType: 'blob' }
@@ -55,6 +58,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
             a.click();
             a.remove();
             window.URL.revokeObjectURL(url);
+            setIsLoading(false);
 
         } catch (error) {
             console.error('Export failed:', error);
@@ -110,7 +114,8 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
                             return (
                                 <tr key={index} className='border-b-[0.3px] border-[#d9d9d9]'>
                                     <td className={`${isOpen ? 'pl-[20px] 2xl:pl-[46px]' : 'pl-[46px]'} py-2`}>
-                                        <p className={`${isOpen ? 'text-[16px] 2xl:text-[18px]' : 'text-[18px]'} text-primary cursor-pointer hover:underline`}>{fileLabel}</p>
+                                        <p className={`${isOpen ? 'text-[16px] 2xl:text-[18px]' : 'text-[18px]'} text-primary cursor-pointer hover:underline`}
+                                            onClick={() => handleView(data)}>{fileLabel}</p>
                                         <p className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}italic text-[#868686]`}>{fileName}</p>
                                     </td>
                                     <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{fileType}</td>

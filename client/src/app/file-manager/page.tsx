@@ -19,6 +19,7 @@ import api from '@/utils/api';
 import * as XLSX from 'xlsx';
 import Alert from "@/components/alerts/Alert";
 import { File } from '@/types/data';
+import Spinner from '@/components/loaders/Spinner';
 
 const FileManagerPage = () => {
   const { isOpen } = useSidebarContext();
@@ -33,6 +34,8 @@ const FileManagerPage = () => {
   const [masterFileData, setMasterFileData] = useState<File[]>([]);
   const [transactionData, setTransactionData] = useState<File[]>([]);
   const { fileToDelete, setFileToDelete } = useFileManagerContext();
+
+  const [exportLoading, setExportLoading] = useState(false);
 
   const ref = useOutsideClick(() => setUpload(false));
 
@@ -199,13 +202,13 @@ const FileManagerPage = () => {
   }, [uploadType, shouldOpenDropzone, open]);
 
   const handleExportAll = async () => {
-    // setExportLoading(true);
-    // setExportError('');
+    console.log("Went in here");
+    setExportLoading(true);
     try {
       const response = await api.post('/files/export_all', {}, {
         responseType: 'blob',
       });
-  
+
       if (response.data instanceof Blob) {
         const url = window.URL.createObjectURL(response.data);
         const a = document.createElement('a');
@@ -218,18 +221,18 @@ const FileManagerPage = () => {
         window.URL.revokeObjectURL(url);
         setInfoMsg('All files exported successfully!');
       } else {
-        throw new Error('Unexpected response format');
+        setErrorMsg('Unexpected response format');
       }
     } catch (error) {
       console.error('Export all files failed:', error);
-      // setExportError(`Failed to export files: ${error.message}`);
+      setErrorMsg(`Failed to export file/s!`);
     } finally {
-      // setExportLoading(false);
+      setExportLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if(fileToDelete) {
+    if (fileToDelete) {
       try {
         await api.post(`/files/delete`, { col: 'file_id', value: fileToDelete });
       } catch (error) {
@@ -261,6 +264,18 @@ const FileManagerPage = () => {
             setClose={() => { setInfoMsg(''); }} />
         }
       </div>
+      {(exportLoading) &&
+        <div className='fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-brightness-50 z-[1500]'>
+          <div className="three-body">
+            <div className="three-body__dot"></div>
+            <div className="three-body__dot"></div>
+            <div className="three-body__dot"></div>
+          </div>
+          <p className='text-primary font-light text-[20px] mt-[10px] text-white'>
+            Exporting files...
+          </p>
+        </div>
+      }
       {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" onProceed={handleDelete} />}
       <Header icon={BsFolderFill} title={"File Manager"} />
       <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px] mt-[75px] 2xl:mt-[40px]' : 'px-[50px] mt-[36px]'} ml-[45px]`}>
