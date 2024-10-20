@@ -872,9 +872,7 @@ class FileController extends ApiController
             $zipFilePath = storage_path("app/temp/$zipFileName");
     
             $zip = new ZipArchive();
-            if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
-                throw new \RuntimeException("Unable to create zip file");
-            }
+            $zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
     
             foreach ($files as $file) {
                 $spreadsheet = new Spreadsheet();
