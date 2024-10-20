@@ -2,6 +2,7 @@ import React from 'react'
 import { RiFileWarningFill } from "react-icons/ri";
 import { IoIosClose } from "react-icons/io";
 import { useFileManagerContext } from '@/contexts/FileManagerContext';
+import { useRouter } from 'next/navigation';
 
 interface ConfirmDialogProps { 
   setConfirmDialog: React.Dispatch<React.SetStateAction<boolean>>;
@@ -12,6 +13,7 @@ interface ConfirmDialogProps {
 
 const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ tab, setConfirmDialog, setTab, setIsEmpty }) => {
   const { setFileType } = useFileManagerContext();
+  const router = useRouter();
   
   const handleTabChange = () => {
       if(tab){
@@ -22,6 +24,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ tab, setConfirmDialog, se
         setFileType(0);
         setIsEmpty(true);
         setConfirmDialog(false);
+        router.push(`/file-manager/workspace`);
       }
   }
 

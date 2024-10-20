@@ -1,6 +1,6 @@
 "use client"
 import Header from '@/components/header/Header'
-import React, { useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { AiOutlineSearch, AiOutlineDown } from 'react-icons/ai';
 import { HiClipboardList } from "react-icons/hi";
 import { MdCompare } from "react-icons/md";
@@ -16,6 +16,12 @@ import { useRouter } from 'next/navigation';
 import ChooseFileDialog from '@/components/modals/ChooseFileDialog';
 import BillOfMaterialsList from '@/components/modals/BillOfMaterialsList';
 import CompareFormulaContainer from '@/components/pages/formulation/CompareFormulaContainer';
+import api from '@/utils/api';
+import { Formulation } from '@/types/data';
+import { useDropzone } from 'react-dropzone';
+import * as XLSX from 'xlsx';
+import { formatMonthYear } from '@/utils/costwiseUtils';
+import Alert from '@/components/alerts/Alert';
 
 const FormulationPage = () => {
     const { isOpen } = useSidebarContext();
@@ -25,16 +31,160 @@ const FormulationPage = () => {
     const [compareFormula, setCompareFormula] = useState(false);
     const [bomList, setBomList] = useState(false);
     const [view, setView] = useState(false);
-    const [dialog, setDialog] = useState(false);
 
     const ref = useOutsideClick(() => setAddFormula(false));
     const router = useRouter();
 
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [isLoading, setIsLoading] = useState(false);
+    const [allData, setAllData] = useState<Formulation[]>([]);
+    const [filteredData, setFilteredData] = useState<Formulation[]>([]);
+    const [searchTerm, setSearchTerm] = useState('');
+
+    const [infoMsg, setInfoMsg] = useState('');
+    const [errorMsg, setErrorMsg] = useState('');
+
+    const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
+        setCurrentPage(page);
+    };
+
+    useEffect(() => {
+        const filtered = allData
+            .filter((formulation) => {
+                const searchTermLower = searchTerm.toLowerCase();
+                const matchesSearch = (
+                    formulation.formula_code.toLowerCase().includes(searchTermLower) ||
+                    formulation.finishedGood.fg_code.toLowerCase().includes(searchTermLower) ||
+                    formulation.finishedGood.fg_desc.toLowerCase().includes(searchTermLower) ||
+                    formulation.finishedGood.unit.toLowerCase().includes(searchTermLower) ||
+                    formatMonthYear(formulation.finishedGood.monthYear).toLowerCase().includes(searchTermLower)
+                );
+                return matchesSearch;
+            })
+            .sort((a, b) => b.finishedGood.monthYear - a.finishedGood.monthYear);
+
+        setFilteredData(filtered);
+        setCurrentPage(1); // Reset to first page when filter changes
+    }, [allData, searchTerm]);
+
+    const fetchData = useCallback(async () => {
+        setIsLoading(true);
+
+        try {
+            const response = await api.get('/formulations/retrieve_all_fg');
+            if (response.data.status === 200) {
+                setTimeout(() => {
+                    setIsLoading(false);
+                }, 1000);
+
+                setAllData(response.data.data);
+            }
+        } catch (error) {
+            console.error('Error fetching data:', error);
+        } finally {
+            setIsLoading(false);
+        }
+    }, []);
+
+    useEffect(() => {
+        fetchData();
+    }, [fetchData]);
+
+
+    const onDrop = useCallback(
+        async (acceptedFiles: File[]) => {
+            setErrorMsg('');
+            setInfoMsg('');
+            setIsLoading(true);
+
+            const uploadPromises = acceptedFiles.map(async (file) => {
+                return new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+
+                    reader.onload = async (e: ProgressEvent<FileReader>) => {
+                        const data = e.target?.result;
+
+                        if (data && data instanceof ArrayBuffer) {
+                            const dataArray = new Uint8Array(data);
+                            const workbook = XLSX.read(dataArray, { type: 'array' });
+
+                            // const sheetNames = workbook.SheetNames;
+
+                            const formData = new FormData();
+                            formData.append('file', file);
+
+                            try {
+                                const response = await api.post('/formulations/upload', formData);
+                                if (response.data.status == 200) {
+                                    resolve(`Successfully uploaded the file!`);
+                                } else {
+                                    reject(`Failed to upload ${file.name}`);
+                                }
+                            } catch (error) {
+                                console.error(error);
+                                reject(`Failed to upload ${file.name}`);
+                            }
+                        } else {
+                            reject(`Error reading ${file.name}`);
+                        }
+                    };
+
+                    reader.onerror = () => {
+                        reject(`Error reading ${file.name}`);
+                    };
+
+                    reader.readAsArrayBuffer(file);
+                });
+            });
+
+            try {
+                const results = await Promise.all(uploadPromises);
+                setInfoMsg(results.join(', '));
+            } catch (errors) {
+                if (Array.isArray(errors)) {
+                    setErrorMsg(errors.join(', '));
+                } else {
+                    setErrorMsg('An error occurred during file upload');
+                }
+            } finally {
+                setIsLoading(false);
+            }
+        },
+        []
+    );
+
+    const { getRootProps, getInputProps, open } = useDropzone({
+        onDrop,
+        noClick: true,
+        noKeyboard: true,
+        multiple: true,
+        accept: {
+            'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet': ['.xlsx'],
+            'application/vnd.ms-excel': ['.xls'],
+            'text/csv': ['.csv'],
+        },
+    });
+
     return (
         <>
+            <div className="absolute top-0 right-0">
+                {errorMsg != '' &&
+                    <Alert
+                        className="!relative"
+                        variant='critical'
+                        message={errorMsg}
+                        setClose={() => { setErrorMsg(''); }} />
+                }
+                {infoMsg != '' &&
+                    <Alert
+                        className="!relative"
+                        variant='success'
+                        message={infoMsg}
+                        setClose={() => { setInfoMsg(''); }} />
+                }
+            </div>
             <Header icon={HiClipboardList} title={"Formulations"} />
             {compareFormula && <CompareFormulaDialog setCompareFormula={setCompareFormula} />}
-            {dialog && <ChooseFileDialog dialogType={1} setDialog={setDialog} />}
             {bomList && <BillOfMaterialsList setBOM={setBomList} />}
             <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
                 {(!view && !edit && !viewFormulas && !viewBOM) &&
@@ -48,6 +198,8 @@ const FormulationPage = () => {
                                 type="text"
                                 className={`${isOpen ? 'pl-[25px] 2xl:pl-[35px] w-[70%] 4xl:w-[50%] text-[15px] 2xl:text-[18px] 3xl:text-[21px]' : 'pl-[35px] w-[60%] 3xl:w-[50%] text-[18px] 2xl:text-[21px]'} focus:outline-none pr-[5px] py-[10px] bg-background border-b border-[#868686] placeholder-text-[#777777] text-[#5C5C5C]`}
                                 placeholder="Search Formulation"
+                                value={searchTerm}
+                                onChange={(e) => setSearchTerm(e.target.value)}
                                 required
                             />
                         </div>
@@ -81,9 +233,9 @@ const FormulationPage = () => {
                                             </li>
                                             <hr className='h-[2px] bg-primary opacity-50' />
                                             <li className={`${isOpen ? 'pl-[6px] 3xl:pl-[15px]' : 'pl-[15px]'} flex items-center justify-left py-[5px] cursor-pointer hover:text-[#851313]`}
-                                                onClick={() => setDialog(true)}>
+                                                onClick={open}>
                                                 <BiSolidFile className='text-[20px] mr-[5px]' />
-                                                <p>Choose File</p>
+                                                <p>Import Files</p>
                                             </li>
                                         </ul>
                                     </div>
@@ -95,7 +247,15 @@ const FormulationPage = () => {
                 }
                 {/* File Container */}
                 <div className='w-full '>
-                    <FormulationContainer view={view} setView={setView} />
+                    <FormulationContainer
+                        setView={setView}
+                        view={view}
+                        setFilteredData={setFilteredData}
+                        filteredData={filteredData}
+                        isLoading={isLoading}
+                        currentPage={currentPage}
+                        handlePageChange={handlePageChange}
+                    />
                 </div>
             </div>
         </>

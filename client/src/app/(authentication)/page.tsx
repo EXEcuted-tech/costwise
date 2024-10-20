@@ -6,10 +6,12 @@ import { GiSmartphone } from "react-icons/gi";
 import config from "@/server/config";
 import { useRouter } from 'next/navigation';
 import api from "@/utils/api";
-import { SetStateAction, useEffect, useState } from "react";
+import { SetStateAction, useEffect, useState, KeyboardEvent } from "react";
 import { useUserContext } from "@/contexts/UserContext";
 import Alert from "@/components/alerts/Alert";
 import Spinner from "@/components/loaders/Spinner";
+import { isTokenExpired, refreshToken } from "@/utils/expirationCheck";
+import { removeTokens } from "@/utils/removeTokens";
 
 function LoginPage() {
   const router = useRouter();
@@ -26,8 +28,21 @@ function LoginPage() {
     const accessToken = localStorage.getItem('accessToken');
     const tokenExpiresAt = localStorage.getItem('tokenExpiresAt');
 
+    // if (tokenExpiresAt && isTokenExpired()) {
+    //   try {
+    //     const refreshed = refreshToken();
+    //     if (!refreshed) {
+    //       removeTokens();
+    //       router.push('/');
+    //     }
+    //   } catch (error) {
+    //     console.error('Failed to refresh token:', error);
+    //   }
+    // }
+    
     if (accessToken && tokenExpiresAt) {
       const expiresAt = new Date(tokenExpiresAt);
+      // console.log(expiresAt, new Date(), expiresAt > new Date());
       if (expiresAt > new Date()) {
         router.push('/dashboard');
       }
@@ -42,7 +57,7 @@ function LoginPage() {
     setAlertMessages([]);
 
     try {
-      const response = await api.post(`${config.API}/api/login`, {
+      const response = await api.post('/login', {
         "email_address": email,
         password
       });
@@ -95,8 +110,14 @@ function LoginPage() {
     }
   };
 
+  const handleKeyDown = (e: KeyboardEvent<HTMLDivElement>) => {
+    if (e.key === 'Enter') {
+      handleSubmit(e as any);
+    }
+  };
+
   return (
-    <>
+    <div onKeyDown={handleKeyDown}>
       <div className="absolute top-0 right-0">
         {alertMessages && alertMessages.map((msg, index) => (
           <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
@@ -104,7 +125,7 @@ function LoginPage() {
           }} />
         ))}
       </div>
-      <div className="relative z-10 flex-col h-[670px] w-[350px] sm:w-[500px] lg:w-[900px] 2xl:w-[1100px] rounded-3xl bg-white font-lato drop-shadow-3xl">
+      <div className="animate-pop-out relative z-10 flex-col h-[670px] w-[350px] sm:w-[500px] lg:w-[900px] 2xl:w-[1100px] rounded-3xl bg-white font-lato drop-shadow-3xl">
 
         <div className="flex-row lg:flex items-center justify-center h-full z-1">
           {/* Left Div */}
@@ -189,7 +210,10 @@ function LoginPage() {
             </div>
             <div className="h-[15%] xl:h-[10%] items-end flex justify-center w-[100%]">
               <div className="relative inline-flex bg-white overflow-hidden text-primary w-[50%] flex items-center justify-center rounded-[30px] h-[70%] xl:h-[70%] xl:w-[50%] cursor-pointer transition-all rounded hover:border-1 hover:border-white group"
-                onClick={handleSubmit}>
+                onClick={handleSubmit}
+                tabIndex={0}
+                role="button"
+              >
                 <button className="flex items-center text-[1em] xl:text-[1.2em] 2xl:text-[1.4em] font-black">
                   <span className="w-full h-48 rounded bg-primary absolute bottom-0 left-0 translate-x-full ease-out duration-500 transition-all translate-y-full mb-9 ml-9 group-hover:ml-0 group-hover:mb-32 group-hover:translate-x-0"></span>
                   {isLoading && <Spinner className="group-hover:!text-white mr-1 !size-[25px]" />}
@@ -202,7 +226,7 @@ function LoginPage() {
           </div>
         </div>
       </div>
-    </>
+    </div>
   );
 }
 

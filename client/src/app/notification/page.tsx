@@ -20,7 +20,7 @@ const NotificationPage = () => {
     const currentDateSections = dateEntries.slice(indexOfFirstItem, indexOfLastItem)
 
     const handleToggle = (state: boolean) => {
-        console.log('Toggle state:', state);
+        // console.log('Toggle state:', state);
     };
 
     return (

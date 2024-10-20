@@ -91,7 +91,7 @@ class AuthController extends ApiController
 
             $user = User::where('email_address', $request->email_address)->first();
 
-            $accessToken = $user->createToken('accessToken', ['*'], now()->addMinutes(15));
+            $accessToken = $user->createToken('accessToken', ['*'], now()->addMinutes(60));
             $refreshToken = $user->createToken('refreshToken', ['*'], now()->addDays(30));
 
             $this->status = 200;
