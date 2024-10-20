@@ -25,11 +25,11 @@ Route::post('/refresh', [AuthController::class, 'refresh']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/logout', [AuthController::class, 'logout']);
-    Route::get('/users',[UserController::class,'getAllUsers']);
+    Route::get('/users', [UserController::class, 'getAllUsers']);
 
-     Route::prefix('/user')->group(function () {
+    Route::prefix('/user')->group(function () {
         Route::get('', [UserController::class, 'getCurrentUser']);
-        Route::post('update/{id}',[UserController::class,'updateUser']);
+        Route::post('update/{id}', [UserController::class, 'updateUser']);
         Route::delete('archive/{id}', [UserController::class, 'archiveUser']);
     });
 
@@ -129,9 +129,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('/article')->group(function () {
-        Route::post('/upload', [ArticleController::class, 'uploadArticle']);
+        // Route::post('/upload', [ArticleController::class, 'uploadArticle']);
         Route::post('/data', [ArticleController::class, 'getArticle']);
         Route::post('/update', [ArticleController::class, 'updateArticle']);
-        Route::get('/all', [ArticleController::class, 'getAll']);
     });
+});
+
+Route::prefix('/article')->group(function () {
+    Route::post('/upload', [ArticleController::class, 'uploadArticle']);
+    Route::get('/all', [ArticleController::class, 'getAll']);
 });
