@@ -20,7 +20,7 @@ interface FileTableComponentProps {
 const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoading }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const { currentUser } = useUserContext();
-    const { setDeleteModal } = useFileManagerContext();
+    const { setDeleteModal, setFileToDelete } = useFileManagerContext();
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
     };
@@ -85,6 +85,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
     };
 
     const handleDelete = (data: File) => {
+        setFileToDelete(data.file_id);
         setDeleteModal(true);
     }
 
