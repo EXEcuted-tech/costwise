@@ -868,11 +868,18 @@ class FileController extends ApiController
                 return response()->json(['message' => 'No files to export'], 404);
             }
     
+            $zipDir = storage_path('app/temp');
+            if (!file_exists($zipDir)) {
+                mkdir($zipDir, 0755, true);
+            }
+            
             $zipFileName = 'exported_files_' . time() . '.zip';
             $zipFilePath = storage_path("app/temp/$zipFileName");
     
             $zip = new ZipArchive();
-            $zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE);
+            if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
+                throw new \RuntimeException("Unable to create zip file");
+            }
     
             foreach ($files as $file) {
                 $spreadsheet = new Spreadsheet();
