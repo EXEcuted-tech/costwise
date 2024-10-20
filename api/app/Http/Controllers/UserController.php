@@ -15,7 +15,10 @@ class UserController extends ApiController
     public function getCurrentUser()
     {
         $user = Auth::user();
-        return response()->json($user);
+        if (!$user) {
+            return response()->json(['error' => 'User not authenticated'], 401);
+        }
+        return response()->json($user->toArray());
     }
 
     public function getAllUsers()
