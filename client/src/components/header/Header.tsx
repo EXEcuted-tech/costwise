@@ -1,4 +1,5 @@
-import React, {useState} from 'react'
+import useColorMode from '@/hooks/useColorMode';
+import React, { useState } from 'react'
 import { IconType } from 'react-icons/lib';
 
 import { MdDarkMode } from "react-icons/md";
@@ -9,7 +10,8 @@ interface HeaderProps {
     style?: string;
 }
 
-const Header: React.FC<HeaderProps> = ({icon: Icon, title, style}) => {
+const Header: React.FC<HeaderProps> = ({ icon: Icon, title, style }) => {
+    const [colorMode, setColorMode] = useColorMode();
 
     return (
         <div className={`font-lato bg-white h-[5rem] flex shadow-md shadow-gray-300 ${style ? style : 'w-full'}`}>
@@ -22,8 +24,9 @@ const Header: React.FC<HeaderProps> = ({icon: Icon, title, style}) => {
                 </div>
 
                 {/* change this to proper dark mode */}
-                <div className="hover:animate-shake-tilt hover:brightness-95 p-6 text-[2.2em] text-primary ml-auto mr-4">
-                    <MdDarkMode className='cursor-pointer'/>
+                <div className="hover:animate-shake-tilt hover:brightness-95 p-6 text-[2.2em] text-primary ml-auto mr-4"
+                    onClick={() => setColorMode(colorMode === "light" ? "dark" : "light")}>
+                    <MdDarkMode className='cursor-pointer' />
                 </div>
             </div>
         </div>

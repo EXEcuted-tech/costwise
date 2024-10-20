@@ -10,15 +10,17 @@ import { PiPackageFill } from "react-icons/pi";
 import LineChart from '@/components/pages/dashboard/LineChart';
 import UserActivity, { UserActivityProps } from '@/components/pages/dashboard/UserActivity';
 import CostTable from '@/components/pages/dashboard/CostTable';
+import useColorMode from '@/hooks/useColorMode';
 
 const DashboardPage = () => {
   const { isOpen, isAdmin } = useSidebarContext();
+  const [colorMode, setColorMode] = useColorMode();
 
   return (
     <div className={`${isOpen ? 'px-[10px] 2xl:px-[25px]' : 'px-[25px]'} bg-background mt-[30px] ml-[45px]`}>
       <div className='flex justify-between'>
         <div className='flex flex-col flex-wrap w-[72%] 4xl:w-[75%]'>
-          <h1 className={`${isOpen ? 'text-[34px] 2xl:text-[42px] 3xl:text-[52px] 4xl:text-[58px]' : 'text-[40px] 2xl:text-[55px] 3xl:text-[68px]'} truncate text-ellipsis text-[#414141] font-bold animate-color-pulse`}>
+          <h1 className={`${isOpen ? 'text-[34px] 2xl:text-[42px] 3xl:text-[52px] 4xl:text-[58px]' : 'text-[40px] 2xl:text-[55px] 3xl:text-[68px]'} truncate text-ellipsis text-[#414141] font-bold animate-color-pulse dark:text-white`}>
             Good Evening, <span className='animate-color-pulse2'>Kathea Mari!</span>
           </h1>
           <p className={`${isOpen ? 'text-[16px] 2xl:text-[18px] 3xl:text-[22px]' : 'text-[18px] 2xl:text-[20px] 3xl:text-[28px]'} font-medium text-[#868686]`}>Welcome to CostWise: Virginia’s Product Costing System!</p>
@@ -28,7 +30,8 @@ const DashboardPage = () => {
           <p className={`${isOpen ? 'text-[14px] 2xl:text-[16px]' : 'text-[16px] 3xl:text-[21px]'} text-[#414141] italic text-right`}>11:05 A.M.</p>
         </div>
         <div>
-          <div className={`${isOpen ? 'text-[1.2em] 2xl:text-[1.8em]' : 'text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]'} text-primary p-3 drop-shadow-lg bg-white rounded-full cursor-pointer hover:text-white hover:bg-primary transition-colors duration-300 ease-in-out`}>
+          <div className={`${isOpen ? 'text-[1.2em] 2xl:text-[1.8em]' : 'text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]'} text-primary p-3 drop-shadow-lg bg-white rounded-full cursor-pointer hover:text-white hover:bg-primary transition-colors duration-300 ease-in-out`}
+                          onClick={() => setColorMode(colorMode === "light" ? "dark" : "light")}>
             <MdDarkMode />
           </div>
         </div>
