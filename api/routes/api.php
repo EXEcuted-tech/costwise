@@ -87,6 +87,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('delete_bulk', [TransactionController::class, 'deleteBulk']);
     });
 
-    Route::get('/auditlogs',[AuditLogController::class,'getAuditLogs']);
-    Route::post('/logsaudit',[AuditLogController::class,'updateAuditLogs']);
+    Route::prefix('/auditlogs')->group(function () {
+        Route::get('',[AuditLogController::class,'getAuditLogs']);
+        Route::post('logsaudit',[AuditLogController::class,'updateAuditLogs']);
+    });
 });

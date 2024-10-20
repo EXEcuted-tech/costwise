@@ -21,6 +21,7 @@ interface AuditDrawerProps {
         employeeNo: string;
         userType: string;
         userEmail: string;
+        description: string;
         actionEvent: ActionType;
         department: string;
     } | null;
@@ -94,7 +95,7 @@ const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
                 <hr className="border-t-[1px] border-[#989898]" />
                 <div className="flex py-[10px]">
                     <p className="w-[50%]">Action/Event</p>
-                    <p className="w-[50%] break-words leading-[20px] items-center">{data.actionEvent}</p>
+                    <p className="w-[50%] break-words leading-[20px] items-center font-bold uppercase">{data.actionEvent}: <p className="font-normal normal-case">{data.description}</p></p>
                 </div>
                 <hr className="border-t-[1px] border-[#989898]" />
                 <div className="flex py-[10px] items-center">

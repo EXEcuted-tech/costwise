@@ -4,15 +4,17 @@ namespace App\Http\Controllers;
 use App\Models\AuditLog;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
+use App\Models\User;
 
 class AuditLogController extends Controller
 {
-    public function logAudit($userId, $action) {
+    public function logAudit($userId, $action, $description) {
         try {
             
             DB::table('audit_logs')->insert([
                 'user_id' => $userId,
                 'action' => $action,
+                'description' => $description,
                 'timestamp' => now(),
             ]);
         } catch (\Exception $e) {
@@ -27,12 +29,37 @@ class AuditLogController extends Controller
             $request->validate([
                 'userId' => 'required|integer',
                 'action' => 'required|string|max:255',
+                'act' => 'required|string|max:255'
             ]);
 
-            
             $userId = $request->input('userId'); 
+            $user = User::find($userId);
             $action = $request->input('action', 'general');
-            $this->logAudit($userId, $action);
+            $act = $request->input('act');
+            $fileName = $request->input('fileName');
+
+            $firstName = $user->first_name;
+            $middleInitial = $user->middle_name ? substr($user->middle_name, 0, 1) . '.' : '';
+            $lastName = $user->last_name;
+
+            if($action == 'crud'){
+                switch($act){
+                    case "view":
+                        $description = "$firstName $middleInitial $lastName viewed $fileName.xlsx";
+                        break;
+                    case "edit":
+                        $description = "Franz Ondiano edited $fileName";
+                        break;
+                    case "delete":
+                        $description = "Franz Ondiano deleted $fileName";
+                        break;
+                    default:
+                        $description = "";
+                        break;
+                }
+            }
+
+            $this->logAudit($userId, $action, $description);
             return response()->json(['message' => 'User details updated and audit log created successfully'], 200);
         } catch (\Exception $e) {
             \Log::error('Audit log error: ' . $e->getMessage());

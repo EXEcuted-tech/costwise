@@ -36,6 +36,7 @@ export interface AuditTableProps {
     userType: string;
     userEmail: string;
     actionEvent: ActionType;
+    description: string;
     department: string;
 }
 
@@ -94,6 +95,7 @@ const AuditLogPage = () => {
                         employeeNo: log.user.employee_number,
                         userType: log.user.user_type,
                         userEmail: log.user.email_address,
+                        description: log.description,
                         actionEvent: log.action as ActionType,
                         department: log.user.department
                     }));
@@ -150,8 +152,13 @@ const AuditLogPage = () => {
                                 <td className="flex flex-col w-[23.5%]">
                                     #{auditLogs.employeeNo}
                                 </td>
-                                <td className="flex w-[34.5%] 4xl:w-[37.5%] text-[14px] 4xl:text-[16px] items-center">
-                                    {auditLogs.actionEvent}
+                                <td className="flex w-[34.5%] 4xl:w-[37.5%] text-[14px] 4xl:text-[18px] items-center">
+                                <span className="font-bold uppercase">
+                                    {auditLogs.actionEvent}:
+                                </span>
+                                <span className="ml-1">
+                                    {auditLogs.description}
+                                </span>
                                 </td>
                                 <td className="flex items-center">
                                     <span onClick={() => handleShowMore(auditLogs)} className="cursor-pointer font-bold text-primary hover:text-[#851818] transition-colors duration-300 ease-in-out">

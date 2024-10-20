@@ -31,17 +31,21 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
     const router = useRouter();
 
     const handleView = (data: File) => {
-        const encodedData = encodeURIComponent(JSON.stringify(data));
+        // const encodedData = encodeURIComponent(JSON.stringify(data));
+        const settings = JSON.parse(data.settings);
+
         const auditData = {
             userId: currentUser?.userId, 
-            action: 'crud'
+            action: 'crud',
+            act: 'view',
+            fileName: `${settings.file_name}`,
         };
         if (currentUser) {
         console.log('Current User ID:', currentUser?.userId);
         } else {
             console.log('Current User is not defined.', currentUser);
         }
-        api.post('/logsaudit', auditData)
+        api.post('/auditlogs/logsaudit', auditData)
         .then(response => {
             console.log('Audit log created successfully:', response.data);
         })
