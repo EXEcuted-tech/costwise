@@ -1,6 +1,10 @@
+"use client"
 import React from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
+
 function LogoutPage() {
+  const router = useRouter();
   return (
     <div className="w-[100%] h-[100%] bg-[#A60000] flex-row rounded-3xl drop-shadow-4xl">
       <div className="flex h-[60%] items-center bg-white justify-center rounded-t-3xl">
@@ -28,12 +32,11 @@ function LogoutPage() {
           </p>
         </div>
         <div className="flex items-center justify-center h-[30%] w-[100%] font">
-          <div className="bg-secondary w-[50%] flex items-center justify-center h-[60%] rounded-3xl cursor-pointer overflow-hidden transition">
-            <Link href="/">
-              <button className="text-[1.4em] 2xl:text-[1.6em] text-[#A60000] font-bold transition-transform transform hover:scale-105">
-                Return to Login Page
-              </button>
-            </Link>
+          <div className="bg-secondary w-[50%] flex items-center justify-center h-[60%] rounded-3xl cursor-pointer overflow-hidden  transition-transform transform hover:scale-105"
+          onClick={() => router.push('/')}>
+            <button className="text-[1.4em] 2xl:text-[1.6em] text-[#A60000] font-bold">
+              Return to Login Page
+            </button>
           </div>
         </div>
       </div>
