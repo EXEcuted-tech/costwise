@@ -1,18 +1,21 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
 import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
+import ProtectedRoute from "@/components/routes/ProtectedRoute";
 
-export default function DashboardLayout({
+export default function UserManualLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
-      <UserManualContent>
-        {children}
-      </UserManualContent>
-    </SidebarProvider>
+    <ProtectedRoute>
+      <SidebarProvider>
+        <UserManualContent>
+          {children}
+        </UserManualContent>
+      </SidebarProvider>
+    </ProtectedRoute>
   );
 }
 

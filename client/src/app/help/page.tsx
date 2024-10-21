@@ -5,13 +5,13 @@ import { FaCompass } from "react-icons/fa";
 import { CgProfile } from "react-icons/cg";
 import { GrHelpBook } from "react-icons/gr";
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { AwaitedReactNode, JSXElementConstructor, Key, ReactElement, ReactNode, ReactPortal, useEffect, useState } from "react";
 import getAll from "@/utils/article/getAll";
 
 const UserManualPage = () => {
-  const [sectionsEssentials, setSectionsEssentials] = useState([]);
-  const [sectionsMG, setSectionsMG] = useState([]);
-  const [sectionsGS, setSectionsGS] = useState([]);
+  const [sectionsEssentials, setSectionsEssentials] = useState<any>([]);
+  const [sectionsMG, setSectionsMG] = useState<any>([]);
+  const [sectionsGS, setSectionsGS] = useState<any>([]);
 
   const divShadows = {
     boxShadow: "inset 0 0 10px rgba(0, 0, 0, 0.3)",
@@ -85,7 +85,7 @@ const UserManualPage = () => {
                 </div>
                 <div className="flex flex-col h-10% pl-[15%] 2xl:pl-[20px] pt-[10%] 3xl:pt-[10px] ">
                   <ul className="list-disc xl:text-[14px] 2xl:text-[16px] 3xl:text-[20px]">
-                    {sectionsGS.slice(0, 3).map((section, index) => (
+                    {sectionsGS.slice(0, 3).map((section: { heading: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; }, index: Key | null | undefined) => (
                       <li key={index}>{section.heading}</li>
                     ))}
                     {sectionsGS.length > 3 && (
@@ -123,7 +123,7 @@ const UserManualPage = () => {
                 </div>
                 <div className="flex flex-col h-10% pl-[15%] 2xl:pl-[20px] pt-[10%] 3xl:pt-[10px] ">
                   <ul className="list-disc xl:text-[14px] 2xl:text-[16px] 3xl:text-[20px]">
-                    {sectionsEssentials.slice(0, 3).map((section, index) => (
+                    {sectionsEssentials.slice(0, 3).map((section: { heading: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; }, index: Key | null | undefined) => (
                       <li key={index}>{section.heading}</li>
                     ))}
                     {sectionsEssentials.length > 3 && (
@@ -161,7 +161,7 @@ const UserManualPage = () => {
                 </div>
                 <div className="flex flex-col h-10% pl-[15%] 2xl:pl-[20px] pt-[10%] 3xl:pt-[10px] ">
                   <ul className="list-disc xl:text-[14px] 2xl:text-[16px] 3xl:text-[20px]">
-                    {sectionsMG.slice(0, 3).map((section, index) => (
+                    {sectionsMG.slice(0, 3).map((section: { heading: string | number | bigint | boolean | ReactElement<any, string | JSXElementConstructor<any>> | Iterable<ReactNode> | ReactPortal | Promise<AwaitedReactNode> | null | undefined; }, index: Key | null | undefined) => (
                       <li key={index}>{section.heading}</li>
                     ))}
                     {sectionsMG.length > 3 && (

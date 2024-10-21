@@ -1,5 +1,6 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
+import ProtectedRoute from "@/components/routes/ProtectedRoute";
 import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
 
 
@@ -7,13 +8,15 @@ export default function ProfileLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
-}>){
+}>) {
   return (
-    <SidebarProvider>
+    <ProtectedRoute>
+      <SidebarProvider>
         <DashboardContent>
-            {children}
+          {children}
         </DashboardContent>
-    </SidebarProvider>
+      </SidebarProvider>
+    </ProtectedRoute>
   );
 }
 
