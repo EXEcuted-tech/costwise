@@ -40,9 +40,6 @@ const config: Config = {
         'inner-lg': 'inset 4px 4px 8px rgba(0, 0, 0, 0.3)',
         'inner-xl': 'inset 8px 8px 16px rgba(0, 0, 0, 0.4)',
       },
-      animation: {
-        fadeIn: 'fadeIn 0.5s ease-in-out',
-      },
       keyframes: {
         'shrink-in': {
           '0%': { transform: 'scale(1)' },
@@ -173,6 +170,7 @@ const config: Config = {
         'color-pulse-dark': 'colorPulseDark 5s ease-in-out infinite',
         'color-pulse-dark2': 'colorPulseDark2 10s ease-in-out infinite',
         'slide': 'slide 2.5s linear infinite',
+        'fadeIn': 'fadeIn 0.5s ease-in-out',
       },
       backgroundImage: {
         'virginia-mascot': "url('/images/virginia-mascot-bg.png')",

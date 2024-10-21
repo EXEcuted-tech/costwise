@@ -129,7 +129,7 @@ function TrainingModel() {
         const endTime = performance.now();
         const duration = (endTime - startTime) / 1000;
         console.log("Training complete");
-        setTrainingSpeed(duration.toFixed(2));
+        setTrainingSpeed(parseFloat(duration.toFixed(2)));
         console.log(
           `Model training complete in ${duration.toFixed(2)} seconds`
         );
@@ -162,7 +162,7 @@ function TrainingModel() {
           const predictionTensor = model.predict(
             tf.tensor2d([[i]])
           ) as tf.Tensor;
-          const predictionArray = await predictionTensor.array();
+          const predictionArray:any = await predictionTensor.array();
 
           const monthYear = numberToMonthYear(i);
           let totalPredictionForMonth = 0;
@@ -270,7 +270,7 @@ function TrainingModel() {
 
       const formattedPredictions = predictionData.map(
         (monthPredictions, index) => {
-          const totalCost = monthPredictions.reduce((acc, prediction) => {
+          const totalCost = monthPredictions.reduce((acc: number, prediction: { cost: string; }) => {
             return acc + parseFloat(prediction.cost);
           }, 0);
 

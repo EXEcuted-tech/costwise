@@ -11,9 +11,9 @@ import { useSidebarContext } from "@/contexts/SidebarContext";
 
 const ManageAccountPage = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [sections, setSections] = useState([]);
+  const [sections, setSections] = useState<any[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-  const isAdmin = localStorage.getItem("currentUser");
+  const { isAdmin } = useSidebarContext();
   const [error, setError] = useState(" ");
 
   // Toggle edit mode
@@ -22,11 +22,11 @@ const ManageAccountPage = () => {
   };
 
   // Handle Input change
-  const handleChange = (e, index) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
     const { name, value } = e.target;
-    const updatedSections = [...sections];
+    const updatedSections:any = [...sections];
     updatedSections[index] = {
-      ...updatedSections[index],
+      ...updatedSections[index] as { [key: string]: string },
       [name]: value,
     };
     setSections(updatedSections);
@@ -34,14 +34,14 @@ const ManageAccountPage = () => {
 
   // Add new heading section
   const addSection = () => {
-    setSections([
-      ...sections,
+    setSections((prevSections:any) => [
+      ...prevSections,
       { heading: "New Heading", content: "New content" },
     ]);
   };
 
   // Remove heading section
-  const removeSection = (index) => {
+  const removeSection = (index: number) => {
     const updatedSections = sections.filter((_, i) => i !== index);
     setSections(updatedSections);
   };
@@ -82,7 +82,6 @@ const ManageAccountPage = () => {
   // Get Article Data
   useEffect(() => {
     fetchArticle();
-    console.log(isAdmin);
   }, []);
 
   // Loading animation
