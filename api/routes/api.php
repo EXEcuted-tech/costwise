@@ -42,6 +42,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('update/{id}', [UserController::class, 'updateUser']);
         Route::delete('archive/{id}', [UserController::class, 'archiveUser']);
         Route::put('update', [UserController::class, 'editUserInfo']);
+        Route::post('update_profile_picture', [UserController::class, 'updateProfilePicture']);
     });
 
     Route::prefix('/files')->group(function () {

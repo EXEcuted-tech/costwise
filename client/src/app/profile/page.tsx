@@ -10,6 +10,11 @@ import SendEmailDialog from "@/components/modals/SendEmailDialog";
 import background from '@/assets/account-profile-bg.png';
 import { useUserContext } from "@/contexts/UserContext";
 import api from "@/utils/api";
+import { FaUserCircle } from "react-icons/fa";
+import { removeTokens } from "@/utils/removeTokens";
+import fs from 'fs/promises';
+import path from 'path';
+import config from "@/server/config";
 
 interface UserProps {
     fName: string;
@@ -21,6 +26,7 @@ interface UserProps {
     dept: string;
     employeeNum: string;
     role: string;
+    display_picture: string;
 }
 
 const ProfilePage = () => {
@@ -45,30 +51,60 @@ const ProfilePage = () => {
                     suffix: user.data.suffix,
                     dept: user.data.department,
                     employeeNum: user.data.employee_number,
-                    role: user.data.sys_role
+                    role: user.data.sys_role,
+                    display_picture: user.data.display_picture
                 }
 
                 setUserAcc(userInformation);
+                setProfilePicture(userInformation.display_picture);
             } catch (error: any) {
-
+                console.error('Error fetching user data:', error);
             }
         }
         fetchData();
     }, [currentUser?.email]);
 
-    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         const file = event.target.files?.[0];
         if (file) {
-            const reader = new FileReader();
-            reader.onloadend = () => {
-                setProfilePicture(reader.result as string);
-            };
-            reader.readAsDataURL(file);
+            try {
+                const formData = new FormData();
+                formData.append('display_picture', file);
+
+                const response = await api.post('/user/update_profile_picture', formData, {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                    },
+                });
+
+                if (response.data.status === 'success') {
+                    setProfilePicture(response.data.display_picture);
+                } else {
+                    console.error('Error updating profile picture:', response.data.message);
+                }
+            } catch (error) {
+                console.error('Error uploading file:', error);
+            }
         }
     };
 
     const handleCameraClick = () => {
         fileInputRef.current?.click();
+    };
+
+    const handleLogout = async () => {
+        await removeTokens();
+        localStorage.removeItem('accessToken');
+        localStorage.clear();
+        window.location.href = '/logout';
+    };
+
+    const getProfilePictureUrl = (path: string | null) => {
+        if (!path) return null;
+        if (path.startsWith('http://') || path.startsWith('https://')) {
+            return path;
+        }
+        return `${config.API}/storage/${path}`;
     };
 
     return (
@@ -112,11 +148,18 @@ const ProfilePage = () => {
                         </button>
                         <div className='w-28 h-28 bg-red-200 border-4 border-[#A60000] rounded-full overflow-hidden'>
                             {profilePicture ? (
-                                <img src={profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                                <div 
+                                    className="w-full h-full object-cover"
+                                    style={{
+                                        backgroundImage: `url(${getProfilePictureUrl(profilePicture) || '/default-profile.png'})`,
+                                        backgroundPosition: 'center',
+                                        backgroundRepeat: 'no-repeat',
+                                        backgroundSize: 'cover'
+                                    }}
+                                />
                             ) : (
-                                // Placeholder or default image
                                 <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-                                    <span className="italic text-gray-600">No Image</span>
+                                    <FaUserCircle className="w-full h-full text-gray-200" />
                                 </div>
                             )}
                         </div>
@@ -124,11 +167,10 @@ const ProfilePage = () => {
                     <div>
                         <div className='text-[25px] 2xl:text-[30px] font-semibold'> {userAcc?.fName} {userAcc?.lName}</div>
                         <div className='text-[22px] 2xl:text-[24px]'> {userAcc?.role} </div>
-                        <Link href="/logout">
-                            <button className="text-[22px] 2xl:text-[24px] text-primary cursor-pointer hover:opacity-65">
-                                Logout
-                            </button>
-                        </Link>
+                        <button className="text-[22px] 2xl:text-[24px] text-primary cursor-pointer hover:opacity-65"
+                            onClick={handleLogout}>
+                            Logout
+                        </button>
                     </div>
                 </div>
 
