@@ -5,12 +5,12 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
-class File extends Model
+class Prediction extends Model
 {
-    use HasFactory;
+    use  HasFactory;
 
-    protected $table = 'files';
-    protected $primaryKey = 'file_id';
+    protected $table = 'predictions';
+    protected $primaryKey = 'prediction_id';
     protected $keyType = 'int';
     public $incrementing = true;
 
@@ -20,11 +20,11 @@ class File extends Model
      * @var array<int, string>
      */
     protected $fillable = [
-        'file_type',
-        'settings',
+        'product_num',
+        'product_name',
+        'cost',
+        'monthYear'
     ];
 
-    // protected $casts = [
-    //     'settings' => 'array', // Ensure 'settings' is cast to an array
-    // ];
+    public $timestamps = false;
 }
