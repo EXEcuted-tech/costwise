@@ -821,8 +821,9 @@ class FileController extends ApiController
     {
         try {
             $files = File::all();
-
+    
             if ($files->isEmpty()) {
+                \Log::info('No files to export');
                 return response()->json(['message' => 'No files to export'], 404);
             }
 
@@ -838,7 +839,7 @@ class FileController extends ApiController
             if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
                 throw new \RuntimeException("Unable to create zip file");
             }
-
+    
             foreach ($files as $file) {
                 $spreadsheet = new Spreadsheet();
 
@@ -863,7 +864,7 @@ class FileController extends ApiController
                 unset($spreadsheet);
                 gc_collect_cycles();
             }
-
+    
             $zip->close();
 
             return response()->download($zipFilePath, $zipFileName, [
