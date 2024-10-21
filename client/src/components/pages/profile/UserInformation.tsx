@@ -60,7 +60,8 @@ const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc} ) =>
                 <div className='flex flex-col'>
                     <div className='flex flex-col justify-start mb-4'>
                         <p className="text-[#8E8E8E] font-semibold">Middle Name</p>
-                        <p>{userAcc?.mName}</p>
+                        <p>{!userAcc?.mName ? " " : userAcc?.mName}</p>
+                        
                     </div>
 
                     <div className='flex flex-col justify-start mb-4'>

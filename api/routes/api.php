@@ -25,6 +25,12 @@ Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/refresh', [AuthController::class, 'refresh']);
 
+Route::prefix('/password-reset')->group(function () {
+    Route::post('email', [PasswordResetController::class, 'sendResetLinkEmail']);
+    Route::get('{token}', [PasswordResetController::class, 'verifyToken']);
+    Route::post('reset', [PasswordResetController::class, 'resetPassword']);
+});
+
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/logout', [AuthController::class, 'logout']);
     Route::get('/users',[UserController::class,'getAllUsers']);
@@ -34,12 +40,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('update/{id}',[UserController::class,'updateUser']);
         Route::delete('archive/{id}', [UserController::class, 'archiveUser']);
         Route::put('update', [UserController::class, 'editUserInfo']);
-    });
-    
-    Route::prefix('/password-reset')->group(function () {
-        Route::post('email', [PasswordResetController::class, 'sendResetLinkEmail']);
-        Route::get('{token}', [PasswordResetController::class, 'verifyToken']);
-        Route::post('reset', [PasswordResetController::class, 'resetPassword']);
     });
 
     Route::prefix('/files')->group(function () {
