@@ -159,7 +159,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <div className='flex flex-col items-center'>
-                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary'>₱{averageCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
+                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary'>₱{(isNaN(averageCost) ? 0 : averageCost).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
                     <p className='italic text-center font-medium text-[12px] 3xl:text-[14px] text-[#969696]'>Average Cost Per Product</p>
                   </div>
                 </div>
@@ -226,9 +226,9 @@ const DashboardPage = () => {
             className={`${isOpen ? "3xl:px-[20px]" : "px-[5px] 2xl:px-[20px]"
               } flex flex-grow bg-white min-h-[600px] rounded-b-[10px] drop-shadow-lg`}
           >
-            <LineChart selectedHalf="Second" selectedYear="2024"
+            {/* <LineChart selectedHalf="Second" selectedYear="2024"
               className={`${isOpen ? "w-full 3xl:w-[60%]" : "w-full"}`}
-            />
+            /> */}
             {/* <div className='flex justify-center mt-[30px] pr-[20px] w-full'>
                 <CostTable className='h-[280px] w-full'/>
               </div> */}

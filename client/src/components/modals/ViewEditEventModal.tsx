@@ -2,37 +2,57 @@ import api from '@/utils/api';
 import React, { useState, useEffect } from 'react';
 import { FaCalendarAlt, FaEdit, FaTrash } from "react-icons/fa";
 import ConfirmDelete from '@/components/modals/ConfirmDelete';
+import { Router } from 'next/router';
 
 type ViewEditEventModalProps = {
-    event: { id: string; date: Date; title: string; description: string; startTime: string; endTime: string };
+    event: { id: string };
     onClose: () => void;
-    onUpdateEvent: (event: { id: string; date: Date; title: string; description: string; startTime: string; endTime: string }) => void;
-    onDeleteEvent: (id: string) => void;
 };
 
-const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose, onUpdateEvent, onDeleteEvent }) => {
+const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose }) => {
     const [isEditing, setIsEditing] = useState(false);
-    const [title, setTitle] = useState(event.title);
-    const [description, setDescription] = useState(event.description);
-    const [startTime, setStartTime] = useState(event.startTime);
-    const [endTime, setEndTime] = useState(event.endTime);
+    const [title, setTitle] = useState('');
+    const [description, setDescription] = useState('');
+    const [startTime, setStartTime] = useState('');
+    const [endTime, setEndTime] = useState('');
+    const [date, setDate] = useState<Date | null>(null);
     const [isLoading, setIsLoading] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
+    const [id, setId] = useState(0);
 
     useEffect(() => {
-        setTitle(event.title);
-        setDescription(event.description);
-        setStartTime(event.startTime);
-        setEndTime(event.endTime);
-    }, [event]);
+        const fetchEventDetails = async () => {
+            try {
+                console.log(event);
+                const response = await api.get(`/events/retrieve`, { params: { col: 'event_id', val: Number(event.id) } });
+                if (response.data.status === 200) {
+                    const eventData = response.data.data;
+                    setId(eventData.event_id);
+                    setTitle(eventData.title);
+                    setDescription(eventData.description);
+                    setStartTime(formatTime(eventData.start_time));
+                    setEndTime(formatTime(eventData.end_time));
+                    setDate(new Date(eventData.event_date));
+                }
+            } catch (error) {
+                console.error('Failed to fetch event details:', error);
+            }
+        };
+
+        fetchEventDetails();
+    }, [event, event.id]);
+
+    const formatTime = (isoString: string) => {
+        const date = new Date(isoString);
+        return date.toTimeString().slice(0, 5); // Returns time in HH:MM format
+    };
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setIsLoading(true);
-        const updatedEvent = { ...event, title, description, startTime, endTime };
+        const updatedEvent = { id: event.id, title, description, startTime, endTime, date: date as Date };
         const response = await api.post(`/events/update`, updatedEvent);
-        if (response.data.status === 200) {
-            onUpdateEvent(updatedEvent);
+        if (response.data.status !== 401) {
             setIsLoading(false);
             setIsEditing(false);
         }
@@ -40,11 +60,11 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose,
 
     const handleDelete = async () => {
         setIsLoading(true);
-        const response = await api.post(`/events/delete`, { event_id: event.id });
-        if (response.data.status === 200) {
-            onDeleteEvent(event.id);
+        console.log(event);
+        const response = await api.post(`/events/delete`, { event_id: id });
+        if (response.data.status !== 401) {
             setIsLoading(false);
-            onClose();
+            window.location.reload();
         }
     };
 
@@ -54,7 +74,7 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose,
                 <h2 className="text-xl text-[20px] font-bold mb-4 flex items-center gap-2">
                     <FaCalendarAlt className='text-[20px]' />
                     {isEditing ? 'Edit Event' : 'View Event'}
-                    <span className="text-primary text-[20px] font-semibold">{event.date.toDateString()}</span>
+                    <span className="text-primary text-[20px] font-semibold">{date?.toDateString()}</span>
                 </h2>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4 flex gap-4">
@@ -135,7 +155,7 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose,
                                 <button
                                     type="button"
                                     onClick={() => setDeleteModal(true)}
-                                    className="px-4 py-2 bg-red-500 text-white rounded font-semibold transition-colors hover:bg-red-600"
+                                    className="px-4 py-2 bg-primary text-white rounded font-semibold transition-colors hover:bg-red-600"
                                     disabled={isLoading}
                                 >
                                     <FaTrash className="inline-block mr-1" /> Delete

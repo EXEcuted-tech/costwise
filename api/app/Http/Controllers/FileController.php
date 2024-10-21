@@ -23,8 +23,6 @@ use App\Models\File;
 use App\Models\MaterialCosts;
 use App\Models\FinishedGood;
 use App\Models\Material;
-use GuzzleHttp\Promise\Create;
-use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;

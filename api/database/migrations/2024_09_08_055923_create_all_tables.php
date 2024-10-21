@@ -162,15 +162,15 @@ return new class extends Migration {
 
         // Events Table
         Schema::create('events', function (Blueprint $table) {
-            $table->id();
-            $table->unsignedBigInteger('user_id');
+            $table->increments('event_id');
+            $table->unsignedInteger('user_id')->nullable();
             $table->string('title');
             $table->text('description')->nullable();
             $table->date('event_date');
             $table->time('start_time')->nullable();
             $table->time('end_time')->nullable();
             $table->timestamps();
-            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
         });
     }
 

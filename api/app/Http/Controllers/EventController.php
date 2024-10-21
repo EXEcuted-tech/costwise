@@ -48,21 +48,25 @@ class EventController extends ApiController
         return $this->getResponse("Event retrieved successfully.");
     }
 
-    public function update(Request $request, $event_id)
+    public function update(Request $request)
     {
-        $event_id = $request->input('event_id');
-        $event = Event::findOrFail($event_id);
+        $event = Event::findOrFail($request->input('id'));
 
         $validatedData = $request->validate([
-            'user_id' => 'sometimes|required|exists:users,user_id',
-            'title' => 'sometimes|required|string|max:255',
+            'title' => 'required|string|max:255',
             'description' => 'nullable|string',
-            'event_date' => 'sometimes|required|date',
-            'start_time' => 'nullable|date_format:H:i',
-            'end_time' => 'nullable|date_format:H:i|after:start_time',
+            'date' => 'required|date',
+            'startTime' => 'required|date_format:H:i',
+            'endTime' => 'required|date_format:H:i|after:startTime',
         ]);
 
-        $event->update($validatedData);
+        $event->update([
+            'title' => $validatedData['title'],
+            'description' => $validatedData['description'],
+            'event_date' => $validatedData['date'],
+            'start_time' => $validatedData['startTime'],
+            'end_time' => $validatedData['endTime'],
+        ]);
 
         $this->status = 200;
         return $this->getResponse("Event updated successfully.");
@@ -70,9 +74,10 @@ class EventController extends ApiController
 
     public function delete(Request $request)
     {
-        $event_id = $request->query('event_id');
+        $event_id = $request->input('event_id');
         $event = Event::findOrFail($event_id);
         $archivedEventData = $event->toArray();
+        $archivedEventData['user_id'] = null;
         Event::on('archive_mysql')->create($archivedEventData);
         $event->delete();
 
