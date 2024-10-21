@@ -6,6 +6,7 @@ import { IoTrash } from "react-icons/io5";
 import { useRouter } from 'next/navigation';
 import { FaFileCircleXmark } from "react-icons/fa6";
 import { useFileManagerContext } from '@/contexts/FileManagerContext';
+import { useUserContext } from '@/contexts/UserContext';
 import Spinner from '@/components/loaders/Spinner';
 import { File, FileSettings } from '@/types/data';
 import api from '@/utils/api';
@@ -14,21 +15,43 @@ interface FileTableComponentProps {
     fileData: File[];
     isOpen: boolean;
     isLoading: boolean;
+    setIsLoading: (value: boolean) => void;
 }
 
-const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoading }) => {
+const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoading, setIsLoading }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const { setDeleteModal, setFileToDelete } = useFileManagerContext();
+    const { currentUser } = useUserContext();
+    const { setDeleteModal, setFileToDelete, setFileSettings } = useFileManagerContext();
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
     };
-
     const indexOfLastItem = currentPage * 8;
     const indexOfFirstItem = indexOfLastItem - 8;
     const currentListPage = fileData.slice(indexOfFirstItem, indexOfLastItem);
     const router = useRouter();
 
     const handleView = (data: File) => {
+        // const encodedData = encodeURIComponent(JSON.stringify(data));
+        const settings = JSON.parse(data.settings);
+
+        const auditData = {
+            userId: currentUser?.userId, 
+            action: 'crud',
+            act: 'view',
+            fileName: `${settings.file_name}`,
+        };
+        if (currentUser) {
+        console.log('Current User ID:', currentUser?.userId);
+        } else {
+            console.log('Current User is not defined.', currentUser);
+        }
+        api.post('/auditlogs/logsaudit', auditData)
+        .then(response => {
+            console.log('Audit log created successfully:', response.data);
+        })
+        .catch(error => {
+            console.error('Error audit logs:', error);
+        });
         router.push(`/file-manager/workspace?id=${data.file_id}&type=${data.file_type}`);
     }
 
@@ -40,6 +63,8 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
     const handleExport = async (data: File) => {
         try {
             const fileId = data.file_id;
+
+            setIsLoading(true);
 
             const response = await api.post('/files/export',
                 { file_id: fileId },
@@ -55,7 +80,26 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
             a.click();
             a.remove();
             window.URL.revokeObjectURL(url);
+            setIsLoading(false);
 
+            const auditData = {
+                userId: currentUser?.userId, 
+                action: 'export',
+                act: 'file',
+                fileName: `${settings.file_name}`,
+            };
+            if (currentUser) {
+            console.log('Current User ID:', currentUser?.userId);
+            } else {
+                console.log('Current User is not defined.', currentUser);
+            }
+            api.post('/auditlogs/logsaudit', auditData)
+            .then(response => {
+                console.log('Audit log created successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error audit logs:', error);
+            });
         } catch (error) {
             console.error('Export failed:', error);
         }
@@ -63,6 +107,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
 
     const handleDelete = (data: File) => {
         setFileToDelete(data.file_id);
+        setFileSettings(data.settings);
         setDeleteModal(true);
     }
 
@@ -110,7 +155,8 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
                             return (
                                 <tr key={index} className='border-b-[0.3px] border-[#d9d9d9]'>
                                     <td className={`${isOpen ? 'pl-[20px] 2xl:pl-[46px]' : 'pl-[46px]'} py-2`}>
-                                        <p className={`${isOpen ? 'text-[16px] 2xl:text-[18px]' : 'text-[18px]'} text-primary cursor-pointer hover:underline`}>{fileLabel}</p>
+                                        <p className={`${isOpen ? 'text-[16px] 2xl:text-[18px]' : 'text-[18px]'} text-primary cursor-pointer hover:underline`}
+                                            onClick={() => handleView(data)}>{fileLabel}</p>
                                         <p className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}italic text-[#868686]`}>{fileName}</p>
                                     </td>
                                     <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{fileType}</td>

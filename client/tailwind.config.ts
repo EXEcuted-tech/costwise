@@ -40,6 +40,9 @@ const config: Config = {
         'inner-lg': 'inset 4px 4px 8px rgba(0, 0, 0, 0.3)',
         'inner-xl': 'inset 8px 8px 16px rgba(0, 0, 0, 0.4)',
       },
+      animation: {
+        fadeIn: 'fadeIn 0.5s ease-in-out',
+      },
       keyframes: {
         'shrink-in': {
           '0%': { transform: 'scale(1)' },

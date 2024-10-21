@@ -317,4 +317,40 @@ class MaterialController extends ApiController
         }
     }
 
+    public function getMaterialCostUtilization()
+    {
+        try {
+            $currentDate = now();
+            $currentMonth = $currentDate->format('Y-m');
+            $previousMonth = $currentDate->subMonth()->format('Y-m');
+
+            $currentMonthCost = $this->calculateMonthMaterialCost($currentMonth);
+            $previousMonthCost = $this->calculateMonthMaterialCost($previousMonth);
+
+            $percentageChange = 0;
+            $trend = 'unchanged';
+
+            if ($previousMonthCost > 0) {
+                $percentageChange = (($currentMonthCost - $previousMonthCost) / $previousMonthCost) * 100;
+                $trend = $percentageChange > 0 ? 'increased' : ($percentageChange < 0 ? 'decreased' : 'unchanged');
+            }
+
+            $this->status = 200;
+            $this->response['material_cost_utilization'] = number_format($currentMonthCost, 2);
+            $this->response['percentage_change'] = round($percentageChange, 2);
+            $this->response['trend'] = $trend;
+            return $this->getResponse("Material cost utilization calculated successfully.");
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = $e->getMessage();
+            return $this->getResponse("An error occurred while calculating material cost utilization.");
+        }
+    }
+
+    private function calculateMonthMaterialCost($month)
+    {
+        return Material::whereRaw("DATE_FORMAT(date, '%Y-%m') = ?", [$month])
+            ->sum('material_cost');
+    }
+
 }

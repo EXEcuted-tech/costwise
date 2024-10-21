@@ -124,6 +124,7 @@ const FileContainer: React.FC<FileContainerProps> = ({
                     fileData={filteredData}
                     isOpen={isOpen}
                     isLoading={isLoading}
+                    setIsLoading={setIsLoading}
                 />
             </div>
         </div>

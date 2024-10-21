@@ -19,6 +19,8 @@ import api from '@/utils/api';
 import * as XLSX from 'xlsx';
 import Alert from "@/components/alerts/Alert";
 import { File } from '@/types/data';
+import { useUserContext } from '@/contexts/UserContext';
+import Spinner from '@/components/loaders/Spinner';
 
 const FileManagerPage = () => {
   const { isOpen } = useSidebarContext();
@@ -32,7 +34,10 @@ const FileManagerPage = () => {
   const [allData, setAllData] = useState<File[]>([]);
   const [masterFileData, setMasterFileData] = useState<File[]>([]);
   const [transactionData, setTransactionData] = useState<File[]>([]);
-  const { fileToDelete, setFileToDelete } = useFileManagerContext();
+  const { fileToDelete, setFileToDelete, fileSettings } = useFileManagerContext();
+  const { currentUser } = useUserContext();
+
+  const [exportLoading, setExportLoading] = useState(false);
 
   const ref = useOutsideClick(() => setUpload(false));
 
@@ -100,7 +105,7 @@ const FileManagerPage = () => {
         return new Promise((resolve, reject) => {
           reader.onload = async (e: ProgressEvent<FileReader>) => {
             const data = e.target?.result;
-
+            const fileName = file.name;
             if (data && data instanceof ArrayBuffer) {
               const dataArray = new Uint8Array(data);
               const workbook = XLSX.read(dataArray, { type: 'array' });
@@ -131,6 +136,26 @@ const FileManagerPage = () => {
                 try {
                   const response = await api.post('/files/upload', formData);
                   if (response.data.status === 200) {
+
+                    const auditData = {
+                      userId: currentUser?.userId,
+                      action: 'import',
+                      fileName: fileName
+                    };
+                    console.log(auditData);
+                    if (currentUser) {
+                      console.log('Current User ID:', currentUser?.userId);
+                    } else {
+                      console.log('Current User is not defined.', currentUser);
+                    }
+                    api.post('/auditlogs/logsaudit', auditData)
+                      .then(response => {
+                        console.log('Audit log created successfully:', response.data);
+                      })
+                      .catch(error => {
+                        console.error('Error audit logs:', error);
+                      });
+
                     resolve(true);
                   } else {
                     reject(new Error('Upload failed'));
@@ -199,13 +224,13 @@ const FileManagerPage = () => {
   }, [uploadType, shouldOpenDropzone, open]);
 
   const handleExportAll = async () => {
-    // setExportLoading(true);
-    // setExportError('');
+    console.log("Went in here");
+    setExportLoading(true);
     try {
       const response = await api.post('/files/export_all', {}, {
         responseType: 'blob',
       });
-  
+
       if (response.data instanceof Blob) {
         const url = window.URL.createObjectURL(response.data);
         const a = document.createElement('a');
@@ -218,20 +243,64 @@ const FileManagerPage = () => {
         window.URL.revokeObjectURL(url);
         setInfoMsg('All files exported successfully!');
       } else {
-        throw new Error('Unexpected response format');
+        setErrorMsg('Unexpected response format');
       }
+
+      const auditData = {
+        userId: currentUser?.userId,
+        action: 'export',
+        act: 'all files',
+      };
+
+      if (currentUser) {
+        console.log('Current User ID:', currentUser?.userId);
+      } else {
+        console.log('Current User is not defined.', currentUser);
+      }
+
+      api.post('/auditlogs/logsaudit', auditData)
+        .then(response => {
+          console.log('Audit log created successfully:', response.data);
+        })
+        .catch(error => {
+          console.error('Error audit logs:', error);
+        });
+
     } catch (error) {
       console.error('Export all files failed:', error);
-      // setExportError(`Failed to export files: ${error.message}`);
+      setErrorMsg(`Failed to export file/s!`);
     } finally {
-      // setExportLoading(false);
+      setExportLoading(false);
     }
   };
 
   const handleDelete = async () => {
-    if(fileToDelete) {
+    if (fileToDelete) {
       try {
         await api.post(`/files/delete`, { col: 'file_id', value: fileToDelete });
+
+        const settings = JSON.parse(fileSettings);
+        const auditData = {
+          userId: currentUser?.userId,
+          action: 'crud',
+          act: 'archive',
+          fileName: settings.file_name
+        };
+
+        if (currentUser) {
+          console.log('Current User ID:', currentUser?.userId);
+        } else {
+          console.log('Current User is not defined.', currentUser);
+        }
+
+        api.post('/auditlogs/logsaudit', auditData)
+          .then(response => {
+            console.log('Audit log created successfully:', response.data);
+          })
+          .catch(error => {
+            console.error('Error audit logs:', error);
+          });
+          
       } catch (error) {
         console.error('Delete failed:', error);
       } finally {
@@ -261,6 +330,18 @@ const FileManagerPage = () => {
             setClose={() => { setInfoMsg(''); }} />
         }
       </div>
+      {(exportLoading) &&
+        <div className='fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-brightness-50 z-[1500]'>
+          <div className="three-body">
+            <div className="three-body__dot"></div>
+            <div className="three-body__dot"></div>
+            <div className="three-body__dot"></div>
+          </div>
+          <p className='text-primary font-light text-[20px] mt-[10px] text-white'>
+            Exporting files...
+          </p>
+        </div>
+      }
       {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" onProceed={handleDelete} />}
       <Header icon={BsFolderFill} title={"File Manager"} />
       <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px] mt-[75px] 2xl:mt-[40px]' : 'px-[50px] mt-[36px]'} ml-[45px]`}>
