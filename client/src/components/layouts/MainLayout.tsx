@@ -14,7 +14,7 @@ const MainLayout = () => {
   const [notificationSound, setNotificationSound] = useState<HTMLAudioElement | null>(null);
 
   const notificationSoundSrc = '/notification-ring.mp3';
-  
+
   useEffect(() => {
     setNotificationSound(new Audio(notificationSoundSrc));
   }, []);
@@ -27,12 +27,14 @@ const MainLayout = () => {
         const response = await api.get('/notifications/new', {
           params: { last_checked_at: lastCheckedAt }
         });
-        
+
         if (response.data.data.length > 0) {
           setHasNewNotifications(true);
           notificationSound?.play()
+        } else {
+          setHasNewNotifications(false);
         }
-        
+
         lastCheckedAt = new Date().toISOString();
       } catch (error) {
         console.error('Error checking for notifications:', error);
@@ -43,7 +45,7 @@ const MainLayout = () => {
 
     return () => clearInterval(intervalId);
   }, [notificationSound, setHasNewNotifications]);
-  
+
   return (
     <div className='flex !font-lato'>
       <div
