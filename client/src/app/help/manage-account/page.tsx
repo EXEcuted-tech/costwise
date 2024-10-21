@@ -12,8 +12,8 @@ import { useSidebarContext } from "@/contexts/SidebarContext";
 const ManageAccountPage = () => {
   const [isEditing, setIsEditing] = useState(false);
   const [sections, setSections] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Loading state
-  const { isAdmin } = useSidebarContext();
+  const [isLoading, setIsLoading] = useState(true);
+  const isAdmin = localStorage.getItem("currentUser");
   const [error, setError] = useState(" ");
 
   // Toggle edit mode
@@ -82,6 +82,7 @@ const ManageAccountPage = () => {
   // Get Article Data
   useEffect(() => {
     fetchArticle();
+    console.log(isAdmin);
   }, []);
 
   // Loading animation

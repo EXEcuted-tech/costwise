@@ -123,7 +123,18 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
 
     prepareChartData();
   }, [priceData, selectedYear, selectedHalf]);
-  if (!chartData) return <p>Select Year Half Data...</p>;
+  if (!chartData) {
+    return (
+      <div className="flex flex-col items-center justify-center animate-fadeIn">
+        <h2 className="text-4xl font-semibold text-gray-700 transition-transform transform hover:scale-105">
+          No Data Available
+        </h2>
+        <p className="mt-2 text-gray-500 text-2xl transition-transform transform hover:scale-105">
+          Please select a year half to view the data.
+        </p>
+      </div>
+    );
+  }
 
   return (
     <div className="h-full w-full">
