@@ -14,9 +14,10 @@ use App\Http\Controllers\CostCalcController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\ModelController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\FGController;
 use App\Http\Controllers\PredictionController;
 use App\Http\Controllers\InventoryController;
@@ -24,6 +25,12 @@ use App\Http\Controllers\InventoryController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/refresh', [AuthController::class, 'refresh']);
+
+Route::prefix('/password-reset')->group(function () {
+    Route::post('email', [PasswordResetController::class, 'sendResetLinkEmail']);
+    Route::get('{token}', [PasswordResetController::class, 'verifyToken']);
+    Route::post('reset', [PasswordResetController::class, 'resetPassword']);
+});
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/logout', [AuthController::class, 'logout']);
@@ -33,6 +40,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('', [UserController::class, 'getCurrentUser']);
         Route::post('update/{id}', [UserController::class, 'updateUser']);
         Route::delete('archive/{id}', [UserController::class, 'archiveUser']);
+        Route::put('update', [UserController::class, 'editUserInfo']);
     });
 
     Route::prefix('/files')->group(function () {
