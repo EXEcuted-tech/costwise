@@ -8,11 +8,8 @@ import { useUserContext } from '@/contexts/UserContext';
 import { Spinner } from '@nextui-org/react';
 import PasswordChangeComplete from '@/components/modals/PasswordChangeComplete';
 
-interface PasswordResetProps { 
-  setDialog: React.Dispatch<React.SetStateAction<boolean>>;
-}
 
-const PasswordReset: React.FC<PasswordResetProps> = ({ setDialog }) => {
+const PasswordReset = () => {
 
     const [password, setPassword] = useState('');
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
