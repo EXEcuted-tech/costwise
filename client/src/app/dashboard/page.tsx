@@ -32,6 +32,7 @@ export interface AuditLogs {
   time: Date;
   profile: string;
 }
+import useColorMode from '@/hooks/useColorMode';
 
 const DashboardPage = () => {
   const { isOpen, isAdmin } = useSidebarContext();
@@ -116,12 +117,13 @@ const DashboardPage = () => {
   const [totalPrediction, setTotalPrediction] = useState<
     { monthYear: string; cost: number }[]
   >([]);
+  const [colorMode, setColorMode] = useColorMode();
 
   return (
     <div
       className={`${
         isOpen ? "px-[10px] 2xl:px-[25px]" : "px-[25px]"
-      } bg-background mt-[30px] ml-[45px]`}
+      } bg-background dark:bg-[#1E1E1E] mt-[30px] ml-[45px] transition-all duration-400 ease-in-out`}
     >
       <div className="flex justify-between">
         <div className="flex flex-col flex-wrap w-[72%] 4xl:w-[75%]">
@@ -130,17 +132,17 @@ const DashboardPage = () => {
               isOpen
                 ? "text-[34px] 2xl:text-[42px] 3xl:text-[52px] 4xl:text-[58px]"
                 : "text-[40px] 2xl:text-[55px] 3xl:text-[68px]"
-            } truncate text-ellipsis text-[#414141] font-bold animate-color-pulse`}
+            } truncate text-ellipsis text-[#414141] font-bold animate-color-pulse dark:animate-color-pulse-dark`}
           >
             Good Evening,{" "}
-            <span className="animate-color-pulse2">{name}!</span>
+            <span className="animate-color-pulse2 dark:animate-color-pulse-dark2">{name}!</span>
           </h1>
           <p
             className={`${
               isOpen
                 ? "text-[16px] 2xl:text-[18px] 3xl:text-[22px]"
                 : "text-[18px] 2xl:text-[20px] 3xl:text-[28px]"
-            } font-medium text-[#868686]`}
+            } font-medium text-[#868686] dark:text-[#C6C6C6]`}
           >
             Welcome to CostWise: Virginia’s Product Costing System!
           </p>
@@ -151,7 +153,7 @@ const DashboardPage = () => {
               isOpen
                 ? "text-[18px] 2xl:text-[24px]"
                 : "text-[19px] 2xl:text-[25px] 3xl:text-[30px]"
-            } text-[#414141] font-bold text-right`}
+            } text-[#414141] dark:text-white font-bold text-right`}
           >
             {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </h2>
@@ -160,7 +162,7 @@ const DashboardPage = () => {
               isOpen
                 ? "text-[14px] 2xl:text-[16px]"
                 : "text-[16px] 3xl:text-[21px]"
-            } text-[#414141] italic text-right`}
+            } text-[#414141] italic dark:text-white text-right`}
           >
             {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
           </p>
@@ -172,7 +174,8 @@ const DashboardPage = () => {
                 ? "text-[1.2em] 2xl:text-[1.8em]"
                 : "text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]"
             } text-primary p-3 drop-shadow-lg bg-white rounded-full cursor-pointer hover:text-white hover:bg-primary transition-colors duration-300 ease-in-out`}
-          >
+          
+                          onClick={() => setColorMode(colorMode === "light" ? "dark" : "light")}>
             <MdDarkMode />
           </div>
         </div>
@@ -181,9 +184,9 @@ const DashboardPage = () => {
       <div className={`${isOpen ? 'gap-3' : 'gap-8'} my-[30px] flex justify-between`}>
         <div className='w-[70%]'>
           <CardHeader cardName='Analytics Overview' />
-          <div className={`${isOpen ? 'min-h-[316px]' : 'min-h-[304px]'} bg-white rounded-b-[10px] drop-shadow-lg px-[40px] py-[20px]`}>
+          <div className={`${isOpen ? 'min-h-[316px]' : 'min-h-[304px]'} bg-white dark:bg-[#3C3C3C] rounded-b-[10px] drop-shadow-lg px-[40px] py-[20px]`}>
             <div className='flex items-center'>
-              <IoMdClock className='text-[25px] 2xl:text-[28px] 3xl:text-[32px] text-[#C6C6C6] mr-[5px]' />
+              <IoMdClock className='text-[25px] 2xl:text-[28px] 3xl:text-[32px] text-[#C6C6C6] dark:text-white mr-[5px]' />
               <h2 className='text-[#C6C6C6] font-light text-[20px]'>Last Update: <span className='italic'>{lastUpdate}</span></h2>
             </div>
             <div className="my-[30px] 3xl:my-[20px] flex justify-between">
@@ -200,7 +203,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <div className='flex flex-col items-center'>
-                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary'>₱{totalProductionCost}</h1>
+                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>₱{totalProductionCost}</h1>
                     <p className='italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]'>Total Production Cost</p>
                   </div>
                 </div>
@@ -218,7 +221,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <div className='flex flex-col items-center'>
-                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary'>₱{(isNaN(averageCost) ? 0 : averageCost).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
+                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>₱{(isNaN(averageCost) ? 0 : averageCost).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
                     <p className='italic text-center font-medium text-[12px] 3xl:text-[14px] text-[#969696]'>Average Cost Per Product</p>
                   </div>
                 </div>
@@ -236,7 +239,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <div className='flex flex-col items-center'>
-                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary'>₱{materialCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
+                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>₱{materialCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
                     <p className='italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]'>Material Cost Utilization</p>
                   </div>
                 </div>
@@ -254,7 +257,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <div className="flex flex-col items-center">
-                    <h1 className="text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary">
+                    <h1 className="text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white">
                       ₱168.35
                     </h1>
                     <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
@@ -286,7 +289,7 @@ const DashboardPage = () => {
           <CardHeader cardName="Projected Costing" />
           <div
             className={`${isOpen ? "3xl:px-[20px]" : "px-[5px] 2xl:px-[20px]"
-              } flex flex-grow bg-white h-[600px] rounded-b-[10px] drop-shadow-lg`}
+              } flex flex-grow bg-white dark:bg-[#3C3C3C] h-[600px] rounded-b-[10px] drop-shadow-lg`}
           >
             <ProductCostChart selectedHalf="Second" selectedYear="2024"
               className={`${isOpen ? "w-full 3xl:w-[60%]" : "w-full"}`}
@@ -301,7 +304,7 @@ const DashboardPage = () => {
             <CardHeader cardName="User Activity" />
             <div
               id="scroll-style"
-              className="bg-white h-[600px] rounded-b-[10px] drop-shadow-lg overflow-y-auto py-[15px]"
+              className="bg-white dark:bg-[#3C3C3C] h-[600px] rounded-b-[10px] drop-shadow-lg overflow-y-auto py-[15px]"
             >
               {auditLogs.map((data, index) => (
                 <div key={index}>

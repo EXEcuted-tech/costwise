@@ -350,8 +350,8 @@ const FileManagerPage = () => {
             <FileTabs tab={tab} setTab={setTab} isOpen={isOpen} />
           </div>
           <div className={`${isOpen ? 'w-full' : 'w-full'} flex justify-end w-full pb-[6px]`}>
-            <button className='flex justify-center items-center bg-white border-1 border-[#D3D3D3] px-[10px] mr-[1%] drop-shadow rounded-[10px]
-                            hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'
+            <button className='flex justify-center items-center bg-white dark:text-white dark:bg-[#3C3C3C] border-1 border-[#D3D3D3] px-[10px] mr-[1%] drop-shadow rounded-[10px]
+                            hover:bg-[#f7f7f7] hover:dark:bg-[#4C4C4C] transition-colors duration-200 ease-in-out'
               onClick={() => { window.location.href = '/file-manager/workspace' }}>
               <PiScrewdriverFill className={`${isOpen ? 'text-[10px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`} />
               <p className={`ml-[5px] font-bold ${isOpen ? 'text-[10.5px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`}>Workspace</p>
