@@ -15,6 +15,23 @@ import { PiPackageFill } from "react-icons/pi";
 import ProductCostChart from '@/components/pages/dashboard/LineChart';
 import UserActivity, { UserActivityProps } from '@/components/pages/dashboard/UserActivity';
 import api from '@/utils/api';
+import { formatDistanceToNow } from 'date-fns';
+
+enum ActionType {
+  General = 'general',
+  Crud = 'crud',
+  Import = 'import',
+  Export = 'export',
+  Stock = 'stock'
+}
+
+export interface AuditLogs {
+  employeeName: string;
+  action: ActionType;
+  description: string;
+  time: Date;
+  profile: string;
+}
 
 const DashboardPage = () => {
   const { isOpen, isAdmin } = useSidebarContext();
@@ -30,6 +47,8 @@ const DashboardPage = () => {
   const [materialCostTrend, setMaterialCostTrend] = useState('');
   const [name, setName] = useState('');
 
+  const [auditLogs, setAuditLogs] = useState<AuditLogs[]>([]);
+
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
     if(storedUser) {
@@ -38,6 +57,7 @@ const DashboardPage = () => {
       fetchAverageCost();
       fetchTotalProductionCost();
       fetchMaterialCostUtilization();
+      fetchAuditLogs();
     }
     setLastUpdate(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
   }, []);
@@ -69,6 +89,30 @@ const DashboardPage = () => {
     setMaterialCostPercentageChange(response.data.percentage_change);
     setMaterialCostTrend(response.data.trend);
   };
+
+  const fetchAuditLogs = async () => {
+    const interval = setInterval(() => {
+      const fetchData = async () => {
+          try {
+              const res = await api.get('/auditlogs');
+              const logs = res.data.map((log: any) => ({
+                  employeeName: `${log.user.first_name} ${log.user.middle_name ? log.user.middle_name.charAt(0) + '. ' : ''}${log.user.last_name}`,
+                  description: log.description,
+                  actionEvent: log.action as ActionType,
+                  profile: log.user.display_picture,
+                  time: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })
+              }));
+              setAuditLogs(logs);
+
+          } catch (error: any) {
+              console.error("Failed to fetch audit logs:", error);
+          }
+      }
+      fetchData();
+  }, 5000);
+  return () => clearInterval(interval);
+  };
+
   const [totalPrediction, setTotalPrediction] = useState<
     { monthYear: string; cost: number }[]
   >([]);
@@ -259,12 +303,13 @@ const DashboardPage = () => {
               id="scroll-style"
               className="bg-white h-[600px] rounded-b-[10px] drop-shadow-lg overflow-y-auto py-[15px]"
             >
-              {fakeData.map((data, index) => (
+              {auditLogs.map((data, index) => (
                 <div key={index}>
                   <UserActivity
-                    url={data.url}
-                    name={data.name}
-                    activity={data.activity}
+                    url="https://i.imgur.com/X7zZFeb.jpg"
+                    name={data.employeeName}
+                    activity={data.action}
+                    description={data.description}
                     time={data.time}
                   />
                 </div>
@@ -279,44 +324,44 @@ const DashboardPage = () => {
 
 export default DashboardPage;
 
-const fakeData: UserActivityProps[] = [
-  {
-    url: "https://i.imgur.com/AZOtzD7.jpg",
-    name: "Kathea Mari Mayol",
-    activity: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-    time: "2 minutes ago",
-  },
-  {
-    url: "https://i.imgur.com/SeymIUb.jpg",
-    name: "John Doe",
-    activity:
-      "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    time: "5 minutes ago",
-  },
-  {
-    url: "https://i.imgur.com/dm51tBF.jpg",
-    name: "Jane Smith",
-    activity:
-      "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-    time: "10 minutes ago",
-  },
-  {
-    url: "https://i.imgur.com/AN69p1a.jpg",
-    name: "Michael Johnson",
-    activity:
-      "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.",
-    time: "15 minutes ago",
-  },
-  {
-    url: "https://i.imgur.com/zb1h8kj.jpg",
-    name: "Emily Davis",
-    activity: "Excepteur sint occaecat cupidatat non proident, sunt in culpa.",
-    time: "20 minutes ago",
-  },
-  {
-    url: "https://i.imgur.com/nzcwr8x.jpg",
-    name: "Chris Lee",
-    activity: "Mollit anim id est laborum.",
-    time: "25 minutes ago",
-  },
-];
+// const fakeData: UserActivityProps[] = [
+//   {
+//     url: "https://i.imgur.com/AZOtzD7.jpg",
+//     name: "Kathea Mari Mayol",
+//     activity: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
+//     time: "2 minutes ago",
+//   },
+//   {
+//     url: "https://i.imgur.com/SeymIUb.jpg",
+//     name: "John Doe",
+//     activity:
+//       "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
+//     time: "5 minutes ago",
+//   },
+//   {
+//     url: "https://i.imgur.com/dm51tBF.jpg",
+//     name: "Jane Smith",
+//     activity:
+//       "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
+//     time: "10 minutes ago",
+//   },
+//   {
+//     url: "https://i.imgur.com/AN69p1a.jpg",
+//     name: "Michael Johnson",
+//     activity:
+//       "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.",
+//     time: "15 minutes ago",
+//   },
+//   {
+//     url: "https://i.imgur.com/zb1h8kj.jpg",
+//     name: "Emily Davis",
+//     activity: "Excepteur sint occaecat cupidatat non proident, sunt in culpa.",
+//     time: "20 minutes ago",
+//   },
+//   {
+//     url: "https://i.imgur.com/nzcwr8x.jpg",
+//     name: "Chris Lee",
+//     activity: "Mollit anim id est laborum.",
+//     time: "25 minutes ago",
+//   },
+// ];
