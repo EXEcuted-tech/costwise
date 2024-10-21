@@ -13,6 +13,7 @@ import Spinner from '@/components/loaders/Spinner';
 import Loader from '@/components/loaders/Loader';
 import Alert from '@/components/alerts/Alert';
 import { FaRegCalendarDays } from "react-icons/fa6";
+import { useUserContext } from '@/contexts/UserContext';
 
 const FormulationTable: React.FC<{
     setView: React.Dispatch<React.SetStateAction<boolean>>;
@@ -23,6 +24,7 @@ const FormulationTable: React.FC<{
 }) => {
         const [formulaData, setFormulaData] = useState<FormulationRecord[]>([]);
         const [removedRows, setRemovedRows] = useState<FormulationRecord[]>([]);
+        const { currentUser } = useUserContext();
         const [fgDesc, setFgDesc] = useState<string>('');
         const [formulaCode, setFormulaCode] = useState<string>('');
         const { isOpen } = useSidebarContext();
@@ -145,6 +147,24 @@ const FormulationTable: React.FC<{
                         }
                     });
                 }
+                const auditData = {
+                    userId: currentUser?.userId, 
+                    action: 'crud',
+                    act: 'edit',
+                    fileName: formulaCode,
+                };
+                if (currentUser) {
+                console.log('Current User ID:', currentUser?.userId);
+                } else {
+                    console.log('Current User is not defined.', currentUser);
+                }
+                api.post('/auditlogs/logsaudit', auditData)
+                .then(response => {
+                    console.log('Audit log created successfully:', response.data);
+                })
+                .catch(error => {
+                    console.error('Error audit logs:', error);
+                });
                 setTimeout(() => {
                     setIsLoading(false);
                 }, 1000);

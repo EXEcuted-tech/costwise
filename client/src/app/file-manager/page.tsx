@@ -19,6 +19,7 @@ import api from '@/utils/api';
 import * as XLSX from 'xlsx';
 import Alert from "@/components/alerts/Alert";
 import { File } from '@/types/data';
+import { useUserContext } from '@/contexts/UserContext';
 
 const FileManagerPage = () => {
   const { isOpen } = useSidebarContext();
@@ -32,6 +33,8 @@ const FileManagerPage = () => {
   const [allData, setAllData] = useState<File[]>([]);
   const [masterFileData, setMasterFileData] = useState<File[]>([]);
   const [transactionData, setTransactionData] = useState<File[]>([]);
+  const { fileToDelete, setFileToDelete, fileSettings } = useFileManagerContext();
+  const { currentUser } = useUserContext();
 
   const ref = useOutsideClick(() => setUpload(false));
 
@@ -99,7 +102,7 @@ const FileManagerPage = () => {
         return new Promise((resolve, reject) => {
           reader.onload = async (e: ProgressEvent<FileReader>) => {
             const data = e.target?.result;
-
+            const fileName = file.name; 
             if (data && data instanceof ArrayBuffer) {
               const dataArray = new Uint8Array(data);
               const workbook = XLSX.read(dataArray, { type: 'array' });
@@ -130,6 +133,26 @@ const FileManagerPage = () => {
                 try {
                   const response = await api.post('/files/upload', formData);
                   if (response.data.status === 200) {
+
+                    const auditData = {
+                      userId: currentUser?.userId,
+                      action: 'import',
+                      fileName: fileName
+                    };
+                    console.log(auditData);
+                    if (currentUser) {
+                    console.log('Current User ID:', currentUser?.userId);
+                    } else {
+                        console.log('Current User is not defined.', currentUser);
+                    }
+                    api.post('/auditlogs/logsaudit', auditData)
+                    .then(response => {
+                        console.log('Audit log created successfully:', response.data);
+                    })
+                    .catch(error => {
+                        console.error('Error audit logs:', error);
+                    });
+
                     resolve(true);
                   } else {
                     reject(new Error('Upload failed'));
@@ -197,62 +220,89 @@ const FileManagerPage = () => {
     }
   }, [uploadType, shouldOpenDropzone, open]);
 
-  // const handleExportAll = async () => {
-  //   try {
-  //     const response = await api.post('/files/export_all', {}, {
-  //       responseType: 'blob',
-  //     });
-
-  //     const url = window.URL.createObjectURL(new Blob([response.data]));
-
-  //     const a = document.createElement('a');
-  //     a.href = url;
-  //     a.download = 'exported_files.zip';
-  //     document.body.appendChild(a);
-
-  //     a.click();
-
-  //     a.remove();
-  //     window.URL.revokeObjectURL(url);
-
-  //   } catch (error) {
-  //     console.error('Export all files failed:', error);
-  //   }
-  // };
-
   const handleExportAll = async () => {
+    // setExportLoading(true);
+    // setExportError('');
     try {
       const response = await api.post('/files/export_all', {}, {
         responseType: 'blob',
       });
-
-      // Check if the response is actually a blob
+  
       if (response.data instanceof Blob) {
-        // Check if the blob is not empty
-        if (response.data.size > 0) {
-          const url = window.URL.createObjectURL(response.data);
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = 'exported_all_files.zip';
-          document.body.appendChild(a);
-          a.click();
-          a.remove();
-          window.URL.revokeObjectURL(url);
-        } else {
-          console.error('Received an empty zip file');
-          // Handle empty zip file (e.g., show an error message to the user)
-        }
+        const url = window.URL.createObjectURL(response.data);
+        const a = document.createElement('a');
+        a.href = url;
+        const currentDate = new Date().toISOString().split('T')[0];
+        a.download = `Costwise_ExportedFiles_${currentDate}.zip`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        window.URL.revokeObjectURL(url);
+        setInfoMsg('All files exported successfully!');
       } else {
-        // If it's not a blob, it might be an error response
-        const errorText = await response.data.text();
-        console.error('Export failed:', errorText);
-        // Handle error (e.g., show error message to the user)
+        throw new Error('Unexpected response format');
       }
+      const auditData = {
+        userId: currentUser?.userId,
+        action: 'export',
+        act: 'all files',
+      };
+      console.log(auditData);
+      if (currentUser) {
+      console.log('Current User ID:', currentUser?.userId);
+      } else {
+          console.log('Current User is not defined.', currentUser);
+      }
+      api.post('/auditlogs/logsaudit', auditData)
+      .then(response => {
+          console.log('Audit log created successfully:', response.data);
+      })
+      .catch(error => {
+          console.error('Error audit logs:', error);
+      });
     } catch (error) {
       console.error('Export all files failed:', error);
-      // Handle error (e.g., show error message to the user)
+      // setExportError(`Failed to export files: ${error.message}`);
+    } finally {
+      // setExportLoading(false);
     }
   };
+
+  const handleDelete = async () => {
+    if(fileToDelete) {
+      try {
+        await api.post(`/files/delete`, { col: 'file_id', value: fileToDelete });
+
+        const settings = JSON.parse(fileSettings);
+        const auditData = {
+          userId: currentUser?.userId,
+          action: 'crud',
+          act: 'archive',
+          fileName: settings.file_name
+        };
+        console.log(auditData);
+        if (currentUser) {
+        console.log('Current User ID:', currentUser?.userId);
+        } else {
+            console.log('Current User is not defined.', currentUser);
+        }
+        api.post('/auditlogs/logsaudit', auditData)
+        .then(response => {
+            console.log('Audit log created successfully:', response.data);
+        })
+        .catch(error => {
+            console.error('Error audit logs:', error);
+        });
+      } catch (error) {
+        console.error('Delete failed:', error);
+      } finally {
+        setDeleteModal(false);
+        setFileToDelete(0);
+        fetchData();
+        setInfoMsg('File deleted successfully!');
+      }
+    }
+  }
 
   return (
     <>
@@ -272,7 +322,7 @@ const FileManagerPage = () => {
             setClose={() => { setInfoMsg(''); }} />
         }
       </div>
-      {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" onProceed={() => {}} />}
+      {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" onProceed={handleDelete} />}
       <Header icon={BsFolderFill} title={"File Manager"} />
       <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px] mt-[75px] 2xl:mt-[40px]' : 'px-[50px] mt-[36px]'} ml-[45px]`}>
         <div className='flex relative'>

@@ -1,38 +1,49 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Header from '@/components/header/Header';
 import { useSidebarContext } from '@/contexts/SidebarContext';
-import { LuCircle } from "react-icons/lu";
 import { MdTrolley, MdCalendarToday } from "react-icons/md";
 import { IoIosArrowBack, IoIosArrowForward, IoIosSearch } from "react-icons/io";
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import MonthSelector from '@/components/modals/MonthSelector';
-import { HiOutlinePlus } from "react-icons/hi2";
 import { CiImport } from "react-icons/ci";
 import { IoTrash } from 'react-icons/io5';
-
-export interface InventoryProps {
-    itemCode: String;
-    description: String;
-    unit: String;
-    cost: String;
-    status: String;
-    inStock: String;
-    qty: String;
-};
+import ImportInventoryList from '@/components/modals/ImportInventory';
+import api from '@/utils/api';
+import { InventoryType } from '@/types/data';
+import Alert from '@/components/alerts/Alert';
+import ConfirmDeleteInventory from '@/components/modals/ConfirmDeleteInventory';
+import { Spinner } from '@nextui-org/react';
 
 const Inventory = () => {
     const { isOpen } = useSidebarContext();
-    const columnNames = ["Item Code", "Description", "Unit", "In Stock", "Qty", "Price", "Status"];
-    const monthOptions = ["January 2024", "February 2024", "March 2024"];
+    const columnNames = ["Item Code", "Description", "Unit", "Purchased Qty", "Total Qty", "Usage Qty", "Status"];
 
-    const [currentPage, setCurrentPage] = useState<number>(1);
-    const [selectedMonth, setSelectedMonth] = useState<string>(monthOptions[1]); // Default to February 2024
+    const [alertMessages, setAlertMessages] = useState<string[]>([]);
+    const [alertStatus, setAlertStatus] = useState<string>('');
     const [isMonthSelectorModalOpen, setMonthSelectorModalOpen] = useState(false);
+    const [isImportInventoryListModalOpen, setImportInventoryListModalOpen] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
 
-    const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
-        setCurrentPage(page);
-    };
+    const [monthOptions, setMonthOptions] = useState<{ display: string; value: string }[]>([]);
+    const [selectedMonth, setSelectedMonth] = useState<string>('');
+    const [inventoryList, setInventoryList] = useState<InventoryType[][]>([]);
+    const currentMonthInventory = inventoryList.find(monthData => monthData[0]?.month_year === selectedMonth) || [];
+
+    // Search & Filter
+    const [searchTerm, setSearchTerm] = useState('');
+    const [filterCategory, setFilterCategory] = useState('');
+    const [filterStatus, setFilterStatus] = useState('');
+
+    // Modals
+    const openImportInventoryListModal = () => {
+        setImportInventoryListModalOpen(true);
+    }
+
+    const closeImportInventoryListModal = () => {
+        setImportInventoryListModalOpen(false);
+    }
 
     const openMonthSelectorModal = () => {
         setMonthSelectorModalOpen(true);
@@ -42,33 +53,181 @@ const Inventory = () => {
         setMonthSelectorModalOpen(false);
     };
 
+    const openDeleteModal = () => {
+        setIsDeleteModalOpen(true);
+    };
+
+    const closeDeleteModal = () => {
+        setIsDeleteModalOpen(false);
+    };
+
+    //Format numbers & monthYear
+    const numberWithCommas = (x: number) => {
+        return x.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+    }
+
+    const convertMonthYear = (monthYear: string[]): { display: string; value: string }[] => {
+        const months = ["January", "February", "March", "April", "May", "June", "July", "August",
+             "September", "October", "November", "December"];
+        
+        return monthYear.map(date => {
+            const [year, monthNumber] = date.split('-');
+            const monthIndex = parseInt(monthNumber, 10) - 1;
+            return {
+                display: `${months[monthIndex]} ${year}`,
+                value: date
+            };
+        });
+    }
+
+    // Retrieve inventory list
+     useEffect(() => {
+        const fetchInventoryLists = async () => {
+            try {
+                const response = await api.get('/inventory/lists');
+                if (response.data && response.data.data) {
+                    const inventoryData = response.data.data;
+
+                    if (Array.isArray(inventoryData)) {
+                        const processedInventoryList = inventoryData.map(monthData => {
+                            const inventoryItems = monthData.inventory_info.map((item: any) => {
+                                const material = monthData.materials.find((m: any) => m.material_id === item.material_id);
+                                return {
+                                    ...item,
+                                    material_code: material?.material_code || '',
+                                    material_desc: material?.material_desc || '',
+                                    unit: material?.unit || '',
+                                    month_year: monthData.month_year
+                                };
+                            });
+                            return inventoryItems;
+                        });
+                        setInventoryList(processedInventoryList);
+
+                        //Set month options
+                        const extractMonths = inventoryData.map((item: any) => item.month_year);
+                        const convertedMonths = convertMonthYear(extractMonths);
+                        setMonthOptions(convertedMonths);
+
+                        if (convertedMonths.length > 0 && !selectedMonth) {
+                            setSelectedMonth(convertedMonths[0].value);
+                        }
+
+                        setIsLoading(false);
+
+                    } else {
+                        setAlertMessages(['Error retrieving inventory lists.']);
+                        setAlertStatus('error');
+                    }
+                } else {
+                    setAlertMessages(['No data retrieved.']);
+                    setAlertStatus('error');
+                }
+            } catch (error) {
+                setAlertMessages(['Error retrieving inventory lists.']);
+                setAlertStatus('error');
+                setIsLoading(false);
+            }
+        };
+        fetchInventoryLists();
+    }, []);
+
+    useEffect(() => {
+        if (monthOptions.length > 0 && !selectedMonth) {
+            setSelectedMonth(monthOptions[0].value); 
+            setCurrentIndex(0);
+        }
+    }, [monthOptions]);
+
+    // Search & Filter
+    const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setSearchTerm(e.target.value);
+        setCurrentPage(1);
+    };
+
+    const handleFilterCategory = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setFilterCategory(e.target.value);
+        setCurrentPage(1);
+    };
+
+    const handleFilterStatus = (e: React.ChangeEvent<HTMLSelectElement>) => {
+        setFilterStatus(e.target.value);
+        setCurrentPage(1);
+    };
+
+    // Filter and search function
+    const filteredAndSearchedInventory = currentMonthInventory.filter((item) => {
+        const matchesSearch = item.material_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            item.material_desc.toLowerCase().includes(searchTerm.toLowerCase());
+            
+        const matchesCategory = filterCategory === '' || filterCategory === 'all' || 
+            item.material_category === filterCategory;
+            
+        const matchesStatus = filterStatus === '' || filterStatus === 'all' || 
+            (filterStatus === 'in-stock' && item.stock_status === 'In Stock') ||
+            (filterStatus === 'low-stock' && item.stock_status === 'Low Stock');
+    
+        return matchesSearch && matchesCategory && matchesStatus;
+    });
+
+    // Month Pagination
+    const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
+        setCurrentPage(page);
+        };
+    
     const handleMonthSelect = (month: string) => {
         setSelectedMonth(month);
+        const newIndex = monthOptions.findIndex(option => option.value === month);
+        setCurrentIndex(newIndex);
+        setCurrentPage(1);
         closeMonthSelectorModal();
     };
-
+    
     const handlePreviousMonth = () => {
-        const currentIndex = monthOptions.indexOf(selectedMonth);
-        const previousIndex = (currentIndex - 1 + monthOptions.length) % monthOptions.length;
-        setSelectedMonth(monthOptions[previousIndex]);
+        if (currentIndex > 0) {
+            const newIndex = currentIndex - 1;
+            setCurrentIndex(newIndex);
+            setSelectedMonth(monthOptions[newIndex].value);
+            setCurrentPage(1);
+        }
     };
-
+        
     const handleNextMonth = () => {
-        const currentIndex = monthOptions.indexOf(selectedMonth);
-        const nextIndex = (currentIndex + 1) % monthOptions.length;
-        setSelectedMonth(monthOptions[nextIndex]);
+        if (currentIndex < monthOptions.length - 1) {
+            const newIndex = currentIndex + 1;
+            setCurrentIndex(newIndex);
+            setSelectedMonth(monthOptions[newIndex].value);
+            setCurrentPage(1);
+        }
     };
 
-    const currentIndex = monthOptions.indexOf(selectedMonth);
-    const indexOfLastItem = currentPage * 8;
-    const indexOfFirstItem = indexOfLastItem - 8;
-    const currentListPage = InventoryFakeData.slice(indexOfFirstItem, indexOfLastItem); //change to data
+    // Pagination
+    const [currentPage, setCurrentPage] = useState<number>(1);
+    const [currentIndex, setCurrentIndex] = useState<number>(0);
+    const itemsPerPage = 8;
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentPageItems = filteredAndSearchedInventory.slice(indexOfFirstItem, indexOfLastItem);
 
     return (
         <>
             {isMonthSelectorModalOpen &&
                 <MonthSelector months={monthOptions} onMonthSelect={handleMonthSelect} onClose={closeMonthSelectorModal} />
             }
+
+            {isImportInventoryListModalOpen &&
+                <ImportInventoryList onClose={closeImportInventoryListModal} />
+            }
+
+            {isDeleteModalOpen && <ConfirmDeleteInventory inventoryList={currentMonthInventory} monthYear={selectedMonth} onClose={closeDeleteModal}/>}
+
+            <div className='absolute top-0 right-0'>
+            {alertMessages && alertMessages.map((msg, index) => (
+            <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
+                setAlertMessages(prev => prev.filter((_, i) => i !== index));
+            }} />
+                ))}
+            </div>
 
             <div className='w-full'>
                 <div>
@@ -86,7 +245,8 @@ const Inventory = () => {
                             <MdCalendarToday className='' />
                         </button>
 
-                        <p>{selectedMonth}</p>
+                        <p className="animate-appearance-in">
+                            {monthOptions.find(m => m.value === selectedMonth)?.display || ''}</p>
 
                         {/* Navigator Buttons */}
                         <div className='flex w-[8rem] ml-auto'>
@@ -120,34 +280,49 @@ const Inventory = () => {
                                 type="search"
                                 name="search"
                                 placeholder="Search here..."
+                                onChange={handleSearch}
                             />
                         </div>
 
                         <div className='flex mt-[0.8em] mr-4 ml-auto text-gray-400 gap-4'>
                             <select
                                 className={`${isOpen ? '4xl:w-[20rem] 3xl:w-[20rem] 2xl:w-[15rem] xl:w-[10rem]' : ''} bg-white h-8 w-[20rem] pl-3 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
+                                onChange={handleFilterCategory}
                             >
                                 <option selected value="" disabled hidden>Item Category</option>
                                 <option value="all">All</option>
-                                <option value="meat-materials">Meat Materials</option>
-                                <option value="food-additives">Food Additives & Meat Extenders</option>
-                                <option value="packaging-materials">Packaging Materials</option>
+                                <option value="meat_material">Meat Materials</option>
+                                <option value="meat_alternate">Meat Alternates</option>
+                                <option value="food_ingredient">Food Ingredients</option>
+                                <option value="packaging">Packaging Materials</option>
+                                <option value="casing">Casing</option>
+                                <option value="tin_can">Tin Can</option>
+                                <option value="other">Other</option>
 
                             </select>
 
                             <select
                                 className='bg-white h-8 w-[8rem] pl-3 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none'
+                                onChange={handleFilterStatus}
                             >
                                 <option selected value="" disabled hidden>Status</option>
                                 <option value="all">All</option>
                                 <option value="in-stock">In Stock</option>
                                 <option value="low-stock">Low Stock</option>
                             </select>
-                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[7rem] px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}>
+
+                            {/* Action Buttons */}
+                            <button 
+                                className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[7rem] px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
+                                onClick={openImportInventoryListModal}
+                            >
                                 <span><CiImport className='w-[30px] h-[22px]'/></span>
                                 <span className='font-semibold'>Import</span>
                             </button>
-                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}>
+                            <button 
+                                className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
+                                onClick={openDeleteModal}
+                            >
                                 <IoTrash className="text-[25px] transition-colors duration-250 ease-in-out" />
                             </button>
                             
@@ -167,36 +342,44 @@ const Inventory = () => {
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentListPage.length > 0 ? (
-                                    currentListPage.map((data, index) => (
-                                        <tr key={index} className={`${isOpen ? '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[18px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[20px] 2xl:text-[20px] xl:text-[16px]'} text-[20px] text-black text-center border-b border-[#ACACAC] hover:bg-gray-50`}>
-                                            <td className='w-[10rem] py-4'>{data.itemCode}</td>
-                                            <td className='break-words'>{data.description}</td>
-                                            <td>{data.unit}</td>
-                                            <td className='w-[10%]'>{data.inStock}</td>
-                                            <td className=''>{data.qty}</td>
-                                            <td>{data.cost}</td>
-                                            <td>
-                                                <div className='flex justify-center'>
-                                                    <p
-                                                        className={`${data.status === 'In Stock'
-                                                            ? 'text-[#00930F] bg-[#9EE29E]'
-                                                            : 'text-primary bg-[#F5BABA]'
-                                                            } rounded-2xl w-[9rem]`}
-                                                    >
-                                                        {data.status}
-                                                    </p>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                    ))
-                                ) : (
+                                {isLoading ? (
                                     <tr>
-                                        <td colSpan={columnNames.length} className='text-center py-10 text-[#555555]'>
-                                            No items found.
+                                        <td colSpan={7} className="text-center py-6">
+                                            <Spinner color="danger" size="lg" label="Loading..." />
                                         </td>
                                     </tr>
-                                )}
+                                ) : currentPageItems.length > 0 ? (
+                                        currentPageItems.map((data, index) => (
+                                            <tr key={index} className={`${isOpen ? '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[18px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[20px] 2xl:text-[20px] xl:text-[16px]'} text-[20px] text-black text-center border-b border-[#ACACAC] hover:bg-gray-50`}>
+                                                <td className='w-[18rem] py-4 text-left pl-8'>{data.material_code}</td>
+                                                <td className='break-words'>{data.material_desc}</td>
+                                                <td>{data.unit}</td>
+                                                <td className='w-[10%] text-right pr-6'>{numberWithCommas(data.purchased_qty)}</td>
+                                                <td className='text-right pr-6 font-semibold'>{numberWithCommas(data.total_qty)}</td>
+                                                <td className='text-right pr-6'>{numberWithCommas(data.usage_qty)}</td>
+                                                <td>
+                                                    <div className='flex justify-center'>
+                                                        <p
+                                                            className={`${data.stock_status === 'In Stock'
+                                                                ? 'text-[#00930F] bg-[#9EE29E]'
+                                                                : 'text-primary bg-[#F5BABA]'
+                                                                } rounded-2xl w-[9rem]`}
+                                                        >
+                                                            {data.stock_status}
+                                                        </p>
+                                                    </div>
+                                                </td>
+                                            </tr>
+                                        ))
+                                    ) : (
+                                        <tr>
+                                            <td colSpan={columnNames.length} className='text-center py-10 text-[#555555]'>
+                                                No items found.
+                                            </td>
+                                        </tr>
+                                    )
+                                    
+                                }
                             </tbody>
                         </table>
                     </div>
@@ -204,8 +387,8 @@ const Inventory = () => {
                     {/* Footer */}
                     <div className="flex w-full justify-center h-[86px] rounded-b-xl border-[#868686]">
                         <PrimaryPagination
-                            data={InventoryFakeData} //change to data
-                            itemsPerPage={8}
+                            data={filteredAndSearchedInventory}
+                            itemsPerPage={itemsPerPage}
                             handlePageChange={handlePageChange}
                             currentPage={currentPage}
                         />
@@ -217,87 +400,3 @@ const Inventory = () => {
 };
 
 export default Inventory;
-
-const InventoryFakeData = [
-    {
-        itemCode: "FG-01",
-        description: "PACKAGING 4",
-        unit: "strd",
-        cost: "104.41",
-        status: "In Stock",
-        inStock: "20",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-02",
-        description: "FLAVOR 1",
-        unit: "kg",
-        cost: "118.97",
-        status: "In Stock",
-        inStock: "10",
-        qty: "20",
-    },
-    {
-        itemCode: "FG-03",
-        description: "SEASONING 2",
-        unit: "pcs",
-        cost: "228.90",
-        status: "Low Stock",
-        inStock: "5",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-04",
-        description: "MEAT MATERIAL 1",
-        unit: "kg",
-        cost: "257.00",
-        status: "In Stock",
-        inStock: "20",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-05",
-        description: "ADDITIVE 3",
-        unit: "g",
-        cost: "52.67",
-        status: "In Stock",
-        inStock: "20",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-06",
-        description: "PACKAGING 3",
-        unit: "strd",
-        cost: "274.00",
-        status: "In Stock",
-        inStock: "20",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-07",
-        description: "FLAVOR 2",
-        unit: "kg",
-        cost: "118.97",
-        status: "In Stock",
-        inStock: "20",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-08",
-        description: "SEASONING 3",
-        unit: "pcs",
-        cost: "295.11",
-        status: "Low Stock",
-        inStock: "10",
-        qty: "30",
-    },
-    {
-        itemCode: "FG-08",
-        description: "SEASONING 3",
-        unit: "pcs",
-        cost: "295.11",
-        status: "Low Stock",
-        inStock: "10",
-        qty: "30",
-    },
-]

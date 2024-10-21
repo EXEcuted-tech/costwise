@@ -39,7 +39,7 @@ const ConfirmDelete: React.FC<ConfirmDeleteProps> = ({ onClose, onProceed, subje
                                     <span className="relative z-10">Proceed</span>
                                 </button>
                             </div>
-                            <div className="relative inline-flex bg-white border-1 border-primary overflow-hidden text-primary flex items-center justify-center rounded-[30px] cursor-pointer transition-all rounded group"
+                            <div className="relative bg-white border-1 border-primary overflow-hidden text-primary flex items-center justify-center rounded-[30px] cursor-pointer transition-all group"
                                 onClick={onClose}>
                                 <button className="text-[19px] font-black before:ease relative h-12 w-40 overflow-hidden bg-white text-primary shadow-2xl transition-all hover:bg-[#FFD3D3] before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-white hover:before:-translate-x-40">
                                     <span className="relative z-10">Cancel</span>

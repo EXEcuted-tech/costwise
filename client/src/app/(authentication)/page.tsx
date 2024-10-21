@@ -81,6 +81,7 @@ function LoginPage() {
 
         setCurrentUser(currentUs);
         console.log(currentUser?.email);
+        localStorage.setItem('currentUser', JSON.stringify(currentUs));
 
         setTimeout(() => {
           setIsLoading(false);
@@ -126,7 +127,7 @@ function LoginPage() {
           }} />
         ))}
       </div>
-      <div className="relative z-10 flex-col h-[670px] w-[350px] sm:w-[500px] lg:w-[900px] 2xl:w-[1100px] rounded-3xl bg-white font-lato drop-shadow-3xl">
+      <div className="animate-pop-out relative z-10 flex-col h-[670px] w-[350px] sm:w-[500px] lg:w-[900px] 2xl:w-[1100px] rounded-3xl bg-white font-lato drop-shadow-3xl">
 
         <div className="flex-row lg:flex items-center justify-center h-full z-1">
           {/* Left Div */}

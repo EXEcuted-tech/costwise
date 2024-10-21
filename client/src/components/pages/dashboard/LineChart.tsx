@@ -7,7 +7,7 @@ interface LineChartProps {
   className?: string;
 }
 
-const LineChart: React.FC<LineChartProps> = ({className}) => {
+const LineChart: React.FC<LineChartProps> = ({ className }) => {
   const chartRef = useRef<HTMLCanvasElement | null>(null);
   const chartInstanceRef = useRef<Chart | null>(null);
 
@@ -17,7 +17,7 @@ const LineChart: React.FC<LineChartProps> = ({className}) => {
       if (ctx) {
 
 
-        const labels = ['January', 'February', 'March', 'April', 'May','June'];
+        const labels = ['January', 'February', 'March', 'April', 'May', 'June'];
         const dataset1Data = [10, 25, 13, 18, 30, 25];
         const dataset2Data = [20, 15, 28, 22, 10, 15];
 
@@ -75,7 +75,7 @@ const LineChart: React.FC<LineChartProps> = ({className}) => {
         });
       }
     }
-    
+
     return () => {
       if (chartInstanceRef.current) {
         chartInstanceRef.current.destroy();

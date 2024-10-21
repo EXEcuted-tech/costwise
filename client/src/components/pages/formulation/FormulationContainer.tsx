@@ -16,6 +16,7 @@ import { Formulation, FormulationRecord } from '@/types/data';
 import Spinner from '@/components/loaders/Spinner';
 import Alert from '@/components/alerts/Alert';
 import { formatMonthYear } from '@/utils/costwiseUtils';
+import { useUserContext } from '@/contexts/UserContext';
 
 export interface FormulationContainerProps {
     number: string;
@@ -54,8 +55,10 @@ const FormulationContainer: React.FC<FormulationProps> = ({
     setFilteredData
 }) => {
     const { edit, setEdit, viewFormulas, viewBOM } = useFormulationContext();
+    const { currentUser } = useUserContext();
     const [deleteModal, setDeleteModal] = useState(false);
     const [formulationToDelete, setFormulationToDelete] = useState<number | null>(null);
+    const { formulaCode, setFormulaCode } = useFormulationContext();
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [successMessage, setSuccessMessage] = useState('');
 
@@ -72,9 +75,10 @@ const FormulationContainer: React.FC<FormulationProps> = ({
         router.push(`/formulation?id=${id}`);
     }
 
-    const handleEdit = (id: number) => {
+    const handleEdit = (id: number, fc: string) => {
         setView(false);
         setEdit(true);
+        setFormulaCode(fc);
         router.push(`/formulation?id=${id}`);
     }
 
@@ -102,13 +106,33 @@ const FormulationContainer: React.FC<FormulationProps> = ({
             a.remove();
             window.URL.revokeObjectURL(url);
 
+            const auditData = {
+                userId: currentUser?.userId, 
+                action: 'export',
+                act: 'formulation_file',
+                fileName: fileName,
+              };
+              if (currentUser) {
+              console.log('Current User ID:', currentUser?.userId);
+              } else {
+                  console.log('Current User is not defined.', currentUser);
+              }
+              api.post('/auditlogs/logsaudit', auditData)
+              .then(response => {
+                  console.log('Audit log created successfully:', response.data);
+              })
+              .catch(error => {
+                  console.error('Error audit logs:', error);
+              });
+
         } catch (error) {
             console.error('Export failed:', error);
         }
     }
 
-    const handleDeleteClick = (formulationId: number) => {
+    const handleDeleteClick = (formulationId: number, formulationCode: string) => {
         setFormulationToDelete(formulationId);
+        setFormulaCode(formulationCode);
         setDeleteModal(true);
     }
 
@@ -119,6 +143,25 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                 const updatedList = filteredData.filter(item => item.formulation_id !== formulationToDelete);
                 setFilteredData(updatedList);
                 setSuccessMessage('Formulation deleted successfully');
+
+                const auditData = {
+                    userId: currentUser?.userId, 
+                    action: 'crud',
+                    act: 'archive_formulation',
+                    fileName: formulaCode,
+                };
+                if (currentUser) {
+                console.log('Current User ID:', currentUser?.userId);
+                } else {
+                    console.log('Current User is not defined.', currentUser);
+                }
+                api.post('/auditlogs/logsaudit', auditData)
+                .then(response => {
+                    console.log('Audit log created successfully:', response.data);
+                })
+                .catch(error => {
+                    console.error('Error audit logs:', error);
+                });
             } catch (error) {
                 setAlertMessages(prev => [...prev, 'Failed to delete formulation']);
             } finally {
@@ -187,7 +230,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                                                         </div>
                                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
                                                                 cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'
-                                                            onClick={() => handleEdit(data.formulation_id)}>
+                                                            onClick={() => handleEdit(data.formulation_id, data.formula_code)}>
                                                             <FaPencilAlt />
                                                         </div>
                                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
@@ -197,7 +240,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                                                         </div>
                                                         <div className='flex justify-center items-center h-full
                                                                 cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px] transition-colors duration-200 ease-in-out'
-                                                            onClick={() => handleDeleteClick(data.formulation_id)}>
+                                                            onClick={() => handleDeleteClick(data.formulation_id, data.formula_code)}>
                                                             <IoTrash />
                                                         </div>
                                                     </div>
