@@ -10,6 +10,7 @@ use App\Http\Controllers\FormulationController;
 use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\CostCalcController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
@@ -26,11 +27,11 @@ Route::post('/refresh', [AuthController::class, 'refresh']);
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/logout', [AuthController::class, 'logout']);
-    Route::get('/users',[UserController::class,'getAllUsers']);
+    Route::get('/users', [UserController::class, 'getAllUsers']);
 
-     Route::prefix('/user')->group(function () {
+    Route::prefix('/user')->group(function () {
         Route::get('', [UserController::class, 'getCurrentUser']);
-        Route::post('update/{id}',[UserController::class,'updateUser']);
+        Route::post('update/{id}', [UserController::class, 'updateUser']);
         Route::delete('archive/{id}', [UserController::class, 'archiveUser']);
     });
 
@@ -119,6 +120,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieveAll', [InventoryController::class, 'retrieveAll']);
         Route::get('lists', [InventoryController::class, 'retrieveInventoryList']);
         Route::delete('archive', [InventoryController::class, 'archiveInventoryList']);
+    });
+
+    Route::prefix('/cost_calculation')->group(function () {
+        Route::get('retrieve_month_year_options', [CostCalcController::class, 'retrieveMonthYearOptions']);
+        Route::get('retrieve_fg', [CostCalcController::class, 'retrieveFGOptions']);
+        Route::get('retrieve_fg_details', [CostCalcController::class, 'retrieveFGDetails']);
+        Route::post('export', [CostCalcController::class, 'export']);
     });
 
     Route::prefix('/training')->group(function () {

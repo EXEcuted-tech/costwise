@@ -2,14 +2,14 @@
 import React, { useState, useRef, useEffect } from 'react';
 
 interface CustomGoodsSelectProps {
-  options: string[];
+  options: {value: number, label: string}[];
   placeholder: string;
   isOpen: boolean;
-  onChange: (selectedValue: string) => void;
+  onChange: (selectedValue: {name: string, id: number}) => void;
 }
 
 const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placeholder, isOpen, onChange }) => {
-  const [selectedOption, setSelectedOption] = useState<string>('');
+  const [selectedOption, setSelectedOption] = useState<{name: string, id: number} | null>(null);
   const [width, setWidth] = useState<number>(0);
   const textRef = useRef<HTMLSpanElement>(null);
 
@@ -21,8 +21,13 @@ const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placehol
   }, [selectedOption]);
 
   const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setSelectedOption(event.target.value);
-    onChange(event.target.value);
+    const selectedId = Number(event.target.value);
+    const selectedOption = options.find(option => option.value === selectedId);
+    if (selectedOption) {
+      const newSelectedValue = { name: selectedOption.label, id: selectedOption.value };
+      setSelectedOption(newSelectedValue);
+      onChange(newSelectedValue);
+    }
   };
 
   const xlWidth = isOpen ? width + 10 : width + 150;
@@ -32,7 +37,7 @@ const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placehol
   return (
     <div className="relative flex items-center">
       <select
-        value={selectedOption}
+        value={selectedOption?.id || ''}
         onChange={handleChange}
         className={`
           ${isOpen ? 'pl-0 xl:text-[21px] 2xl:text-[26px] 3xl:text-[26px] 4xl:text-[26px]' : 'pl-2'}
@@ -45,9 +50,9 @@ const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placehol
         }}
       >
         <option value="" disabled selected className='truncate bg-gray-200'>{placeholder}</option>
-        {options.map((option, index) => (
-          <option key={index} value={option} className='text-[#ACACAC] truncate'>
-            {option}
+        {options.map((option) => (
+          <option key={option.value} value={option.value} className='text-[#ACACAC] truncate'>
+            {option.label}
           </option>
         ))}
       </select>
@@ -60,7 +65,7 @@ const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placehol
         ref={textRef}
         className="absolute opacity-0 pointer-events-none whitespace-nowrap"
       >
-        {selectedOption || placeholder}
+        {selectedOption?.name || placeholder}
       </span>
     </div>
   );

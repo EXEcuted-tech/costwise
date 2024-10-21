@@ -23,6 +23,8 @@ use App\Models\File;
 use App\Models\MaterialCosts;
 use App\Models\FinishedGood;
 use App\Models\Material;
+use GuzzleHttp\Promise\Create;
+use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -809,7 +811,6 @@ class FileController extends ApiController
             return response()->download($tempFile, $fileName, [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ])->deleteFileAfterSend(true);
-
         } catch (\Exception $e) {
             $this->status = 500;
             $this->response['message'] = "Export failed: " . $e->getMessage();
@@ -870,7 +871,6 @@ class FileController extends ApiController
             return response()->download($zipFilePath, $zipFileName, [
                 'Content-Type' => 'application/zip',
             ])->deleteFileAfterSend(true);
-
         } catch (\Exception $e) {
             $tempFiles = glob(sys_get_temp_dir() . '/excel_*');
             foreach ($tempFiles as $tempFile) {
