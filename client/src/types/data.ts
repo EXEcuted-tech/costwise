@@ -151,3 +151,18 @@ export interface InventoryType {
     total_qty: number;
     month_year: string;
 }
+
+export interface ReleaseNote {
+    note_id: number;
+    title: string;
+    version: string;
+    content: string;
+    user_id: number;
+    created_at: string;
+}
+
+export interface ReleaseNoteContent {
+    note_type: string;
+    note: string;
+}
+

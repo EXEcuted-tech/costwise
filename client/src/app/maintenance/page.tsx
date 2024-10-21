@@ -10,23 +10,14 @@ import { IoGitNetworkOutline } from "react-icons/io5";
 import { IoMdAdd, IoIosSearch } from "react-icons/io";
 import ReleaseNoteTile from '@/components/pages/system-maintenance/ReleaseNoteTile';
 import CreateReleaseNotes from '@/components/modals/CreateReleaseNotes';
-import EditReleaseNotes from '@/components/modals/EditReleaseNotes';
+import ViewReleaseNotes from '@/components/modals/ViewReleaseNotes';
 import api from '@/utils/api';
-
-
-export interface SystemMaintenanceProps {
-    date: String;
-    title: String;
-    author: String;
-    setEditNotes: React.Dispatch<React.SetStateAction<boolean>>;
-    //contents, idk how to structure it rn
-};
 
 const SystemMaintenance = () => {
     const { isOpen } = useSidebarContext();
     const [currentPage, setCurrentPage] = useState<number>(1);
     const [createNotes, setCreateNotes] = useState(false);
-    const [editNotes, setEditNotes] = useState(false);
+    const [viewNotes, setViewNotes] = useState(false);
     const [storage, setStorage] = useState<any>(null);
     const [totalFiles, setTotalFiles] = useState<number>(0);
     const [fileTypes, setFileTypes] = useState<any>(null);
@@ -65,7 +56,7 @@ const SystemMaintenance = () => {
                 <Header icon={GrSystem} title="System Maintenance" />
             </div>
             {createNotes && <CreateReleaseNotes setCreateNotes={setCreateNotes} />}
-            {editNotes && <EditReleaseNotes setEditNotes={setEditNotes} />}
+            {viewNotes && <ViewReleaseNotes setViewNotes={setViewNotes} />}
             <div className='ml-[45px]'>
                 {/* Info Tiles */}
                 <div className='flex mx-16 mt-12 mb-9 gap-[5rem] justify-center'>
@@ -192,7 +183,7 @@ const SystemMaintenance = () => {
                                 date={note.date}
                                 title={note.title}
                                 author={note.author}
-                                setEditNotes={setEditNotes}
+                                setViewNotes={setViewNotes}
                             />
                         ))}
                     </div>

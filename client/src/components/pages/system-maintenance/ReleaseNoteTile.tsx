@@ -1,8 +1,14 @@
 "use client";
 import React, { useState } from 'react';
-import { SystemMaintenanceProps } from '@/app/maintenance/page';
 import { TfiMoreAlt } from "react-icons/tfi";
 import { useSidebarContext } from '@/contexts/SidebarContext';
+
+interface ReleaseNoteTileProps {
+    date: string;
+    title: string;
+    author: string;
+    setViewNotes: React.Dispatch<React.SetStateAction<boolean>>;
+}
 
 const formatDate = (dateString: String) => {
     const date = new Date(dateString as string);
@@ -10,7 +16,7 @@ const formatDate = (dateString: String) => {
     return date.toLocaleDateString('en-US', options);
 };
 
-const ReleaseNoteTile:React.FC<SystemMaintenanceProps> = ({date, title, author, setEditNotes}) => {
+const ReleaseNoteTile:React.FC<ReleaseNoteTileProps> = ({date, title, author, setViewNotes}) => {
     const { isOpen } = useSidebarContext();
     
     return (
@@ -22,7 +28,8 @@ const ReleaseNoteTile:React.FC<SystemMaintenanceProps> = ({date, title, author, 
             <span className='ml-8 mr-3 text-[22px] 2xl:text-[25px] text-[#5B5353] text-ellipsis'>{title}</span>
             <span className={`${isOpen ? 'hidden 4xl:block' : 'hidden 2xl:block'}  text-[18px] 2xl:text-[21px] text-[#5B5353] font-light`}>by: {author}</span>
             </div>
-            <button className='w-[4rem] h-[2rem] text-[30px] text-[#5B5353] px-4 py-[3px] ml-auto mr-10 bg-white border border-[#9290905b] rounded-full shadow-lg' onClick={()=>setEditNotes(true)}><TfiMoreAlt/></button>
+            <button className='w-[4rem] h-[2rem] text-[30px] text-[#5B5353] px-4 py-[3px] ml-auto mr-10 bg-white border border-[#9290905b] rounded-full shadow-lg' 
+                onClick={()=>setViewNotes(true)}><TfiMoreAlt/></button>
         </div>
     )
 }

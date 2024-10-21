@@ -159,6 +159,16 @@ return new class extends Migration {
             $table->timestamps();
             $table->foreign('material_id')->references('material_id')->on('materials')->onDelete('cascade');
         });
+
+        // Release Notes Table
+        Schema::create('release_notes', function (Blueprint $table) {
+            $table->increments('note_id');
+            $table->string('title', 255);
+            $table->string('version', 255);
+            $table->longText('content');
+            $table->timestamps();
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+        });
     }
 
     /**
