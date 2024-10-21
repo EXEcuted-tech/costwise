@@ -14,7 +14,8 @@ import Alert from "@/components/alerts/Alert";
 import { useRouter } from 'next/navigation';
 import ConfirmChanges from '@/components/modals/ConfirmChanges';
 import AddUserRoles from '@/components/pages/user-management/addUserRoles';
-import dotenv from "dotenv";
+// import dotenv from "dotenv";
+import { useUserContext } from '@/contexts/UserContext';
 
 const AccountCreation = () => {
     const router = useRouter();
@@ -53,6 +54,8 @@ const AccountCreation = () => {
     const [positionError, setPositionError] = useState(false);
     const [profilePictureError, setProfilePictureError] = useState(false);
     const [roleError, setRoleError] = useState(false);
+
+    const { currentUser } = useUserContext();
 
     //Confirm changes
     useEffect(() => {
@@ -253,6 +256,24 @@ const AccountCreation = () => {
 
             setAlertMessages([response.data.message]);
             setAlertStatus('success');
+
+            const auditData = {
+                userId: currentUser?.userId, 
+                action: 'general',
+                act: 'create',
+            };
+            if (currentUser) {
+            console.log('Current User ID:', currentUser?.userId);
+            } else {
+                console.log('Current User is not defined.', currentUser);
+            }
+            api.post('/auditlogs/logsaudit', auditData)
+            .then(response => {
+                console.log('Audit log created successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error audit logs:', error);
+            });
 
             // Reset form fields
             setFirst_name('');
