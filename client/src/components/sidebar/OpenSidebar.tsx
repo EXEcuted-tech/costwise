@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import logo from '@/assets/virginia-logo.png';
 import { iconMap } from '@/utils/iconMap';
@@ -12,6 +12,7 @@ import api from '@/utils/api';
 import config from '@/server/config';
 import { removeTokens } from '@/utils/removeTokens';
 import { useNotificationContext } from '@/contexts/NotificationContext';
+import { FaUser } from 'react-icons/fa';
 
 export interface IconOpenConfig {
   iconName: string;
@@ -22,14 +23,34 @@ export interface IconOpenConfig {
 }
 
 const OpenSidebar: React.FC = () => {
-  const { isAdmin } = useSidebarContext();
+  const { isAdmin, setIsAdmin } = useSidebarContext();
   const { hasNewNotifications } = useNotificationContext();
   const [isMore, setIsMore] = useState(false);
   const path = usePath();
   const router = useRouter();
 
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    const userString = localStorage.getItem('currentUser');
+    if (userString) {
+      try {
+        const parsedUser = JSON.parse(userString);
+        setCurrentUser(parsedUser);
+        if(parsedUser.userType === 'Admin'){
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
+  }, [setIsAdmin]);
+  
   const handleLogout = async () => {
     await removeTokens();
+    localStorage.removeItem('currentUser');
     router.push('/logout');
   }
 
@@ -45,14 +66,23 @@ const OpenSidebar: React.FC = () => {
 
           {/* Account Profile */}
           <div className='w-[280px] 2xl:w-[360px] flex items-center bg-[#CD3939] mb-[15px] px-[20px] 2xl:px-[40px] py-[15px]'>
-            <img
-              src="https://i.imgur.com/AZOtzD7.jpg"
-              alt={'Profile Picture'}
-              className='flex object-cover size-[70px] 2xl:size-[80px] rounded-full border cursor-pointer'
-              onClick={() => { router.push('/profile') }}
-            />
+            {currentUser?.displayPicture ? (
+              <img
+                src={currentUser.displayPicture}
+                alt={'Profile Picture'}
+                className='flex object-cover size-[70px] 2xl:size-[80px] rounded-full border cursor-pointer'
+                onClick={() => { router.push('/profile') }}
+              />
+            ) : (
+              <div
+                className='flex justify-center items-center size-[70px] 2xl:size-[80px] rounded-full border border-white hover:brightness-90 cursor-pointer bg-gray-200'
+                onClick={() => { router.push('/profile') }}
+              >
+                <FaUser className='text-gray-500 text-3xl' />
+              </div>
+            )}
             <div className='text-white ml-[15px] mt-[-8px]'>
-              <h1 className='font-extrabold text-[24px] 2xl:text-[28px]'>Kathea Mari</h1>
+              <h1 className='font-extrabold text-[24px] 2xl:text-[28px]'>{currentUser?.name}</h1>
               <p className='font-light text-[16px] 2xl:text-[20px] mt-[-8px] cursor-pointer hover:text-[#dbdbdb]'
                 onClick={() => { router.push('/profile') }}>My Account</p>
             </div>

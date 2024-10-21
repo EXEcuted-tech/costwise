@@ -1,5 +1,5 @@
 "use client"
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import Image from 'next/image';
 import virginialogo from '@/assets/virginia-logo.png';
 import { useSidebarContext } from "@/contexts/SidebarContext";
@@ -24,41 +24,58 @@ interface UserProps {
 }
 
 const ProfilePage = () => {
-const { isOpen } = useSidebarContext();
-const { currentUser } = useUserContext();
-const [userAcc, setUserAcc] = useState<UserProps | null>(null);
-const [userInfo, setuserInfo] = useState(false);
-const [dialog, setDialog] = useState(false);
+    const { isOpen } = useSidebarContext();
+    const { currentUser } = useUserContext();
+    const [userAcc, setUserAcc] = useState<UserProps | null>(null);
+    const [userInfo, setuserInfo] = useState(false);
+    const [dialog, setDialog] = useState(false);
+    const [profilePicture, setProfilePicture] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-useEffect(() => {
-    const fetchData = async () => {
-        try {
-            const user = await api.get('/user');
-            const userInformation = {
-                fName: user.data.first_name,
-                mName: user.data.middle_name,
-                lName: user.data.last_name,
-                email: user.data.email_address,
-                phoneNum: user.data.phone_number,   
-                suffix: user.data.suffix,
-                dept: user.data.department,
-                employeeNum: user.data.employee_number,
-                role: user.data.sys_role
+    useEffect(() => {
+        const fetchData = async () => {
+            try {
+                const user = await api.get('/user');
+                const userInformation = {
+                    fName: user.data.first_name,
+                    mName: user.data.middle_name,
+                    lName: user.data.last_name,
+                    email: user.data.email_address,
+                    phoneNum: user.data.phone_number,
+                    suffix: user.data.suffix,
+                    dept: user.data.department,
+                    employeeNum: user.data.employee_number,
+                    role: user.data.sys_role
+                }
+
+                setUserAcc(userInformation);
+            } catch (error: any) {
+
             }
-
-            setUserAcc(userInformation);
-        } catch (error: any) {
-            
         }
-    }
-    fetchData();
-}, [currentUser?.email]);
+        fetchData();
+    }, [currentUser?.email]);
 
-return (
+    const handleFileUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+        const file = event.target.files?.[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setProfilePicture(reader.result as string);
+            };
+            reader.readAsDataURL(file);
+        }
+    };
+
+    const handleCameraClick = () => {
+        fileInputRef.current?.click();
+    };
+
+    return (
         <div className='w-full h-screen flex flex-col items-center bg-repeat' style={{ backgroundImage: `url(${background.src})` }}>
-            {dialog && 
-                <SendEmailDialog 
-                setDialog={setDialog}
+            {dialog &&
+                <SendEmailDialog
+                    setDialog={setDialog}
                 />
             }
             <div className="relative w-full h-[170px]">
@@ -67,9 +84,9 @@ return (
                     <Image src={virginialogo} alt={'Hotdog Logo'} className='flex w-[120px] cursor-pointer' />
                 </div>
             </div>
-            
-            <div className={`${isOpen ? 'h-[65%] 3xl:h-[74%]' : 'h-[74%]'} flex flex-col w-[80%] mx-[50px] py-6 mt-[1%] bg-white shadow-md shadow-gray-800 rounded-lg`}> 
-                {/* Title */} 
+
+            <div className={`${isOpen ? 'h-[65%] 3xl:h-[74%]' : 'h-[74%]'} flex flex-col w-[80%] mx-[50px] py-6 mt-[1%] bg-white shadow-md shadow-gray-800 rounded-lg`}>
+                {/* Title */}
                 <div className='flex flex-col mt mb-2 border-b-2 border-[#A0A0A0]'>
                     <div className="flex text-[24px] font-semibold mx-8 2xl:mx-12 mb-2">
                         Account Profile
@@ -79,12 +96,29 @@ return (
 
                 {/* Profile Picture */}
                 <div className='flex justify-center items-center h-[10rem] mt-2 pb-4 gap-4 border-b-2 border-[#A0A0A0]'>
-                    <div className="">
-                        <button className="w-10 h-10 fixed  ml-[5rem] mt-20 bg-[#A60000] rounded-full border-3 border-white p-[0.3rem] text-white text-[1.6em]">
+                    <div className="relative">
+                        <input
+                            type="file"
+                            ref={fileInputRef}
+                            onChange={handleFileUpload}
+                            accept="image/*"
+                            className="hidden"
+                        />
+                        <button
+                            className="w-10 h-10 absolute right-0 bottom-0 bg-[#A60000] rounded-full border-3 border-white p-[0.3rem] text-white text-[1.6em]"
+                            onClick={handleCameraClick}
+                        >
                             <IoCamera />
                         </button>
-                        <div className='w-28 h-28 bg-red-200 border-4 border-[#A60000] rounded-full'>
-                            {/* <img src="../assets/virginia-logo.png"></img> */}
+                        <div className='w-28 h-28 bg-red-200 border-4 border-[#A60000] rounded-full overflow-hidden'>
+                            {profilePicture ? (
+                                <img src={profilePicture} alt="Profile" className="w-full h-full object-cover" />
+                            ) : (
+                                // Placeholder or default image
+                                <div className="w-full h-full bg-gray-300 flex items-center justify-center">
+                                    <span className="italic text-gray-600">No Image</span>
+                                </div>
+                            )}
                         </div>
                     </div>
                     <div>
@@ -97,12 +131,11 @@ return (
                         </Link>
                     </div>
                 </div>
-                
-                <UserInformation isOpen={isOpen} userAcc={userAcc}/>
+
+                <UserInformation isOpen={isOpen} userAcc={userAcc} />
             </div>
         </div>
     );
 }
 
 export default ProfilePage
-

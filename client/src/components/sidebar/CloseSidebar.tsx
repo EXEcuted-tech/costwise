@@ -1,5 +1,5 @@
 "use client"
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Image from 'next/image';
 import logo from '@/assets/virginia-logo.png';
 import { iconMap } from '@/utils/iconMap';
@@ -14,6 +14,7 @@ import api from '@/utils/api';
 import config from '@/server/config';
 import { removeTokens } from '@/utils/removeTokens';
 import { useNotificationContext } from '@/contexts/NotificationContext';
+import { FaUser } from 'react-icons/fa';
 
 interface IconClosedConfig {
   iconName: string;
@@ -24,15 +25,34 @@ interface IconClosedConfig {
 }
 
 const CloseSidebar: React.FC = () => {
-  const { isAdmin } = useSidebarContext();
+  const { isAdmin, setIsAdmin } = useSidebarContext();
   const [isMore, setIsMore] = useState(false);
   const path = usePath();
   const router = useRouter();
-  const { currentUser } = useUserContext();
   const { hasNewNotifications } = useNotificationContext();
+
+  const [currentUser, setCurrentUser] = useState<any>(null);
+
+  useEffect(() => {
+    const userString = localStorage.getItem('currentUser');
+    if (userString) {
+      try {
+        const parsedUser = JSON.parse(userString);
+        setCurrentUser(parsedUser);
+        if(parsedUser.userType === 'Admin'){
+          setIsAdmin(true);
+        } else {
+          setIsAdmin(false);
+        }
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
+  }, [setIsAdmin]);
 
   const handleLogout = async () => {
     await removeTokens();
+    localStorage.removeItem('currentUser');
     router.push('/logout');
   }
   
@@ -49,12 +69,21 @@ const CloseSidebar: React.FC = () => {
           <div className={`${path == 'profile' && 'bg-[#CD3939] w-[128px] h-[100px] items-center mb-0'} flex justify-center mb-[10px]`}>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             {/* @TODO: Display Profile Pictures Properly */}
-            <img
-              src={currentUser?.displayPicture ?? "https://i.imgur.com/AZOtzD7.jpg"}
+            {currentUser?.displayPicture ? (
+              <img
+                src={currentUser.displayPicture}
               alt={'Profile Picture'}
               className='flex object-cover w-[80px] h-[80px] rounded-full border cursor-pointer'
               onClick={() => { router.push('/profile') }}
-            />
+              />
+            ) : (
+              <div
+                className='flex justify-center items-center w-[80px] h-[80px] rounded-full border border-white hover:brightness-90 cursor-pointer bg-gray-200'
+                onClick={() => { router.push('/profile') }}
+              >
+                <FaUser className='text-gray-500 text-3xl' />
+              </div>
+            )}
           </div>
 
           {/* Pages */}

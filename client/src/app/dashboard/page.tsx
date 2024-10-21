@@ -12,7 +12,7 @@ import {
   FaArrowTrendUp,
 } from "react-icons/fa6";
 import { PiPackageFill } from "react-icons/pi";
-import LineChart from '@/components/pages/dashboard/LineChart';
+import ProductCostChart from '@/components/pages/dashboard/LineChart';
 import UserActivity, { UserActivityProps } from '@/components/pages/dashboard/UserActivity';
 import api from '@/utils/api';
 
@@ -28,11 +28,17 @@ const DashboardPage = () => {
   const [materialCost, setMaterialCost] = useState(0);
   const [materialCostPercentageChange, setMaterialCostPercentageChange] = useState(0);
   const [materialCostTrend, setMaterialCostTrend] = useState('');
+  const [name, setName] = useState('');
 
   useEffect(() => {
-    fetchAverageCost();
-    fetchTotalProductionCost();
-    fetchMaterialCostUtilization();
+    const storedUser = localStorage.getItem('currentUser');
+    if(storedUser) {
+      const user = JSON.parse(storedUser);
+      setName(user.name);
+      fetchAverageCost();
+      fetchTotalProductionCost();
+      fetchMaterialCostUtilization();
+    }
     setLastUpdate(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
   }, []);
 
@@ -83,7 +89,7 @@ const DashboardPage = () => {
             } truncate text-ellipsis text-[#414141] font-bold animate-color-pulse`}
           >
             Good Evening,{" "}
-            <span className="animate-color-pulse2">Kathea Mari!</span>
+            <span className="animate-color-pulse2">{name}!</span>
           </h1>
           <p
             className={`${
@@ -103,7 +109,7 @@ const DashboardPage = () => {
                 : "text-[19px] 2xl:text-[25px] 3xl:text-[30px]"
             } text-[#414141] font-bold text-right`}
           >
-            September 4, 2024
+            {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </h2>
           <p
             className={`${
@@ -112,7 +118,7 @@ const DashboardPage = () => {
                 : "text-[16px] 3xl:text-[21px]"
             } text-[#414141] italic text-right`}
           >
-            11:05 A.M.
+            {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
           </p>
         </div>
         <div>
@@ -236,11 +242,11 @@ const DashboardPage = () => {
           <CardHeader cardName="Projected Costing" />
           <div
             className={`${isOpen ? "3xl:px-[20px]" : "px-[5px] 2xl:px-[20px]"
-              } flex flex-grow bg-white min-h-[600px] rounded-b-[10px] drop-shadow-lg`}
+              } flex flex-grow bg-white h-[600px] rounded-b-[10px] drop-shadow-lg`}
           >
-            {/* <LineChart selectedHalf="Second" selectedYear="2024"
+            <ProductCostChart selectedHalf="Second" selectedYear="2024"
               className={`${isOpen ? "w-full 3xl:w-[60%]" : "w-full"}`}
-            /> */}
+            />
             {/* <div className='flex justify-center mt-[30px] pr-[20px] w-full'>
                 <CostTable className='h-[280px] w-full'/>
               </div> */}

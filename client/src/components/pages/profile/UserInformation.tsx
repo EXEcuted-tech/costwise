@@ -59,9 +59,8 @@ const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc} ) =>
                 {/* 2nd Col */}
                 <div className='flex flex-col'>
                     <div className='flex flex-col justify-start mb-4'>
-                        <p className="text-[#8E8E8E] font-semibold">Middle Name</p>
-                        <p>{!userAcc?.mName ? " " : userAcc?.mName}</p>
-                        
+                        <p className={`${!userAcc?.mName ? 'opacity-25' : 'text-[#039300]'} font-semibold`}>Middle Name</p>
+                        <p>{!userAcc?.mName ? "‎" : userAcc?.mName}</p>
                     </div>
 
                     <div className='flex flex-col justify-start mb-4'>
@@ -83,8 +82,8 @@ const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc} ) =>
                     </div>
 
                     <div className='flex flex-col justify-start mb-4'>
-                        <p className="text-[#8E8E8E] font-semibold">Suffix</p>
-                        <p>{!userAcc?.suffix ? " " : userAcc?.suffix}</p>
+                        <p className={`${!userAcc?.mName ? 'opacity-25' : 'text-[#039300]'} font-semibold`}>Suffix</p>
+                        <p>{!userAcc?.suffix ? "‎" : userAcc?.suffix}</p>
                     </div>
 
                     <div className='flex flex-col justify-start mb-4'>
