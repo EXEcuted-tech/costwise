@@ -8,23 +8,7 @@ import ProductCost from "@/components/charts/LineChart";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import api from "@/utils/api";
 import TrainingModel from "../../components/model/sketch";
-import { prod } from "@tensorflow/tfjs";
-
-interface ProductEntry {
-  product_num: number;
-  product_name: string;
-  cost: number;
-  monthYear: string;
-}
-
-interface Product {
-  productName: string;
-  cost: number;
-}
-interface CostDataEntry {
-  monthYear: string;
-  products: Product[];
-}
+import { ProductEntry, CostDataEntry } from "@/types/data";
 
 const ProjectedCostPage = () => {
   const { isOpen } = useSidebarContext();
@@ -227,7 +211,7 @@ const ProjectedCostPage = () => {
               <p className="w-[95%]">Estimated Summary</p>
               <IoIosInformationCircle className="text-[35px] text-[#625F5F]" />
             </div>
-            <div className="flex items-center justify-center h-[30%] bg-white">
+            <div className="flex items-center justify-center h-[30%] bg-white p-10 2xl:p-0">
               <TrainingModel />
             </div>
           </div>

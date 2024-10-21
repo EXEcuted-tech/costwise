@@ -2,12 +2,19 @@ import Link from 'next/link';
 import React, { useState } from 'react';
 import { MdModeEdit } from 'react-icons/md';
 import EditInformation from './EditInformation';
-import PasswordChangeDialog from '@/components/modal/PasswordChangeDialog';
+import PasswordChangeDialog from '@/components/modals/SendEmailDialog';
+import ConfirmChangeInfo from '@/components/modals/ConfirmChangeInfo';
 
+type UserInformationProps ={
+    isOpen: boolean;
+    userAcc: any;
+}
 
-const UserInformation: React.FC<{isOpen: boolean, fakeAccData: any}> = ( {isOpen, fakeAccData} ) => {
+const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc} ) => {
     const [props, setProps] = useState(false);
     const [dialog, setDialog] = useState(false);
+    const [successModal, setSuccessModal] = useState(false);
+    
     return (
         <>
         {dialog && 
@@ -15,8 +22,13 @@ const UserInformation: React.FC<{isOpen: boolean, fakeAccData: any}> = ( {isOpen
             setDialog={setDialog}
             />
         }
+        {successModal && 
+            <ConfirmChangeInfo 
+            setSuccessModal={setSuccessModal}
+            />
+        }
         {props ? 
-        <EditInformation setProps={setProps} setDialog={setDialog} isOpen={isOpen} fakeAccData={fakeAccData}/>
+        <EditInformation setProps={setProps} setSuccessModal={setSuccessModal} setDialog={setDialog} isOpen={isOpen} userAcc={userAcc}/>
         :
         <div className="mx-8 2xl:mx-12">
             <div className={`${isOpen ? 'text-[24px] 2xl:text-[32px]' : 'text-[28px] 2xl:text-[32px]'} flex text-[#8E8E8E] font-semibold mt-3 mb-2`}>
@@ -30,17 +42,17 @@ const UserInformation: React.FC<{isOpen: boolean, fakeAccData: any}> = ( {isOpen
                 <div className='flex flex-col ml-3'>
                     <div className='flex flex-col justify-start mb-4'>
                         <p className="text-[#8E8E8E] font-semibold">First Name</p>
-                        <p>{fakeAccData[0].firstName}</p>
+                        <p>{userAcc?.fName}</p>
                     </div>
 
                     <div className='flex flex-col justify-start mb-4'>
                         <p className="text-[#8E8E8E] font-semibold">Email Address</p>
-                        <p>{fakeAccData[0].emailAddress}</p>
+                        <p>{userAcc?.email}</p>
                     </div>
 
                     <div className='flex flex-col justify-start mb-4'>
                         <p className="text-[#8E8E8E] font-semibold">Department</p>
-                        <p>{fakeAccData[0].department}</p>
+                        <p>{userAcc?.dept}</p>
                     </div>
                 </div>
 
@@ -48,17 +60,18 @@ const UserInformation: React.FC<{isOpen: boolean, fakeAccData: any}> = ( {isOpen
                 <div className='flex flex-col'>
                     <div className='flex flex-col justify-start mb-4'>
                         <p className="text-[#8E8E8E] font-semibold">Middle Name</p>
-                        <p>{fakeAccData[0].middleName}</p>
+                        <p>{!userAcc?.mName ? " " : userAcc?.mName}</p>
+                        
                     </div>
 
                     <div className='flex flex-col justify-start mb-4'>
                         <p className="text-[#8E8E8E] font-semibold">Phone Number</p>
-                        <p>{fakeAccData[0].phoneNumber}</p>
+                        <p>{userAcc?.phoneNum}</p>
                     </div>
 
                     <div className='flex flex-col justify-start mb-4'>
                         <p className="text-[#8E8E8E] font-semibold">Employee Number</p>
-                        <p>{fakeAccData[0].employeeNumber}</p>
+                        <p>{userAcc?.employeeNum}</p>
                     </div>
                 </div>
 
@@ -66,17 +79,17 @@ const UserInformation: React.FC<{isOpen: boolean, fakeAccData: any}> = ( {isOpen
                 <div className='flex flex-col mr-6'>
                     <div className='flex flex-col justify-start mb-4'>
                         <p className="text-[#8E8E8E] font-semibold">Last Name</p>
-                        <p>{fakeAccData[0].lastName}</p>
+                        <p>{userAcc?.lName}</p>
                     </div>
 
                     <div className='flex flex-col justify-start mb-4'>
                         <p className="text-[#8E8E8E] font-semibold">Suffix</p>
-                        <p>{fakeAccData[0].suffix}</p>
+                        <p>{!userAcc?.suffix ? " " : userAcc?.suffix}</p>
                     </div>
 
                     <div className='flex flex-col justify-start mb-4'>
                         <p className="text-[#8E8E8E] font-semibold">Role</p>
-                        <p>{fakeAccData[0].role}</p>
+                        <p>{userAcc?.role}</p>
                     </div>
                 </div>
             </div>

@@ -15,9 +15,10 @@ use App\Http\Controllers\CostCalcController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\PasswordResetController;
 use App\Http\Controllers\FileController;
 use App\Http\Controllers\ModelController;
-use App\Http\Controllers\UserController;
 use App\Http\Controllers\FGController;
 use App\Http\Controllers\PredictionController;
 use App\Http\Controllers\InventoryController;
@@ -25,6 +26,12 @@ use App\Http\Controllers\InventoryController;
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/refresh', [AuthController::class, 'refresh']);
+
+Route::prefix('/password-reset')->group(function () {
+    Route::post('email', [PasswordResetController::class, 'sendResetLinkEmail']);
+    Route::get('{token}', [PasswordResetController::class, 'verifyToken']);
+    Route::post('reset', [PasswordResetController::class, 'resetPassword']);
+});
 
 Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::delete('/logout', [AuthController::class, 'logout']);
@@ -34,6 +41,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('', [UserController::class, 'getCurrentUser']);
         Route::post('update/{id}', [UserController::class, 'updateUser']);
         Route::delete('archive/{id}', [UserController::class, 'archiveUser']);
+        Route::put('update', [UserController::class, 'editUserInfo']);
     });
 
     Route::prefix('/files')->group(function () {
@@ -107,10 +115,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('/auditlogs')->group(function () {
-        Route::get('',[AuditLogController::class,'getAuditLogs']);
-        Route::post('logsaudit',[AuditLogController::class,'updateAuditLogs']);
+        Route::get('', [AuditLogController::class, 'getAuditLogs']);
+        Route::post('logsaudit', [AuditLogController::class, 'updateAuditLogs']);
     });
-        
+
     Route::prefix('/notifications')->group(function () {
         Route::get('new', [NotificationController::class, 'getNewNotifications']);
         Route::get('retrieve', [NotificationController::class, 'retrieve']);
@@ -157,9 +165,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('/article')->group(function () {
-        Route::post('/upload', [ArticleController::class, 'uploadArticle']);
+        // Route::post('/upload', [ArticleController::class, 'uploadArticle']);
         Route::post('/data', [ArticleController::class, 'getArticle']);
         Route::post('/update', [ArticleController::class, 'updateArticle']);
-        Route::get('/all', [ArticleController::class, 'getAll']);
     });
 });
