@@ -6,6 +6,8 @@ use App\Models\FinishedGood;
 use App\Models\Fodl;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
+use App\Helpers\DateHelper;
+use Illuminate\Support\Facades\Log;
 
 class FinishedGoodController extends ApiController
 {
@@ -364,65 +366,108 @@ class FinishedGoodController extends ApiController
         // }
     }
 
-    // public function updateBatch(Request $request)
+    // public function getAverageCost()
     // {
-    //     $rules = [
-    //         'data' => 'required|array|min:1',
-    //         'data.*.fg_code' => 'required|string|exists:finished_goods,fg_code',
-    //         'data.*.fg_desc' => 'required|string',
-    //         'data.*.unit' => 'required|string',
-    //     ];
-
-    //     $validator = Validator::make($request->all(), $rules);
-
-    //     if ($validator->fails()) {
-    //         $this->status = 422;
-    //         $this->response['errors'] = $validator->errors();
-    //         return $this->getResponse("Validation failed.");
-    //     }
-
-    //     $updatedRecords = [];
-    //     $failedRecords = [];
-
-    //     \DB::beginTransaction();
-
     //     try {
-    //         foreach ($request->input('data') as $record) {
-    //             $fg = FinishedGood::where('fg_code', $record['fg_code'])->first();
-
-    //             if ($fg) {
-    //                 $fg->fg_desc = $record['fg_desc'];
-    //                 $fg->unit = $record['unit'];
-    //                 $fg->save();
-
-    //                 $updatedRecords[] = $fg;
-    //             } else {
-    //                 $failedRecords[] = [
-    //                     'fg_code' => $record['fg_code'],
-    //                     'message' => 'Finished Good record not found.',
-    //                 ];
-    //             }
-    //         }
-
-    //         if (count($failedRecords) > 0) {
-    //             \DB::rollBack();
-    //             $this->status = 400;
-    //             $this->response['failed_records'] = $failedRecords;
-    //             return $this->getResponse("Some records failed to update.");
-    //         }
-
-    //         // Commit the transaction
-    //         \DB::commit();
+    //         $overallAverage = FinishedGood::where('is_least_cost', 1)->avg('total_cost');
 
     //         $this->status = 200;
-    //         $this->response['data'] = $updatedRecords;
-    //         return $this->getResponse("Finished Goods records updated successfully.");
+    //         $this->response['average_cost'] = $overallAverage;
+    //         return $this->getResponse("Average costs for least cost products retrieved successfully.");
     //     } catch (\Exception $e) {
-    //         // Rollback the transaction on error
-    //         \DB::rollBack();
     //         $this->status = 500;
     //         $this->response['message'] = $e->getMessage();
-    //         return $this->getResponse("An error occurred while updating records.");
+    //         return $this->getResponse("An error occurred while retrieving average costs.");
     //     }
     // }
+
+    public function getAverageCost()
+{
+    try {
+        $currentMonthYear = now()->format('Ym');
+        $previousMonthYear = now()->subMonth()->format('Ym');
+
+        $currentAverage = FinishedGood::where('is_least_cost', 1)
+            ->where('monthYear', $currentMonthYear)
+            ->avg('total_cost');
+
+        $previousAverage = FinishedGood::where('is_least_cost', 1)
+            ->where('monthYear', $previousMonthYear)
+            ->avg('total_cost');
+
+        $percentageChange = 0;
+        $trend = 'unchanged';
+
+        if ($previousAverage > 0) {
+            $percentageChange = (($currentAverage - $previousAverage) / $previousAverage) * 100;
+            $trend = $percentageChange > 0 ? 'increased' : ($percentageChange < 0 ? 'decreased' : 'unchanged');
+        }
+
+        $this->status = 200;
+        $this->response['average_cost'] = $currentAverage;
+        $this->response['percentage_change'] = round($percentageChange, 2);
+        $this->response['trend'] = $trend;
+
+        return $this->getResponse("Average costs for least cost products retrieved successfully.");
+    } catch (\Exception $e) {
+        $this->status = 500;
+        $this->response['message'] = $e->getMessage();
+        return $this->getResponse("An error occurred while retrieving average costs.");
+    }
+}
+
+    public function retrieveAllFGData(Request $request)
+    {
+        $validator = Validator::make($request->all(), [
+            'monthYear' => 'required', // Validate monthYear
+        ]);
+
+        if ($validator->fails()) {
+            $this->status = 400;
+            return $this->getResponse($validator->errors()->first());
+        }
+
+        try {
+            $monthYear = $request->input('monthYear');
+
+            $fgData = FinishedGood::where('is_least_cost', 1)
+                ->where('monthYear', $monthYear)
+                ->get();
+
+            if ($fgData->isEmpty()) {
+                $this->status = 404;
+                $this->response['message'] = 'No finished goods found for the specified criteria.';
+                return $this->getResponse();
+            }
+
+            $fodlIds = $fgData->pluck('fodl_id');
+
+            $fodlData = Fodl::whereIn('fodl_id', $fodlIds)->get();
+
+            $fullfgData = $fgData->map(function ($finishedGood) use ($fodlData) {
+
+                $fodl = $fodlData->firstWhere('fodl_id', $finishedGood->fodl_id);
+                return [
+                    'fg_id' => $finishedGood->fg_id,
+                    'fodl_id' => $finishedGood->fodl_id,
+                    'fg_code' => $finishedGood->fg_code,
+                    'fg_desc' => $finishedGood->fg_desc,
+                    'rm_cost' => $finishedGood->rm_cost,
+                    'formulation_no' => $finishedGood->formulation_no,
+                    'monthYear' => $finishedGood->monthYear,
+                    'factory_overhead' => $fodl->factory_overhead,
+                    'direct_labor' => $fodl->direct_labor,
+                    'total_cost' => $finishedGood->total_cost,
+                ];
+            });
+
+            $this->status = 200;
+            $this->response['data'] = $fullfgData;
+            return $this->getResponse();
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = $e->getMessage();
+            return $this->getResponse();
+        }
+    }
 }

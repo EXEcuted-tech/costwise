@@ -49,10 +49,10 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
     };
 
     return (
-        <div className="flex flex-col w-auto h-auto rounded-lg shadow-md shadow-gray-300">
+        <div className="flex flex-col w-auto h-[44rem] rounded-lg shadow-md shadow-gray-300">
             {/* Main Content */}
             <div className="animate-fade-in3 flex flex-col w-auto h-[38rem] xl:h-[40rem] 2xl:h-[38rem] 3xl:h-[38rem] 4xl:h-[38rem]">
-                <table className="w-full h-full text-left">
+                <table className="w-full h-[5rem] text-left">
                     <thead className="bg-[#F3F3F3] border-b border-[#868686]">
                         <tr className={`${isOpen ? 'text-[1.1em] 3xl:text-[1em] 2xl:text-[1em] xl:text-[0.9em]' : 'text-[1.3em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[1em]'} text-[#6B6B6B]`}>
                             <th className={`${isOpen ? 'pl-[2rem] 4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[14rem] xl:w-[8rem]' : 'pl-8 w-[20rem] 4xl:w-[20rem] 3xl:w-[15rem] 2xl:w-[14rem] xl:pl-6'} py-4`}
@@ -81,13 +81,13 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                         ) : fileData.length > 0 ? (
                                 currentListPage.map((data, index) => (
                                 <tr key={index} className={`${isOpen ? 'text-[1.1em] 4xl:text-[1.1em] 3xl:text-[0.9em] 2xl:text-[0.8em] xl:text-[0.7em]' : 'text-[1.2em] 4xl:text-[1.2em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[1em]' } border-b border-[#868686] hover:bg-gray-50`}>
-                                    <td className={`${isOpen ? 'pl-[2rem]' : 'pl-8 xl:pl-6'} py-5 break-words capitalize`}>{data.first_name} {data.last_name}</td>
-                                    <td className="py-2 break-words capitalize">{data.position}</td>
-                                    <td className="py-2 break-words">{data.email_address}</td>
-                                    <td className="py-2 break-words">{data.phone_number}</td>
-                                    <td className="py-2 break-words capitalize">{data.department}</td>
-                                    <td className="py-2 break-words capitalize">{data.user_type}</td>
-                                    <td className={`${isOpen ? 'pl-[1rem] 2xl:pr-2 xl:pr-2' : 'pl-[3rem] xl:pl-[2rem] xl:pr-2'} py-2`}>
+                                    <td className={`${isOpen ? 'pl-[2rem]' : 'pl-8 xl:pl-6'} break-words capitalize`}>{data.first_name} {data.last_name}</td>
+                                    <td className="py-5 break-words capitalize">{data.position}</td>
+                                    <td className="py-4 break-words">{data.email_address}</td>
+                                    <td className="py-4 break-words">{data.phone_number}</td>
+                                    <td className="py-4 break-words capitalize">{data.department}</td>
+                                    <td className="py-4 break-words capitalize">{data.user_type}</td>
+                                    <td className={`${isOpen ? 'pl-[1rem] 2xl:pr-2 xl:pr-2' : 'pl-[3rem] xl:pl-[2rem] xl:pr-2'}`}>
                                         <div className="flex">
                                             <button
                                                 onClick={() => openEditModal(data)}
@@ -119,7 +119,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
             {isDeleteModalOpen && <ConfirmDeleteUser user={selectedUser} onClose={closeDeleteModal}/>}
 
             {/* Footer */}
-            <div className="flex w-full justify-center h-[5rem] mt-2 rounded-b-xl bg-white border-[#868686]">
+            <div className="flex w-full justify-center h-[5rem] mt-4 rounded-b-xl bg-white border-[#868686]">
                 <PrimaryPagination
                     data={fileData}
                     itemsPerPage={8}

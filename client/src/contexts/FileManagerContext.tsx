@@ -11,6 +11,8 @@ interface FileManagerContextType {
   setAddedRowsCount: React.Dispatch<React.SetStateAction<number>>;
   fileToDelete: number;
   setFileToDelete: React.Dispatch<React.SetStateAction<number>>;
+  fileSettings: string;
+  setFileSettings: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const FileManagerContext = createContext<FileManagerContextType | undefined>(undefined);
@@ -20,8 +22,9 @@ export function FileManagerProvider({ children }: { children: ReactNode }) {
   const [deleteModal, setDeleteModal] = useState(false);
   const [addedRowsCount, setAddedRowsCount] = useState(0);
   const [fileToDelete, setFileToDelete] = useState(0);
+  const [fileSettings, setFileSettings] = useState('');
   return (
-    <FileManagerContext.Provider value={{ fileType, setFileType, deleteModal, setDeleteModal, addedRowsCount, setAddedRowsCount, fileToDelete, setFileToDelete }}>
+    <FileManagerContext.Provider value={{ fileType, setFileType, deleteModal, setDeleteModal, addedRowsCount, setAddedRowsCount, fileToDelete, setFileToDelete, fileSettings, setFileSettings }}>
       {children}
     </FileManagerContext.Provider>
   );

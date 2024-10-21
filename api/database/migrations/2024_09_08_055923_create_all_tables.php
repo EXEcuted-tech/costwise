@@ -160,6 +160,19 @@ return new class extends Migration {
             $table->foreign('material_id')->references('material_id')->on('materials')->onDelete('cascade');
         });
 
+        // Events Table
+        Schema::create('events', function (Blueprint $table) {
+            $table->increments('event_id');
+            $table->unsignedInteger('user_id')->nullable();
+            $table->string('title');
+            $table->text('description')->nullable();
+            $table->date('event_date');
+            $table->time('start_time')->nullable();
+            $table->time('end_time')->nullable();
+            $table->timestamps();
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+        });
+
         // Release Notes Table
         Schema::create('release_notes', function (Blueprint $table) {
             $table->increments('note_id');
@@ -187,5 +200,6 @@ return new class extends Migration {
         Schema::dropIfExists('audit_logs');
         Schema::dropIfExists('users');
         Schema::dropIfExists('transactions');
+        Schema::dropIfExists('events');
     }
 };

@@ -372,35 +372,58 @@ class TransactionController extends ApiController
         return $this->getResponse();
     }
 
-    // public static function deleteTransaction($transactionId)
-    // {
-    //     $transaction = Transaction::find($transactionId);
+    public function getTotalProductionCost()
+    {
+        try {
+            $currentDate = Carbon::now();
+            $currentMonth = $currentDate->format('Y-m');
+            $previousMonth = $currentDate->copy()->subMonth()->format('Y-m');
 
-    //     if (!$transaction) {
-    //         return false;
-    //     }
+            $currentMonthCost = $this->calculateMonthCost($currentMonth);
+            $previousMonthCost = $this->calculateMonthCost($previousMonth);
 
-    //     if ($transaction->fg_id != null) {
-    //         $fg = FinishedGood::find($transaction->fg_id);
-    //         if ($fg) {
-    //             if (isset($fg['fodl_id']) && !Fodl::on('archive_mysql')->find($fg['fodl_id'])) {
-    //                 unset($fg['fodl_id']);
-    //             }
-    //             FinishedGood::on('archive_mysql')->create($fg->toArray());
-    //             $fg->delete();
-    //         }
-    //     } else if ($transaction->material_id != null) {
-    //         $material = Material::find($transaction->material_id);
-    //         if ($material) {
-    //             Material::on('archive_mysql')->create($material->toArray());
-    //             // dd($debug);
-    //             $material->delete();
-    //         }
-    //     }
+            $percentageChange = 0;
+            $trend = 'unchanged';
 
-    //     Transaction::on('archive_mysql')->create($transaction->toArray());
-    //     $transaction->delete();
+            if ($previousMonthCost > 0) {
+                $percentageChange = (($currentMonthCost - $previousMonthCost) / $previousMonthCost) * 100;
+                $trend = $percentageChange > 0 ? 'increased' : ($percentageChange < 0 ? 'decreased' : 'unchanged');
+            }
 
-    //     return true;
-    // }
+            $this->status = 200;
+            $this->response['total_production_cost'] = $currentMonthCost;
+            $this->response['percentage_change'] = abs(round($percentageChange, 2));
+            $this->response['trend'] = $trend;
+            return $this->getResponse("Total production cost calculated successfully.");
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = $e->getMessage();
+            return $this->getResponse("An error occurred while calculating total production cost.");
+        }
+    }
+
+    private function calculateMonthCost($month)
+    {
+        $transactions = Transaction::whereRaw("DATE_FORMAT(date, '%Y-%m') = ?", [$month])->get();
+        $totalCost = 0;
+
+        foreach ($transactions as $transaction) {
+            $settings = json_decode($transaction->settings, true);
+            $qty = $settings['qty'] ?? 0;
+
+            if ($transaction->fg_id) {
+                $finishedGood = FinishedGood::find($transaction->fg_id);
+                if ($finishedGood) {
+                    $totalCost += $finishedGood->rm_cost * $qty;
+                }
+            } elseif ($transaction->material_id && !$transaction->fg_id) {
+                $material = Material::find($transaction->material_id);
+                if ($material) {
+                    $totalCost += $material->material_cost * $qty;
+                }
+            }
+        }
+
+        return $totalCost;
+    }
 }

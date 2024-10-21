@@ -1,5 +1,6 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
+import ProtectedRoute from "@/components/routes/ProtectedRoute";
 import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
 
 export default function NotificationLayout({
@@ -8,11 +9,13 @@ export default function NotificationLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <SidebarProvider>
-      <NotificationContent>
-        {children}
-      </NotificationContent>
-    </SidebarProvider>
+    <ProtectedRoute>
+      <SidebarProvider>
+        <NotificationContent>
+          {children}
+        </NotificationContent>
+      </SidebarProvider>
+    </ProtectedRoute>
   );
 }
 
