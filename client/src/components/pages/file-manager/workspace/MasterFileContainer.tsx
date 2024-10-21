@@ -7,6 +7,7 @@ import { BOM, File, FodlPair, FodlRecord, FormulationRecord, MaterialRecord, Rem
 import api from '@/utils/api';
 import { formatMonthYear, transformMonthYearToDate } from '@/utils/costwiseUtils';
 import Alert from '@/components/alerts/Alert';
+import { useUserContext } from '@/contexts/UserContext';
 
 const MasterFileContainer = (data: File) => {
 
@@ -27,6 +28,8 @@ const MasterFileContainer = (data: File) => {
 
   const [alertMessages, setAlertMessages] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
+
+  const { currentUser } = useUserContext();
 
   useEffect(() => {
     if (localStorage.getItem("edit") === "true") {
@@ -382,6 +385,25 @@ const MasterFileContainer = (data: File) => {
       }
 
       // await fetchFodlSheet();
+
+      const auditData = {
+        userId: currentUser?.userId, 
+        action: 'crud',
+        act: 'edit',
+        fileName: `${settings.file_name}`,
+      };
+      if (currentUser) {
+      console.log('Current User ID:', currentUser?.userId);
+      } else {
+          console.log('Current User is not defined.', currentUser);
+      }
+      api.post('/auditlogs/logsaudit', auditData)
+      .then(response => {
+          console.log('Audit log created successfully:', response.data);
+      })
+      .catch(error => {
+          console.error('Error audit logs:', error);
+      });
     } catch (error: any) {
       if (error.response?.data?.message) {
         setAlertMessages([error.response.data.message]);
@@ -461,6 +483,25 @@ const MasterFileContainer = (data: File) => {
         const errorMsg = saveResponse.data.message || 'Failed to save material sheet.';
         setAlertMessages([errorMsg]);
       }
+
+      const auditData = {
+        userId: currentUser?.userId, 
+        action: 'crud',
+        act: 'edit',
+        fileName: `${settings.file_name}`,
+      };
+      if (currentUser) {
+      console.log('Current User ID:', currentUser?.userId);
+      } else {
+          console.log('Current User is not defined.', currentUser);
+      }
+      api.post('/auditlogs/logsaudit', auditData)
+      .then(response => {
+          console.log('Audit log created successfully:', response.data);
+      })
+      .catch(error => {
+          console.error('Error audit logs:', error);
+      });
     } catch (error: any) {
       if (error.response?.data?.message) {
         setAlertMessages([error.response.data.message]);
@@ -702,6 +743,25 @@ const MasterFileContainer = (data: File) => {
 
         setRemovedIds([]);
 
+        const settings = JSON.parse(data.settings);
+        const auditData = {
+          userId: currentUser?.userId, 
+          action: 'crud',
+          act: 'edit',
+          fileName: `${settings.file_name}`,
+        };
+        if (currentUser) {
+        console.log('Current User ID:', currentUser?.userId);
+        } else {
+            console.log('Current User is not defined.', currentUser);
+        }
+        api.post('/auditlogs/logsaudit', auditData)
+        .then(response => {
+            console.log('Audit log created successfully:', response.data);
+        })
+        .catch(error => {
+            console.error('Error audit logs:', error);
+        });
         setIsLoading(false);
       }
     } catch (error: any) {

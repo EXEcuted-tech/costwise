@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import { IoIosClose } from 'react-icons/io';
 import { TiWarning } from "react-icons/ti";
 import Alert from '../alerts/Alert';
+import { useUserContext } from '@/contexts/UserContext';
 
 interface ConfirmDeleteProps {
     user: User;
@@ -13,20 +14,42 @@ interface ConfirmDeleteProps {
 const ConfirmDeleteUser: React.FC<ConfirmDeleteProps> = ({ user, onClose }) => {
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
+    const { currentUser } = useUserContext();
 
     console.log("DELETING USERRRRRR", user);
 
-    const handleDeleteUser = async(userId: number) => {
+    const handleDeleteUser = async(userId: number, fName: string, lName: string) => {
         //Reset errors
         setAlertStatus('');
         setAlertMessages([]);
-
+        const fullName = `${fName} ${lName}`;
+        console.log(fullName);
         try {
             const response = await api.delete(`/user/archive/${userId}`);
             console.log(response);
 
             setAlertStatus('success');
             setAlertMessages([response.data.message])
+            
+            const auditData = {
+                userId: currentUser?.userId,
+                action: 'general',
+                act: 'archive',
+                fileName: fullName
+            };
+            console.log(auditData);
+            if (currentUser) {
+            console.log('Current User ID:', currentUser?.userId);
+            } else {
+                console.log('Current User is not defined.', currentUser);
+            }
+            api.post('/auditlogs/logsaudit', auditData)
+            .then(response => {
+                console.log('Audit log created successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error audit logs:', error);
+            });
             setTimeout(() => {
                 window.location.reload();
               }, 1000);
@@ -72,7 +95,7 @@ const ConfirmDeleteUser: React.FC<ConfirmDeleteProps> = ({ user, onClose }) => {
                                >
                                 <button 
                                 className="text-[19px] font-black before:ease relative h-12 w-40 overflow-hidden bg-primary text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-primary hover:before:-translate-x-40"
-                                onClick={()=>handleDeleteUser(user.user_id)}>
+                                onClick={()=>handleDeleteUser(user.user_id, user.first_name, user.last_name)}>
                                     <span className="relative z-10">Proceed</span>
                                 </button>
                             </div>

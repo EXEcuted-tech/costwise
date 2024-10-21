@@ -54,6 +54,7 @@ const AuditLogPage = () => {
     const toggleDrawer = () => setDrawerOpen(!drawerOpen);
     // const [data, setData] = useState<AuditTableProps[]>(fakeAuditAllData);
     const [auditLogs, setAuditLogs] = useState<AuditTableProps[]>([]);
+    const [sortAscending, setSortAscending] = useState<boolean>(true);
     const [currentPage, setCurrentPage] = useState<number>(1);
 
     const handleShowMore = (dataItem: AuditTableProps) => {
@@ -110,6 +111,16 @@ const AuditLogPage = () => {
         return () => clearInterval(interval);
     }, [setCurrentUser]);
 
+    const sortAuditLogs = () => {
+        const sortedLogs = [...auditLogs].sort((a, b) => {
+            const dateA = new Date(a.dateTimeAdded).getTime();
+            const dateB = new Date(b.dateTimeAdded).getTime();
+            return sortAscending ? dateA - dateB : dateB - dateA;
+        });
+        setAuditLogs(sortedLogs);
+        setSortAscending(!sortAscending);
+    };
+
     return (
         <div className={`w-full h-screen font-lato bg-background`}>
             <AuditDrawer data={selectedData}/>
@@ -121,8 +132,8 @@ const AuditLogPage = () => {
                             <BiSearchAlt className="absolute left-3 top-[20px] 4xl:top-[24px] text-[20px] 4xl:text-[23px] transform -translate-y-1/2 text-gray-600" />
                             <input className={`${isOpen ? 'w-[300px] 3xl:w-[400px]': 'w-[400px]'} p-[6px] 4xl:p-[7px] text-[16px] 4xl:text-[20px] pl-[35px] 4xl:pl-[40px] border border-[#868686] rounded-full`} placeholder="Search here..." />
                         </div>
-                        <button className="flex justify-center items-center bg-white hover:bg-[#ebebeb] transition-colors duration-300 ease-in-out 4xl:p-[6px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]">
-                            <LuArrowDownUp className="text-[20px] 4xl:text-[25px] text-[#414141]" />
+                        <button onClick={sortAuditLogs} className="flex justify-center items-center bg-white hover:bg-[#ebebeb] transition-colors duration-300 ease-in-out 4xl:p-[6px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]">
+                            {sortAscending ? <LuArrowUpDown className="text-[20px] 4xl:text-[25px] text-[#414141]" /> : <LuArrowDownUp className="text-[20px] 4xl:text-[25px] text-[#414141]" />}
                         </button>
                         <button className="flex justify-center items-center bg-white hover:bg-[#ebebeb] transition-colors duration-300 ease-in-out 4xl:p-[10px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]">
                             <FaFilter className="text-[20px] 4xl:text-[25px] text-[#414141]" />
@@ -197,150 +208,3 @@ const AuditLogPage = () => {
 }
 
 export default AuditLogPage
-
-// const fakeAuditAllData: AuditTableProps[] = [
-//     {
-//         dateTimeAdded: 'January 12, 2024 12:50:22',
-//         employeeName: 'Kathea Mari Mayol',
-//         employeeNo: '#112391',
-//         userType: 'Regular User',
-//         userEmail: 'katheamari@gmail.com',
-//         actionEvent: 'Record changed: BOM_V1_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 13, 2024 12:50:22',
-//         employeeName: 'Franz Casimir Ondiano',
-//         employeeNo: '#123531',
-//         userType: 'Regular User',
-//         userEmail: 'franzcasimir.ondiano@gmail.com',
-//         actionEvent: 'Record changed: BOM_V3_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 14, 2024 12:50:22',
-//         employeeName: 'Hannah Angelica Galve',
-//         employeeNo: '#125131',
-//         userType: 'Regular User',
-//         userEmail: 'hannah.galve@gmail.com',
-//         actionEvent: 'Record changed: BOM_V5_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 15, 2024 12:50:22',
-//         employeeName: 'Tyrone Ybanez',
-//         employeeNo: '#199999',
-//         userType: 'Regular User',
-//         userEmail: 'tyrone.ybanez@gmail.com',
-//         actionEvent: 'Record changed: BOM_V7_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 17, 2024 12:50:22',
-//         employeeName: 'Kathea Mari Mayol',
-//         employeeNo: '#188888',
-//         userType: 'Regular User',
-//         userEmail: 'katheamari@gmail.com',
-//         actionEvent: 'Record changed: BOM_V9_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 12, 2024 12:50:22',
-//         employeeName: 'Franz Casimir Ondiano',
-//         employeeNo: '#112391',
-//         userType: 'Regular User',
-//         userEmail: 'franzcasimir.ondiano@gmail.com',
-//         actionEvent: 'Record changed: BOM_V1_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 13, 2024 12:50:22',
-//         employeeName: 'Hannah Angelica Galve',
-//         employeeNo: '#123531',
-//         userType: 'Regular User',
-//         userEmail: 'hannah.galve.ondiano@gmail.com',
-//         actionEvent: 'Record changed: BOM_V3_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 14, 2024 12:50:22',
-//         employeeName: 'Tyrone Ybanez',
-//         employeeNo: '#125131',
-//         userType: 'Regular User',
-//         userEmail: 'tyrone.ybanez@gmail.com',
-//         actionEvent: 'Record changed: BOM_V5_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 15, 2024 12:50:22',
-//         employeeName: 'Kathea Mari Mayol',
-//         employeeNo: '#199999',
-//         userType: 'Regular User',
-//         userEmail: 'katheamari@gmail.com',
-//         actionEvent: 'Record changed: BOM_V7_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 17, 2024 12:50:22',
-//         employeeName: 'Franz Casimir Ondiano',
-//         employeeNo: '#188888',
-//         userType: 'Regular User',
-//         userEmail: 'franzcasimir.ondiano@gmail.com',
-//         actionEvent: 'Record changed: BOM_V9_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 12, 2024 12:50:22',
-//         employeeName: 'Hannah Angelica Galve',
-//         employeeNo: '#112391',
-//         userType: 'Regular User',
-//         userEmail: 'hannah.galve@gmail.com',
-//         actionEvent: 'Record changed: BOM_V1_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 13, 2024 12:50:22',
-//         employeeName: 'Tyrone Ybanez',
-//         employeeNo: '#123531',
-//         userType: 'Regular User',
-//         userEmail: 'tyrone.ybanez@gmail.com',
-//         actionEvent: 'Record changed: BOM_V3_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 14, 2024 12:50:22',
-//         employeeName: 'Kathea Mari Mayol',
-//         employeeNo: '#125131',
-//         userType: 'Regular User',
-//         userEmail: 'katheamari@gmail.com',
-//         actionEvent: 'Record changed: BOM_V5_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 15, 2024 12:50:22',
-//         employeeName: 'Franz Casimir Ondiano',
-//         employeeNo: '#199999',
-//         userType: 'Regular User',
-//         userEmail: 'franzcasimir.ondiano@gmail.com',
-//         actionEvent: 'Record changed: BOM_V7_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 17, 2024 12:50:22',
-//         employeeName: 'Hannah Angelica Galve',
-//         employeeNo: '#188888',
-//         userType: 'Regular User',
-//         userEmail: 'hannah.galve@gmail.com',
-//         actionEvent: 'Record changed: BOM_V9_Cost.csv',
-//         department: 'Accounting',
-//     },
-//     {
-//         dateTimeAdded: 'January 13, 2024 12:50:22',
-//         employeeName: 'Tyrone Ybanez',
-//         employeeNo: '#123531',
-//         userType: 'Regular User',
-//         userEmail: 'tyrone.ybanez@gmail.com',
-//         actionEvent: 'Record changed: BOM_V3_Cost.csv',
-//         department: 'Accounting',
-//     },
-// ];
