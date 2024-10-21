@@ -5,12 +5,14 @@ import { BsExclamationCircle } from 'react-icons/bs';
 import { FaFileCircleCheck, FaFileCircleXmark, FaRegFile } from "react-icons/fa6";
 import Alert from '../alerts/Alert';
 import api from '@/utils/api';
+import { useUserContext } from '@/contexts/UserContext';
 
 interface ImportInventoryListProps { 
   onClose: () => void;
 }
 
 const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) => {
+    const { currentUser } = useUserContext();
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
 
@@ -143,6 +145,25 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
             }
             
             setTimeout(function(){location.reload()}, 1000);
+
+            const auditData = {
+                userId: currentUser?.userId, 
+                action: 'crud',
+                act: 'edit',
+                fileName: fileName,
+            };
+            if (currentUser) {
+            console.log('Current User ID:', currentUser?.userId);
+            } else {
+                console.log('Current User is not defined.', currentUser);
+            }
+            api.post('/auditlogs/logsaudit', auditData)
+            .then(response => {
+                console.log('Audit log created successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error audit logs:', error);
+            });
                     
         } catch (error: any) {
             console.error('Error importing file:', error);

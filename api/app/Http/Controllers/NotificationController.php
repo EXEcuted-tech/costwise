@@ -40,10 +40,6 @@ class NotificationController extends ApiController
             $colB = $request->input('col2');
             $valB = $request->input('val2');
 
-            if (!$colA || !$valA || !$colB || !$valB) {
-                throw new \Exception('Column and value are required');
-            }
-
             $records = AuditLog::where($colA, $valA)->where($colB, $valB)->get();
 
             $this->status = 200;
@@ -71,11 +67,29 @@ class NotificationController extends ApiController
                 throw new \Exception('Notification not found');
             }
 
-            $record->read = 1;
+            $record->read = $record->read == 1 ? 0 : 1;
             $record->save();
 
             $this->status = 200;
-            $this->response['message'] = 'Notification marked as read successfully';
+            return $this->getResponse();
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = $e->getMessage();
+            return $this->getResponse();
+        }
+    }
+
+    public function markAllAsRead(Request $request)
+    {
+        try {
+            $userId = $request->user()->user_id;
+
+            AuditLog::where('user_id', $userId)
+                ->where('read', 0)
+                ->update(['read' => 1]);
+
+            $this->status = 200;
+            $this->response['message'] = 'All notifications marked as read';
             return $this->getResponse();
         } catch (\Exception $e) {
             $this->status = 500;
@@ -92,6 +106,7 @@ class NotificationController extends ApiController
 
             $newNotifications = AuditLog::where('user_id', $userId)
                 ->where('timestamp', '>', $lastCheckedAt)
+                ->where('read', 0)
                 ->get();
 
             $this->status = 200;

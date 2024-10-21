@@ -4,6 +4,7 @@ import { TiWarning } from "react-icons/ti";
 import { InventoryType } from '@/types/data';
 import Alert from '../alerts/Alert';
 import api from '@/utils/api';
+import { useUserContext } from '@/contexts/UserContext';
 
 interface ConfirmDeleteProps {
     onClose: () => void;
@@ -14,6 +15,7 @@ interface ConfirmDeleteProps {
 const ConfirmDeleteInventory: React.FC<ConfirmDeleteProps> = ({ onClose, inventoryList, monthYear }) => {
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
+    const { currentUser } = useUserContext();
 
     const handleDelete = async() => {
         try {
@@ -31,6 +33,23 @@ const ConfirmDeleteInventory: React.FC<ConfirmDeleteProps> = ({ onClose, invento
             setAlertMessages([response.data.message]);
             setAlertStatus('success');
 
+            const auditData = {
+                userId: currentUser?.userId, 
+                action: 'crud',
+                act: 'archive_inventory'
+              };
+              if (currentUser) {
+              console.log('Current User ID:', currentUser?.userId);
+              } else {
+                  console.log('Current User is not defined.', currentUser);
+              }
+              api.post('/auditlogs/logsaudit', auditData)
+              .then(response => {
+                  console.log('Audit log created successfully:', response.data);
+              })
+              .catch(error => {
+                  console.error('Error audit logs:', error);
+              });
             setTimeout(function(){location.reload()}, 1000);
 
         } catch (error: any) {
