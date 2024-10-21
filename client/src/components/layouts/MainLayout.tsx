@@ -11,9 +11,17 @@ import { useNotificationContext } from '@/contexts/NotificationContext';
 const MainLayout = () => {
   const { isOpen, setIsOpen } = useSidebarContext();
   const { setHasNewNotifications } = useNotificationContext();
+  const [notificationSound, setNotificationSound] = useState<HTMLAudioElement | null>(null);
+
+  const notificationSoundSrc = '/notification-ring.mp3';
+  
+  useEffect(() => {
+    setNotificationSound(new Audio(notificationSoundSrc));
+  }, []);
 
   useEffect(() => {
     let lastCheckedAt = new Date().toISOString();
+
     const checkForNewNotifications = async () => {
       try {
         const response = await api.get('/notifications/new', {
@@ -22,6 +30,7 @@ const MainLayout = () => {
         
         if (response.data.data.length > 0) {
           setHasNewNotifications(true);
+          notificationSound?.play()
         }
         
         lastCheckedAt = new Date().toISOString();
@@ -33,7 +42,7 @@ const MainLayout = () => {
     const intervalId = setInterval(checkForNewNotifications, 30000); // Check every 30 seconds
 
     return () => clearInterval(intervalId);
-  }, [setHasNewNotifications]);
+  }, [notificationSound, setHasNewNotifications]);
   
   return (
     <div className='flex !font-lato'>

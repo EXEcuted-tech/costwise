@@ -104,6 +104,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('new', [NotificationController::class, 'getNewNotifications']);
         Route::get('retrieve', [NotificationController::class, 'retrieve']);
         Route::get('retrieve_unread', [NotificationController::class, 'retrieveUnread']);
+        Route::post('mark_as_read', [NotificationController::class, 'markAsRead']);
     });
 
     Route::prefix('/inventory')->group(function () {

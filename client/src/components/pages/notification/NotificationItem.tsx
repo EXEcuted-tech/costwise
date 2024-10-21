@@ -14,7 +14,7 @@ export interface NotificationItemProps {
   isRead: boolean;
 }
 
-export const NotificationItem: React.FC<NotificationItemProps> = ({ icon, mainText, subText, time, isRead }) => {
+export const NotificationItem: React.FC<NotificationItemProps> = ({ id, icon, mainText, subText, time, isRead }) => {
   const [read, setRead] = useState(isRead);
 
   const handleMarkAsRead = async () => {
@@ -28,9 +28,11 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ icon, mainTe
     }
   };
 
-  const onMarkAsRead = async (id: string) => {
+  const onMarkAsRead = async () => {
+    console.log("HERE");
+    setRead(!read)
     try {
-      const response = await api.post('/notifications/mark-as-read', {
+      const response = await api.post('/notifications/mark_as_read', {
         log_id: id
       });
     } catch (error) {
@@ -45,7 +47,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ icon, mainTe
       {icon === 'file' && <FaFileAlt className="size-8 mr-4 text-black" />}
       {icon === 'bell' && <GiShoppingCart className="size-8 mr-4 text-[#F6D048]" />}
       {icon === 'general' && <AiFillNotification className="size-8 mr-4 text-[#F6D048]" />}
-      <div className="flex-grow hover:cursor-pointer" onClick={() => { setRead(!read) }}>
+      <div className="flex-grow hover:cursor-pointer" onClick={onMarkAsRead}>
         <p className="text-[#757575]">{mainText}<span className="font-light">‎ {subText}</span></p>
         <p className="text-[13px] text-[#757575] font-light">{time}</p>
       </div>

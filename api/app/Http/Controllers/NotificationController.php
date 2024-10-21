@@ -71,11 +71,10 @@ class NotificationController extends ApiController
                 throw new \Exception('Notification not found');
             }
 
-            $record->read = 1;
+            $record->read = $record->read == 1 ? 0 : 1;
             $record->save();
 
             $this->status = 200;
-            $this->response['message'] = 'Notification marked as read successfully';
             return $this->getResponse();
         } catch (\Exception $e) {
             $this->status = 500;
@@ -92,6 +91,7 @@ class NotificationController extends ApiController
 
             $newNotifications = AuditLog::where('user_id', $userId)
                 ->where('timestamp', '>', $lastCheckedAt)
+                ->where('read', 0)
                 ->get();
 
             $this->status = 200;
