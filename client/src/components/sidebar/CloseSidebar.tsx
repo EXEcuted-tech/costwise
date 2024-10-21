@@ -32,6 +32,7 @@ const CloseSidebar: React.FC = () => {
   const { hasNewNotifications } = useNotificationContext();
 
   const [currentUser, setCurrentUser] = useState<any>(null);
+  const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
   useEffect(() => {
     const userString = localStorage.getItem('currentUser');
@@ -39,7 +40,8 @@ const CloseSidebar: React.FC = () => {
       try {
         const parsedUser = JSON.parse(userString);
         setCurrentUser(parsedUser);
-        if(parsedUser.userType === 'Admin'){
+        setProfilePicture(parsedUser.displayPicture);
+        if (parsedUser.userType === 'Admin') {
           setIsAdmin(true);
         } else {
           setIsAdmin(false);
@@ -55,7 +57,15 @@ const CloseSidebar: React.FC = () => {
     localStorage.removeItem('currentUser');
     router.push('/logout');
   }
-  
+
+  const getProfilePictureUrl = (path: string | null) => {
+    if (!path) return null;
+    if (path.startsWith('http://') || path.startsWith('https://')) {
+      return path;
+    }
+    return `${config.API}/storage/${path}`;
+  };
+
   return (
     <>
       <div className='flex justify-center w-full bg-primary min-h-screen'>
@@ -70,12 +80,20 @@ const CloseSidebar: React.FC = () => {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             {/* @TODO: Display Profile Pictures Properly */}
             {currentUser?.displayPicture ? (
-              <img
-                src={currentUser.displayPicture}
-              alt={'Profile Picture'}
-              className='flex object-cover w-[80px] h-[80px] rounded-full border cursor-pointer'
-              onClick={() => { router.push('/profile') }}
-              />
+              <div
+                className='flex justify-center items-center size-[70px] 2xl:size-[80px] rounded-full border border-white hover:brightness-90 cursor-pointer overflow-hidden'
+                onClick={() => { router.push('/profile') }}
+              >
+                <div
+                  className="w-full h-full object-cover"
+                  style={{
+                    backgroundImage: `url(${getProfilePictureUrl(profilePicture) || '/default-profile.png'})`,
+                    backgroundPosition: 'center',
+                    backgroundRepeat: 'no-repeat',
+                    backgroundSize: 'cover'
+                  }}
+                />
+              </div>
             ) : (
               <div
                 className='flex justify-center items-center w-[80px] h-[80px] rounded-full border border-white hover:brightness-90 cursor-pointer bg-gray-200'
@@ -125,7 +143,7 @@ const CloseSidebar: React.FC = () => {
               {!isAdmin
                 ?
                 (userDefaultMenu.map(({ iconName, className, tooltip, route }, index) => {
-                  if(iconName === 'FaBell' && hasNewNotifications){
+                  if (iconName === 'FaBell' && hasNewNotifications) {
                     iconName = 'MdNotificationsActive';
                   }
                   const IconComponent = iconMap[iconName];
@@ -166,7 +184,7 @@ const CloseSidebar: React.FC = () => {
                 }))
                 :
                 (adminDefaultMenu.map(({ iconName, className, tooltip, route, routes }, index) => {
-                  if(iconName === 'FaBell' && hasNewNotifications){
+                  if (iconName === 'FaBell' && hasNewNotifications) {
                     iconName = 'MdNotificationsActive';
                   }
                   const IconComponent = iconMap[iconName];

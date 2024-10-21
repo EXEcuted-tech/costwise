@@ -6,6 +6,7 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
@@ -45,6 +46,7 @@ class UserController extends ApiController
         $user->last_name = $request->get('lName', $user->last_name);
         $user->email_address = $request->get('email', $user->email_address);
         $user->phone_number = $request->get('phoneNum', $user->phone_number);
+        $user->display_picture = $request->get('displayPicture', $user->display_picture);
         $user->suffix = $request->get('suffix', $user->suffix);
 
         $user->save();
@@ -54,6 +56,46 @@ class UserController extends ApiController
             'message' => 'User information updated successfully',
             'user' => $user
         ]);
+    }
+
+    public function updateProfilePicture(Request $request)
+    {
+        $user = Auth::user();
+
+        $validator = Validator::make($request->all(), [
+            'display_picture' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+        ]);
+
+        if ($validator->fails()) {
+            return response()->json([
+                'status' => 'error',
+                'errors' => $validator->errors()
+            ], 400);
+        }
+
+        if ($request->hasFile('display_picture')) {
+            if ($user->display_picture) {
+                Storage::disk('public')->delete($user->display_picture);
+            }
+
+            $path = $request->file('display_picture')->store('profile_pictures', 'public');
+            $user->display_picture = $path;
+            $user->save();
+
+            // Return the full URL
+            $fullUrl = asset('storage/' . $path);
+
+            return response()->json([
+                'status' => 'success',
+                'message' => 'Profile picture updated successfully',
+                'display_picture' => $fullUrl
+            ]);
+        }
+
+        return response()->json([
+            'status' => 'error',
+            'message' => 'No file was uploaded'
+        ], 400);
     }
 
     public function getAllUsers()
