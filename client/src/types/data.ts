@@ -200,7 +200,7 @@ export interface ProductEntry {
     monthYear: string;
     products: Product[];
   }
-}
+
 
 export interface ReleaseNote {
     note_id: number;

@@ -23,6 +23,7 @@ use App\Http\Controllers\ModelController;
 use App\Http\Controllers\FGController;
 use App\Http\Controllers\PredictionController;
 use App\Http\Controllers\InventoryController;
+use App\Http\Controllers\ReleaseNoteController;
 
 Route::post('/register', [AuthController::class, 'register']);
 Route::post('/login', [AuthController::class, 'login']);
@@ -174,5 +175,13 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('/system')->group(function () {
         Route::get('retrieve_data', [SystemController::class, 'retrieveData']);
+    });
+
+    Route::prefix('/release_note')->group(function () {
+        Route::get('retrieve', [ReleaseNoteController::class, 'retrieveNote']);
+        Route::get('retrieve_all', [ReleaseNoteController::class, 'retrieveAll']);
+        Route::post('create', [ReleaseNoteController::class, 'createNote']);
+        Route::post('update', [ReleaseNoteController::class, 'updateNote']);
+        Route::post('delete', [ReleaseNoteController::class, 'deleteNote']);
     });
 });

@@ -12,6 +12,7 @@ import ReleaseNoteTile from '@/components/pages/system-maintenance/ReleaseNoteTi
 import CreateReleaseNotes from '@/components/modals/CreateReleaseNotes';
 import ViewReleaseNotes from '@/components/modals/ViewReleaseNotes';
 import api from '@/utils/api';
+import { ReleaseNote } from '@/types/data';
 
 const SystemMaintenance = () => {
     const { isOpen } = useSidebarContext();
@@ -21,6 +22,9 @@ const SystemMaintenance = () => {
     const [storage, setStorage] = useState<any>(null);
     const [totalFiles, setTotalFiles] = useState<number>(0);
     const [fileTypes, setFileTypes] = useState<any>(null);
+    const [releaseNotes, setReleaseNotes] = useState<ReleaseNote[]>([]);
+    const [alertMessages, setAlertMessages] = useState<string[]>([]);
+    const [alertStatus, setAlertStatus] = useState<string>('');
 
     useEffect(() => {
         const fetchSystemData = async () => {
@@ -49,6 +53,19 @@ const SystemMaintenance = () => {
         const phpMyAdminUrl = process.env.NEXT_PUBLIC_PHPMYADMIN_URL || 'http://localhost/phpmyadmin';
         window.open(phpMyAdminUrl, '_blank');
     };
+
+    //Retrieve all release notes
+    const retrieveAllReleaseNotes = async () => {
+        try {
+            const response = await api.get('/release_note/retrieve_all');
+            if (response.status === 200) {
+                setReleaseNotes(response.data.data);
+            }
+        } catch (error) {
+            setAlertMessages(["Failed to retrieve release notes"]);
+            setAlertStatus("error");
+        }
+    }
 
     return (
         <div className='w-full h-screen bg-background'>
