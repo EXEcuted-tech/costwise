@@ -184,3 +184,19 @@ export interface InventoryType {
     total_qty: number;
     month_year: string;
 }
+
+export interface ProductEntry {
+    product_num: number;
+    product_name: string;
+    cost: number;
+    monthYear: string;
+  }
+  
+  interface Product {
+    productName: string;
+    cost: number;
+  }
+  export interface CostDataEntry {
+    monthYear: string;
+    products: Product[];
+  }

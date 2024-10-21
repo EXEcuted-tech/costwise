@@ -111,10 +111,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('/auditlogs')->group(function () {
-        Route::get('',[AuditLogController::class,'getAuditLogs']);
-        Route::post('logsaudit',[AuditLogController::class,'updateAuditLogs']);
+        Route::get('', [AuditLogController::class, 'getAuditLogs']);
+        Route::post('logsaudit', [AuditLogController::class, 'updateAuditLogs']);
     });
-        
+
     Route::prefix('/notifications')->group(function () {
         Route::get('new', [NotificationController::class, 'getNewNotifications']);
         Route::get('retrieve', [NotificationController::class, 'retrieve']);
@@ -153,9 +153,8 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('/article')->group(function () {
-        Route::post('/upload', [ArticleController::class, 'uploadArticle']);
+        // Route::post('/upload', [ArticleController::class, 'uploadArticle']);
         Route::post('/data', [ArticleController::class, 'getArticle']);
         Route::post('/update', [ArticleController::class, 'updateArticle']);
-        Route::get('/all', [ArticleController::class, 'getAll']);
     });
 });
