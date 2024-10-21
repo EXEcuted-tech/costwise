@@ -10,6 +10,7 @@ import config from '@/server/config';
 import api from '@/utils/api';
 import ConfirmChanges from './ConfirmChanges';
 import Alert from '../alerts/Alert';
+import { useUserContext } from '@/contexts/UserContext';
 
 interface EditUserInfoProps {
     user: User;
@@ -37,6 +38,8 @@ const getRoleName = (roleId: number): string => {
 
 
 const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
+    const { currentUser } = useUserContext(); 
+
     const [isInitialized, setIsInitialized] = useState(false);
     const [showRolesSelectModal, setShowRolesSelectModal] = useState(false);
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
@@ -310,6 +313,25 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
 
             setAlertMessages([response.data.message]);
             setAlertStatus('success');
+            const fullName = `${user.first_name} ${user.last_name}`;
+            const auditData = {
+                userId: currentUser?.userId, 
+                action: 'general',
+                act: 'edit_user',
+                fileName: fullName
+            };
+            if (currentUser) {
+            console.log('Current User ID:', currentUser?.userId);
+            } else {
+                console.log('Current User is not defined.', currentUser);
+            }
+            api.post('/auditlogs/logsaudit', auditData)
+            .then(response => {
+                console.log('Audit log created successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error audit logs:', error);
+            });
 
             window.location.reload();
 

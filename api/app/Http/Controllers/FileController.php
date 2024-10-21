@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Http\Controllers\ApiController;
 use App\Helpers\DateHelper;
 use App\Helpers\ControllerHelper;
 use App\Models\Bom;
@@ -14,9 +15,16 @@ use DateTime;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
 use PhpOffice\PhpSpreadsheet\IOFactory;
+use League\Csv\Reader;
+use App\Models\ProductCosting;
+use App\Models\FodlCost;
+use Illuminate\Support\Facades\Validator;
 use App\Models\File;
+use App\Models\MaterialCosts;
 use App\Models\FinishedGood;
 use App\Models\Material;
+use GuzzleHttp\Promise\Create;
+use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
@@ -803,7 +811,6 @@ class FileController extends ApiController
             return response()->download($tempFile, $fileName, [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ])->deleteFileAfterSend(true);
-
         } catch (\Exception $e) {
             $this->status = 500;
             $this->response['message'] = "Export failed: " . $e->getMessage();
@@ -815,8 +822,9 @@ class FileController extends ApiController
     {
         try {
             $files = File::all();
-
+    
             if ($files->isEmpty()) {
+                \Log::info('No files to export');
                 return response()->json(['message' => 'No files to export'], 404);
             }
 
@@ -832,7 +840,7 @@ class FileController extends ApiController
             if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
                 throw new \RuntimeException("Unable to create zip file");
             }
-
+    
             foreach ($files as $file) {
                 $spreadsheet = new Spreadsheet();
 
@@ -857,13 +865,12 @@ class FileController extends ApiController
                 unset($spreadsheet);
                 gc_collect_cycles();
             }
-
+    
             $zip->close();
 
             return response()->download($zipFilePath, $zipFileName, [
                 'Content-Type' => 'application/zip',
             ])->deleteFileAfterSend(true);
-
         } catch (\Exception $e) {
             $tempFiles = glob(sys_get_temp_dir() . '/excel_*');
             foreach ($tempFiles as $tempFile) {
@@ -1193,6 +1200,128 @@ class FileController extends ApiController
             }
 
             $row++;
+        }
+    }
+
+    public function uploadTrainingData(Request $request)
+    {
+        try {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'file_type' => 'required|string',
+                    'settings' => 'required|file|mimes:csv,txt|max:2048',
+                ]
+            );
+
+            if ($validator->fails()) {
+                $this->status = 401;
+                $this->response['error'] = $validator->errors();
+                return $this->getResponse("Incorrect input details.");
+            }
+
+            $validatedData = $validator->validated();
+
+            if ($request->hasFile('settings')) {
+                $file = $request->file('settings');
+
+                $fileName = time() . '_' . $file->getClientOriginalName();
+                $csvData = $this->processCsvData($file);
+
+                $fileData = [
+                    'file_type' => $validatedData['file_type'],
+                    'settings' => json_encode($csvData),
+                ];
+
+                $fileRecord = File::on(connection: 'archive_mysql')->create($fileData);
+                $this->status = 200;
+                $this->response['data'] = [
+                    'file_record' => $fileRecord,
+                    'csv_data' => $csvData,
+                ];
+                return $this->getResponse("File Successfully Uploaded");
+            }
+
+            $this->status = 400;
+            $this->response['message'] = "No file uploaded.";
+            return $this->getResponse("File upload failed.");
+        } catch (\Throwable $th) {
+            $this->status = $th->getCode() ?: 500;
+            $this->response['message'] = $th->getMessage();
+            return $this->getResponse();
+        }
+    }
+
+    private function processCsvData($file)
+    {
+        $parsedCostData = [];
+        $currentMonthYear = '';
+
+        if (($handle = fopen($file->getRealPath(), 'r')) !== false) {
+            fgetcsv($handle);
+            while (($data = fgetcsv($handle)) !== false) {
+                if (empty($data) || $data[0] === "Item Code") {
+                    continue;
+                }
+
+                if (!empty($data[0]) && empty($data[2])) {
+                    $currentMonthYear = $data[0];
+                } elseif (!empty($data[0]) && !empty($data[2])) {
+                    $productName = $data[1];
+                    $productCost = floatval($data[2]);
+
+                    $monthYearIndex = null;
+                    foreach ($parsedCostData as $index => $entry) {
+                        if ($entry['monthYear'] === $currentMonthYear) {
+                            $monthYearIndex = $index;
+                            break;
+                        }
+                    }
+
+                    if ($monthYearIndex === null) {
+                        $parsedCostData[] = [
+                            'monthYear' => $currentMonthYear,
+                            'products' => [
+                                [
+                                    'productName' => $productName,
+                                    'cost' => $productCost,
+                                ]
+                            ],
+                        ];
+                    } else {
+                        $parsedCostData[$monthYearIndex]['products'][] = [
+                            'productName' => $productName,
+                            'cost' => $productCost,
+                        ];
+                    }
+                }
+            }
+            fclose($handle);
+        }
+
+        return $parsedCostData;
+    }
+
+
+    public function getData()
+    {
+        try {
+            $file = File::on(connection: 'archive_mysql')->where('file_type', 'training_file')->get();
+
+            if (!$file) {
+                return response()->json([
+                    'status' => 'error',
+                    'message' => 'Model not found.'
+                ], 404);
+            }
+
+            $this->status = 201;
+            $this->response['data'] = $file;
+            return $this->getResponse("File retrieved successfully.");
+        } catch (\Throwable $th) {
+            $this->status = $th->getCode();
+            $this->response['message'] = $th->getMessage();
+            return $this->getResponse();
         }
     }
 }

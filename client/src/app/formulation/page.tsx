@@ -22,10 +22,12 @@ import { useDropzone } from 'react-dropzone';
 import * as XLSX from 'xlsx';
 import { formatMonthYear } from '@/utils/costwiseUtils';
 import Alert from '@/components/alerts/Alert';
+import { useUserContext } from '@/contexts/UserContext';
 
 const FormulationPage = () => {
     const { isOpen } = useSidebarContext();
     const { edit, setEdit, add, setAdd, viewFormulas, viewBOM } = useFormulationContext();
+    const { currentUser } = useUserContext();
 
     const [addFormula, setAddFormula] = useState(false);
     const [compareFormula, setCompareFormula] = useState(false);
@@ -117,6 +119,25 @@ const FormulationPage = () => {
                                 const response = await api.post('/formulations/upload', formData);
                                 if (response.data.status == 200) {
                                     resolve(`Successfully uploaded the file!`);
+                                    const fileName = file.name; 
+                                    const auditData = {
+                                        userId: currentUser?.userId,
+                                        action: 'import',
+                                        fileName: fileName
+                                      };
+                                      console.log(auditData);
+                                      if (currentUser) {
+                                      console.log('Current User ID:', currentUser?.userId);
+                                      } else {
+                                          console.log('Current User is not defined.', currentUser);
+                                      }
+                                      api.post('/auditlogs/logsaudit', auditData)
+                                      .then(response => {
+                                          console.log('Audit log created successfully:', response.data);
+                                      })
+                                      .catch(error => {
+                                          console.error('Error audit logs:', error);
+                                      });
                                 } else {
                                     reject(`Failed to upload ${file.name}`);
                                 }
