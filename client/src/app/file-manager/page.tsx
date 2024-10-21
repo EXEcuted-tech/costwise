@@ -19,8 +19,7 @@ import api from '@/utils/api';
 import * as XLSX from 'xlsx';
 import Alert from "@/components/alerts/Alert";
 import { File } from '@/types/data';
-import JSZip from 'jszip';
-import { saveAs } from 'file-saver';
+import { useUserContext } from '@/contexts/UserContext';
 
 const FileManagerPage = () => {
   const { isOpen } = useSidebarContext();
@@ -34,7 +33,8 @@ const FileManagerPage = () => {
   const [allData, setAllData] = useState<File[]>([]);
   const [masterFileData, setMasterFileData] = useState<File[]>([]);
   const [transactionData, setTransactionData] = useState<File[]>([]);
-  const { fileToDelete, setFileToDelete } = useFileManagerContext();
+  const { fileToDelete, setFileToDelete, fileSettings } = useFileManagerContext();
+  const { currentUser } = useUserContext();
 
   const ref = useOutsideClick(() => setUpload(false));
 
@@ -102,7 +102,7 @@ const FileManagerPage = () => {
         return new Promise((resolve, reject) => {
           reader.onload = async (e: ProgressEvent<FileReader>) => {
             const data = e.target?.result;
-
+            const fileName = file.name; 
             if (data && data instanceof ArrayBuffer) {
               const dataArray = new Uint8Array(data);
               const workbook = XLSX.read(dataArray, { type: 'array' });
@@ -133,6 +133,26 @@ const FileManagerPage = () => {
                 try {
                   const response = await api.post('/files/upload', formData);
                   if (response.data.status === 200) {
+
+                    const auditData = {
+                      userId: currentUser?.userId,
+                      action: 'import',
+                      fileName: fileName
+                    };
+                    console.log(auditData);
+                    if (currentUser) {
+                    console.log('Current User ID:', currentUser?.userId);
+                    } else {
+                        console.log('Current User is not defined.', currentUser);
+                    }
+                    api.post('/auditlogs/logsaudit', auditData)
+                    .then(response => {
+                        console.log('Audit log created successfully:', response.data);
+                    })
+                    .catch(error => {
+                        console.error('Error audit logs:', error);
+                    });
+
                     resolve(true);
                   } else {
                     reject(new Error('Upload failed'));
@@ -222,6 +242,24 @@ const FileManagerPage = () => {
       } else {
         throw new Error('Unexpected response format');
       }
+      const auditData = {
+        userId: currentUser?.userId,
+        action: 'export',
+        act: 'all files',
+      };
+      console.log(auditData);
+      if (currentUser) {
+      console.log('Current User ID:', currentUser?.userId);
+      } else {
+          console.log('Current User is not defined.', currentUser);
+      }
+      api.post('/auditlogs/logsaudit', auditData)
+      .then(response => {
+          console.log('Audit log created successfully:', response.data);
+      })
+      .catch(error => {
+          console.error('Error audit logs:', error);
+      });
     } catch (error) {
       console.error('Export all files failed:', error);
       // setExportError(`Failed to export files: ${error.message}`);
@@ -234,6 +272,27 @@ const FileManagerPage = () => {
     if(fileToDelete) {
       try {
         await api.post(`/files/delete`, { col: 'file_id', value: fileToDelete });
+
+        const settings = JSON.parse(fileSettings);
+        const auditData = {
+          userId: currentUser?.userId,
+          action: 'crud',
+          act: 'archive',
+          fileName: settings.file_name
+        };
+        console.log(auditData);
+        if (currentUser) {
+        console.log('Current User ID:', currentUser?.userId);
+        } else {
+            console.log('Current User is not defined.', currentUser);
+        }
+        api.post('/auditlogs/logsaudit', auditData)
+        .then(response => {
+            console.log('Audit log created successfully:', response.data);
+        })
+        .catch(error => {
+            console.error('Error audit logs:', error);
+        });
       } catch (error) {
         console.error('Delete failed:', error);
       } finally {

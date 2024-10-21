@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\ApiController;
+use App\Http\Controllers\AuditLogController;
 use App\Http\Controllers\ArticleController;
 use App\Http\Controllers\BomController;
 use App\Http\Controllers\FinishedGoodController;
@@ -100,6 +101,11 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('delete_bulk', [TransactionController::class, 'deleteBulk']);
     });
 
+    Route::prefix('/auditlogs')->group(function () {
+        Route::get('',[AuditLogController::class,'getAuditLogs']);
+        Route::post('logsaudit',[AuditLogController::class,'updateAuditLogs']);
+    });
+        
     Route::prefix('/notifications')->group(function () {
         Route::get('new', [NotificationController::class, 'getNewNotifications']);
         Route::get('retrieve', [NotificationController::class, 'retrieve']);
