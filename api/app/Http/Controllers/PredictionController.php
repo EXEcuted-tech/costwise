@@ -30,7 +30,6 @@ class PredictionController extends ApiController
             }
 
             $validatedData = $validator->validated();
-            dump($validatedData);
             $prediction = Prediction::create($validatedData);
 
             $this->status = 200;
@@ -47,7 +46,7 @@ class PredictionController extends ApiController
     {
         try {
             $validator = Validator::make($request->all(), [
-                'monthYear' => 'required',
+                'numberOfProducts' => 'required|integer|min:1',
             ]);
 
             if ($validator->fails()) {
@@ -58,19 +57,22 @@ class PredictionController extends ApiController
                 ], 400);
             }
 
-            $prediction = Prediction::where('monthYear', $request->monthYear)->get();
+            $numberOfPredictions = $request->numberOfProducts * 3;
 
-            if (!$prediction) {
+            $predictions = Prediction::orderBy('prediction_id', 'desc')->take($numberOfPredictions)->get();
+
+            if ($predictions->isEmpty()) {
                 return response()->json([
                     'status' => 'error',
-                    'message' => 'Model not found.'
+                    'message' => 'No predictions found.'
                 ], 404);
             }
+            $predictions = $predictions->sortBy('prediction_id')->values()->all();
 
             return response()->json([
                 'status' => 'success',
-                'data' => $prediction,
-                'message' => 'Model retrieved successfully.'
+                'data' => $predictions,
+                'message' => 'Predictions retrieved successfully.'
             ], 200);
         } catch (\Throwable $th) {
             return response()->json([
@@ -79,6 +81,46 @@ class PredictionController extends ApiController
             ], 500);
         }
     }
+
+    public function getCurrentPrediction(Request $request)
+    {
+        try {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'monthYear' => 'required|string'
+                ]
+            );
+
+            if ($validator->fails()) {
+                $this->status = 401;
+                $this->response['error'] = $validator->errors();
+                return $this->getResponse("Incorrect input details.");
+            }
+
+            $validatedData = $validator->validated();
+            $monthYear = $validatedData['monthYear'];
+
+            $prediction = Prediction::where('monthYear', $monthYear)->get();
+
+            if ($prediction) {
+                // If a prediction is found, return it
+                $this->status = 200;
+                $this->response['data'] = $prediction;
+                $this->response['message'] = "Prediction retrieved successfully.";
+            } else {
+                $this->status = 404;
+                $this->response['message'] = "No prediction records found for the given monthYear.";
+            }
+
+            return $this->getResponse();
+        } catch (\Throwable $th) {
+            $this->status = 500;
+            $this->response['message'] = $th->getMessage();
+            return $this->getResponse();
+        }
+    }
+
 
     public function getAllData() {}
 }

@@ -148,7 +148,6 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_fg', [CostCalcController::class, 'retrieveFGOptions']);
         Route::get('retrieve_fg_details', [CostCalcController::class, 'retrieveFGDetails']);
         Route::post('export', [CostCalcController::class, 'export']);
-        // Route::get('/retrieve_all', [CostCalcController::class, ])
     });
 
 
@@ -158,10 +157,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('/data', [FGController::class, 'getFGData']);
     });
 
-    Route::prefix('/prediction')->group(function () {
-        Route::post('/upload', [PredictionController::class, 'uploadPrediction']);
-        Route::post('/data', [PredictionController::class, 'getPrediction']);
-    });
+
 
     Route::prefix('/article')->group(function () {
         // Route::post('/upload', [ArticleController::class, 'uploadArticle']);
@@ -173,4 +169,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 Route::prefix('/training')->group(function () {
     Route::post('/upload', [FileController::class, 'uploadTrainingData']);
     Route::get('/data', [FileController::class, 'getData']);
+});
+
+Route::prefix('/prediction')->group(function () {
+    Route::post('/upload', [PredictionController::class, 'uploadPrediction']);
+    Route::post('/data', [PredictionController::class, 'getPrediction']);
+    Route::post('/current_data', [PredictionController::class, 'getCurrentPrediction']);
 });
