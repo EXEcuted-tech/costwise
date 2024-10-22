@@ -42,7 +42,7 @@ const CustomDatePicker: React.FC<CustomDatePickerProps> = ({ selectedDate, setSe
           type="text"
           value={formattedDate}
           placeholder="Date Added"
-          className="w-full pl-10 pr-10 bg-white border border-[#868686] text-[#5C5C5C] placeholder-[#B0B0B0] text-[15px] rounded-[5px] py-[3px] cursor-pointer"
+          className="w-full pl-10 pr-10 bg-white dark:bg-[#3C3C3C] border border-[#868686] text-[#5C5C5C] dark:text-white placeholder-[#B0B0B0] text-[15px] rounded-[5px] py-[3px] cursor-pointer"
           readOnly
           onClick={openDatePicker}
         />

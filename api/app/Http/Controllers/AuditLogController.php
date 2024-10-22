@@ -15,7 +15,7 @@ class AuditLogController extends Controller
                 'user_id' => $userId,
                 'action' => $action,
                 'description' => $description,
-                'timestamp' => now(),
+                'timestamp' => now()->setTimezone('Asia/Manila'),
             ]);
         } catch (\Exception $e) {
             

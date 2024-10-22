@@ -18,19 +18,21 @@ const NotificationPage = () => {
     const [isOnlyShowUnread, setIsOnlyShowUnread] = useState(false);
 
     const getIconForAction = (action: string | number) => {
-        // Map actions to icons
         const actionIcons = {
             general: 'general',
-            // Add more mappings as needed
+            crud: 'crud',
+            import: 'import',
+            export: 'export'
         } as Record<string, string>;
         return actionIcons[action as keyof typeof actionIcons] || 'bell';
     };
 
     const getMainTextForAction = (action: string | number) => {
-        // Map actions to main text
         const actionTexts = {
-            general: 'General',
-            // Add more mappings as needed
+            general: 'General |',
+            crud: 'CRUD |',
+            import: 'Import |',
+            export: 'Export |'
         } as Record<string, string>;
         return actionTexts[action as keyof typeof actionTexts] || 'Notification';
     };
@@ -70,6 +72,7 @@ const NotificationPage = () => {
                     mainText: getMainTextForAction(notification.action),
                     subText: notification.description,
                     time: formatTime(date),
+                    timestamp: date,
                     isRead: notification.read
                 });
             });
@@ -79,15 +82,19 @@ const NotificationPage = () => {
 
         const fetchNotifications = async () => {
             try {
-                const response = await api.get('/notifications/retrieve', {
-                    params: {
-                        col: 'user_id',
-                        val: 1 // TODO: get user id from context
-                    }
-                });
-                const categorizedNotifications = categorizeNotifications(response.data.data);
-                setNotifications(categorizedNotifications);
-                setHasNewNotifications(false);
+                const storedUser = localStorage.getItem('currentUser');
+                if (storedUser) {
+                    const parsedUser = JSON.parse(storedUser);
+                    const response = await api.get('/notifications/retrieve', {
+                        params: {
+                            col: 'user_id',
+                            val: parsedUser.userId
+                        }
+                    });
+                    const categorizedNotifications = categorizeNotifications(response.data.data);
+                    setNotifications(categorizedNotifications);
+                    setHasNewNotifications(false);
+                }
             } catch (error) {
                 console.error('Error fetching notifications:', error);
             }
@@ -106,7 +113,7 @@ const NotificationPage = () => {
     const currentDateSections = dateEntries.slice(indexOfFirstItem, indexOfLastItem)
 
     const handleToggle = async (state: boolean) => {
-        setIsOnlyShowUnread(state);
+        setIsOnlyShowUnread(!state);
 
         const categorizeNotifications = (notifications: any[]) => {
             const categorized: Record<string, any[]> = {};
@@ -135,6 +142,7 @@ const NotificationPage = () => {
                     mainText: getMainTextForAction(notification.action),
                     subText: notification.description,
                     time: formatTime(date),
+                    timestamp: date,
                     isRead: notification.read
                 });
             });
@@ -143,30 +151,34 @@ const NotificationPage = () => {
         };
 
         try {
-            if (isOnlyShowUnread) {
-                const response = await api.get('/notifications/retrieve_unread', {
-                    params: {
-                        col1: 'user_id',
-                        val1: 1, // TODO: get user id from context
-                        col2: 'read',
-                        val2: 0
-                    }
-                });
+            const storedUser = localStorage.getItem('currentUser');
+            if (storedUser) {
+                const parsedUser = JSON.parse(storedUser);
+                if (state) {
+                    const response = await api.get('/notifications/retrieve_unread', {
+                        params: {
+                            col1: 'user_id',
+                            val1: parsedUser.userId,
+                            col2: 'read',
+                            val2: 0
+                        }
+                    });
 
-                const categorizedNotifications = categorizeNotifications(response.data.data);
-                setNotifications(categorizedNotifications);
-            } else {
-                const response = await api.get('/notifications/retrieve', {
-                    params: {
-                        col: 'user_id',
-                        val: 1 // TODO: get user id from context
-                    }
-                });
-                const categorizedNotifications = categorizeNotifications(response.data.data);
-                setNotifications(categorizedNotifications);
+                    const categorizedNotifications = categorizeNotifications(response.data.data);
+                    setNotifications(categorizedNotifications);
+                } else {
+                    const response = await api.get('/notifications/retrieve', {
+                        params: {
+                            col: 'user_id',
+                            val: parsedUser.userId
+                        }
+                    });
+                    const categorizedNotifications = categorizeNotifications(response.data.data);
+                    setNotifications(categorizedNotifications);
+                    setHasNewNotifications(false);
+                }
                 setHasNewNotifications(false);
             }
-            setHasNewNotifications(false);
         } catch (error) {
             console.error('Error fetching notifications:', error);
         }
@@ -182,32 +194,38 @@ const NotificationPage = () => {
                 </div>
                 <div className='bg-white w-full rounded-[20px] drop-shadow-lg mt-[15px]'>
                     <div>
-                        {currentDateSections.map(([date, dateNotifications], index) => (
-                            <>
-                                <DateSection
-                                    key={date}
-                                    date={date}
-                                    notifications={dateNotifications as NotificationItemProps[]}
-                                // showMarkAllRead={currentPage === 1 && index === 0}
+                        {currentDateSections.length > 0 ? (
+                            currentDateSections.map(([date, dateNotifications], index) => (
+                                <>
+                                    <DateSection
+                                        key={date}
+                                        date={date}
+                                        notifications={dateNotifications as NotificationItemProps[]}
+                                        showMarkAllRead={currentPage === 1 && index === 0}
+                                    />
+                                    {index !== currentDateSections.length - 1 &&
+                                        <div className='flex justify-center w-full'>
+                                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                <path d="M14.6667 29.3333H29.3334V16.5H34.8334V34.8333H9.16675V16.5H14.6667V29.3333Z" fill="#C64141" fill-opacity="0.3" />
+                                                <path d="M9.16675 12.834H34.8334V7.33398H9.16675V12.834Z" fill="#B22222" />
+                                            </svg>
+                                        </div>
+                                    }
+                                </>
+                            ))
+                        ) : (
+                            <div className="text-center py-4 text-[24px] text-[#ABABAB]">No notifications</div>
+                        )}
+                        {currentDateSections.length > 0 && (
+                            <div className="relative py-[1%]">
+                                <PrimaryPagination
+                                    data={dateEntries}
+                                    itemsPerPage={itemsPerPage}
+                                    handlePageChange={handlePageChange}
+                                    currentPage={currentPage}
                                 />
-                                {index !== currentDateSections.length - 1 &&
-                                    <div className='flex justify-center w-full'>
-                                        <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path d="M14.6667 29.3333H29.3334V16.5H34.8334V34.8333H9.16675V16.5H14.6667V29.3333Z" fill="#C64141" fill-opacity="0.3" />
-                                            <path d="M9.16675 12.834H34.8334V7.33398H9.16675V12.834Z" fill="#B22222" />
-                                        </svg>
-                                    </div>
-                                }
-                            </>
-                        ))}
-                        <div className="relative py-[1%]">
-                            <PrimaryPagination
-                                data={dateEntries}
-                                itemsPerPage={itemsPerPage}
-                                handlePageChange={handlePageChange}
-                                currentPage={currentPage}
-                            />
-                        </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </div>
@@ -216,77 +234,3 @@ const NotificationPage = () => {
 }
 
 export default NotificationPage
-
-const notifications = {
-    TODAY: [
-        {
-            icon: 'user',
-            mainText: 'John Doe and 1 other',
-            subText: 'edited your uploaded file BOM_1_Cost.csv.',
-            time: '4 minutes ago',
-            action: 'View Changes',
-        },
-        {
-            icon: 'bell',
-            mainText: 'Order is coming!',
-            subText: 'Check inventory reordering schedule.',
-            time: '1 hour ago',
-            action: 'View Inventory Reordering',
-        },
-        {
-            icon: 'file',
-            mainText: 'A new file uploaded.',
-            subText: 'Check it on file manager.',
-            time: '2 hours ago',
-            action: 'View File Manager',
-        },
-    ],
-    YESTERDAY: [
-        {
-            icon: 'user',
-            mainText: 'John Doe and 1 other',
-            subText: 'edited your uploaded file BOM_1_Cost.csv.',
-            time: 'Apr 13, 8:30 PM',
-            action: 'View Changes',
-        },
-        {
-            icon: 'bell',
-            mainText: 'Order is coming!',
-            subText: 'Check inventory reordering schedule.',
-            time: 'Apr 13, 7:10 AM',
-            action: 'View Inventory Reordering',
-        },
-    ],
-    '3 DAYS AGO': [
-        {
-            icon: 'file',
-            mainText: 'Monthly report generated.',
-            subText: 'View it in the reports section.',
-            time: 'Apr 10, 9:00 AM',
-            action: 'View Report',
-        },
-        {
-            icon: 'file',
-            mainText: 'Monthly report generated.',
-            subText: 'View it in the reports section.',
-            time: 'Apr 10, 9:00 AM',
-            action: 'View Report',
-        },
-    ],
-    'LAST WEEK': [
-        {
-            icon: 'file',
-            mainText: 'Monthly report generated.',
-            subText: 'View it in the reports section.',
-            time: 'Apr 10, 9:00 AM',
-            action: 'View Report',
-        },
-        {
-            icon: 'file',
-            mainText: 'Monthly report generated.',
-            subText: 'View it in the reports section.',
-            time: 'Apr 10, 9:00 AM',
-            action: 'View Report',
-        },
-    ],
-};

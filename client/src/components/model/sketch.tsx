@@ -7,16 +7,8 @@ import {
   MdOutlineCalculate,
   MdOnlinePrediction,
 } from "react-icons/md";
-
-interface Product {
-  productName: string;
-  cost: number;
-}
-
-interface CostDataEntry {
-  monthYear: string;
-  products: Product[];
-}
+import LoadingAnimation from "../loaders/LoadingAnimation";
+import { CostDataEntry } from "@/types/data";
 
 function TrainingModel() {
   const [costData, setCostData] = useState<CostDataEntry[]>([]);
@@ -137,7 +129,7 @@ function TrainingModel() {
         const endTime = performance.now();
         const duration = (endTime - startTime) / 1000;
         console.log("Training complete");
-        setTrainingSpeed(duration.toFixed(2));
+        setTrainingSpeed(parseFloat(duration.toFixed(2)));
         console.log(
           `Model training complete in ${duration.toFixed(2)} seconds`
         );
@@ -170,7 +162,7 @@ function TrainingModel() {
           const predictionTensor = model.predict(
             tf.tensor2d([[i]])
           ) as tf.Tensor;
-          const predictionArray = await predictionTensor.array();
+          const predictionArray:any = await predictionTensor.array();
 
           const monthYear = numberToMonthYear(i);
           let totalPredictionForMonth = 0;
@@ -278,7 +270,7 @@ function TrainingModel() {
 
       const formattedPredictions = predictionData.map(
         (monthPredictions, index) => {
-          const totalCost = monthPredictions.reduce((acc, prediction) => {
+          const totalCost = monthPredictions.reduce((acc: number, prediction: { cost: string; }) => {
             return acc + parseFloat(prediction.cost);
           }, 0);
 
@@ -289,17 +281,11 @@ function TrainingModel() {
         }
       );
 
-      console.log("Formatted Predictions: ", formattedPredictions);
       setTotalPrediction(formattedPredictions);
     } catch (error) {
       console.error("Failed to load models:", error);
     }
   };
-
-  useEffect(() => {
-    console.log("Total Prediction", totalPrediction);
-    console.log(lossHistory);
-  });
 
   useEffect(() => {
     const fetchData = async () => {
@@ -329,10 +315,16 @@ function TrainingModel() {
 
   useEffect(() => {
     if (costData.length > 0) {
+      setIsLoading(true);
       initializeModel();
     }
-    setIsLoading(false);
   }, [costData]);
+
+  useEffect(() => {
+    if (trainingSpeed > 0 && lossHistory.length > 0) {
+      setIsLoading(false);
+    }
+  }, [trainingSpeed, lossHistory]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const itemsPerPage = 1; // Number of items to display at once
@@ -348,16 +340,12 @@ function TrainingModel() {
   };
 
   return (
-    <div className="mx-auto p-2 flex flex-col xl:flex-row gap-6 h-[90%]">
-      {/* Left Section */}
+    <div>
       {isLoading ? (
-        <div className="flex items-center justify-center flex-1 bg-white shadow-lg rounded-lg p-8">
-          {/* Loading Spinner or Message */}
-          <p className="text-xl font-semibold text-primary">Loading...</p>
-          {/* You can also use a spinner component here */}
-        </div>
+        <LoadingAnimation />
       ) : (
-        <>
+        <div className="mx-auto p-5 flex flex-col xl:flex-row gap-6 h-[90%]">
+          {/* Left Section */}
           <div className="w-[500px] flex-1 bg-white shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
             <h2 className="flex items-center 2xl:text-2xl text-4xl font-semibold text-primary mb-4 xl:mb-2">
               <MdModelTraining className="2xl:text-4xl text-4xl font-semibold text-primary mr-2" />
@@ -368,6 +356,7 @@ function TrainingModel() {
               Duration of model training
             </p>
           </div>
+
           <div className="flex-1 bg-white shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
             <h2 className="flex items-center 2xl:text-2xl text-4xl font-semibold text-primary mb-4 xl:mb-2">
               <MdOutlineCalculate className="2xl:text-4xl text-4xl font-semibold text-primary mr-2" />
@@ -380,52 +369,54 @@ function TrainingModel() {
               Average loss of all predictions
             </p>
           </div>
-        </>
-      )}
 
-      {/* Right Section */}
-      <div className="flex-1 bg-primary shadow-lg rounded-lg p-4 grid grid-cols-1 gap-4 items-center justify-center">
-        <h2 className="flex items-center text-2xl font-semibold text-white">
-          <MdOnlinePrediction className="text-4xl font-semibold text-white mr-2" />
-          Total Cost Prediction
-        </h2>
+          {/* Right Section */}
+          <div className="flex-1 bg-primary shadow-lg rounded-lg p-4 grid grid-cols-1 gap-4 items-center justify-center">
+            <h2 className="flex items-center text-2xl font-semibold text-white">
+              <MdOnlinePrediction className="text-4xl font-semibold text-white mr-2" />
+              Total Cost Prediction
+            </h2>
 
-        <div className="flex items-center justify-between w-full">
-          <button
-            onClick={prev}
-            disabled={currentIndex === 0}
-            className="p-1 pl-[10%] text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200"
-            aria-label="Previous predictions"
-          >
-            &#9664; {/* Left arrow */}
-          </button>
+            <div className="flex items-center justify-between w-full">
+              <button
+                onClick={prev}
+                disabled={currentIndex === 0}
+                className="p-1 pl-[10%] text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200"
+                aria-label="Previous predictions"
+              >
+                &#9664; {/* Left arrow */}
+              </button>
 
-          <div className="flex-grow flex flex-wrap justify-center p-0">
-            {totalPrediction
-              .slice(currentIndex, currentIndex + itemsPerPage)
-              .map((monthData, index) => (
-                <div
-                  key={index}
-                  className="bg-primary shadow-sm rounded-lg flex flex-col items-center transition-transform duration-300 hover:scale-105"
-                >
-                  <p className="text-4xl font-bold text-white">
-                    ₱{monthData.cost}
-                  </p>
-                  <p className="text-sm text-white">{monthData.monthYear}</p>
-                </div>
-              ))}
+              <div className="flex-grow flex flex-wrap justify-center p-0">
+                {totalPrediction
+                  .slice(currentIndex, currentIndex + itemsPerPage)
+                  .map((monthData, index) => (
+                    <div
+                      key={index}
+                      className="bg-primary shadow-sm rounded-lg flex flex-col items-center transition-transform duration-300 hover:scale-105"
+                    >
+                      <p className="text-4xl font-bold text-white">
+                        ₱{monthData.cost}
+                      </p>
+                      <p className="text-sm text-white">
+                        {monthData.monthYear}
+                      </p>
+                    </div>
+                  ))}
+              </div>
+
+              <button
+                onClick={next}
+                disabled={currentIndex + itemsPerPage >= totalPrediction.length}
+                className="p-1 pr-[10%] text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200"
+                aria-label="Next predictions"
+              >
+                &#9654; {/* Right arrow */}
+              </button>
+            </div>
           </div>
-
-          <button
-            onClick={next}
-            disabled={currentIndex + itemsPerPage >= totalPrediction.length}
-            className="p-1 pr-[10%] text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200"
-            aria-label="Next predictions"
-          >
-            &#9654; {/* Right arrow */}
-          </button>
         </div>
-      </div>
+      )}
     </div>
   );
 }

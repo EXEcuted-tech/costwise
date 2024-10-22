@@ -11,9 +11,10 @@ import { useSidebarContext } from "@/contexts/SidebarContext";
 
 const ManageAccountPage = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [sections, setSections] = useState([]);
-  const [isLoading, setIsLoading] = useState(true); // Loading state
+  const [sections, setSections] = useState<any[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   const { isAdmin } = useSidebarContext();
+  const [error, setError] = useState(" ");
 
   // Toggle edit mode
   const handleEditClick = () => {
@@ -21,11 +22,11 @@ const ManageAccountPage = () => {
   };
 
   // Handle Input change
-  const handleChange = (e, index) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
     const { name, value } = e.target;
-    const updatedSections = [...sections];
+    const updatedSections:any = [...sections];
     updatedSections[index] = {
-      ...updatedSections[index],
+      ...updatedSections[index] as { [key: string]: string },
       [name]: value,
     };
     setSections(updatedSections);
@@ -33,11 +34,14 @@ const ManageAccountPage = () => {
 
   // Add new heading section
   const addSection = () => {
-    setSections([...sections, { heading: "New Heading", content: "New content" }]);
+    setSections((prevSections:any) => [
+      ...prevSections,
+      { heading: "New Heading", content: "New content" },
+    ]);
   };
 
   // Remove heading section
-  const removeSection = (index) => {
+  const removeSection = (index: number) => {
     const updatedSections = sections.filter((_, i) => i !== index);
     setSections(updatedSections);
   };
@@ -102,11 +106,20 @@ const ManageAccountPage = () => {
             {isAdmin && (
               <div className="flex justify-center items-center h-[50%] cursor-pointer transition-colors duration-200 ease-in-out">
                 {!isEditing ? (
-                  <FaPencilAlt onClick={handleEditClick} className="w-[30px] h-auto text-primary" />
+                  <FaPencilAlt
+                    onClick={handleEditClick}
+                    className="w-[30px] h-auto text-primary"
+                  />
                 ) : (
                   <div className="flex items-center gap-2">
-                    <FaCheck onClick={saveEdit} className="w-[30px] h-auto text-green-500 cursor-pointer" />
-                    <FaTimes onClick={handleEditClick} className="w-[30px] h-auto text-red-500 cursor-pointer" />
+                    <FaCheck
+                      onClick={saveEdit}
+                      className="w-[30px] h-auto text-green-500 cursor-pointer"
+                    />
+                    <FaTimes
+                      onClick={handleEditClick}
+                      className="w-[30px] h-auto text-red-500 cursor-pointer"
+                    />
                   </div>
                 )}
               </div>
@@ -117,7 +130,10 @@ const ManageAccountPage = () => {
           ) : (
             <div id="scroll-style" className="overflow-y-scroll">
               {sections.map((section, index) => (
-                <div key={index} className="flex flex-col pt-[50px] text-[30px] text-tertiary">
+                <div
+                  key={index}
+                  className="flex flex-col pt-[50px] text-[30px] text-tertiary"
+                >
                   {isEditing ? (
                     <div className="flex items-center gap-4">
                       <input
