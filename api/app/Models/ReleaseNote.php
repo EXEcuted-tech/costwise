@@ -17,6 +17,10 @@ class ReleaseNote extends Model
         'user_id',
     ];
 
+    protected $casts = [
+        'content' => 'json',
+    ];
+
     public $timestamps = true;
 
     public function user()

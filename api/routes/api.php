@@ -41,6 +41,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('/user')->group(function () {
         Route::get('', [UserController::class, 'getCurrentUser']);
+        Route::get('retrieve', [UserController::class, 'retrieveUser']);
         Route::post('update/{id}', [UserController::class, 'updateUser']);
         Route::delete('archive/{id}', [UserController::class, 'archiveUser']);
         Route::put('update', [UserController::class, 'editUserInfo']);
@@ -178,7 +179,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('/release_note')->group(function () {
-        Route::get('retrieve', [ReleaseNoteController::class, 'retrieveNote']);
+        Route::get('retrieve', [ReleaseNoteController::class, 'retrieve']);
         Route::get('retrieve_all', [ReleaseNoteController::class, 'retrieveAll']);
         Route::post('create', [ReleaseNoteController::class, 'createNote']);
         Route::post('update', [ReleaseNoteController::class, 'updateNote']);

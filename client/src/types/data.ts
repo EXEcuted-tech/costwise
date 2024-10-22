@@ -201,18 +201,19 @@ export interface ProductEntry {
     products: Product[];
   }
 
-
-export interface ReleaseNote {
+  export interface ReleaseNote {
     note_id: number;
     title: string;
     version: string;
-    content: string;
+    content: {
+        added: string[];
+        updated: string[];
+        removed: string[];
+    };
     user_id: number;
     created_at: string;
+    user: {
+        user_id: number;
+        name: string;
+    };
 }
-
-export interface ReleaseNoteContent {
-    note_type: string;
-    note: string;
-}
-

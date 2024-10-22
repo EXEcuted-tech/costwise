@@ -7,13 +7,16 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\ReleaseNote;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+
+
 class ReleaseNoteController extends ApiController
 {
     public function retrieve(Request $request)
     {
         try {
             $validator = Validator::make($request->all(), [
-                'note_id' => 'required',
+                'note_id' => 'required|integer',
             ]);
 
             if ($validator->fails()) {
@@ -24,7 +27,7 @@ class ReleaseNoteController extends ApiController
                 ], 400);
             }
 
-            $note = ReleaseNote::where('note_id', $request->note_id)->get();
+            $note = ReleaseNote::with('user:user_id,first_name,middle_name,last_name,suffix')->find($request->note_id);
 
             if (!$note) {
                 return response()->json([
@@ -33,13 +36,25 @@ class ReleaseNoteController extends ApiController
                 ], 404);
             }
 
+            $formattedNote = [
+                'note_id' => $note->note_id,
+                'title' => $note->title,
+                'version' => $note->version,
+                'content' => $note->content,
+                'created_at' => $note->created_at,
+                'user' => [
+                    'user_id' => $note->user->user_id,
+                    'name' => $note->user->first_name . ' ' . $note->user->middle_name . ' ' . $note->user->last_name . ' ' . $note->user->suffix
+                    ]
+            ];
+
             return response()->json([
                 'status' => 'success',
-                'data' => $note,
+                'data' => $formattedNote,
                 'message' => 'Release Note retrieved successfully.'
             ], 200);
         } catch (\Throwable $th) {
-            return response()->json([
+           return response()->json([
                 'status' => 'error',
                 'message' => $th->getMessage()
             ], 500);
@@ -47,11 +62,10 @@ class ReleaseNoteController extends ApiController
     }
 
 
-    public function retrieveAll(Request $request)
+    public function retrieveAll()
     {
         try {
-            $notes = ReleaseNote::all();
-
+            $notes = ReleaseNote::with('user:user_id,first_name,middle_name,last_name,suffix')->orderBy('created_at', 'desc')->get();
 
             if ($notes->isEmpty()) {
                 return response()->json([
@@ -60,9 +74,23 @@ class ReleaseNoteController extends ApiController
                 ], 404);
             }
 
+            $formattedNotes = $notes->map(function ($note) {
+                return [
+                    'note_id' => $note->note_id,
+                    'title' => $note->title,
+                    'version' => $note->version,
+                    'content' => $note->content,
+                    'created_at' => $note->created_at,
+                    'user' => [
+                        'user_id' => $note->user->user_id,
+                        'name' => $note->user->first_name . ' ' . $note->user->middle_name . ' ' . $note->user->last_name . ' ' . $note->user->suffix
+                    ]
+                ];
+            });
+
             return response()->json([
                 'status' => 'success',
-                'data' => $notes,
+                'data' => $formattedNotes,
                 'message' => 'Release Notes retrieved successfully.'
             ], 200);
         } catch (\Throwable $th) {
@@ -82,7 +110,7 @@ class ReleaseNoteController extends ApiController
                     'title' => 'required',
                     'version' => 'required',
                     'content' => 'required',
-                    'user_id' => 'required'
+                    'user_id' => 'required|exists:users,user_id'
                 ]
             );
 
@@ -93,8 +121,10 @@ class ReleaseNoteController extends ApiController
             }
 
             $validatedData = $validator->validated();
+            $validatedData['content'] = json_decode($validatedData['content'], true);
 
             $note = ReleaseNote::create($validatedData);
+
             $this->status = 200;
             $this->response['data'] = $note;
             return $this->getResponse("Release Note Successfully Created");
@@ -124,13 +154,11 @@ class ReleaseNoteController extends ApiController
                 ], 400);
             }
 
-            $note = ReleaseNote::where('note_id', $request->note_id)->first();
+            $note = ReleaseNote::findOrFail($request->note_id);
 
-            if (!$note) {
-                return response()->json([
-                    'status' => 'error',
-                        'message' => 'Release Note not found.'
-                ], 404);
+            $validatedData = $validator->validated();
+            if (isset($validatedData['content'])) {
+                $validatedData['content'] = json_decode($validatedData['content'], true);
             }
 
             $note->update($validator->validated());
@@ -151,8 +179,6 @@ class ReleaseNoteController extends ApiController
     public function deleteNote(Request $request)
     {
         try {
-            //Connect to archive database
-            DB::beginTransaction();
 
             $note = ReleaseNote::where('note_id', $request->note_id)->first();
 
@@ -163,15 +189,26 @@ class ReleaseNoteController extends ApiController
                 ], 404);
             }
 
+            // Format datetime values
+            $noteData = $note->toArray();
+            $noteData['created_at'] = $note->created_at->format('Y-m-d H:i:s');
+            $noteData['updated_at'] = $note->updated_at->format('Y-m-d H:i:s');
+            $noteData['content'] = json_encode($noteData['content']);
+            $noteData['user_id'] = NULL;
+
             //Archive release note
-            DB::connection('archive_mysql')->table('release_notes')->insert($note->toArray());
+            DB::beginTransaction();
+            DB::connection('archive_mysql')->table('release_notes')->insert($noteData);
             $note->delete();
+
+            DB::commit();
 
             return response()->json([
                 'status' => 'success',
                 'message' => 'Release Note successfully deleted.'
             ], 200);
         } catch (\Throwable $th) {
+            Log::error($th->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => $th->getMessage()

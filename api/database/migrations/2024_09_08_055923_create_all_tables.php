@@ -176,6 +176,7 @@ return new class extends Migration {
         // Release Notes Table
         Schema::create('release_notes', function (Blueprint $table) {
             $table->increments('note_id');
+            $table->unsignedInteger('user_id')->nullable();
             $table->string('title', 255);
             $table->string('version', 255);
             $table->longText('content');
@@ -201,5 +202,6 @@ return new class extends Migration {
         Schema::dropIfExists('users');
         Schema::dropIfExists('transactions');
         Schema::dropIfExists('events');
+        Schema::dropIfExists('release_notes');
     }
 };
