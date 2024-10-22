@@ -24,7 +24,7 @@ const GettingStartedPage = () => {
     };
 
     // Handle Input change
-    const handleChange = (e, index) => {
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
         const { name, value } = e.target;
         const updatedSections = [...sections];
         updatedSections[index] = {
@@ -40,7 +40,7 @@ const GettingStartedPage = () => {
     };
 
     // Remove heading section
-    const removeSection = (index) => {
+    const removeSection = (index: number) => {
         const updatedSections = sections.filter((_, i) => i !== index);
         setSections(updatedSections);
     };

@@ -2,6 +2,7 @@ import { nextui } from '@nextui-org/theme';
 import type { Config } from "tailwindcss";
 
 const config: Config = {
+  darkMode: 'class',
   content: [
     "./src/pages/**/*.{js,ts,jsx,tsx,mdx}",
     "./src/components/**/*.{js,ts,jsx,tsx,mdx}",
@@ -38,9 +39,6 @@ const config: Config = {
         'inner-md': 'inset 2px 2px 4px rgba(0, 0, 0, 0.2)',
         'inner-lg': 'inset 4px 4px 8px rgba(0, 0, 0, 0.3)',
         'inner-xl': 'inset 8px 8px 16px rgba(0, 0, 0, 0.4)',
-      },
-      animation: {
-        fadeIn: 'fadeIn 0.5s ease-in-out',
       },
       keyframes: {
         'shrink-in': {
@@ -122,12 +120,24 @@ const config: Config = {
           '50%': { color: '#2e2e2e' },
           '100%': { color: '#414141' },
         },
+        colorPulseDark: {
+          '0%': { color: '#FFFFFF' },
+          '50%': { color: '#E0E0E0' },
+          '100%': { color: '#FFFFFF' },
+        },
         colorPulse2: {
           '0%': { color: '#414141' },
           '25%': { color: '#2e2e2e' },
           '50%': { color: '#B22222' },
           '75%': { color: '#B22222' },
           '100%': { color: '#414141' },
+        },
+        colorPulseDark2: {
+          '0%': { color: '#FFFFFF' },
+          '25%': { color: '#E0E0E0' },
+          '50%': { color: '#B22222' },
+          '75%': { color: '#B22222' },
+          '100%': { color: '#FFFFFF' },
         },
         slide: {
           "0%": { transform: "translateY(100%)", opacity: '0.1' },
@@ -157,7 +167,10 @@ const config: Config = {
         'border-pulse2': 'border-pulse2 3s infinite',
         'color-pulse': 'colorPulse 5s ease-in-out infinite',
         'color-pulse2': 'colorPulse2 10s ease-in-out infinite',
+        'color-pulse-dark': 'colorPulseDark 5s ease-in-out infinite',
+        'color-pulse-dark2': 'colorPulseDark2 10s ease-in-out infinite',
         'slide': 'slide 2.5s linear infinite',
+        'fadeIn': 'fadeIn 0.5s ease-in-out',
       },
       backgroundImage: {
         'virginia-mascot': "url('/images/virginia-mascot-bg.png')",

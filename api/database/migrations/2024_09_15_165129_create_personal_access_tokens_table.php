@@ -21,12 +21,6 @@ return new class extends Migration
             $table->timestamp('expires_at')->nullable();
             $table->timestamps();
         });
-        
-        Schema::create('password_resets_token', function (Blueprint $table) {
-            $table->string('email')->index();
-            $table->string('token');
-            $table->timestamp('created_at')->nullable();
-        });
     }
 
     /**
@@ -35,6 +29,5 @@ return new class extends Migration
     public function down(): void
     {
         Schema::dropIfExists('personal_access_tokens');
-        Schema::dropIfExists('password_resets_token');
     }
 };

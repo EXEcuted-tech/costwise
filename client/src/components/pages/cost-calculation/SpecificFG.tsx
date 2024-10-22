@@ -44,7 +44,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
     id: 0,
   });
   const [selectedFGDetails, setSelectedFGDetails] = useState<
-    SpecificFinishedGood[]
+    any[]
   >([]);
 
   //Retrieve FG info
@@ -193,7 +193,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
 
                   {selectedFGDetails[0]?.components
                     ?.slice(1)
-                    .map((component, index) => (
+                    .map((component: { level: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; item_code: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; description: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; batch_quantity: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; unit: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; cost: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; total_cost: string; }, index: React.Key | null | undefined) => (
                       <tr key={index} className={`text-[#6B6B6B]`}>
                         <td className="text-center px-6 py-3"></td>
                         <td className="text-center">{component.level}</td>

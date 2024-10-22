@@ -1,6 +1,7 @@
 "use client"
 import MainLayout from "@/components/layouts/MainLayout";
 import Spinner from "@/components/loaders/Spinner";
+import ProtectedRoute from "@/components/routes/ProtectedRoute";
 import { FormulationProvider, useFormulationContext } from "@/contexts/FormulationContext";
 import { SidebarProvider, useSidebarContext } from "@/contexts/SidebarContext";
 import { Suspense, useEffect, useState } from "react";
@@ -11,6 +12,7 @@ export default function FormulationLayout({
   children: React.ReactNode;
 }>) {
   return (
+    <ProtectedRoute>
     <SidebarProvider>
       <FormulationProvider>
         <Suspense fallback={<div className="flex justify-center items-center w-full h-screen"><Spinner/></div>}>
@@ -19,7 +21,8 @@ export default function FormulationLayout({
           </FormulationContent>
         </Suspense>
       </FormulationProvider>
-    </SidebarProvider>
+      </SidebarProvider>
+    </ProtectedRoute>
   );
 }
 

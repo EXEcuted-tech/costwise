@@ -112,7 +112,8 @@ const CostCalculation = () => {
       sheetData = sheets
         .filter((sheet) => sheet.data !== null)
         .map((sheet) => sheet.data);
-      if (sheetData.length === 0) {
+      const sheetDataArray = sheetData as SpecificFinishedGood[];
+      if (sheetDataArray.length === 0) {
         setAlertMessages(["No sheets are selected"]);
         setAlertStatus("critical");
         return;
