@@ -199,7 +199,7 @@ const CostCalculation = () => {
 
   const retrieveAllFG = async (monthYear: number) => {
     try {
-      const response = await api.get("/cost_calculation/retrieve_all", {
+      const response = await api.get("/finished_goods/retrieve_allFG", {
         params: { monthYear: monthYear },
       });
 
@@ -236,12 +236,12 @@ const CostCalculation = () => {
               className="!relative"
               variant={
                 alertStatus as
-                  | "default"
-                  | "information"
-                  | "warning"
-                  | "critical"
-                  | "success"
-                  | undefined
+                | "default"
+                | "information"
+                | "warning"
+                | "critical"
+                | "success"
+                | undefined
               }
               key={index}
               message={msg}
@@ -293,22 +293,20 @@ const CostCalculation = () => {
               <div
                 onClick={() => handleFGClick("Specific-FG")}
                 className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-l-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                    ${
-                                      selectedFG === "Specific-FG"
-                                        ? "bg-[#B22222] text-white"
-                                        : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
-                                    }`}
+                                    ${selectedFG === "Specific-FG"
+                    ? "bg-[#B22222] text-white"
+                    : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
+                  }`}
               >
                 Specific-FG
               </div>
               <div
                 onClick={() => handleFGClick("All-FG")}
                 className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-r-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                    ${
-                                      selectedFG === "All-FG"
-                                        ? "bg-[#B22222] text-white"
-                                        : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
-                                    }`}
+                                    ${selectedFG === "All-FG"
+                    ? "bg-[#B22222] text-white"
+                    : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
+                  }`}
               >
                 All-FG
               </div>

@@ -11,7 +11,6 @@ use App\Http\Controllers\MaterialController;
 use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\CostCalcController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
@@ -54,6 +53,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('/finished_goods')->group(function () {
         Route::get('retrieve_all', [FinishedGoodController::class, 'retrieveAll']);
+        Route::get('retrieve_allFG', [FinishedGoodController::class, 'retrieveAllFGData']);
         Route::get('retrieve', [FinishedGoodController::class, 'retrieve']);
         Route::get('retrieve_first', [FinishedGoodController::class, 'retrieveFirst']);
         Route::get('retrieve_batch', [FinishedGoodController::class, 'retrieveBatch']);
@@ -135,12 +135,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::get('retrieve_fg', [CostCalcController::class, 'retrieveFGOptions']);
         Route::get('retrieve_fg_details', [CostCalcController::class, 'retrieveFGDetails']);
         Route::post('export', [CostCalcController::class, 'export']);
+        // Route::get('/retrieve_all', [CostCalcController::class, ])
     });
 
-    Route::prefix('/training')->group(function () {
-        Route::post('/upload', [FileController::class, 'uploadTrainingData']);
-        Route::get('/data', [FileController::class, 'getData']);
-    });
+
 
     Route::prefix('/fg')->group(function () {
         Route::post('/upload', [FGController::class, 'uploadFG']);
@@ -157,4 +155,9 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('/data', [ArticleController::class, 'getArticle']);
         Route::post('/update', [ArticleController::class, 'updateArticle']);
     });
+});
+
+Route::prefix('/training')->group(function () {
+    Route::post('/upload', [FileController::class, 'uploadTrainingData']);
+    Route::get('/data', [FileController::class, 'getData']);
 });
