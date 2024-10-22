@@ -138,6 +138,8 @@ class ReleaseNoteController extends ApiController
     public function updateNote(Request $request)
     {
         try {
+            Log::info($request->all());
+
             $validator = Validator::make($request->all(), [
                 'note_id' => 'sometimes|required',
                 'title' => 'sometimes|required',
@@ -158,7 +160,7 @@ class ReleaseNoteController extends ApiController
 
             $validatedData = $validator->validated();
             if (isset($validatedData['content'])) {
-                $validatedData['content'] = json_decode($validatedData['content'], true);
+                $validatedData['content'] = json_encode($validatedData['content']);
             }
 
             $note->update($validator->validated());
@@ -169,6 +171,7 @@ class ReleaseNoteController extends ApiController
                 'message' => 'Release Note successfully updated.'
             ], 200);
         } catch (\Throwable $th) {
+            Log::error($th->getMessage());
             return response()->json([
                 'status' => 'error',
                 'message' => $th->getMessage()

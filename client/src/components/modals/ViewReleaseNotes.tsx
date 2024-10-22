@@ -1,12 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { IoIosClose } from 'react-icons/io';
+import { IoIosClose} from 'react-icons/io';
 import { FaCodeBranch } from "react-icons/fa";
+import { FaCheck } from "react-icons/fa6";
 import { MdModeEdit } from "react-icons/md";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { ReleaseNote } from '@/types/data';
 import api from '@/utils/api';
 import Loader from '../loaders/Loader';
 import Alert from '../alerts/Alert';
+import { secondsToMinutes } from 'date-fns';
 
 interface ViewReleaseNotesProps {
     note_id: number;
@@ -15,13 +17,13 @@ interface ViewReleaseNotesProps {
 
 
 const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNotes}) => {
-    const [title, setTitle] = useState("");
-    const [version, setVersion] = useState("");
     const [note, setNote] = useState<ReleaseNote>();
+    const [editedNote, setEditedNote] = useState<ReleaseNote>();
 
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
     const [isLoading, setIsLoading] = useState(true);
+    const [isEditing, setIsEditing] = useState(false);
     const [titleError, setTitleError] = useState(false);
     const [versionError, setVersionError] = useState(false);
     const [contentError, setContentError] = useState(false);
@@ -41,6 +43,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
 
             if (response.status === 200) {
                 setNote(response.data.data);
+                setEditedNote(response.data.data);
                 setIsLoading(false);
             }
         }catch (error) {
@@ -50,7 +53,21 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
     }
 
     //Edit release note 
-    const handleSaveEdit = async () => {
+    const handleEdit = async () => {
+        setIsEditing(true);
+        setEditedNote(note);
+    }  
+
+    const handleCancelEdit = () => {
+        setIsEditing(false);
+        secondsToMinutes
+        setEditedNote(note);
+    }
+
+    const handleSaveEdit = async () => {        
+        if (!editedNote) return;
+        setIsEditing(false);
+
         const newAlertMessages: string[] = [];
 
         //Reset errors
@@ -59,51 +76,82 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
         setContentError(false); 
 
         //Check errors
-        if (title === "" || version === "" || !note) {
+        if (editedNote.title === "" && editedNote.version === "" && Object.values(editedNote.content).some(arr => arr.length === 0 || arr.some(item => item.trim() === ''))) {
             setTitleError(true);
             setVersionError(true);
             setContentError(true);
+            setIsEditing(true);
+            setAlertMessages(["Title, version, and content are required"]);
             setAlertStatus("critical");
             return;
         }
-        if (title === "") {
+        if (editedNote.title === "") {
             newAlertMessages.push("Title is required");
             setTitleError(true);
             setAlertStatus("critical");
         }
-        if (version === "") {
+        if (editedNote.version === "") {
             newAlertMessages.push("Version is required");
             setVersionError(true);
             setAlertStatus("critical"); 
         }
-        if (!note) {
-            newAlertMessages.push("Content is required");
+        // Check if all content sections are empty
+        const isContentEmpty = Object.values(editedNote.content).every(arr => arr.length === 0 || arr.every(item => item.trim() === ''));
+        if (isContentEmpty) {
+            newAlertMessages.push("At least one content section must have a non-empty item");
             setContentError(true);
-            setAlertStatus("critical");
         }
         if (newAlertMessages.length > 0) {
             setAlertMessages(newAlertMessages);
             setAlertStatus("critical");
+            setIsEditing(true);
             return;
         }
 
         try {
             const response = await api.post('/release_note/update', {
                 note_id: note_id,
-                title: title,
-                version: version,
-                content: note
+                title: editedNote.title,
+                version: editedNote.version,
+                content: editedNote.content
             });
 
             if (response.status === 200) {
+                setNote(editedNote);
+                setIsEditing(false);
                 setAlertMessages(["Release note successfully updated"]);
                 setAlertStatus("success");
             }
         } catch (error) {
             setAlertMessages(["Failed to edit release note"]);
             setAlertStatus("critical");
+            setIsEditing(true);
         }
-    }  
+    }
+
+    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+        if (!editedNote) return;
+        const { name, value } = e.target;
+        setEditedNote(prev => {
+            if (!prev) return undefined;
+            if (name === 'version') {
+                // For version, allow only positive numbers with up to one decimal place
+                const numValue = parseFloat(value);
+                if (!isNaN(numValue) && numValue > 0) {
+                    return {...prev, [name]: numValue.toFixed(1)};
+                }
+                return prev; // If invalid, don't update
+            }
+            return {...prev, [name]: value};
+        });
+    }
+
+    const handleContentChange = (noteType: keyof ReleaseNote['content'], index: number, value: string) => {
+        if (!editedNote || !editedNote.content) return;
+        const newContent = {...editedNote.content};
+        newContent[noteType][index] = value;
+        setEditedNote(prev => prev ? {...prev, content: newContent} : undefined);
+    }
 
     //Delete release note
     const deleteReleaseNote = async () => {
@@ -167,9 +215,19 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                     </div>
                     <div className='flex items-center w-[80%] h-full text-[25px] font-semibold  ml-[20px] gap-[10px]'>
                         <FaCodeBranch className='text-[30px] text-[#5B5353] opacity-60'/>
-                        {isLoading ? <Loader className='h-6 w-4'/>
-                            : <p>{note?.title}</p>
-                        }
+                        {isLoading ? (
+                            <Loader className='h-6 w-4'/>
+                        ) : isEditing ? (
+                            <input
+                                type="text"
+                                name="title"
+                                value={editedNote?.title || ''}
+                                onChange={handleInputChange}
+                                className="w-full p-2 border rounded"
+                            />
+                        ) : (
+                            <p>{note?.title}</p>
+                        )}
                     </div>
                     <IoIosClose className='mt-[2px] text-[70px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out'
                         onClick={()=>setViewNotes(false)}/>
@@ -178,27 +236,66 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                 {/* Main Content Area */}
                 <div className="h-[80%]">
                     <div className='flex h-[10%] items-end text-[24px] pb-2 pl-[30px] border-b-[4px]'>
-                        {isLoading ? <Loader className='h-6'/>
-                            : <p>Version {note?.version} - {formatDateLong(note?.created_at as string)}</p>
+                        {isLoading ? (
+                            <Loader className='h-6'/>
+                        ) : isEditing ? (
+                            <div className="flex items-center">
+                                <span>Version</span>
+                                <input
+                                    name='version'
+                                    step='0.1'
+                                    type='number'
+                                    min="1"
+                                    value={editedNote?.version || ''}
+                                    onChange={handleInputChange}
+                                    className="w-20 mx-2 p-1 border rounded"
+                                />
+                                <span>- {formatDateLong(note?.created_at as string)}</span>
+                            </div>
+                        ) : (
+                            <p>Version {note?.version} - {formatDateLong(note?.created_at as string)}</p>
+                        )}
+                        {isEditing ? 
+                            <div className='flex justify-center items-center h-full gap-1 animate-pop-out'>
+                                <FaCheck className='text-[28px] mt-3 ml-4 text-[#007100] cursor-pointer hover:animate-shake-infinte'
+                                    onClick={handleSaveEdit}/>
+                                <IoIosClose className='text-[45px] mt-3 text-[#921B1BFF] cursor-pointer hover:animate-shake-infinte'
+                                    onClick={handleCancelEdit}/>
+                            </div>
+                            : 
+                            <div className='flex justify-center items-center h-full gap-1 animate-pop-out'>
+                                <MdModeEdit className='text-[24px] mt-3 ml-4 mb-1 text-[#5B5353] cursor-pointer animate-pop-out hover:text-[#921B1BFF] hover:animate-shake transition-colors duration-250 ease-in-out'
+                                    onClick={handleEdit}/>
+                            </div>
                         }
-                        <MdModeEdit className='text-[28px] ml-4 mb-1 text-[#5B5353] cursor-pointer hover:text-[#921B1BFF] hover:animate-shake transition-colors duration-250 ease-in-out'
-                            onClick={handleSaveEdit}/>
                     </div>      
 
                     {/* Release Note Content */}
                     <div className='h-[540px] text-[20px] p-7 pb-[10px] border-b-[4px] overflow-y-scroll'>
-                        {isLoading ? <Loader className='h-60 w-4'/>
-                            : note?.content && Object.entries(note?.content).map(([noteType, items]) => (
+                        {isLoading ? <Loader className='h-60 w-4'/> : 
+                            editedNote?.content && Object.entries(editedNote.content).map(([noteType, items]) => (
                                 <div key={noteType}>
                                     <h3 className={`font-bold ${getHeadingColors(noteType)} inline-block px-3 py-1 rounded-full`}>
-                                {noteType.charAt(0).toUpperCase() + noteType.slice(1)}</h3>
-                            <ul className='list-disc pl-12 mt-4'>
-                                {Array.isArray(items) && items.map((item: string, idx: number) => (
-                                    <li key={idx} className="text-justify mb-6">{item}</li>
-                                ))}
-                            </ul>
+                                        {noteType.charAt(0).toUpperCase() + noteType.slice(1)}
+                                    </h3>
+                                    <ul className='list-disc pl-12 mt-4'>
+                                        {Array.isArray(items) && items.map((item: string, idx: number) => (
+                                            <li key={idx} className="text-justify mb-6">
+                                                {isEditing ? (
+                                                    <textarea
+                                                        value={item}
+                                                        onChange={(e) => handleContentChange(noteType as keyof ReleaseNote['content'], idx, e.target.value)}
+                                                        className="w-full p-2 border rounded"
+                                                    />
+                                                ) : (
+                                                    item
+                                                )}
+                                            </li>
+                                        ))}
+                                    </ul>
                                 </div>
-                            ))}
+                            ))
+                        }
                     </div>
                 </div>
 
