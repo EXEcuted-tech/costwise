@@ -11,7 +11,6 @@ import { useSidebarContext } from "@/contexts/SidebarContext";
 import { SpecificFinishedGood, Component, AllFinishedGood } from "@/types/data";
 import api from "@/utils/api";
 import Alert from "@/components/alerts/Alert";
-import { select } from "@nextui-org/theme";
 
 const CostCalculation = () => {
   const { isOpen } = useSidebarContext();

@@ -46,7 +46,7 @@ const ProjectedCostPage = () => {
 
   useEffect(() => {
     const fetchPredictions = async () => {
-      const response = api.post("/prediction/data", {
+      const response = api.post("/prediction/current_data", {
         monthYear: "January 2025",
       });
 
@@ -70,7 +70,7 @@ const ProjectedCostPage = () => {
   });
 
   useEffect(() => {
-    const fetchData = async () => {
+    const fetchMonth = async () => {
       try {
         const response = await api.get("/training/data");
 
@@ -84,8 +84,6 @@ const ProjectedCostPage = () => {
           parsedData = dataString;
         }
 
-        console.log("Parsed Data: ", parsedData);
-
         let monthYearList: any[] = [];
 
         parsedData.map((entry) => {
@@ -96,14 +94,12 @@ const ProjectedCostPage = () => {
         });
 
         setyearList(monthYearList);
-
-        console.log("List of Months from previous Data:", yearList);
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
-    fetchData();
+    fetchMonth();
   }, []);
 
   return (
@@ -131,8 +127,8 @@ const ProjectedCostPage = () => {
               </span>
               <ul
                 className={`list-none px-[1px] absolute border border-gray-300 rounded-lg top-[2.7em] left-50% w-full translate-[-50%] transition z-1 overflow-hidden bg-white shadow-md ${!isActiveStart
-                    ? "opacity-0 pointer-events-none"
-                    : "block opacity-100"
+                  ? "opacity-0 pointer-events-none"
+                  : "block opacity-100"
                   } ${yearList.length < 6 ? " " : "overflow-y-scroll h-[175px]"}`}
               >
                 {yearList.map((date) => (
@@ -218,8 +214,8 @@ const ProjectedCostPage = () => {
           >
             <div
               className={`${isOpen
-                  ? "flex flex-col 2xl:flex-row 4xl:flex-col"
-                  : "flex flex-row 2xl:flex-col"
+                ? "flex flex-col 2xl:flex-row 4xl:flex-col"
+                : "flex flex-row 2xl:flex-col"
                 } gap-[20px] w-full`}
             >
               {/* Predictions Section */}
@@ -277,10 +273,10 @@ const ProjectedCostPage = () => {
                         <tr
                           key={item.product_num}
                           className={`text-[#383838] ${item.product_name === activeFG.product_name
-                              ? "bg-primary font-bold text-white"
-                              : item.product_num % 2 === 0
-                                ? "bg-[#F6EBEB]"
-                                : ""
+                            ? "bg-primary font-bold text-white"
+                            : item.product_num % 2 === 0
+                              ? "bg-[#F6EBEB]"
+                              : ""
                             } w-full cursor-pointer`}
                           onClick={() => setActiveFG(item)}
                         >
