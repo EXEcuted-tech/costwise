@@ -12,6 +12,7 @@ interface SendEmailDialogProps {
 const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
 
   const [email, setEmail] = useState('');
+  const [employeeNum, setEmployeeNum] = useState('');
   const [modal, setModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [access, setAccess] = useState(false);
@@ -21,7 +22,7 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
     setModal(true);
     setIsLoading(true);
     try {
-      const response = await api.post('/password-reset/email', { email });
+      const response = await api.post('/password-reset/email', { email, employeeNum });
       const respo = "Success!";
       console.log(respo);
       setAccess(true);
@@ -47,13 +48,21 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
           </div>
           <form onSubmit={handleSubmit}>
             <div className='flex flex-col w-full px-5 gap-2'>
-              <p className='text-[20px]'>Enter your email address</p>
+              <p className='text-[20px]'>Enter email address</p>
               <input
                   className="bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border border-[#B3B3B3] rounded-lg focus:outline"
                   type="email"
                   name="fname"
                   placeholder="Email Address"
                   onChange={(e) => setEmail(e.target.value)}
+              />
+              <p className='text-[20px]'>Enter employee number</p>
+              <input
+                  className="bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border border-[#B3B3B3] rounded-lg focus:outline"
+                  type="email"
+                  name="fname"
+                  placeholder="Employee Number"
+                  onChange={(e) => setEmployeeNum(e.target.value)}
               />
               <div className='flex w-full justify-center'>
                   <button className='w-[50%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] bg-primary text-white rounded-xl hover:bg-[#9c1c1c]'

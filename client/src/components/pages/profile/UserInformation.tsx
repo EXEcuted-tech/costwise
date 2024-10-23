@@ -4,13 +4,15 @@ import { MdModeEdit } from 'react-icons/md';
 import EditInformation from './EditInformation';
 import PasswordChangeDialog from '@/components/modals/SendEmailDialog';
 import ConfirmChangeInfo from '@/components/modals/ConfirmChangeInfo';
+import Spinner from '@/components/loaders/Spinner';
 
 type UserInformationProps ={
     isOpen: boolean;
     userAcc: any;
+    isLoading: boolean;
 }
 
-const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc} ) => {
+const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc, isLoading} ) => {
     const [props, setProps] = useState(false);
     const [dialog, setDialog] = useState(false);
     const [successModal, setSuccessModal] = useState(false);
@@ -37,60 +39,65 @@ const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc} ) =>
                     <MdModeEdit/>
                 </button>
             </div>
-            <div className={`${isOpen ? 'text-[13px] 2xl:text-[17px] 3xl:text-[22px] 4xl:text-[24px]' : 'text-[18px] 2xl:text-[22px] 3xl:text-[24px]'} flex justify-center border-2 border-[#D9D9D9] py-5 text-black gap-[10%] rounded-[15px]`}>
-                {/* 1st Col */}
-                <div className='flex flex-col ml-3'>
-                    <div className='flex flex-col justify-start mb-4'>
-                        <p className="text-[#8E8E8E] font-semibold">First Name</p>
-                        <p>{userAcc?.fName}</p>
+            <div className={`${isOpen ? 'text-[13px] 2xl:text-[17px] 3xl:text-[22px] 4xl:text-[24px]' : 'text-[18px] 2xl:text-[22px] 3xl:text-[24px]'} flex h-[310px] justify-center border-2 border-[#D9D9D9] py-5 text-black rounded-[15px]`}>
+               {isLoading? (<div className='flex h-[260px] pt-[100px]'><Spinner className='!size-[50px]'/> </div>) : 
+               (
+                <div className='flex w-full justify-center gap-[10%]'>
+                    {/* 1st Col */}
+                    <div className='flex flex-col ml-3'>
+                        <div className='flex flex-col justify-start mb-4'>
+                            <p className="text-[#8E8E8E] font-semibold">First Name</p>
+                            <p>{userAcc?.fName}</p>
+                        </div>
+
+                        <div className='flex flex-col justify-start mb-4'>
+                            <p className="text-[#8E8E8E] font-semibold">Email Address</p>
+                            <p>{userAcc?.email}</p>
+                        </div>
+
+                        <div className='flex flex-col justify-start mb-4'>
+                            <p className="text-[#8E8E8E] font-semibold">Department</p>
+                            <p>{userAcc?.dept}</p>
+                        </div>
                     </div>
 
-                    <div className='flex flex-col justify-start mb-4'>
-                        <p className="text-[#8E8E8E] font-semibold">Email Address</p>
-                        <p>{userAcc?.email}</p>
+                    {/* 2nd Col */}
+                    <div className='flex flex-col'>
+                        <div className='flex flex-col justify-start mb-4'>
+                            <p className={`${!userAcc?.mName ? 'opacity-25' : 'text-[#808080]'} font-semibold`}>Middle Name</p>
+                            <p>{!userAcc?.mName ? "‎" : userAcc?.mName}</p>
+                        </div>
+
+                        <div className='flex flex-col justify-start mb-4'>
+                            <p className="text-[#8E8E8E] font-semibold">Phone Number</p>
+                            <p>{userAcc?.phoneNum}</p>
+                        </div>
+
+                        <div className='flex flex-col justify-start mb-4'>
+                            <p className="text-[#8E8E8E] font-semibold">Employee Number</p>
+                            <p>{userAcc?.employeeNum}</p>
+                        </div>
                     </div>
 
-                    <div className='flex flex-col justify-start mb-4'>
-                        <p className="text-[#8E8E8E] font-semibold">Department</p>
-                        <p>{userAcc?.dept}</p>
+                    {/* 3rd Col */}
+                    <div className='flex flex-col mr-6'>
+                        <div className='flex flex-col justify-start mb-4'>
+                            <p className="text-[#8E8E8E] font-semibold">Last Name</p>
+                            <p>{userAcc?.lName}</p>
+                        </div>
+
+                        <div className='flex flex-col justify-start mb-4'>
+                            <p className={`${!userAcc?.suffix ? 'opacity-25' : 'text-[#808080]'} font-semibold`}>Suffix</p>
+                            <p>{!userAcc?.suffix ? "‎" : userAcc?.suffix}</p>
+                        </div>
+
+                        <div className='flex flex-col justify-start mb-4'>
+                            <p className="text-[#8E8E8E] font-semibold">Position</p>
+                            <p>{userAcc?.position}</p>
+                        </div>
                     </div>
                 </div>
-
-                {/* 2nd Col */}
-                <div className='flex flex-col'>
-                    <div className='flex flex-col justify-start mb-4'>
-                        <p className={`${!userAcc?.mName ? 'opacity-25' : 'text-[#039300]'} font-semibold`}>Middle Name</p>
-                        <p>{!userAcc?.mName ? "‎" : userAcc?.mName}</p>
-                    </div>
-
-                    <div className='flex flex-col justify-start mb-4'>
-                        <p className="text-[#8E8E8E] font-semibold">Phone Number</p>
-                        <p>{userAcc?.phoneNum}</p>
-                    </div>
-
-                    <div className='flex flex-col justify-start mb-4'>
-                        <p className="text-[#8E8E8E] font-semibold">Employee Number</p>
-                        <p>{userAcc?.employeeNum}</p>
-                    </div>
-                </div>
-
-                {/* 3rd Col */}
-                <div className='flex flex-col mr-6'>
-                    <div className='flex flex-col justify-start mb-4'>
-                        <p className="text-[#8E8E8E] font-semibold">Last Name</p>
-                        <p>{userAcc?.lName}</p>
-                    </div>
-
-                    <div className='flex flex-col justify-start mb-4'>
-                        <p className={`${!userAcc?.mName ? 'opacity-25' : 'text-[#039300]'} font-semibold`}>Suffix</p>
-                        <p>{!userAcc?.suffix ? "‎" : userAcc?.suffix}</p>
-                    </div>
-
-                    <div className='flex flex-col justify-start mb-4'>
-                        <p className="text-[#8E8E8E] font-semibold">Role</p>
-                        <p>{userAcc?.role}</p>
-                    </div>
-                </div>
+                )}
             </div>
         </div>
         }

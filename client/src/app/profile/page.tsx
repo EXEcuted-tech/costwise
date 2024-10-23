@@ -27,6 +27,7 @@ interface UserProps {
     employeeNum: string;
     role: string;
     display_picture: string;
+    position: string;
 }
 
 const ProfilePage = () => {
@@ -36,6 +37,7 @@ const ProfilePage = () => {
     const [userInfo, setuserInfo] = useState(false);
     const [dialog, setDialog] = useState(false);
     const [profilePicture, setProfilePicture] = useState<string | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     useEffect(() => {
@@ -52,11 +54,13 @@ const ProfilePage = () => {
                     dept: user.data.department,
                     employeeNum: user.data.employee_number,
                     role: user.data.sys_role,
-                    display_picture: user.data.display_picture
+                    display_picture: user.data.display_picture,
+                    position: user.data.position
                 }
 
                 setUserAcc(userInformation);
                 setProfilePicture(userInformation.display_picture);
+                setIsLoading(false);
             } catch (error: any) {
                 console.error('Error fetching user data:', error);
             }
@@ -166,7 +170,7 @@ const ProfilePage = () => {
                     </div>
                     <div>
                         <div className='text-[25px] 2xl:text-[30px] font-semibold'> {userAcc?.fName} {userAcc?.lName}</div>
-                        <div className='text-[22px] 2xl:text-[24px]'> {userAcc?.role} </div>
+                        <div className='text-[22px] 2xl:text-[24px]'> {userAcc?.position} </div>
                         <button className="text-[22px] 2xl:text-[24px] text-primary cursor-pointer hover:opacity-65"
                             onClick={handleLogout}>
                             Logout
@@ -174,7 +178,7 @@ const ProfilePage = () => {
                     </div>
                 </div>
 
-                <UserInformation isOpen={isOpen} userAcc={userAcc} />
+                <UserInformation isOpen={isOpen} userAcc={userAcc} isLoading={isLoading} />
             </div>
         </div>
     );
