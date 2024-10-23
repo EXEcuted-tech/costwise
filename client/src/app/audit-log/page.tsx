@@ -115,7 +115,7 @@ const AuditLogPage = () => {
         const sortedLogs = [...auditLogs].sort((a, b) => {
             const dateA = new Date(a.dateTimeAdded).getTime();
             const dateB = new Date(b.dateTimeAdded).getTime();
-            return sortAscending ? dateA - dateB : dateB - dateA;
+            return sortAscending ? dateB - dateA : dateA - dateB;
         });
         setAuditLogs(sortedLogs);
         setSortAscending(!sortAscending);
@@ -183,7 +183,7 @@ const AuditLogPage = () => {
                                     <td colSpan={4} className='h-[74px] border-b border-x rounded-b-xl border-black border-opacity-[50%] bg-white flex justify-center items-center py-4'>
                                     {isLoading ? 
                                         (
-                                            <Spinner className="!size-[30px]" />
+                                            <Spinner className="!size-[50px]" />
                                         ) : 
                                         (
                                             <p>No logs available</p>

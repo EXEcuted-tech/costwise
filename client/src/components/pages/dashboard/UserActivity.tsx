@@ -13,18 +13,18 @@ export type UserActivityProps = {
     name: string;
     activity: ActionType;
     description: string,
-    time: Date;
+    formattedTime: string;
 }
 
-const UserActivity: React.FC<UserActivityProps> = ({ url, name, activity ,description , time }) => {
-    const formattedTime = time.toLocaleString('en-US', {
-        year: 'numeric',
-        month: 'long',
-        day: 'numeric',
-        hour: 'numeric',
-        minute: 'numeric',
-        hour12: true,
-      });
+const UserActivity: React.FC<UserActivityProps> = ({ url, name, activity ,description , formattedTime }) => {
+    // const formattedTime = time.toLocaleString('en-US', {
+    //     year: 'numeric',
+    //     month: 'long',
+    //     day: 'numeric',
+    //     hour: 'numeric',
+    //     minute: 'numeric',
+    //     hour12: true,
+    //   });
     return (
         <div className='flex px-[20px] py-[18px] bg-[#FFFAF8] dark:bg-[#3C3C3C]'>
             <div className='mr-[15px] flex justify-center'>
