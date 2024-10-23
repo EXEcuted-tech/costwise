@@ -10,7 +10,11 @@ import AllFG from "@/components/pages/cost-calculation/AllFG";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import { SpecificFinishedGood, Component, AllFinishedGood } from "@/types/data";
 import api from "@/utils/api";
+import * as tf from "@tensorflow/tfjs";
 import Alert from "@/components/alerts/Alert";
+import { CostDataEntry, Product } from "@/types/data";
+import { initializeModel, makePrediction } from "@/components/model/sketch";
+import { request } from "http";
 
 const CostCalculation = () => {
   const { isOpen } = useSidebarContext();
@@ -34,6 +38,55 @@ const CostCalculation = () => {
   const [sheets, setSheets] = useState<
     { id: number; data: SpecificFinishedGood | null }[]
   >([{ id: 0, data: null }]);
+  // ===============> Month Year Format <=====================
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const currentDate = new Date();
+  const currentMonthName = monthNames[currentDate.getMonth()];
+  const currentYear = currentDate.getFullYear();
+  const currentMonthYear = `${currentMonthName} ${currentYear}`;
+  //================> Machine Learning Code <====================
+  const [costData, setCostData] = useState<CostDataEntry[]>([]);
+  const [model, setModel] = useState<tf.Sequential | null>(null);
+  const [trained, setTrained] = useState(false);
+  const [lossHistory, setLossHistory] = useState<number[]>([0]);
+  const [trainingSpeed, setTrainingSpeed] = useState<number>(0);
+  const addNewData = (newData: CostDataEntry[]) => {
+    setCostData((prevData) => [...prevData, ...newData]);
+  };
+
+  const fetchData = async () => {
+    try {
+      const response = await api.get("/training/data");
+
+      const dataString = response.data.data[0].settings;
+      let parsedData: CostDataEntry[];
+
+      parsedData = JSON.parse(dataString);
+
+      if (costData.length === 0) {
+        setCostData(parsedData);
+      }
+      console.log(parsedData);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const handleFGClick = (fg: React.SetStateAction<string>) => {
     setSelectedFG(fg);
@@ -153,8 +206,48 @@ const CostCalculation = () => {
       }
     } catch (error) {
       console.error("Error exporting workbook:", error);
+    } finally {
+      console.log("Cost Data: ", costData);
+      if (
+        selectedFG === "All-FG" &&
+        !costData.some((entry) => entry.monthYear === currentMonthYear)
+      ) {
+        // Map allFGData to the Product format
+        const products: Product[] = allFGData.map((fg) => ({
+          productName: fg.fg_desc,
+          cost: parseFloat(fg.total_cost) || 0,
+        }));
+
+        let newData: CostDataEntry = {
+          monthYear: currentMonthYear,
+          products: products,
+        };
+
+        addNewData([newData]);
+        api.post("/training/update", {
+          settings: costData,
+        });
+        try {
+          initializeModel(
+            costData,
+            model,
+            setModel,
+            setTrained,
+            setTrainingSpeed,
+            setLossHistory
+          );
+          console.log("After initialized model here are the data: ", trained);
+          console.log("Model Data", model);
+        } catch (err) {
+          console.log("Model training was unsuccessful.");
+        }
+      }
     }
   };
+
+  useEffect(() => {
+    makePrediction(trained, model, costData);
+  }, [trained]);
 
   //Retrieve month and year options
   const retrieveMonthYearOptions = async () => {
@@ -236,12 +329,12 @@ const CostCalculation = () => {
               className="!relative"
               variant={
                 alertStatus as
-                | "default"
-                | "information"
-                | "warning"
-                | "critical"
-                | "success"
-                | undefined
+                  | "default"
+                  | "information"
+                  | "warning"
+                  | "critical"
+                  | "success"
+                  | undefined
               }
               key={index}
               message={msg}
@@ -293,20 +386,22 @@ const CostCalculation = () => {
               <div
                 onClick={() => handleFGClick("Specific-FG")}
                 className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-l-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                    ${selectedFG === "Specific-FG"
-                    ? "bg-[#B22222] text-white"
-                    : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
-                  }`}
+                                    ${
+                                      selectedFG === "Specific-FG"
+                                        ? "bg-[#B22222] text-white"
+                                        : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
+                                    }`}
               >
                 Specific-FG
               </div>
               <div
                 onClick={() => handleFGClick("All-FG")}
                 className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-r-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                    ${selectedFG === "All-FG"
-                    ? "bg-[#B22222] text-white"
-                    : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
-                  }`}
+                                    ${
+                                      selectedFG === "All-FG"
+                                        ? "bg-[#B22222] text-white"
+                                        : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
+                                    }`}
               >
                 All-FG
               </div>

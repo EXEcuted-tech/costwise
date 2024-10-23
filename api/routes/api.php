@@ -151,24 +151,18 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
 
-
-    Route::prefix('/fg')->group(function () {
-        Route::post('/upload', [FGController::class, 'uploadFG']);
-        Route::get('/data', [FGController::class, 'getFGData']);
-    });
-
-
-
     Route::prefix('/article')->group(function () {
-        // Route::post('/upload', [ArticleController::class, 'uploadArticle']);
-        Route::post('/data', [ArticleController::class, 'getArticle']);
-        Route::post('/update', [ArticleController::class, 'updateArticle']);
+        Route::post('upload', [ArticleController::class, 'uploadArticle']);
+        Route::get('all', [ArticleController::class, 'getAll']);
+        Route::post('data', [ArticleController::class, 'getArticle']);
+        Route::post('update', [ArticleController::class, 'updateArticle']);
     });
 });
 
 Route::prefix('/training')->group(function () {
-    Route::post('/upload', [FileController::class, 'uploadTrainingData']);
-    Route::get('/data', [FileController::class, 'getData']);
+    Route::post('upload', [FileController::class, 'uploadTrainingData']);
+    Route::get('data', [FileController::class, 'getData']);
+    Route::post('update', [FileController::class, 'updateTrainingData']);
 });
 
 Route::prefix('/prediction')->group(function () {
