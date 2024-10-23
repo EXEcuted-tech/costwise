@@ -41,10 +41,47 @@ const MainLayout = () => {
       }
     };
 
-    const intervalId = setInterval(checkForNewNotifications, 30000); // Check every 30 seconds
+    const intervalId = setInterval(checkForNewNotifications, 15000); // Check every 30 seconds
 
     return () => clearInterval(intervalId);
   }, [notificationSound, setHasNewNotifications]);
+
+  // useEffect(() => {
+  //   let lastCheckedAt = new Date().toISOString();
+  //   let isPolling = false;
+  
+  //   const checkForNewNotifications = async () => {
+  //     if (isPolling) return;
+  //     isPolling = true;
+  
+  //     try {
+  //       const response = await api.get('/notifications/new', {
+  //         params: { last_checked_at: lastCheckedAt },
+  //         timeout: 30000 // 30 seconds timeout
+  //       });
+  
+  //       if (response.data.data.length > 0) {
+  //         setHasNewNotifications(true);
+  //         notificationSound?.play();
+  //       } else {
+  //         setHasNewNotifications(false);
+  //       }
+  
+  //       lastCheckedAt = new Date().toISOString();
+  //     } catch (error) {
+
+  //     } finally {
+  //       isPolling = false;
+  //       checkForNewNotifications(); // Start the next long poll
+  //     }
+  //   };
+  
+  //   checkForNewNotifications(); // Start the initial long poll
+  
+  //   return () => {
+  //     isPolling = false; // Stop polling on unmount
+  //   };
+  // }, [notificationSound, setHasNewNotifications]);
 
   return (
     <div className='flex !font-lato'>

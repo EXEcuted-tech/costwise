@@ -31,26 +31,38 @@ const CloseSidebar: React.FC = () => {
   const router = useRouter();
   const { hasNewNotifications } = useNotificationContext();
 
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  const { currentUser, setCurrentUser } = useUserContext();
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
+  // useEffect(() => {
+  //   const userString = localStorage.getItem('currentUser');
+  //   if (userString) {
+  //     try {
+  //       const parsedUser = JSON.parse(userString);
+  //       setCurrentUser(parsedUser);
+  //       setProfilePicture(parsedUser.displayPicture);
+  //       if (parsedUser.userType === 'Admin') {
+  //         setIsAdmin(true);
+  //       } else {
+  //         setIsAdmin(false);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error parsing user data:', error);
+  //     }
+  //   }
+  // }, [setIsAdmin]);
+
   useEffect(() => {
-    const userString = localStorage.getItem('currentUser');
-    if (userString) {
-      try {
-        const parsedUser = JSON.parse(userString);
-        setCurrentUser(parsedUser);
-        setProfilePicture(parsedUser.displayPicture);
-        if (parsedUser.userType === 'Admin') {
-          setIsAdmin(true);
-        } else {
-          setIsAdmin(false);
-        }
-      } catch (error) {
-        console.error('Error parsing user data:', error);
+    if (currentUser) {
+      console.log(currentUser.displayPicture);
+      setProfilePicture(currentUser.displayPicture);
+      if (currentUser.userType === 'Admin') {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
       }
     }
-  }, [setIsAdmin]);
+  }, [currentUser, setIsAdmin]);
 
   const handleLogout = async () => {
     await removeTokens();
@@ -87,7 +99,7 @@ const CloseSidebar: React.FC = () => {
                 <div
                   className="w-full h-full object-cover"
                   style={{
-                    backgroundImage: `url(${getProfilePictureUrl(profilePicture) || '/default-profile.png'})`,
+                    backgroundImage: `url(${getProfilePictureUrl(currentUser.displayPicture) || '/default-profile.png'})`,
                     backgroundPosition: 'center',
                     backgroundRepeat: 'no-repeat',
                     backgroundSize: 'cover'

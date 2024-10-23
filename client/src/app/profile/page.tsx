@@ -8,7 +8,7 @@ import Link from "next/link";
 import UserInformation from '@/components/pages/profile/UserInformation';
 import SendEmailDialog from "@/components/modals/SendEmailDialog";
 import background from '@/assets/account-profile-bg.png';
-import { useUserContext } from "@/contexts/UserContext";
+import { User, useUserContext } from "@/contexts/UserContext";
 import api from "@/utils/api";
 import { FaUserCircle } from "react-icons/fa";
 import { removeTokens } from "@/utils/removeTokens";
@@ -31,10 +31,10 @@ interface UserProps {
 
 const ProfilePage = () => {
     const { isOpen } = useSidebarContext();
-    const { currentUser } = useUserContext();
     const [userAcc, setUserAcc] = useState<UserProps | null>(null);
     const [userInfo, setuserInfo] = useState(false);
     const [dialog, setDialog] = useState(false);
+    const { currentUser, setCurrentUser } = useUserContext();
     const [profilePicture, setProfilePicture] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -78,6 +78,12 @@ const ProfilePage = () => {
                 });
 
                 if (response.data.status === 'success') {
+                    const updatedUser = {
+                        ...currentUser,
+                        displayPicture: response.data.display_picture
+                    };
+                    localStorage.setItem('currentUser', JSON.stringify(updatedUser));
+                    setCurrentUser(updatedUser as User);
                     setProfilePicture(response.data.display_picture);
                 } else {
                     console.error('Error updating profile picture:', response.data.message);

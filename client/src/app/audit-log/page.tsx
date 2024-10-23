@@ -109,7 +109,7 @@ const AuditLogPage = () => {
             fetchData();
         }, 5000);
         return () => clearInterval(interval);
-    }, [setCurrentUser]);
+    }, [currentUser, setCurrentUser]);
 
     const sortAuditLogs = () => {
         const sortedLogs = [...auditLogs].sort((a, b) => {

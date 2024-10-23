@@ -12,7 +12,6 @@ export const DateSection: React.FC<DateSectionProps> = ({ date, notifications, s
     const [localNotifications, setLocalNotifications] = useState<NotificationItemProps[]>([]);
 
     useEffect(() => {
-        
         const sortedNotifications = [...notifications].sort((a, b) => {
             return new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime();
         });
@@ -22,9 +21,11 @@ export const DateSection: React.FC<DateSectionProps> = ({ date, notifications, s
     const handleMarkAllAsRead = async () => {
         try {
             await api.post('/notifications/mark_all_as_read');
-            setLocalNotifications(prevNotifications =>
-                prevNotifications.map(notification => ({ ...notification, isRead: true }))
-            );
+            window.location.reload();
+            // setLocalNotifications(prevNotifications => {
+            //     const updatedNotifications = prevNotifications.map(notification => ({ ...notification, isRead: 1 }));
+            //     return updatedNotifications.sort((a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime());
+            // });
         } catch (error) {
             console.error('Error marking all notifications as read:', error);
         }

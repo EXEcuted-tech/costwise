@@ -106,17 +106,16 @@ const FormulationContainer: React.FC<FormulationProps> = ({
             a.remove();
             window.URL.revokeObjectURL(url);
 
+            const user = localStorage.getItem('currentUser');
+            const parsedUser = JSON.parse(user || '{}');
+
             const auditData = {
-                userId: currentUser?.userId, 
+                userId: parsedUser?.userId, 
                 action: 'export',
                 act: 'formulation_file',
                 fileName: fileName,
               };
-              if (currentUser) {
-              console.log('Current User ID:', currentUser?.userId);
-              } else {
-                  console.log('Current User is not defined.', currentUser);
-              }
+
               api.post('/auditlogs/logsaudit', auditData)
               .then(response => {
                   console.log('Audit log created successfully:', response.data);
@@ -144,17 +143,16 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                 setFilteredData(updatedList);
                 setSuccessMessage('Formulation deleted successfully');
 
+                const user = localStorage.getItem('currentUser');
+                const parsedUser = JSON.parse(user || '{}');
+
                 const auditData = {
-                    userId: currentUser?.userId, 
+                    userId: parsedUser?.userId, 
                     action: 'crud',
                     act: 'archive_formulation',
                     fileName: formulaCode,
                 };
-                if (currentUser) {
-                console.log('Current User ID:', currentUser?.userId);
-                } else {
-                    console.log('Current User is not defined.', currentUser);
-                }
+
                 api.post('/auditlogs/logsaudit', auditData)
                 .then(response => {
                     console.log('Audit log created successfully:', response.data);

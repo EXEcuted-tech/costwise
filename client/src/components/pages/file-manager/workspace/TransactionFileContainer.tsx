@@ -8,6 +8,7 @@ import api from '@/utils/api'
 import Alert from '@/components/alerts/Alert'
 import PrimaryPagination from '@/components/pagination/PrimaryPagination'
 import { useFileManagerContext } from '@/contexts/FileManagerContext'
+import { useUserContext } from '@/contexts/UserContext'
 
 const TransactionFileContainer = (data: File) => {
   const [isEdit, setIsEdit] = useState(false);
@@ -37,6 +38,8 @@ const TransactionFileContainer = (data: File) => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentListPage = transactionData.slice(indexOfFirstItem, indexOfLastItem);
+
+  const { currentUser } = useUserContext();
 
   // useEffect(() => {
   //   setTransactionsCount(transactionData.length); // Update the count based on current data
@@ -73,7 +76,7 @@ const TransactionFileContainer = (data: File) => {
 
       fetchAllData();
     }
-  }, [data])
+  }, []);
 
   const fetchTransactionsSheet = async (transaction_ids: Number[]) => {
     try {
@@ -215,6 +218,27 @@ const TransactionFileContainer = (data: File) => {
           setAlertMessages(saveResponse.data.errors);
         }
       }
+
+      const settings = JSON.parse(data.settings);
+
+      const user = localStorage.getItem('currentUser');
+      const parsedUser = JSON.parse(user || '{}');
+
+      const auditData = {
+        userId: parsedUser?.userId, 
+        action: 'crud',
+        act: 'edit',
+        fileName: `${settings.file_name}`,
+      };
+
+      api.post('/auditlogs/logsaudit', auditData)
+      .then(response => {
+          console.log('Audit log created successfully:', response.data);
+      })
+      .catch(error => {
+          console.error('Error audit logs:', error);
+      });
+      
     } catch (error: any) {
       if (error.response?.data?.message) {
         setAlertMessages([error.response.data.message]);

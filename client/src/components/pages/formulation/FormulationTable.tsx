@@ -38,141 +38,120 @@ const FormulationTable: React.FC<{
         const [monthYear, setMonthYear] = useState<number>(202401);
 
         useEffect(() => {
+            const retrieveFormulationData = async (formulationId: number) => {
+                setIsLoading(true);
+                try {
+                    const formulationResponse = await api.get('/formulations/retrieve', {
+                        params: { col: 'formulation_id', value: formulationId },
+                    });
+    
+                    if (formulationResponse.data.status !== 200) {
+                        throw new Error("Failed to fetch formulation data");
+                    }
+    
+                    const formulation = formulationResponse.data.data[0];
+                    const finishedGoodResponse = await api.get('/finished_goods/retrieve', {
+                        params: { col: 'fg_id', value: formulation.fg_id },
+                    });
+    
+                    if (finishedGoodResponse.data.status !== 200) {
+                        throw new Error("Failed to fetch finished good data");
+                    }
+    
+                    const finishedGood = finishedGoodResponse.data.data[0];
+                    setMonthYear(finishedGood.monthYear);
+                    setFgDesc(finishedGood.fg_desc);
+                    setFormulaCode(formulation.formula_code);
+    
+                    const allMaterialIds: number[] = [];
+                    if (formulation.material_qty_list) {
+                        const materialList = JSON.parse(formulation.material_qty_list);
+                        materialList.forEach((material: {}) => {
+                            const materialId = Object.keys(material)[0];
+                            allMaterialIds.push(parseInt(materialId, 10));
+                        });
+                    }
+    
+                    const materialResponse = await api.get('/materials/retrieve_batch', {
+                        params: { col: 'material_id', values: allMaterialIds },
+                    });
+    
+                    if (materialResponse.data.status !== 200) {
+                        throw new Error("Failed to fetch material data");
+                    }
+    
+                    const materialDataArray = materialResponse.data.data;
+    
+                    let currentFormulation: FormulationRecord[] = [];
+    
+                    if (finishedGood) {
+                        let fgRow: FormulationRecord = {
+                            id: finishedGood.fg_id,
+                            track_id: formulationId,
+                            rowType: 'finishedGood',
+                            formula: formulation.formula_code,
+                            level: null,
+                            itemCode: finishedGood.fg_code,
+                            description: finishedGood.fg_desc,
+                            formulation: parseFloat(finishedGood.formulation_no).toString(),
+                            batchQty: parseFloat(finishedGood.total_batch_qty),
+                            unit: finishedGood.unit,
+                        };
+                        currentFormulation.push(fgRow);
+                    }
+    
+                    if (formulation.emulsion) {
+                        const emulsionData = JSON.parse(formulation.emulsion);
+                        if (Object.keys(emulsionData).length !== 0) {
+                            currentFormulation.push({
+                                id: formulationId,
+                                track_id: formulationId,
+                                rowType: 'emulsion',
+                                formula: null,
+                                level: emulsionData.level,
+                                itemCode: null,
+                                description: "EMULSION",
+                                formulation: null,
+                                batchQty: emulsionData.batch_qty,
+                                unit: emulsionData.unit,
+                            });
+                        }
+                    }
+    
+                    if (formulation.material_qty_list) {
+                        const materials = JSON.parse(formulation.material_qty_list);
+                        materials.forEach((material: { [key: string]: any }) => {
+                            const materialId = Object.keys(material)[0];
+                            const materialInfo = material[materialId];
+                            const materialDetails = materialDataArray.find((m: { material_id: string; }) => m.material_id == materialId);
+    
+                            if (materialDetails) {
+                                currentFormulation.push({
+                                    id: materialDetails.material_id,
+                                    track_id: formulationId,
+                                    rowType: 'material',
+                                    formula: null,
+                                    level: parseFloat(materialInfo.level).toString(),
+                                    itemCode: materialDetails.material_code,
+                                    description: materialDetails.material_desc,
+                                    formulation: null,
+                                    batchQty: materialInfo.qty,
+                                    unit: materialDetails.unit,
+                                });
+                            }
+                        });
+                    }
+                    setFormulaData(currentFormulation);
+                } catch (error) {
+                    console.error('Error retrieving formulation data:', error);
+                }
+            };
+
             const formulationId = searchParams.get('id');
             if (formulationId) {
                 retrieveFormulationData(parseInt(formulationId));
             }
-        }, [searchParams]);
-
-        const retrieveFormulationData = async (formulationId: number) => {
-            setIsLoading(true);
-            try {
-                const formulationResponse = await api.get('/formulations/retrieve', {
-                    params: { col: 'formulation_id', value: formulationId },
-                });
-
-                if (formulationResponse.data.status !== 200) {
-                    throw new Error("Failed to fetch formulation data");
-                }
-
-                const formulation = formulationResponse.data.data[0];
-                const finishedGoodResponse = await api.get('/finished_goods/retrieve', {
-                    params: { col: 'fg_id', value: formulation.fg_id },
-                });
-
-                if (finishedGoodResponse.data.status !== 200) {
-                    throw new Error("Failed to fetch finished good data");
-                }
-
-                const finishedGood = finishedGoodResponse.data.data[0];
-                setMonthYear(finishedGood.monthYear);
-                setFgDesc(finishedGood.fg_desc);
-                setFormulaCode(formulation.formula_code);
-
-                const allMaterialIds: number[] = [];
-                if (formulation.material_qty_list) {
-                    const materialList = JSON.parse(formulation.material_qty_list);
-                    materialList.forEach((material: {}) => {
-                        const materialId = Object.keys(material)[0];
-                        allMaterialIds.push(parseInt(materialId, 10));
-                    });
-                }
-
-                const materialResponse = await api.get('/materials/retrieve_batch', {
-                    params: { col: 'material_id', values: allMaterialIds },
-                });
-
-                if (materialResponse.data.status !== 200) {
-                    throw new Error("Failed to fetch material data");
-                }
-
-                const materialDataArray = materialResponse.data.data;
-
-                let currentFormulation: FormulationRecord[] = [];
-
-                if (finishedGood) {
-                    let fgRow: FormulationRecord = {
-                        id: finishedGood.fg_id,
-                        track_id: formulationId,
-                        rowType: 'finishedGood',
-                        formula: formulation.formula_code,
-                        level: null,
-                        itemCode: finishedGood.fg_code,
-                        description: finishedGood.fg_desc,
-                        formulation: parseFloat(finishedGood.formulation_no).toString(),
-                        batchQty: parseFloat(finishedGood.total_batch_qty),
-                        unit: finishedGood.unit,
-                    };
-                    currentFormulation.push(fgRow);
-                }
-
-                if (formulation.emulsion) {
-                    const emulsionData = JSON.parse(formulation.emulsion);
-                    if (Object.keys(emulsionData).length !== 0) {
-                        currentFormulation.push({
-                            id: formulationId,
-                            track_id: formulationId,
-                            rowType: 'emulsion',
-                            formula: null,
-                            level: emulsionData.level,
-                            itemCode: null,
-                            description: "EMULSION",
-                            formulation: null,
-                            batchQty: emulsionData.batch_qty,
-                            unit: emulsionData.unit,
-                        });
-                    }
-                }
-
-                if (formulation.material_qty_list) {
-                    const materials = JSON.parse(formulation.material_qty_list);
-                    materials.forEach((material: { [key: string]: any }) => {
-                        const materialId = Object.keys(material)[0];
-                        const materialInfo = material[materialId];
-                        const materialDetails = materialDataArray.find((m: { material_id: string; }) => m.material_id == materialId);
-
-                        if (materialDetails) {
-                            currentFormulation.push({
-                                id: materialDetails.material_id,
-                                track_id: formulationId,
-                                rowType: 'material',
-                                formula: null,
-                                level: parseFloat(materialInfo.level).toString(),
-                                itemCode: materialDetails.material_code,
-                                description: materialDetails.material_desc,
-                                formulation: null,
-                                batchQty: materialInfo.qty,
-                                unit: materialDetails.unit,
-                            });
-                        }
-                    });
-                }
-                const auditData = {
-                    userId: currentUser?.userId, 
-                    action: 'crud',
-                    act: 'edit',
-                    fileName: formulaCode,
-                };
-                if (currentUser) {
-                console.log('Current User ID:', currentUser?.userId);
-                } else {
-                    console.log('Current User is not defined.', currentUser);
-                }
-                api.post('/auditlogs/logsaudit', auditData)
-                .then(response => {
-                    console.log('Audit log created successfully:', response.data);
-                })
-                .catch(error => {
-                    console.error('Error audit logs:', error);
-                });
-                setTimeout(() => {
-                    setIsLoading(false);
-                }, 1000);
-                setFormulaData(currentFormulation);
-            } catch (error) {
-                console.error('Error retrieving formulation data:', error);
-            }
-        };
+        }, [currentUser, formulaCode, searchParams]);
 
         const handleBack = () => {
             setView(false);
@@ -366,6 +345,27 @@ const FormulationTable: React.FC<{
                         }
                     }
                 }
+
+                const user = localStorage.getItem('currentUser');
+                const parsedUser = JSON.parse(user || '{}');
+
+                const auditData = {
+                    userId: parsedUser?.userId, 
+                    action: 'crud',
+                    act: 'edit',
+                    fileName: formulaCode,
+                };
+
+                api.post('/auditlogs/logsaudit', auditData)
+                .then(response => {
+                    console.log('Audit log created successfully:', response.data);
+                })
+                .catch(error => {
+                    console.error('Error audit logs:', error);
+                });
+                setTimeout(() => {
+                    setIsLoading(false);
+                }, 1000);
 
                 setRemovedRows([]);
                 setSuccessMessage("Formulation saved successfully.");

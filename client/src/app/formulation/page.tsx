@@ -119,18 +119,17 @@ const FormulationPage = () => {
                                 const response = await api.post('/formulations/upload', formData);
                                 if (response.data.status == 200) {
                                     resolve(`Successfully uploaded the file!`);
+                                    fetchData();
+
                                     const fileName = file.name; 
+                                    const user = localStorage.getItem('currentUser');
+                                    const parsedUser = JSON.parse(user || '{}');
+
                                     const auditData = {
-                                        userId: currentUser?.userId,
+                                        userId: parsedUser?.userId,
                                         action: 'import',
                                         fileName: fileName
                                       };
-                                      console.log(auditData);
-                                      if (currentUser) {
-                                      console.log('Current User ID:', currentUser?.userId);
-                                      } else {
-                                          console.log('Current User is not defined.', currentUser);
-                                      }
                                       api.post('/auditlogs/logsaudit', auditData)
                                       .then(response => {
                                           console.log('Audit log created successfully:', response.data);
@@ -139,11 +138,10 @@ const FormulationPage = () => {
                                           console.error('Error audit logs:', error);
                                       });
                                 } else {
-                                    reject(`Failed to upload ${file.name}`);
+                                    reject(response.data.data.message);
                                 }
-                            } catch (error) {
-                                console.error(error);
-                                reject(`Failed to upload ${file.name}`);
+                            } catch (error: any) {
+                                reject([error.response.data.message]);
                             }
                         } else {
                             reject(`Error reading ${file.name}`);
@@ -162,6 +160,7 @@ const FormulationPage = () => {
                 const results = await Promise.all(uploadPromises);
                 setInfoMsg(results.join(', '));
             } catch (errors) {
+                console.log("Errors", errors);
                 if (Array.isArray(errors)) {
                     setErrorMsg(errors.join(', '));
                 } else {

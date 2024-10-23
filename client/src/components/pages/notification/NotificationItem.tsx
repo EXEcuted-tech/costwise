@@ -14,11 +14,11 @@ export interface NotificationItemProps {
   subText: string;
   time: string;
   timestamp: string;
-  isRead: boolean;
+  isRead: number;
 }
 
 export const NotificationItem: React.FC<NotificationItemProps> = ({ id, icon, mainText, subText, time, isRead }) => {
-  const [read, setRead] = useState(isRead);
+  const [read, setRead] = useState(isRead === 0 ? false : true);
 
   const onMarkAsRead = async () => {
     setRead(!read)

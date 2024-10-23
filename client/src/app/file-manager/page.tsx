@@ -137,17 +137,15 @@ const FileManagerPage = () => {
                   const response = await api.post('/files/upload', formData);
                   if (response.data.status === 200) {
 
+                    const user = localStorage.getItem('currentUser');
+                    const parsedUser = JSON.parse(user || '{}');
+
                     const auditData = {
-                      userId: currentUser?.userId,
+                      userId: parsedUser?.userId,
                       action: 'import',
                       fileName: fileName
                     };
-                    console.log(auditData);
-                    if (currentUser) {
-                      console.log('Current User ID:', currentUser?.userId);
-                    } else {
-                      console.log('Current User is not defined.', currentUser);
-                    }
+
                     api.post('/auditlogs/logsaudit', auditData)
                       .then(response => {
                         console.log('Audit log created successfully:', response.data);
@@ -246,17 +244,14 @@ const FileManagerPage = () => {
         setErrorMsg('Unexpected response format');
       }
 
+      const user = localStorage.getItem('currentUser');
+      const parsedUser = JSON.parse(user || '{}');
+
       const auditData = {
-        userId: currentUser?.userId,
+        userId: parsedUser?.userId,
         action: 'export',
         act: 'all files',
       };
-
-      if (currentUser) {
-        console.log('Current User ID:', currentUser?.userId);
-      } else {
-        console.log('Current User is not defined.', currentUser);
-      }
 
       api.post('/auditlogs/logsaudit', auditData)
         .then(response => {
@@ -280,18 +275,16 @@ const FileManagerPage = () => {
         await api.post(`/files/delete`, { col: 'file_id', value: fileToDelete });
 
         const settings = JSON.parse(fileSettings);
+
+        const user = localStorage.getItem('currentUser');
+        const parsedUser = JSON.parse(user || '{}');
+
         const auditData = {
-          userId: currentUser?.userId,
+          userId: parsedUser?.userId,
           action: 'crud',
           act: 'archive',
           fileName: settings.file_name
         };
-
-        if (currentUser) {
-          console.log('Current User ID:', currentUser?.userId);
-        } else {
-          console.log('Current User is not defined.', currentUser);
-        }
 
         api.post('/auditlogs/logsaudit', auditData)
           .then(response => {

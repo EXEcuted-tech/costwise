@@ -23,6 +23,7 @@ export interface IconOpenConfig {
 }
 
 import { FaUserCircle } from 'react-icons/fa';
+import { useUserContext } from '@/contexts/UserContext';
 
 const OpenSidebar: React.FC = () => {
   const { isAdmin, setIsAdmin } = useSidebarContext();
@@ -31,26 +32,39 @@ const OpenSidebar: React.FC = () => {
   const path = usePath();
   const router = useRouter();
 
-  const [currentUser, setCurrentUser] = useState<any>(null);
+  // const [currentUser, setCurrentUser] = useState<any>(null);
+  
+  const { currentUser, setCurrentUser } = useUserContext();
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
+  // useEffect(() => {
+  //   const userString = localStorage.getItem('currentUser');
+  //   if (userString) {
+  //     try {
+  //       const parsedUser = JSON.parse(userString);
+  //       setCurrentUser(parsedUser);
+  //       setProfilePicture(parsedUser.displayPicture);
+  //       if (parsedUser.userType === 'Admin') {
+  //         setIsAdmin(true);
+  //       } else {
+  //         setIsAdmin(false);
+  //       }
+  //     } catch (error) {
+  //       console.error('Error parsing user data:', error);
+  //     }
+  //   }
+  // }, [currentUser, setIsAdmin]);
+
   useEffect(() => {
-    const userString = localStorage.getItem('currentUser');
-    if (userString) {
-      try {
-        const parsedUser = JSON.parse(userString);
-        setCurrentUser(parsedUser);
-        setProfilePicture(parsedUser.displayPicture);
-        if (parsedUser.userType === 'Admin') {
-          setIsAdmin(true);
-        } else {
-          setIsAdmin(false);
-        }
-      } catch (error) {
-        console.error('Error parsing user data:', error);
+    if (currentUser) {
+      setProfilePicture(currentUser.displayPicture);
+      if (currentUser.userType === 'Admin') {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
       }
     }
-  }, [setIsAdmin]);
+  }, [currentUser, setIsAdmin]);
 
   const handleLogout = async () => {
     await removeTokens();

@@ -31,27 +31,6 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
     const router = useRouter();
 
     const handleView = (data: File) => {
-        // const encodedData = encodeURIComponent(JSON.stringify(data));
-        const settings = JSON.parse(data.settings);
-
-        const auditData = {
-            userId: currentUser?.userId, 
-            action: 'crud',
-            act: 'view',
-            fileName: `${settings.file_name}`,
-        };
-        if (currentUser) {
-        console.log('Current User ID:', currentUser?.userId);
-        } else {
-            console.log('Current User is not defined.', currentUser);
-        }
-        api.post('/auditlogs/logsaudit', auditData)
-        .then(response => {
-            console.log('Audit log created successfully:', response.data);
-        })
-        .catch(error => {
-            console.error('Error audit logs:', error);
-        });
         router.push(`/file-manager/workspace?id=${data.file_id}&type=${data.file_type}`);
     }
 
@@ -82,17 +61,16 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
             window.URL.revokeObjectURL(url);
             setIsLoading(false);
 
+            const user = localStorage.getItem('currentUser');
+            const parsedUser = JSON.parse(user || '{}');
+
             const auditData = {
-                userId: currentUser?.userId, 
+                userId: parsedUser?.userId, 
                 action: 'export',
                 act: 'file',
                 fileName: `${settings.file_name}`,
             };
-            if (currentUser) {
-            console.log('Current User ID:', currentUser?.userId);
-            } else {
-                console.log('Current User is not defined.', currentUser);
-            }
+
             api.post('/auditlogs/logsaudit', auditData)
             .then(response => {
                 console.log('Audit log created successfully:', response.data);

@@ -200,7 +200,7 @@ const CostCalculation = () => {
 
   const retrieveAllFG = async (monthYear: number) => {
     try {
-      const response = await api.get("/cost_calculation/retrieve_all", {
+      const response = await api.get("/finished_goods/retrieve_all", {
         params: { monthYear: monthYear },
       });
 
