@@ -100,22 +100,24 @@ const AuditLogPage = () => {
                         actionEvent: log.action as ActionType,
                         department: log.user.department
                     }));
+                    const sortedLogs = logs.sort((a: AuditTableProps, b: AuditTableProps) => b.dateTimeAdded.getTime() - a.dateTimeAdded.getTime());
                     setAuditLogs(logs);
-                    setIsLoading(false);
                 } catch (error: any) {
                     console.error("Failed to fetch audit logs:", error);
+                } finally {
+                    setIsLoading(false);
                 }
             }
             fetchData();
         }, 5000);
         return () => clearInterval(interval);
-    }, [setCurrentUser]);
+    }, []);
 
     const sortAuditLogs = () => {
         const sortedLogs = [...auditLogs].sort((a, b) => {
             const dateA = new Date(a.dateTimeAdded).getTime();
             const dateB = new Date(b.dateTimeAdded).getTime();
-            return sortAscending ? dateB - dateA : dateA - dateB;
+            return sortAscending ? dateA - dateB : dateB - dateA;
         });
         setAuditLogs(sortedLogs);
         setSortAscending(!sortAscending);
