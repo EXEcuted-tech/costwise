@@ -183,10 +183,10 @@ const FormulationContainer: React.FC<FormulationProps> = ({
             {(view || edit) ? <FormulationTable view={view} setView={setView} /> :
                 viewFormulas ? <CompareFormulaContainer /> :
                     viewBOM ? <BOMListContainer /> :
-                        <div className='w-full font-lato bg-white mt-[20px] px-[20px] rounded-lg drop-shadow-lg'>
+                        <div className='w-full font-lato bg-white dark:bg-[#3C3C3C] mt-[20px] px-[20px] rounded-lg drop-shadow-lg'>
                             <table className='w-full '>
                                 <thead className='border-b border-b-[#c4c4c4]'>
-                                    <tr className='text-[#777777] font-bold text-[18px]'>
+                                    <tr className='text-[#777777] font-bold text-[18px] dark:text-[#d1d1d1]'>
                                         <th className='py-[10px] px-[15px] text-left'>FORMULA CODE</th>
                                         <th className='px-[15px] text-left'>ITEM CODE</th>
                                         <th className='px-[15px] text-left'>DESCRIPTION</th>
@@ -210,7 +210,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                                     ) :
                                         currentListPage.length > 0 &&
                                         (currentListPage.map((data, index) => (
-                                            <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7]'}`}>
+                                            <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7] dark:bg-[#4c4c4c]'} dark:text-white`}>
                                                 <td className='py-[15px] px-[15px]'>{data.formula_code}</td>
                                                 <td className='px-[15px]'>{data.finishedGood.fg_code}</td>
                                                 <td className='px-[15px]'>{data.finishedGood.fg_desc}</td>
@@ -221,22 +221,22 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                                                 <td className='px-[15px] text-right'>{data.finishedGood.total_cost ?? 'N/A'}</td>
                                                 <td className='px-[15px]'>
                                                     <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
-                                                        <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
+                                                        <div className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c]
                                                                 cursor-pointer hover:bg-[#f7f7f7] rounded-l-[5px] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleView(data.formulation_id)}>
                                                             <FaEye />
                                                         </div>
-                                                        <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
+                                                        <div className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c]
                                                                 cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleEdit(data.formulation_id, data.formula_code)}>
                                                             <FaPencilAlt />
                                                         </div>
-                                                        <div className='flex justify-center items-center border-r-1 border-[#868686] h-full
+                                                        <div className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c]
                                                                 cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleExport(data.formulation_id)}>
                                                             <TiExport />
                                                         </div>
-                                                        <div className='flex justify-center items-center h-full
+                                                        <div className='flex justify-center items-center h-full dark:border-[#5C5C5C]
                                                                 cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleDeleteClick(data.formulation_id, data.formula_code)}>
                                                             <IoTrash />

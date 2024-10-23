@@ -151,7 +151,7 @@ const CustomCompareSelect: React.FC<CustomCompareSelectProps> = ({
   return (
     <div ref={ref} className="relative w-full font-lato z-[1000]">
       <div
-        className="w-full rounded-[20px] border border-[#B6B6B6] bg-white text-[#5C5C5C] cursor-pointer p-3"
+        className="w-full rounded-[20px] border border-[#B6B6B6] bg-white dark:bg-[#3C3C3C] dark:border-[#5C5C5C] text-[#5C5C5C] dark:text-[#d1d1d1] cursor-pointer p-3"
         onClick={() => {
           setIsDropdownOpen(!isDropdownOpen);
         }}
@@ -165,7 +165,7 @@ const CustomCompareSelect: React.FC<CustomCompareSelectProps> = ({
           ))}
           <input
             type="text"
-            className={`min-w-[150px] flex-grow outline-none focus:ring-0 border-none pr-4`}
+            className={`min-w-[150px] flex-grow outline-none focus:ring-0 border-none pr-4 dark:bg-[#3C3C3C] dark:text-[#d1d1d1]`}
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder={inputValue === '' ? '➯ Select or type formulation...' : '➯'}
             value={inputValue}
@@ -177,12 +177,12 @@ const CustomCompareSelect: React.FC<CustomCompareSelectProps> = ({
         </div>
       </div>
       {isDropdownOpen && (
-        <div id="scroll-style" className="animate-pull-down absolute w-full bg-white z-10 mt-1 border border-[#B6B6B6] drop-shadow-lg rounded-l-[10px] rounded-r-[5px] max-h-[180px] overflow-y-auto">
+        <div id="scroll-style" className="animate-pull-down absolute w-full bg-white dark:bg-[#3C3C3C] z-10 mt-1 border border-[#B6B6B6] dark:border-[#5C5C5C] dark:text-[#d1d1d1] drop-shadow-lg rounded-l-[10px] rounded-r-[5px] max-h-[180px] overflow-y-auto">
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option, index) => (
               <div
                 key={index}
-                className="flex items-center p-2 hover:bg-gray-100"
+                className="flex items-center p-2 hover:bg-gray-100 dark:hover:bg-[#4c4c4c]"
               >
                 <label className="relative flex items-center p-3 rounded-full cursor-pointer"
 

@@ -221,14 +221,14 @@ const CompareFormulaContainer = () => {
                 ))}
                 {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
             </div>
-            <div className='bg-white rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[20px]'>
+            <div className='bg-white rounded-[10px] dark:bg-[#3C3C3C] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[20px]'>
                 {/* header */}
                 <div className='flex items-center py-[10px]'>
-                    <IoIosArrowRoundBack className='text-primary text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] cursor-pointer'
+                    <IoIosArrowRoundBack className='text-primary dark:text-[#ff4d4d] text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] cursor-pointer'
                         onClick={() => {
                             setViewFormulas(false);
                         }} />
-                    <h1 className='font-bold text-[28px] text-primary'>
+                    <h1 className='font-bold text-[28px] text-primary dark:text-[#ff4d4d]'>
                         Compare Formulas
                     </h1>
                 </div>
@@ -246,7 +246,7 @@ const CompareFormulaContainer = () => {
                             data
                                 .filter(item => item.rowType === 'finishedGood')
                                 .map((info, index, array) => (
-                                    <p key={index} className='italic font-semibold text-[18px]'>
+                                    <p key={index} className='italic font-semibold text-[18px] dark:text-white'>
                                         {info.description} ({info.formula})
                                         {index !== array.length - 1 && ',\u00A0'}
                                     </p>
@@ -289,9 +289,11 @@ const CompareFormulaContainer = () => {
                         </thead>
                         <tbody>
                             {isLoading ? (
-                                <tr className='flex justify-center'>
+                                <tr>
                                     <td colSpan={9} className="text-center py-4">
-                                        <Spinner />
+                                        <div className="flex justify-center items-center h-[200px]">
+                                            <Spinner />
+                                        </div>
                                     </td>
                                 </tr>
                             ) : (
@@ -305,7 +307,7 @@ const CompareFormulaContainer = () => {
                                 }, []).map((group, groupIndex) => (
                                     <React.Fragment key={groupIndex}>
                                         {group.map((info, index) => (
-                                            <tr key={index} className={`${info.rowType === 'finishedGood' ? (Number(info.cost) === minProductCost ? 'bg-[#fff873]' : 'text-black') : (index % 2 === 1 ? 'bg-[#FCF7F7]' : '')} animate-zoomIn text-center ${info.rowType === 'finishedGood' ? 'font-bold' : 'font-medium'} ${info.rowType === 'finishedGood' ? 'text-black' : 'text-[#6B6B6B]'} text-[18px] ${info.rowType === 'finishedGood' ? 'border-y border-[#ACACAC]' : ''}`}>
+                                            <tr key={index} className={`${info.rowType === 'finishedGood' ? (Number(info.cost) === minProductCost ? 'bg-[#fff873] dark:text-black' : 'text-black') : (index % 2 === 1 ? 'bg-[#FCF7F7] dark:bg-[#4C4C4C]' : '')} animate-zoomIn text-center ${info.rowType === 'finishedGood' ? 'font-bold' : 'font-medium'} ${info.rowType === 'finishedGood' ? 'text-black dark:text-white' : 'text-[#6B6B6B] dark:text-[#d1d1d1]'} text-[18px] ${info.rowType === 'finishedGood' ? 'border-y border-[#ACACAC]' : ''}`}>
                                                 <td className={`py-[10px] ${info.rowType === 'finishedGood' ? 'relative text-left px-6' : ''}`}>
                                                     {info.rowType === 'finishedGood' && (
                                                         <>

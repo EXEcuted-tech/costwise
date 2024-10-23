@@ -350,7 +350,7 @@ const FileManagerPage = () => {
               <p className={`ml-[5px] font-bold ${isOpen ? 'text-[10.5px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`}>Workspace</p>
             </button>
             <button className='flex justify-center items-center bg-white border-1 border-[#D3D3D3] px-[10px] mr-[1%] drop-shadow rounded-[10px]
-                            hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'>
+                            hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out dark:bg-[#3C3C3C] dark:hover:bg-[#4C4C4C] dark:text-white'>
               <VscExport className={`${isOpen ? 'text-[10.5px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`} />
               <p className={`ml-[5px] font-bold ${isOpen ? 'hidden 2xl:block 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`}
                 onClick={handleExportAll}>

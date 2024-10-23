@@ -38,11 +38,11 @@ const CompareFormulaDialog: React.FC<{ setCompareFormula: React.Dispatch<React.S
                 ))}
             </div>
             <div className={`flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]`}>
-                <div className='px-[35px] mx-[50px] 2xl:mx-0 animate-pop-out bg-white w-[860px] min-h-[210px] mt-[-50px] rounded-[10px]'>
+                <div className='px-[35px] mx-[50px] 2xl:mx-0 animate-pop-out bg-white dark:bg-[#3C3C3C] w-[860px] min-h-[210px] mt-[-50px] rounded-[10px]'>
                     <div className='flex justify-between pt-[10px]'>
                         <div className='flex items-center'>
-                            <MdCompare className='mr-[5px] text-[35px]' />
-                            <h1 className='text-[35px] font-black'>Compare Formulas</h1>
+                            <MdCompare className='mr-[5px] text-[35px] dark:text-white' />
+                            <h1 className='text-[35px] font-black dark:text-white'>Compare Formulas</h1>
                         </div>
                         <IoClose className='text-[60px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out p-0'
                             onClick={() => setCompareFormula(false)} />

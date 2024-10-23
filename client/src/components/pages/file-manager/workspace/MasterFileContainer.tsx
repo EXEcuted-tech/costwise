@@ -873,12 +873,12 @@ const MasterFileContainer = (data: File) => {
           )}
         </div>
       </div>
-      <div className='w-full bg-white rounded-[10px] drop-shadow mb-[35px]'>
+      <div className='w-full bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow mb-[35px]'>
         <FileLabel {...data} />
         {!isLoading ?
           <div className='overflow-auto'>
             {/* FODL Costing */}
-            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'
+            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] dark:bg-[#bababa] dark:border-[#5C5C5C] py-[15px] px-[20px]'
               id="fodl-cost">
               <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>FODL COST</h1>
               {isEdit['A'] ?
@@ -903,7 +903,7 @@ const MasterFileContainer = (data: File) => {
             </div>
 
             {/* Material Cost */}
-            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'
+            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] dark:bg-[#bababa] dark:border-[#5C5C5C] py-[15px] px-[20px]'
               id="material-cost">
               <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>MATERIAL COST</h1>
               {isEdit['B'] ?
@@ -933,7 +933,7 @@ const MasterFileContainer = (data: File) => {
               return (
                 <div key={bom.bom_id} className='mb-8'>
                   {/* BOM Header */}
-                  <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'
+                  <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] dark:bg-[#bababa] dark:border-[#5C5C5C] py-[15px] px-[20px]'
                     id={`bom-${bom.bom_id}`} >
                     <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px] uppercase'>{bom.bomName}</h1>
                     {isEdit[editKey] ?
@@ -981,17 +981,17 @@ const MasterFileContainer = (data: File) => {
                   Loading...
                   <span className="relative ml-3 h-[1.2em] w-[470px] overflow-hidden">
                     <span
-                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary"
+                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary dark:text-[#ff5252]"
                     >
                       Organizing your information!
                     </span>
                     <span
-                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary [animation-delay:0.83s]"
+                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary dark:text-[#ff5252] [animation-delay:0.83s]"
                     >
                       Slowly sorting your files!
                     </span>
                     <span
-                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary [animation-delay:1.83s]"
+                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary dark:text-[#ff5252] [animation-delay:1.83s]"
                     >
                       Skimming your documents!
                     </span>

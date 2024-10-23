@@ -206,17 +206,17 @@ const FormulationPage = () => {
             <Header icon={HiClipboardList} title={"Formulations"} />
             {compareFormula && <CompareFormulaDialog setCompareFormula={setCompareFormula} />}
             {bomList && <BillOfMaterialsList setBOM={setBomList} />}
-            <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
+            <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px] transition-all duration-400 ease-in-out`}>
                 {(!view && !edit && !viewFormulas && !viewBOM) &&
                     <div className='flex'>
                         {/* Search Component */}
-                        <div className={`${isOpen ? 'w-[40%] 4xl:w-[50%] 4xl:mr-[1%]' : 'w-[45%] 2xl:w-[50%] 3xl:w-[60%] mr-[1%]'} relative`}>
+                        <div className={`${isOpen ? 'w-[40%] 4xl:w-[50%] 4xl:mr-[1%]' : 'w-[45%] 2xl:w-[50%] 3xl:w-[60%] mr-[1%]'} relative transition-all duration-400 ease-in-out`}>
                             <div className="absolute inset-y-0 left-0 flex items-center pl-1 pointer-events-none">
-                                <AiOutlineSearch className={`${isOpen ? 'text-[14px] 2xl:text-[19px] 3xl:text-[22px]' : 'text-[19px] 2xl:text-[22px]'} text-[#575757]`} />
+                                <AiOutlineSearch className={`${isOpen ? 'text-[14px] 2xl:text-[19px] 3xl:text-[22px]' : 'text-[19px] 2xl:text-[22px]'} text-[#575757] dark:bg-[#1E1E1E]`} />
                             </div>
                             <input
                                 type="text"
-                                className={`${isOpen ? 'pl-[25px] 2xl:pl-[35px] w-[70%] 4xl:w-[50%] text-[15px] 2xl:text-[18px] 3xl:text-[21px]' : 'pl-[35px] w-[60%] 3xl:w-[50%] text-[18px] 2xl:text-[21px]'} focus:outline-none pr-[5px] py-[10px] bg-background border-b border-[#868686] placeholder-text-[#777777] text-[#5C5C5C]`}
+                                className={`${isOpen ? 'pl-[25px] 2xl:pl-[35px] w-[70%] 4xl:w-[50%] text-[15px] 2xl:text-[18px] 3xl:text-[21px]' : 'pl-[35px] w-[60%] 3xl:w-[50%] text-[18px] 2xl:text-[21px]'} dark:bg-[#1E1E1E] dark:text-[#d1d1d1] focus:outline-none pr-[5px] py-[10px] bg-background border-b border-[#868686] placeholder-text-[#777777] text-[#5C5C5C]`}
                                 placeholder="Search Formulation"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -224,12 +224,12 @@ const FormulationPage = () => {
                             />
                         </div>
                         <div className={`${isOpen ? 'w-[60%] 4xl:w-[50%]' : 'w-[55%] 2xl:w-[50%] 3xl:w-[40%]'} flex flex-grow items-end justify-end`}>
-                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} mr-[10px] bg-white px-[15px] py-[5px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out`}
+                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} mr-[10px] bg-white dark:bg-[#3C3C3C] dark:text-[#d1d1d1] dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c] px-[15px] py-[5px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out`}
                                 onClick={() => setCompareFormula(true)}>
                                 <MdCompare className='mr-[5px]' />
                                 <span className='font-bold'>Compare</span>
                             </button>
-                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} mr-[10px] bg-white px-[15px] py-[5px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out`}
+                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} mr-[10px] bg-white dark:bg-[#3C3C3C] dark:text-[#d1d1d1] dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c] px-[15px] py-[5px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out`}
                                 onClick={() => setBomList(true)}>
                                 <IoList className={`${isOpen ? 'text-[15px] 2xl:text-[22px]' : 'text-[22px]'} mr-[5px]`} />
                                 <span className='font-bold'>BOM List</span>

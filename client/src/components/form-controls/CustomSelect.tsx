@@ -28,7 +28,7 @@ const CustomSelect: React.FC<CustomSelectProps> = ({ setSelectedOption, selected
     return (
         <div ref={ref} className="relative w-full">
             <div
-                className="w-full rounded-[5px] border border-[#868686] pl-[30px] pr-[30px] py-[2.5px] bg-white text-[#5C5C5C] cursor-pointer"
+                className="w-full rounded-[5px] border border-[#868686] dark:border-[#5C5C5C] pl-[30px] pr-[30px] py-[2.5px] bg-white dark:bg-[#3C3C3C] text-[#5C5C5C] dark:text-[#d1d1d1] cursor-pointer"
                 onClick={() => setIsDropdownOpen(!isDropdownOpen)}
             >
                 <span className={selectedOption ? "" : "text-[#B0B0B0]"}>

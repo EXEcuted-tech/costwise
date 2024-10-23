@@ -142,6 +142,7 @@ const FormulationTable: React.FC<{
                         });
                     }
                     setFormulaData(currentFormulation);
+                    setIsLoading(false);
                 } catch (error) {
                     console.error('Error retrieving formulation data:', error);
                 }
@@ -419,12 +420,12 @@ const FormulationTable: React.FC<{
                     ))}
                     {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
                 </div>
-                <div className='bg-white rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[25px] mb-[20px]'>
+                <div className='bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[25px] mb-[20px]'>
                     {/* header */}
                     <div className='flex items-center py-[10px]'>
-                        <IoIosArrowRoundBack className='text-primary text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] transition-colors duration-200 ease-in-out cursor-pointer'
+                        <IoIosArrowRoundBack className='text-primary dark:text-[#ff4d4d] text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] transition-colors duration-200 ease-in-out cursor-pointer'
                             onClick={handleBack} />
-                        <h1 className='font-bold text-[28px] text-primary'>
+                        <h1 className='font-bold text-[28px] text-primary dark:text-[#ff4d4d]'>
                             {view ? 'View Formulation' : 'Edit Formulation'}
                         </h1>
                     </div>
@@ -435,7 +436,7 @@ const FormulationTable: React.FC<{
                             For the month of
                             {
                                 !isLoading ?
-                                    <span className='font-semibold italic text-primary'>
+                                    <span className='font-semibold italic text-primary dark:text-[#ff4d4d]'>
                                         ‎ {formatMonthYear(monthYear)}
                                     </span>
                                     :
@@ -449,7 +450,7 @@ const FormulationTable: React.FC<{
                         <p className={`${isLoading && 'flex'} ${(isOpen && edit) ? 'w-[80%] 3xl:w-[50%]' : edit ? 'w-[80%] 2xl:w-[50%]' : 'w-full'} pt-[10px] pb-[20px] text-[#8F8F8F] text-[18px]`}>The following formula is shown:
                             {
                                 !isLoading ?
-                                    <span className='font-semibold italic text-black'>
+                                    <span className='font-semibold italic text-black dark:text-white'>
                                         ‎ {fgDesc} ({formulaCode})
                                     </span>
                                     :
@@ -498,7 +499,7 @@ const FormulationTable: React.FC<{
                                                 }
 
                                                 return (
-                                                    <th key={key} className={`${textAlignClass} animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}>
+                                                    <th key={key} className={`${textAlignClass} animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] dark:text-[#d1d1d1] dark:border-b dark:border-[#5C5C5C] py-2 px-6 border-b border-[#ACACAC]`}>
                                                         {formatHeader(key)}{key == 'batchQty' && '.'}
                                                     </th>
                                                 );
@@ -506,13 +507,13 @@ const FormulationTable: React.FC<{
                                     </tr>
                                     :
                                     <tr>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[100px]' /></th>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[100px]' /></th>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[150px]' /></th>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[160px]' /></th>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[100px]' /></th>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[120px]' /></th>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[100px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[100px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[100px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[150px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[160px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[100px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[120px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[100px]' /></th>
                                     </tr>
                                 }
                             </thead>
@@ -522,7 +523,7 @@ const FormulationTable: React.FC<{
                                         {!edit ?
                                             <>
                                                 {formulaData.map((item, index) => (
-                                                    <tr key={index} className={`${index % 2 === 1 ? 'bg-[#FCF7F7]' : ''} animate-zoomIn text-center ${index === 0 ? 'font-bold text-black' : 'font-medium text-[#6B6B6B]'} text-[18px] ${index === 0 ? 'border-b border-[#ACACAC]' : ''}`}>
+                                                    <tr key={index} className={`${index % 2 === 1 ? 'bg-[#FCF7F7] dark:bg-[#4C4C4C]' : ''} animate-zoomIn text-center ${index === 0 ? 'font-bold text-black dark:text-white' : 'font-medium text-[#6B6B6B] dark:text-[#d1d1d1]'} text-[18px] ${index === 0 ? 'border-b border-[#ACACAC]' : ''}`}>
                                                         <td className='py-[10px] px-6 text-left'>{index === 0 ? item.formula : ''}</td>
                                                         <td className='py-[10px] px-6'>{index === 0 ? '' : item.level}</td>
                                                         <td className='py-[10px] px-6 text-left'>{item.itemCode}</td>
@@ -537,7 +538,7 @@ const FormulationTable: React.FC<{
                                             <>
                                                 {formulaData && (
                                                     <>
-                                                        <tr className='animate-zoomIn text-center font-bold text-black text-[18px] border-b border-[#ACACAC]'>
+                                                        <tr className='animate-zoomIn text-center font-bold text-black text-[18px] border-b border-[#ACACAC] dark:border-[#5C5C5C] dark:text-[#d1d1d1]'>
                                                             <td className='w-[150px] py-[10px] px-6 text-left'>{formulaData[0]?.formula}</td>
                                                             <td></td>
                                                             <td className='px-6 text-left'>
@@ -545,7 +546,7 @@ const FormulationTable: React.FC<{
                                                                     type="text"
                                                                     onChange={(e) => handleInputChange(0, 'itemCode', e.target.value)}
                                                                     value={formulaData[0]?.itemCode || ''}
-                                                                    className={`text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]`}
+                                                                    className={`text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
                                                                 />
                                                             </td>
                                                             <td className='px-6 text-left'>
@@ -553,7 +554,7 @@ const FormulationTable: React.FC<{
                                                                     type="text"
                                                                     onChange={(e) => handleInputChange(0, 'description', e.target.value)}
                                                                     value={formulaData[0]?.description || ''}
-                                                                    className={`text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                                    className={`text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
                                                                 />
                                                             </td>
                                                             <td className='px-6 text-center'>
@@ -561,7 +562,7 @@ const FormulationTable: React.FC<{
                                                                     type="text"
                                                                     onChange={(e) => handleInputChange(0, 'formulation', e.target.value)}
                                                                     value={formulaData[0]?.formulation || ''}
-                                                                    className={`text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[80px]`} // Set width for formulation
+                                                                    className={`text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[80px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`} // Set width for formulation
                                                                 />
                                                             </td>
                                                             <td className='px-6 text-right'>
@@ -569,7 +570,7 @@ const FormulationTable: React.FC<{
                                                                     type="text"
                                                                     onChange={(e) => handleInputChange(0, 'batchQty', e.target.value)}
                                                                     value={Number(formulaData[0]?.batchQty).toFixed(2) ?? ''}
-                                                                    className={`text-right animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                                    className={`text-right animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
                                                                 />
                                                             </td>
                                                             <td className='px-6 text-left'>
@@ -577,15 +578,15 @@ const FormulationTable: React.FC<{
                                                                     type="text"
                                                                     onChange={(e) => handleInputChange(0, 'unit', e.target.value)}
                                                                     value={formulaData[0]?.unit || ''}
-                                                                    className={`w-full text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[110px]`}
+                                                                    className={`w-full text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[110px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
                                                                 />
                                                             </td>
                                                         </tr>
 
                                                         {formulaData.slice(1).map((item, index) => (
-                                                            <tr key={index + 1} className={`${(index + 1) % 2 === 1 && 'bg-[#FCF7F7]'} animate-zoomIn text-center font-medium text-[#6B6B6B] text-[18px]`}>
+                                                            <tr key={index + 1} className={`${(index + 1) % 2 === 1 && 'bg-[#FCF7F7] dark:bg-[#4C4C4C]'} animate-zoomIn text-center font-medium text-[#6B6B6B] dark:text-[#d1d1d1] text-[18px]`}>
                                                                 <td className='flex justify-center items-center py-[15px]'>
-                                                                    <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-300 ease-in-out"
+                                                                    <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-300 ease-in-out dark:text-[#d1d1d1] dark:hover:text-red-500"
                                                                         onClick={() => removeRow(index + 1)} />
                                                                 </td>
                                                                 <td className='text-center px-6 py-[10px]'>
@@ -593,7 +594,7 @@ const FormulationTable: React.FC<{
                                                                         type="text"
                                                                         onChange={(e) => handleInputChange(index + 1, 'level', e.target.value)}
                                                                         value={item.level || ''}
-                                                                        className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[60px]"
+                                                                        className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[60px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                                     />
                                                                 </td>
                                                                 {item.description?.toLowerCase() !== 'emulsion' ? (
@@ -602,7 +603,7 @@ const FormulationTable: React.FC<{
                                                                             type="text"
                                                                             onChange={(e) => handleInputChange(index + 1, 'itemCode', e.target.value)}
                                                                             value={item.itemCode || ''}
-                                                                            className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                                            className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                                         />
                                                                     </td>
                                                                 ) : <td></td>}
@@ -611,7 +612,7 @@ const FormulationTable: React.FC<{
                                                                         type="text"
                                                                         onChange={(e) => handleInputChange(index + 1, 'description', e.target.value)}
                                                                         value={item.description || ''}
-                                                                        className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                                        className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                                     />
                                                                 </td>
                                                                 <td>
@@ -626,7 +627,7 @@ const FormulationTable: React.FC<{
                                                                             }
                                                                         }}
                                                                         value={item.batchQty !== undefined && item.batchQty !== null ? Number(item.batchQty).toFixed(2) : ''}
-                                                                        className="w-full text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                                        className="w-full text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                                     />
                                                                 </td>
                                                                 <td className='px-6 text-left'>
@@ -634,7 +635,7 @@ const FormulationTable: React.FC<{
                                                                         type="text"
                                                                         onChange={(e) => handleInputChange(index + 1, 'unit', e.target.value)}
                                                                         value={item.unit || ''}
-                                                                        className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[100px]"
+                                                                        className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[100px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                                     />
                                                                 </td>
                                                             </tr>

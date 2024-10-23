@@ -33,11 +33,11 @@ export const DateSection: React.FC<DateSectionProps> = ({ date, notifications, s
 
     return (
         <div className="mb-2">
-            <div className="flex justify-between items-center border-b border-[#A0A0A0] px-[20px] py-[5px]">
-                <h2 className="uppercase text-[20px] font-bold text-[#ABABAB]">{date}</h2>
+            <div className="flex justify-between items-center border-b border-[#A0A0A0] dark:border-[#5C5C5C] px-[20px] py-[5px]">
+                <h2 className="uppercase text-[20px] font-bold text-[#ABABAB] dark:text-white">{date}</h2>
                 {showMarkAllRead && (
                     <button
-                        className="text-[#ABABAB] font-bold hover:underline hover:text-[#919191] transition-colors duration-300 ease-in-out"
+                        className="text-[#ABABAB] dark:text-[#d1d1d1] font-bold hover:underline hover:text-[#919191] transition-colors duration-300 ease-in-out"
                         onClick={handleMarkAllAsRead}
                     >
                         Mark all as read
@@ -49,7 +49,7 @@ export const DateSection: React.FC<DateSectionProps> = ({ date, notifications, s
                     <NotificationItem key={index} {...notification} />
                 ))
             ) : (
-                <div className="text-center py-4 text-[#ABABAB]">No notifications</div>
+                <div className="text-center py-4 text-[#ABABAB] dark:text-white">No notifications</div>
             )}
         </div>
     );

@@ -216,7 +216,7 @@ const NotificationPage = () => {
                     <span className='text-[#ABABAB] mr-[10px]'>Only show unread</span>
                     <ToggleButton initialState={false} onToggle={handleToggle} />
                 </div>
-                <div className='bg-white w-full rounded-[20px] drop-shadow-lg mt-[15px]'>
+                <div className='bg-white dark:bg-[#3C3C3C] w-full rounded-[20px] drop-shadow-lg mt-[15px]'>
                     {isLoading ? (
                         <div className="flex justify-center items-center h-64">
                             <Spinner />
@@ -243,7 +243,7 @@ const NotificationPage = () => {
                                     </>
                                 ))
                             ) : (
-                                <div className="text-center py-4 text-[24px] text-[#ABABAB]">No notifications to show.</div>
+                                <div className="text-center py-4 text-[24px] text-[#ABABAB] dark:text-[#d1d1d1]">No notifications to show.</div>
                             )}
                             {currentDateSections.length > 0 && (
                                 <div className="relative py-[1%]">
