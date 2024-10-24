@@ -35,7 +35,7 @@ const FileManagerPage = () => {
   const [masterFileData, setMasterFileData] = useState<File[]>([]);
   const [transactionData, setTransactionData] = useState<File[]>([]);
   const { fileToDelete, setFileToDelete, fileSettings } = useFileManagerContext();
-  const { currentUser } = useUserContext();
+  const { currentUser, setError } = useUserContext();
 
   const [exportLoading, setExportLoading] = useState(false);
 
@@ -137,17 +137,15 @@ const FileManagerPage = () => {
                   const response = await api.post('/files/upload', formData);
                   if (response.data.status === 200) {
 
+                    const user = localStorage.getItem('currentUser');
+                    const parsedUser = JSON.parse(user || '{}');
+
                     const auditData = {
-                      userId: currentUser?.userId,
+                      userId: parsedUser?.userId,
                       action: 'import',
                       fileName: fileName
                     };
-                    console.log(auditData);
-                    if (currentUser) {
-                      console.log('Current User ID:', currentUser?.userId);
-                    } else {
-                      console.log('Current User is not defined.', currentUser);
-                    }
+
                     api.post('/auditlogs/logsaudit', auditData)
                       .then(response => {
                         console.log('Audit log created successfully:', response.data);
@@ -210,8 +208,13 @@ const FileManagerPage = () => {
   });
 
   const handleUpload = (type: React.SetStateAction<string>) => {
-    setUploadType(type);
-    setShouldOpenDropzone(true);
+    const sysRoles = currentUser?.roles;
+    if (sysRoles?.includes(6)) {
+      setUploadType(type);
+      setShouldOpenDropzone(true);
+    } else {
+      setErrorMsg('You are not authorized to upload files.');
+    }
   };
 
   const [shouldOpenDropzone, setShouldOpenDropzone] = useState(false);
@@ -225,6 +228,11 @@ const FileManagerPage = () => {
 
   const handleExportAll = async () => {
     console.log("Went in here");
+    const sysRoles = currentUser?.roles;
+    if (!sysRoles?.includes(17)) {
+        setError('You are not authorized to export records or files.');
+        return;
+    }
     setExportLoading(true);
     try {
       const response = await api.post('/files/export_all', {}, {
@@ -246,17 +254,14 @@ const FileManagerPage = () => {
         setErrorMsg('Unexpected response format');
       }
 
+      const user = localStorage.getItem('currentUser');
+      const parsedUser = JSON.parse(user || '{}');
+
       const auditData = {
-        userId: currentUser?.userId,
+        userId: parsedUser?.userId,
         action: 'export',
         act: 'all files',
       };
-
-      if (currentUser) {
-        console.log('Current User ID:', currentUser?.userId);
-      } else {
-        console.log('Current User is not defined.', currentUser);
-      }
 
       api.post('/auditlogs/logsaudit', auditData)
         .then(response => {
@@ -280,18 +285,16 @@ const FileManagerPage = () => {
         await api.post(`/files/delete`, { col: 'file_id', value: fileToDelete });
 
         const settings = JSON.parse(fileSettings);
+
+        const user = localStorage.getItem('currentUser');
+        const parsedUser = JSON.parse(user || '{}');
+
         const auditData = {
-          userId: currentUser?.userId,
+          userId: parsedUser?.userId,
           action: 'crud',
           act: 'archive',
           fileName: settings.file_name
         };
-
-        if (currentUser) {
-          console.log('Current User ID:', currentUser?.userId);
-        } else {
-          console.log('Current User is not defined.', currentUser);
-        }
 
         api.post('/auditlogs/logsaudit', auditData)
           .then(response => {
@@ -300,7 +303,7 @@ const FileManagerPage = () => {
           .catch(error => {
             console.error('Error audit logs:', error);
           });
-          
+
       } catch (error) {
         console.error('Delete failed:', error);
       } finally {
@@ -314,21 +317,23 @@ const FileManagerPage = () => {
 
   return (
     <>
-      <div className="absolute top-0 right-0">
-        {errorMsg != '' &&
-          <Alert
-            className="!relative"
-            variant='critical'
-            message={errorMsg}
-            setClose={() => { setErrorMsg(''); }} />
-        }
-        {infoMsg != '' &&
-          <Alert
-            className="!relative"
-            variant='success'
-            message={infoMsg}
-            setClose={() => { setInfoMsg(''); }} />
-        }
+      <div className="fixed top-4 right-4 z-50">
+        <div className="flex flex-col items-end space-y-2">
+          {errorMsg != '' &&
+            <Alert
+              className="!relative"
+              variant='critical'
+              message={errorMsg}
+              setClose={() => { setErrorMsg(''); }} />
+          }
+          {infoMsg != '' &&
+            <Alert
+              className="!relative"
+              variant='success'
+              message={infoMsg}
+              setClose={() => { setInfoMsg(''); }} />
+          }
+        </div>
       </div>
       {(exportLoading) &&
         <div className='fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-brightness-50 z-[1500]'>
@@ -338,7 +343,7 @@ const FileManagerPage = () => {
             <div className="three-body__dot"></div>
           </div>
           <p className='text-primary font-light text-[20px] mt-[10px] text-white'>
-            Exporting files...
+            Exporting file(s)...
           </p>
         </div>
       }
@@ -357,7 +362,7 @@ const FileManagerPage = () => {
               <p className={`ml-[5px] font-bold ${isOpen ? 'text-[10.5px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`}>Workspace</p>
             </button>
             <button className='flex justify-center items-center bg-white border-1 border-[#D3D3D3] px-[10px] mr-[1%] drop-shadow rounded-[10px]
-                            hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'>
+                            hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out dark:bg-[#3C3C3C] dark:hover:bg-[#4C4C4C] dark:text-white'>
               <VscExport className={`${isOpen ? 'text-[10.5px] 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`} />
               <p className={`ml-[5px] font-bold ${isOpen ? 'hidden 2xl:block 2xl:text-[12px] 3xl:text-[16px]' : 'text-[12px] 2xl:text-[16px]'}`}
                 onClick={handleExportAll}>
@@ -403,6 +408,8 @@ const FileManagerPage = () => {
             isOpen={isOpen}
             isLoading={isLoading}
             setIsLoading={setIsLoading}
+            setErrorMsg={setErrorMsg}
+            setExportLoading={setExportLoading}
             allData={allData}
             masterFileData={masterFileData}
             transactionData={transactionData}

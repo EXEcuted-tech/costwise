@@ -32,7 +32,7 @@ const WorkspaceTabs: React.FC<WkspTabProps> = ({ tab, setTab, isOpen, isEmpty, s
                 <div key={index} className={`cursor-pointer rounded-b-[20px] drop-shadow-lg w-[50%] flex justify-center text-[20px] py-[10px]
                         ${tab === value
                         ? 'bg-primary text-white hover:bg-gradient-to-r hover:from-primary hover:to-[#d42020]'
-                        : 'bg-[#F3F3F3] text-[#8F8F8F] hover:bg-gradient-to-r hover:from-[#EFEFEF] hover:to-[#D4D4D4]'
+                        : 'bg-[#F3F3F3] text-[#8F8F8F] dark:bg-[#bababa] dark:border-[#5C5C5C] hover:bg-gradient-to-r hover:from-[#EFEFEF] hover:to-[#D4D4D4]'
                     }`}
                     onClick={() => handleTabChange(value)}>
                     <li className='flex cursor-pointer items-center'>

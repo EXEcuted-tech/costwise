@@ -8,6 +8,7 @@ import api from '@/utils/api'
 import Alert from '@/components/alerts/Alert'
 import PrimaryPagination from '@/components/pagination/PrimaryPagination'
 import { useFileManagerContext } from '@/contexts/FileManagerContext'
+import { useUserContext } from '@/contexts/UserContext'
 
 const TransactionFileContainer = (data: File) => {
   const [isEdit, setIsEdit] = useState(false);
@@ -37,6 +38,8 @@ const TransactionFileContainer = (data: File) => {
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentListPage = transactionData.slice(indexOfFirstItem, indexOfLastItem);
+
+  const { currentUser } = useUserContext();
 
   // useEffect(() => {
   //   setTransactionsCount(transactionData.length); // Update the count based on current data
@@ -73,7 +76,7 @@ const TransactionFileContainer = (data: File) => {
 
       fetchAllData();
     }
-  }, [data])
+  }, []);
 
   const fetchTransactionsSheet = async (transaction_ids: Number[]) => {
     try {
@@ -215,6 +218,27 @@ const TransactionFileContainer = (data: File) => {
           setAlertMessages(saveResponse.data.errors);
         }
       }
+
+      const settings = JSON.parse(data.settings);
+
+      const user = localStorage.getItem('currentUser');
+      const parsedUser = JSON.parse(user || '{}');
+
+      const auditData = {
+        userId: parsedUser?.userId,
+        action: 'crud',
+        act: 'edit',
+        fileName: `${settings.file_name}`,
+      };
+
+      api.post('/auditlogs/logsaudit', auditData)
+        .then(response => {
+          console.log('Audit log created successfully:', response.data);
+        })
+        .catch(error => {
+          console.error('Error audit logs:', error);
+        });
+
     } catch (error: any) {
       if (error.response?.data?.message) {
         setAlertMessages([error.response.data.message]);
@@ -275,27 +299,36 @@ const TransactionFileContainer = (data: File) => {
 
   return (
     <>
-      <div className="absolute top-0 right-0">
-        {alertMessages && alertMessages.map((msg, index) => (
-          <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
-            setAlertMessages(prev => prev.filter((_, i) => i !== index));
-          }} />
-        ))}
-        {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+      <div className="fixed top-4 right-4 z-50">
+        <div className="flex flex-col items-end space-y-2">
+          {alertMessages && alertMessages.map((msg, index) => (
+            <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+              setAlertMessages(prev => prev.filter((_, i) => i !== index));
+            }} />
+          ))}
+          {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+        </div>
       </div>
-      <div className='bg-white rounded-[10px] drop-shadow mb-[35px] overflow-hidden'>
+      <div className='bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow mb-[35px] overflow-hidden'>
         <FileLabel {...data} />
         {!isLoading ?
           <>
             <div className=''>
               {/* Production Transactions */}
-              <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'>
+              <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] dark:bg-[#bababa] dark:border-[#5C5C5C] py-[15px] px-[20px]'>
                 <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>PRODUCTION TRANSACTIONS</h1>
                 {isEdit ?
                   <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin' />
                   :
                   <FaPencilAlt className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
-                    onClick={() => { setIsEdit(true) }} />
+                    onClick={() => {
+                      const sysRoles = currentUser?.roles;
+                      if (!sysRoles?.includes(7)) {
+                        setAlertMessages(['You are not authorized to edit files.']);
+                        return;
+                      }
+                      setIsEdit(true)
+                    }} />
                 }
               </div>
               {showScrollMessage && (
@@ -347,17 +380,17 @@ const TransactionFileContainer = (data: File) => {
                   Loading...
                   <span className="relative ml-3 h-[1.2em] w-[470px] overflow-hidden">
                     <span
-                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary"
+                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary dark:text-[#ff5252]"
                     >
                       Organizing your information!
                     </span>
                     <span
-                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary [animation-delay:0.83s]"
+                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary dark:text-[#ff5252] [animation-delay:0.83s]"
                     >
                       Slowly sorting your files!
                     </span>
                     <span
-                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary [animation-delay:1.83s]"
+                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary dark:text-[#ff5252] [animation-delay:1.83s]"
                     >
                       Skimming your documents!
                     </span>

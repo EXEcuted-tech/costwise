@@ -3,6 +3,7 @@ import React, { useState, useEffect } from 'react';
 import { FaCalendarAlt, FaEdit, FaTrash } from "react-icons/fa";
 import ConfirmDelete from '@/components/modals/ConfirmDelete';
 import { Router } from 'next/router';
+import { useUserContext } from '@/contexts/UserContext';
 
 type ViewEditEventModalProps = {
     event: { id: string };
@@ -19,6 +20,8 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
     const [isLoading, setIsLoading] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
     const [id, setId] = useState(0);
+    const { currentUser, setError } = useUserContext();
+    const sysRoles = currentUser?.roles;
 
     useEffect(() => {
         const fetchEventDetails = async () => {
@@ -59,6 +62,10 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
     };
 
     const handleDelete = async () => {
+        if (!sysRoles?.includes(16)) {
+            setError('You are not authorized to delete this event.');
+            return;
+        }
         setIsLoading(true);
         console.log(event);
         const response = await api.post(`/events/delete`, { event_id: id });

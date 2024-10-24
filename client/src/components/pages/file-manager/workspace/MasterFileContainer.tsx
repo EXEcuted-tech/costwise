@@ -26,10 +26,12 @@ const MasterFileContainer = (data: File) => {
   const [removedMaterialIds, setRemovedMaterialIds] = useState<number[]>([]);
   const [removedIds, setRemovedIds] = useState<RemovedId[]>([]);
 
+  const [warningMessages, setWarningMessages] = useState<string[]>([]);
   const [alertMessages, setAlertMessages] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
 
   const { currentUser } = useUserContext();
+  const sysRoles = currentUser?.roles;
 
   useEffect(() => {
     if (localStorage.getItem("edit") === "true") {
@@ -56,7 +58,7 @@ const MasterFileContainer = (data: File) => {
 
       fetchAllData();
     }
-  }, [data]);
+  }, []);
 
   const toggleEdit = (key: string) => {
     setIsEdit(prev => ({
@@ -386,24 +388,23 @@ const MasterFileContainer = (data: File) => {
 
       // await fetchFodlSheet();
 
+      const user = localStorage.getItem('currentUser');
+      const parsedUser = JSON.parse(user || '{}');
+
       const auditData = {
-        userId: currentUser?.userId, 
+        userId: parsedUser?.userId,
         action: 'crud',
         act: 'edit',
         fileName: `${settings.file_name}`,
       };
-      if (currentUser) {
-      console.log('Current User ID:', currentUser?.userId);
-      } else {
-          console.log('Current User is not defined.', currentUser);
-      }
+
       api.post('/auditlogs/logsaudit', auditData)
-      .then(response => {
+        .then(response => {
           console.log('Audit log created successfully:', response.data);
-      })
-      .catch(error => {
+        })
+        .catch(error => {
           console.error('Error audit logs:', error);
-      });
+        });
     } catch (error: any) {
       if (error.response?.data?.message) {
         setAlertMessages([error.response.data.message]);
@@ -484,24 +485,22 @@ const MasterFileContainer = (data: File) => {
         setAlertMessages([errorMsg]);
       }
 
+      const user = localStorage.getItem('currentUser');
+      const parsedUser = JSON.parse(user || '{}');
       const auditData = {
-        userId: currentUser?.userId, 
+        userId: parsedUser?.userId,
         action: 'crud',
         act: 'edit',
         fileName: `${settings.file_name}`,
       };
-      if (currentUser) {
-      console.log('Current User ID:', currentUser?.userId);
-      } else {
-          console.log('Current User is not defined.', currentUser);
-      }
+
       api.post('/auditlogs/logsaudit', auditData)
-      .then(response => {
+        .then(response => {
           console.log('Audit log created successfully:', response.data);
-      })
-      .catch(error => {
+        })
+        .catch(error => {
           console.error('Error audit logs:', error);
-      });
+        });
     } catch (error: any) {
       if (error.response?.data?.message) {
         setAlertMessages([error.response.data.message]);
@@ -561,6 +560,7 @@ const MasterFileContainer = (data: File) => {
           console.log(formulationData);
           const finishedGood = formulationData[0];
 
+          let hasError = false;
           if (!finishedGood ||
             !('formula' in finishedGood) ||
             !('itemCode' in finishedGood) ||
@@ -570,89 +570,89 @@ const MasterFileContainer = (data: File) => {
             !('unit' in finishedGood) ||
             finishedGood.itemCode !== firstRowItemCode ||
             finishedGood.description !== firstRowDescription) {
-            setAlertMessages(['The first row is not a valid finished good or does not match the expected item code and description. Please check your data.']);
+            setWarningMessages(['Warning! The saved FG row is not a valid finished good or does not match the expected item code and description. Please re-check your data.']);
+            hasError = true;
             return;
           }
 
-          let fgRow = {
-            fg_id: finishedGood.id,
-            fg_code: finishedGood.itemCode,
-            fg_desc: finishedGood.description,
-            total_batch_qty: finishedGood.batchQty,
-            unit: finishedGood.unit,
-            formulation_no: parseInt(finishedGood.formulation ?? '0', 10),
-          };
+          // console.log("hasError", !hasError);
+          if (!hasError) {
+            console.log("No error here!");
+            let fgRow = {
+              fg_id: finishedGood.id,
+              fg_code: finishedGood.itemCode,
+              fg_desc: finishedGood.description,
+              total_batch_qty: finishedGood.batchQty,
+              unit: finishedGood.unit,
+              formulation_no: parseInt(finishedGood.formulation ?? '0', 10),
+            };
 
-          const fgResponse = await api.post('/finished_goods/update_or_create', fgRow);
+            let fgError = false;
+            const fgResponse = await api.post('/finished_goods/update_or_create', fgRow);
 
-          if (fgResponse.data.status !== 200) {
-
-          }
-
-          const nextData = formulationData[1];
-
-          if (!nextData) {
-            setAlertMessages(['There is no data after the finished good row. Please check your formulation data.']);
-            return;
-          }
-          // let emulsion = formulationData[1]?.description === 'EMULSION' ? formulationData[1] : null;
-
-          // if (!emulsion) {
-          //   const emulsions = formulationData.filter(item => item.description === 'EMULSION');
-
-          //   if (emulsions.length === 1) {
-          //     emulsion = emulsions[0];
-          //   }
-          //   else if (emulsions.length > 1) {
-          //     emulsion = formulationData[1];
-          //   }
-          // }
-
-          let emulsion = formulationData.find(item => item.description?.toLowerCase() === 'emulsion');
-
-          const transformedEmulsionData = emulsion
-            ? {
-              level: emulsion.level,
-              batch_qty: emulsion.batchQty,
-              unit: emulsion.unit
+            if (fgResponse.data.status !== 200) {
+              fgError = true;
             }
-            : {};
 
-          // const materials = formulationData.slice(2);
-          const materials = formulationData.filter(item => item.rowType === 'material');
+            if (!fgError) {
+              let nextDataError = false;
+              const nextData = formulationData[1];
 
-          const transformedMaterialData = materials.map(item => ({
-            material_id: item.id,
-            material_code: item.itemCode,
-            material_desc: item.description,
-            unit: item.unit,
-            level: item.level,
-            batchQty: item.batchQty,
-          }));
+              if (!nextData) {
+                setAlertMessages(['There is no data after the finished good row. Please check your formulation data.']);
+                nextDataError = true;
+                return;
+              }
 
-          console.log(fgResponse.data.data);
-          const payload = {
-            bom: bomId,
-            emulsion: transformedEmulsionData,
-            materials: transformedMaterialData,
-            formulation_id: id,
-            formula_code: finishedGood.formula,
-            fg_id: fgResponse.data.data.fg_id
-          };
-          const saveResponse = await api.post('/boms/update_create_batch', payload);
-          if (saveResponse.data.status == 200) {
-            setIsLoading(false);
-            setSuccessMessage("BOM Sheet saved successfully.");
-          } else {
-            setIsLoading(false);
-            if (saveResponse.data.message) {
-              setAlertMessages([saveResponse.data.message]);
-            } else if (saveResponse.data.errors) {
-              setAlertMessages(saveResponse.data.errors);
+              if (!nextDataError) {
+                let emulsion = formulationData.find(item => item.description?.toLowerCase() === 'emulsion');
+
+                const transformedEmulsionData = emulsion
+                  ? {
+                    level: emulsion.level,
+                    batch_qty: emulsion.batchQty,
+                    unit: emulsion.unit
+                  }
+                  : {};
+
+                // const materials = formulationData.slice(2);
+                const materials = formulationData.filter(item => item.rowType === 'material');
+
+                const transformedMaterialData = materials.map(item => ({
+                  material_id: item.id,
+                  material_code: item.itemCode,
+                  material_desc: item.description,
+                  unit: item.unit,
+                  level: item.level,
+                  batchQty: item.batchQty,
+                }));
+
+                console.log(fgResponse.data.data);
+                const payload = {
+                  bom: bomId,
+                  emulsion: transformedEmulsionData,
+                  materials: transformedMaterialData,
+                  formulation_id: id,
+                  formula_code: finishedGood.formula,
+                  fg_id: fgResponse.data.data.fg_id
+                };
+                const saveResponse = await api.post('/boms/update_create_batch', payload);
+                if (saveResponse.data.status == 200) {
+                  setIsLoading(false);
+                  setSuccessMessage("BOM Sheet saved successfully.");
+                } else {
+                  setIsLoading(false);
+                  if (saveResponse.data.message) {
+                    setAlertMessages([saveResponse.data.message]);
+                  } else if (saveResponse.data.errors) {
+                    setAlertMessages(saveResponse.data.errors);
+                  }
+                }
+              }
             }
           }
-          // deletionzzz afterzz
         });
+
         const finishedGoodIds = removedIds
           .filter(item => item.rowType === 'finishedGood')
           .map(item => item.id);
@@ -743,25 +743,23 @@ const MasterFileContainer = (data: File) => {
 
         setRemovedIds([]);
 
+        const user = localStorage.getItem('currentUser');
+        const parsedUser = JSON.parse(user || '{}');
         const settings = JSON.parse(data.settings);
         const auditData = {
-          userId: currentUser?.userId, 
+          userId: parsedUser?.userId,
           action: 'crud',
           act: 'edit',
           fileName: `${settings.file_name}`,
         };
-        if (currentUser) {
-        console.log('Current User ID:', currentUser?.userId);
-        } else {
-            console.log('Current User is not defined.', currentUser);
-        }
+
         api.post('/auditlogs/logsaudit', auditData)
-        .then(response => {
+          .then(response => {
             console.log('Audit log created successfully:', response.data);
-        })
-        .catch(error => {
+          })
+          .catch(error => {
             console.error('Error audit logs:', error);
-        });
+          });
         setIsLoading(false);
       }
     } catch (error: any) {
@@ -842,20 +840,46 @@ const MasterFileContainer = (data: File) => {
 
   return (
     <>
-      <div className="absolute top-0 right-0">
-        {alertMessages && alertMessages.map((msg, index) => (
-          <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
-            setAlertMessages(prev => prev.filter((_, i) => i !== index));
-          }} />
-        ))}
-        {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+      <div className="fixed top-4 right-4 z-50">
+        <div className="flex flex-col items-end space-y-2">
+          {alertMessages && alertMessages.map((msg, index) => (
+            <Alert 
+              className="!relative" 
+              variant='critical' 
+              key={index} 
+              message={msg} 
+              setClose={() => {
+                setAlertMessages(prev => prev.filter((_, i) => i !== index));
+              }} 
+            />
+          ))}
+          {warningMessages && warningMessages.map((msg, index) => (
+            <Alert 
+              className="!relative" 
+              variant='warning' 
+              message={msg} 
+              key={index} 
+              setClose={() => {
+                setWarningMessages(prev => prev.filter((_, i) => i !== index));
+              }} 
+            />
+          ))}
+          {successMessage && (
+            <Alert 
+              className="!relative" 
+              variant='success' 
+              message={successMessage} 
+              setClose={() => setSuccessMessage('')} 
+            />
+          )}
+        </div>
       </div>
-      <div className='w-full bg-white rounded-[10px] drop-shadow mb-[35px]'>
+      <div className='w-full bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow mb-[35px]'>
         <FileLabel {...data} />
         {!isLoading ?
           <div className='overflow-auto'>
             {/* FODL Costing */}
-            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'
+            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] dark:bg-[#bababa] dark:border-[#5C5C5C] py-[15px] px-[20px]'
               id="fodl-cost">
               <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>FODL COST</h1>
               {isEdit['A'] ?
@@ -863,7 +887,13 @@ const MasterFileContainer = (data: File) => {
                 :
                 <FaPencilAlt
                   className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
-                  onClick={() => toggleEdit('A')}
+                  onClick={() => {
+                    if (!sysRoles?.includes(7)) {
+                      setAlertMessages(['You are not authorized to edit files.']);
+                      return;
+                    }
+                    toggleEdit('A')
+                  }}
                 />
               }
             </div>
@@ -880,7 +910,7 @@ const MasterFileContainer = (data: File) => {
             </div>
 
             {/* Material Cost */}
-            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'
+            <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] dark:bg-[#bababa] dark:border-[#5C5C5C] py-[15px] px-[20px]'
               id="material-cost">
               <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>MATERIAL COST</h1>
               {isEdit['B'] ?
@@ -888,7 +918,13 @@ const MasterFileContainer = (data: File) => {
                 :
                 <FaPencilAlt
                   className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
-                  onClick={() => toggleEdit('B')}
+                  onClick={() => {
+                    if (!sysRoles?.includes(7)) {
+                      setAlertMessages(['You are not authorized to edit files.']);
+                      return;
+                    }
+                    toggleEdit('B')
+                  }}
                 />
               }
             </div>
@@ -910,7 +946,7 @@ const MasterFileContainer = (data: File) => {
               return (
                 <div key={bom.bom_id} className='mb-8'>
                   {/* BOM Header */}
-                  <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] py-[15px] px-[20px]'
+                  <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] dark:bg-[#bababa] dark:border-[#5C5C5C] py-[15px] px-[20px]'
                     id={`bom-${bom.bom_id}`} >
                     <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px] uppercase'>{bom.bomName}</h1>
                     {isEdit[editKey] ?
@@ -918,7 +954,13 @@ const MasterFileContainer = (data: File) => {
                       :
                       <FaPencilAlt
                         className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
-                        onClick={() => toggleEdit(editKey)}
+                        onClick={() => {
+                          if (!sysRoles?.includes(7)) {
+                            setAlertMessages(['You are not authorized to edit files.']);
+                            return;
+                          }
+                          toggleEdit(editKey)
+                        }}
                       />
                     }
                   </div>
@@ -958,17 +1000,17 @@ const MasterFileContainer = (data: File) => {
                   Loading...
                   <span className="relative ml-3 h-[1.2em] w-[470px] overflow-hidden">
                     <span
-                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary"
+                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary dark:text-[#ff5252]"
                     >
                       Organizing your information!
                     </span>
                     <span
-                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary [animation-delay:0.83s]"
+                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary dark:text-[#ff5252] [animation-delay:0.83s]"
                     >
                       Slowly sorting your files!
                     </span>
                     <span
-                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary [animation-delay:1.83s]"
+                      className="absolute h-full w-full -translate-y-full animate-slide leading-none text-primary dark:text-[#ff5252] [animation-delay:1.83s]"
                     >
                       Skimming your documents!
                     </span>

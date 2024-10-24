@@ -17,6 +17,7 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 
 class FormulationController extends ApiController
 {
+    protected $error = false;
     public function retrieveAll()
     {
         try {
@@ -216,8 +217,13 @@ class FormulationController extends ApiController
         if ($extension == 'xlsx') {
             $this->processExcel($file->getRealPath());
 
-            $this->status = 200;
-            return $this->getResponse();
+            if ($this->error) {
+                $this->status = 400;
+                return $this->getResponse("Material not found on the current month.");
+            } else {
+                $this->status = 200;
+                return $this->getResponse();
+            }
         }
 
         return response()->json(['error' => 'Unsupported file type'], 400);
@@ -280,7 +286,6 @@ class FormulationController extends ApiController
                     ->whereYear('date', date('Y'))
                     ->whereMonth('date', date('m'))
                     ->first();
-
                 if ($material) {
                     $material_qty_list[] = [
                         $material->material_id => [
@@ -289,6 +294,9 @@ class FormulationController extends ApiController
                             'total_cost' => $material->material_cost * floatval(str_replace(',', '', $row[5]))
                         ]
                     ];
+                } else {
+                    $this->error = true;
+                    break;
                 }
             } elseif (empty($row[0]) && empty($row[1]) && empty($row[2]) && empty($row[3])) {
                 $formulation->formula_code = $formulaCode;

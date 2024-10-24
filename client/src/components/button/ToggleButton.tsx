@@ -20,7 +20,7 @@ const ToggleButton: React.FC<ToggleButtonProps> = ({ initialState = false, onTog
     <div
       onClick={toggle}
       className={`w-12 h-6 flex items-center rounded-full p-1 cursor-pointer transition-colors duration-300 ${
-        isOn ? 'bg-[#077B5A]' : 'bg-gray-300'
+        isOn ? 'bg-[#077B5A]' : 'bg-gray-300 dark:bg-[#3C3C3C]'
       }`}
     >
       <div
