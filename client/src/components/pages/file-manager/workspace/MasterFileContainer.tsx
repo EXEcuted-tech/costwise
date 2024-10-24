@@ -30,7 +30,8 @@ const MasterFileContainer = (data: File) => {
   const [alertMessages, setAlertMessages] = useState<string[]>([]);
   const [successMessage, setSuccessMessage] = useState('');
 
-  // const { currentUser } = useUserContext();
+  const { currentUser } = useUserContext();
+  const sysRoles = currentUser?.roles;
 
   useEffect(() => {
     if (localStorage.getItem("edit") === "true") {
@@ -886,7 +887,13 @@ const MasterFileContainer = (data: File) => {
                 :
                 <FaPencilAlt
                   className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
-                  onClick={() => toggleEdit('A')}
+                  onClick={() => {
+                    if (!sysRoles?.includes(7)) {
+                      setAlertMessages(['You are not authorized to edit files.']);
+                      return;
+                    }
+                    toggleEdit('A')
+                  }}
                 />
               }
             </div>
@@ -911,7 +918,13 @@ const MasterFileContainer = (data: File) => {
                 :
                 <FaPencilAlt
                   className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
-                  onClick={() => toggleEdit('B')}
+                  onClick={() => {
+                    if (!sysRoles?.includes(7)) {
+                      setAlertMessages(['You are not authorized to edit files.']);
+                      return;
+                    }
+                    toggleEdit('B')
+                  }}
                 />
               }
             </div>
@@ -941,7 +954,13 @@ const MasterFileContainer = (data: File) => {
                       :
                       <FaPencilAlt
                         className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
-                        onClick={() => toggleEdit(editKey)}
+                        onClick={() => {
+                          if (!sysRoles?.includes(7)) {
+                            setAlertMessages(['You are not authorized to edit files.']);
+                            return;
+                          }
+                          toggleEdit(editKey)
+                        }}
                       />
                     }
                   </div>

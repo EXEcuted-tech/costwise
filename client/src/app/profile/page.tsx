@@ -101,6 +101,7 @@ const ProfilePage = () => {
     const handleLogout = async () => {
         await removeTokens();
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('currentUser');
         localStorage.clear();
         window.location.href = '/logout';
     };

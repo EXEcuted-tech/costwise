@@ -29,6 +29,14 @@ const Alert: React.FC<AlertProps> = ({ className, variant = 'default', message, 
         return () => clearInterval(timer);
     }, []);
 
+    useEffect(() => {
+        const autoCloseTimer = setTimeout(() => {
+            setClose(false);
+        }, 20000);
+
+        return () => clearTimeout(autoCloseTimer);
+    }, [setClose]);
+
     const outerElement = classNames(
         {
             [`bg-white border border-gray-500 text-gray-500`]: variant === 'default',

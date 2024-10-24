@@ -118,6 +118,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::prefix('/auditlogs')->group(function () {
         Route::get('', [AuditLogController::class, 'getAuditLogs']);
         Route::post('logsaudit', [AuditLogController::class, 'updateAuditLogs']);
+        Route::post('export', [AuditLogController::class, 'export']);
     });
 
     Route::prefix('/notifications')->group(function () {

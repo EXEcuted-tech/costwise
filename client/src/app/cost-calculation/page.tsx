@@ -12,12 +12,14 @@ import { SpecificFinishedGood, Component, AllFinishedGood } from "@/types/data";
 import api from "@/utils/api";
 import Alert from "@/components/alerts/Alert";
 import { select } from "@nextui-org/theme";
+import { useUserContext } from "@/contexts/UserContext";
 
 const CostCalculation = () => {
   const { isOpen } = useSidebarContext();
   const [selectedFG, setSelectedFG] = useState<string>("Specific-FG");
   const [alertMessages, setAlertMessages] = useState<string[]>([]);
   const [alertStatus, setAlertStatus] = useState<string>("");
+  const { currentUser, setError } = useUserContext();
 
   const [monthYearOptions, setMonthYearOptions] = useState<
     { value: number; label: string }[]
@@ -107,6 +109,12 @@ const CostCalculation = () => {
 
   //Export
   const handleExport = async () => {
+    const sysRoles = currentUser?.roles;
+    if (!sysRoles?.includes(17)) {
+        setError('You are not authorized to export records or files.');
+        return;
+    }
+
     let sheetData = {};
     if (selectedFG === "Specific-FG") {
       sheetData = sheets

@@ -9,11 +9,14 @@ export type User = {
   email: string;
   userType: 'Regular' | 'Admin';
   displayPicture: string;
+  roles: number[];
 }
 
 export interface UserProps {
   currentUser: User | null;
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
+  setError: React.Dispatch<React.SetStateAction<string>>;
+  error: string;
 }
 
 export const useUserContext = () => {
@@ -26,7 +29,7 @@ export const useUserContext = () => {
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
-
+  const [error, setError] = useState('');
   useEffect(() => {
     const userString = localStorage.getItem('currentUser');
     if (userString) {
@@ -40,7 +43,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ currentUser, setCurrentUser }}>
+    <UserContext.Provider value={{ currentUser, setCurrentUser, setError, error }}>
       {children}
     </UserContext.Provider>
   );

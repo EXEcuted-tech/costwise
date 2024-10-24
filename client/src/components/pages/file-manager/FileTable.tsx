@@ -10,17 +10,19 @@ import { useUserContext } from '@/contexts/UserContext';
 import Spinner from '@/components/loaders/Spinner';
 import { File, FileSettings } from '@/types/data';
 import api from '@/utils/api';
+import Alert from '@/components/alerts/Alert';
 
 interface FileTableComponentProps {
     fileData: File[];
     isOpen: boolean;
     isLoading: boolean;
     setIsLoading: (value: boolean) => void;
+    setErrorMsg: (value: string) => void;
 }
 
-const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoading, setIsLoading }) => {
+const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoading, setIsLoading, setErrorMsg }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const { currentUser } = useUserContext();
+    const { currentUser, setError } = useUserContext();
     const { setDeleteModal, setFileToDelete, setFileSettings } = useFileManagerContext();
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
@@ -31,15 +33,30 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
     const router = useRouter();
 
     const handleView = (data: File) => {
+        const sysRoles = currentUser?.roles;
+        if (!sysRoles?.includes(5)) {
+            setErrorMsg('You are not authorized to view files.');
+            return;
+        }
         router.push(`/file-manager/workspace?id=${data.file_id}&type=${data.file_type}`);
     }
 
     const handleEdit = (data: File) => {
+        const sysRoles = currentUser?.roles;
+        if (!sysRoles?.includes(7)) {
+            setErrorMsg('You are not authorized to edit files.');
+            return;
+        }
         localStorage.setItem("edit", "true");
         router.push(`/file-manager/workspace?id=${data.file_id}&type=${data.file_type}`);
     }
 
     const handleExport = async (data: File) => {
+        const sysRoles = currentUser?.roles;
+        if (!sysRoles?.includes(17)) {
+            setError('You are not authorized to export records or files.');
+            return;
+        }
         try {
             const fileId = data.file_id;
 
@@ -65,25 +82,30 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
             const parsedUser = JSON.parse(user || '{}');
 
             const auditData = {
-                userId: parsedUser?.userId, 
+                userId: parsedUser?.userId,
                 action: 'export',
                 act: 'file',
                 fileName: `${settings.file_name}`,
             };
 
             api.post('/auditlogs/logsaudit', auditData)
-            .then(response => {
-                console.log('Audit log created successfully:', response.data);
-            })
-            .catch(error => {
-                console.error('Error audit logs:', error);
-            });
+                .then(response => {
+                    console.log('Audit log created successfully:', response.data);
+                })
+                .catch(error => {
+                    console.error('Error audit logs:', error);
+                });
         } catch (error) {
             console.error('Export failed:', error);
         }
     };
 
     const handleDelete = (data: File) => {
+        const sysRoles = currentUser?.roles;
+        if (!sysRoles?.includes(8)) {
+            setErrorMsg('You are not authorized to delete/archive files.');
+            return;
+        }
         setFileToDelete(data.file_id);
         setFileSettings(data.settings);
         setDeleteModal(true);

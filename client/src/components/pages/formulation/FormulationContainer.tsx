@@ -55,7 +55,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
     setFilteredData
 }) => {
     const { edit, setEdit, viewFormulas, viewBOM } = useFormulationContext();
-    const { currentUser } = useUserContext();
+    const { currentUser, setError } = useUserContext();
     const [deleteModal, setDeleteModal] = useState(false);
     const [formulationToDelete, setFormulationToDelete] = useState<number | null>(null);
     const { formulaCode, setFormulaCode } = useFormulationContext();
@@ -70,12 +70,22 @@ const FormulationContainer: React.FC<FormulationProps> = ({
     const router = useRouter();
 
     const handleView = (id: number) => {
+        const sysRoles = currentUser?.roles;
+        if (!sysRoles?.includes(9)) {
+            setAlertMessages(['You are not authorized to view formulations.']);
+            return;
+        }
         setEdit(false);
         setView(true);
         router.push(`/formulation?id=${id}`);
     }
 
     const handleEdit = (id: number, fc: string) => {
+        const sysRoles = currentUser?.roles;
+        if (!sysRoles?.includes(11)) {
+            setAlertMessages(['You are not authorized to edit formulations.']);
+            return;
+        }
         setView(false);
         setEdit(true);
         setFormulaCode(fc);
@@ -83,6 +93,12 @@ const FormulationContainer: React.FC<FormulationProps> = ({
     }
 
     const handleExport = async (id: number) => {
+        const sysRoles = currentUser?.roles;
+        if (!sysRoles?.includes(17)) {
+            setError('You are not authorized to export records or files.');
+            return;
+        }
+
         try {
             const formulationId = id;
 
@@ -110,19 +126,19 @@ const FormulationContainer: React.FC<FormulationProps> = ({
             const parsedUser = JSON.parse(user || '{}');
 
             const auditData = {
-                userId: parsedUser?.userId, 
+                userId: parsedUser?.userId,
                 action: 'export',
                 act: 'formulation_file',
                 fileName: fileName,
-              };
+            };
 
-              api.post('/auditlogs/logsaudit', auditData)
-              .then(response => {
-                  console.log('Audit log created successfully:', response.data);
-              })
-              .catch(error => {
-                  console.error('Error audit logs:', error);
-              });
+            api.post('/auditlogs/logsaudit', auditData)
+                .then(response => {
+                    console.log('Audit log created successfully:', response.data);
+                })
+                .catch(error => {
+                    console.error('Error audit logs:', error);
+                });
 
         } catch (error) {
             console.error('Export failed:', error);
@@ -130,6 +146,11 @@ const FormulationContainer: React.FC<FormulationProps> = ({
     }
 
     const handleDeleteClick = (formulationId: number, formulationCode: string) => {
+        const sysRoles = currentUser?.roles;
+        if (!sysRoles?.includes(12)) {
+            setAlertMessages(['You are not authorized to delete formulations.']);
+            return;
+        }
         setFormulationToDelete(formulationId);
         setFormulaCode(formulationCode);
         setDeleteModal(true);
@@ -147,19 +168,19 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                 const parsedUser = JSON.parse(user || '{}');
 
                 const auditData = {
-                    userId: parsedUser?.userId, 
+                    userId: parsedUser?.userId,
                     action: 'crud',
                     act: 'archive_formulation',
                     fileName: formulaCode,
                 };
 
                 api.post('/auditlogs/logsaudit', auditData)
-                .then(response => {
-                    console.log('Audit log created successfully:', response.data);
-                })
-                .catch(error => {
-                    console.error('Error audit logs:', error);
-                });
+                    .then(response => {
+                        console.log('Audit log created successfully:', response.data);
+                    })
+                    .catch(error => {
+                        console.error('Error audit logs:', error);
+                    });
             } catch (error) {
                 setAlertMessages(prev => [...prev, 'Failed to delete formulation']);
             } finally {
@@ -171,13 +192,15 @@ const FormulationContainer: React.FC<FormulationProps> = ({
 
     return (
         <>
-            <div className="absolute top-0 right-0">
-                {alertMessages && alertMessages.map((msg, index) => (
-                    <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
-                        setAlertMessages(prev => prev.filter((_, i) => i !== index));
-                    }} />
-                ))}
-                {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+            <div className="fixed top-4 right-4 z-50">
+                <div className="flex flex-col items-end space-y-2">
+                    {alertMessages && alertMessages.map((msg, index) => (
+                        <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+                            setAlertMessages(prev => prev.filter((_, i) => i !== index));
+                        }} />
+                    ))}
+                    {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+                </div>
             </div>
             {deleteModal && <ConfirmDelete onClose={() => setDeleteModal(false)} onProceed={handleDelete} subject="formulation" />}
             {(view || edit) ? <FormulationTable view={view} setView={setView} /> :

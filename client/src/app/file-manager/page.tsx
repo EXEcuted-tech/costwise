@@ -35,7 +35,7 @@ const FileManagerPage = () => {
   const [masterFileData, setMasterFileData] = useState<File[]>([]);
   const [transactionData, setTransactionData] = useState<File[]>([]);
   const { fileToDelete, setFileToDelete, fileSettings } = useFileManagerContext();
-  const { currentUser } = useUserContext();
+  const { currentUser, setError } = useUserContext();
 
   const [exportLoading, setExportLoading] = useState(false);
 
@@ -208,8 +208,13 @@ const FileManagerPage = () => {
   });
 
   const handleUpload = (type: React.SetStateAction<string>) => {
-    setUploadType(type);
-    setShouldOpenDropzone(true);
+    const sysRoles = currentUser?.roles;
+    if (sysRoles?.includes(6)) {
+      setUploadType(type);
+      setShouldOpenDropzone(true);
+    } else {
+      setErrorMsg('You are not authorized to upload files.');
+    }
   };
 
   const [shouldOpenDropzone, setShouldOpenDropzone] = useState(false);
@@ -223,6 +228,11 @@ const FileManagerPage = () => {
 
   const handleExportAll = async () => {
     console.log("Went in here");
+    const sysRoles = currentUser?.roles;
+    if (!sysRoles?.includes(17)) {
+        setError('You are not authorized to export records or files.');
+        return;
+    }
     setExportLoading(true);
     try {
       const response = await api.post('/files/export_all', {}, {
@@ -293,7 +303,7 @@ const FileManagerPage = () => {
           .catch(error => {
             console.error('Error audit logs:', error);
           });
-          
+
       } catch (error) {
         console.error('Delete failed:', error);
       } finally {
@@ -307,21 +317,23 @@ const FileManagerPage = () => {
 
   return (
     <>
-      <div className="absolute top-0 right-0">
-        {errorMsg != '' &&
-          <Alert
-            className="!relative"
-            variant='critical'
-            message={errorMsg}
-            setClose={() => { setErrorMsg(''); }} />
-        }
-        {infoMsg != '' &&
-          <Alert
-            className="!relative"
-            variant='success'
-            message={infoMsg}
-            setClose={() => { setInfoMsg(''); }} />
-        }
+      <div className="fixed top-4 right-4 z-50">
+        <div className="flex flex-col items-end space-y-2">
+          {errorMsg != '' &&
+            <Alert
+              className="!relative"
+              variant='critical'
+              message={errorMsg}
+              setClose={() => { setErrorMsg(''); }} />
+          }
+          {infoMsg != '' &&
+            <Alert
+              className="!relative"
+              variant='success'
+              message={infoMsg}
+              setClose={() => { setInfoMsg(''); }} />
+          }
+        </div>
       </div>
       {(exportLoading) &&
         <div className='fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-brightness-50 z-[1500]'>
@@ -396,6 +408,7 @@ const FileManagerPage = () => {
             isOpen={isOpen}
             isLoading={isLoading}
             setIsLoading={setIsLoading}
+            setErrorMsg={setErrorMsg}
             allData={allData}
             masterFileData={masterFileData}
             transactionData={transactionData}

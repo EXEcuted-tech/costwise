@@ -31,7 +31,8 @@ const CloseSidebar: React.FC = () => {
   const router = useRouter();
   const { hasNewNotifications } = useNotificationContext();
 
-  const { currentUser, setCurrentUser } = useUserContext();
+  const { currentUser } = useUserContext();
+  const sysRoles = currentUser?.roles;
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
   // useEffect(() => {
@@ -67,6 +68,7 @@ const CloseSidebar: React.FC = () => {
   const handleLogout = async () => {
     await removeTokens();
     localStorage.removeItem('currentUser');
+    localStorage.clear();
     router.push('/logout');
   }
 
@@ -121,29 +123,32 @@ const CloseSidebar: React.FC = () => {
             <ul className='flex flex-col justify-center items-center text-white'>
               {mainMenu.map(({ iconName, className, tooltip, route }, index) => {
                 const IconComponent = iconMap[iconName];
+                const showAuditLog = (isAdmin || (sysRoles && sysRoles.includes(4))) && tooltip === 'Audit Log';
                 return (
-                  <Tooltip
-                    key={index}
-                    content={tooltip}
-                    placement={"right"}
-                    classNames={{
-                      base: [
-                        "before:bg-[#FFD3D3]",
-                      ],
-                      content: [
-                        "py-2 px-4 shadow-xl",
-                        "font-lato text-primary text-[20px] font-bold bg-[#FFD3D3] from-white to-neutral-400",
-                      ],
-                    }}
-                  >
-                    <Link href={`/${route}`}>
-                      <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
-                        'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
-                        'my-[15px] hover:text-[#FFD3D3] '}`}>
-                        <IconComponent className={className} />
-                      </li>
-                    </Link>
-                  </Tooltip>
+                  showAuditLog || tooltip !== 'Audit Log' ? (
+                    <Tooltip
+                      key={index}
+                      content={tooltip}
+                      placement={"right"}
+                      classNames={{
+                        base: [
+                          "before:bg-[#FFD3D3]",
+                        ],
+                        content: [
+                          "py-2 px-4 shadow-xl",
+                          "font-lato text-primary text-[20px] font-bold bg-[#FFD3D3] from-white to-neutral-400",
+                        ],
+                      }}
+                    >
+                      <Link href={`/${route}`}>
+                        <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
+                          'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
+                          'my-[15px] hover:text-[#FFD3D3] '}`}>
+                          <IconComponent className={className} />
+                        </li>
+                      </Link>
+                    </Tooltip>
+                  ) : null
                 );
               })}
             </ul>

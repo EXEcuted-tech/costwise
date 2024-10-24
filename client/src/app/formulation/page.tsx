@@ -253,7 +253,14 @@ const FormulationPage = () => {
                                             </li>
                                             <hr className='h-[2px] bg-primary opacity-50' />
                                             <li className={`${isOpen ? 'pl-[6px] 3xl:pl-[15px]' : 'pl-[15px]'} flex items-center justify-left py-[5px] cursor-pointer hover:text-[#851313]`}
-                                                onClick={open}>
+                                                onClick={()=>{
+                                                    const sysRoles = currentUser?.roles;
+                                                    if (!sysRoles?.includes(10)) {
+                                                        setErrorMsg('You are not authorized to import formulations.');
+                                                        return;
+                                                    }
+                                                    open();
+                                                }}>
                                                 <BiSolidFile className='text-[20px] mr-[5px]' />
                                                 <p>Import Files</p>
                                             </li>

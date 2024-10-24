@@ -225,20 +225,20 @@ const TransactionFileContainer = (data: File) => {
       const parsedUser = JSON.parse(user || '{}');
 
       const auditData = {
-        userId: parsedUser?.userId, 
+        userId: parsedUser?.userId,
         action: 'crud',
         act: 'edit',
         fileName: `${settings.file_name}`,
       };
 
       api.post('/auditlogs/logsaudit', auditData)
-      .then(response => {
+        .then(response => {
           console.log('Audit log created successfully:', response.data);
-      })
-      .catch(error => {
+        })
+        .catch(error => {
           console.error('Error audit logs:', error);
-      });
-      
+        });
+
     } catch (error: any) {
       if (error.response?.data?.message) {
         setAlertMessages([error.response.data.message]);
@@ -299,13 +299,15 @@ const TransactionFileContainer = (data: File) => {
 
   return (
     <>
-      <div className="absolute top-0 right-0">
-        {alertMessages && alertMessages.map((msg, index) => (
-          <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
-            setAlertMessages(prev => prev.filter((_, i) => i !== index));
-          }} />
-        ))}
-        {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+      <div className="fixed top-4 right-4 z-50">
+        <div className="flex flex-col items-end space-y-2">
+          {alertMessages && alertMessages.map((msg, index) => (
+            <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+              setAlertMessages(prev => prev.filter((_, i) => i !== index));
+            }} />
+          ))}
+          {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+        </div>
       </div>
       <div className='bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow mb-[35px] overflow-hidden'>
         <FileLabel {...data} />
@@ -319,7 +321,14 @@ const TransactionFileContainer = (data: File) => {
                   <TbProgress className='text-[24px] text-[#5C5C5C] animate-spin' />
                   :
                   <FaPencilAlt className='text-[20px] text-[#5C5C5C] hover:animate-shake-tilt hover:brightness-75 cursor-pointer'
-                    onClick={() => { setIsEdit(true) }} />
+                    onClick={() => {
+                      const sysRoles = currentUser?.roles;
+                      if (!sysRoles?.includes(7)) {
+                        setAlertMessages(['You are not authorized to edit files.']);
+                        return;
+                      }
+                      setIsEdit(true)
+                    }} />
                 }
               </div>
               {showScrollMessage && (

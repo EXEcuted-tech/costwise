@@ -31,10 +31,9 @@ const OpenSidebar: React.FC = () => {
   const [isMore, setIsMore] = useState(false);
   const path = usePath();
   const router = useRouter();
-
-  // const [currentUser, setCurrentUser] = useState<any>(null);
   
-  const { currentUser, setCurrentUser } = useUserContext();
+  const { currentUser } = useUserContext();
+  const sysRoles = currentUser?.roles;
   const [profilePicture, setProfilePicture] = useState<string | null>(null);
 
   // useEffect(() => {
@@ -69,6 +68,7 @@ const OpenSidebar: React.FC = () => {
   const handleLogout = async () => {
     await removeTokens();
     localStorage.removeItem('currentUser');
+    localStorage.clear();
     router.push('/logout');
   }
 
@@ -127,8 +127,10 @@ const OpenSidebar: React.FC = () => {
             <ul className='flex flex-col text-white'>
               {mainMenu.map(({ iconName, className, menuName, route }, index) => {
                 const IconComponent = iconMap[iconName];
+                const showAuditLog = (isAdmin || (sysRoles && sysRoles.includes(4))) && menuName === 'Audit Log';
                 return (
-                  <Link href={`/${route}`} key={index}>
+                  showAuditLog || menuName !== 'Audit Log' ? (
+                    <Link href={`/${route}`} key={index}>
                     <li
                       className={`flex items-center hover:animate-shrink-in grid grid-cols-[auto_1fr] gap-x-5 items-center cursor-pointer ${path === route
                         ? 'w-[88%] 2xl:w-[86%] text-primary bg-[#FFD3D3] ml-[17px] 2xl:ml-[25px] pr-[20px] pl-[10px] 2xl:pl-[15px] py-[5px] my-[8px] rounded-[20px]'
@@ -138,7 +140,8 @@ const OpenSidebar: React.FC = () => {
                       <IconComponent className={`${className} justify-center`} />
                       <p className='font-lato text-[20px] 2xl:text-[25px]'>{menuName}</p>
                     </li>
-                  </Link>
+                    </Link>
+                  ) : null
                 );
               })}
             </ul>
