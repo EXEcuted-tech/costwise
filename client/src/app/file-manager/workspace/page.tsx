@@ -94,19 +94,19 @@ const WorkspacePage = () => {
                     onMouseEnter={() => setIsHovered(true)}
                     onMouseLeave={() => setIsHovered(false)}
                 >
-                    <div className="flex items-center mb-4 bg-white p-4 rounded-l-lg shadow-md">
+                    <div className="flex items-center mb-4 bg-white dark:bg-[#5e5e5e] p-4 rounded-l-lg shadow-md">
                         {isHovered ? (
-                            <IoIosArrowForward className="text-2xl text-primary cursor-pointer mr-5" />
+                            <IoIosArrowForward className="text-2xl text-primary dark:text-white cursor-pointer mr-5" />
                         ) : (
-                            <IoIosArrowBack className="text-2xl text-primary cursor-pointer mr-5" />
+                            <IoIosArrowBack className="text-2xl text-primary dark:text-white cursor-pointer mr-5" />
                         )}
-                        <span className="font-semibold text-primary">Navigation</span>
+                        <span className="font-semibold text-primary dark:text-white">Navigation</span>
                     </div>
-                    <ul className="fixed right-[-15px] bg-white rounded-l-lg shadow-md p-4">
+                    <ul className="fixed right-[-15px] bg-white dark:bg-[#5e5e5e] rounded-l-lg shadow-md p-4">
                         <li>
                             <a
                                 href="#fodl-cost"
-                                className="block py-2 text-gray-600 hover:text-primary"
+                                className="block py-2 text-gray-600 dark:text-[#d1d1d1] hover:text-primary"
                             >
                                 FODL Sheet
                             </a>
@@ -114,7 +114,7 @@ const WorkspacePage = () => {
                         <li>
                             <a
                                 href="#material-cost"
-                                className="block py-2 text-gray-600 hover:text-primary"
+                                className="block py-2 text-gray-600 dark:text-[#d1d1d1] hover:text-primary"
                             >
                                 Material Sheet
                             </a>
@@ -123,7 +123,7 @@ const WorkspacePage = () => {
                             <li key={bomId}>
                                 <a
                                     href={`#bom-${bomId}`}
-                                    className="block py-2 text-gray-600 hover:text-primary"
+                                    className="block py-2 text-gray-600 dark:text-[#d1d1d1] hover:text-primary"
                                 >
                                     BOM Sheet {index + 1}
                                 </a>
@@ -135,10 +135,10 @@ const WorkspacePage = () => {
             <div id='scroll-style'>
                 <Header icon={BsFolderFill} title={"File Manager"} style={''} />
                 <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[40px] ml-[45px]`}>
-                    <div className='bg-white flex items-center px-[20px] py-[10px] rounded-t-[10px] drop-shadow'>
-                        <IoIosArrowRoundBack className='text-primary text-[40px] mr-[15px] hover:text-[#D13131] transition-colors duration-300 ease-in-out cursor-pointer'
+                    <div className='bg-white dark:bg-[#5e5e5e] flex items-center px-[20px] py-[10px] rounded-t-[10px] drop-shadow'>
+                        <IoIosArrowRoundBack className='text-primary dark:text-[#ff4d4d] text-[40px] mr-[15px] hover:text-[#D13131] transition-colors duration-300 ease-in-out cursor-pointer'
                             onClick={redirectBack} />
-                        <h1 className='font-bold text-[28px] text-primary'>Workspace</h1>
+                        <h1 className='font-bold text-[28px] text-primary dark:text-[#ff4d4d]'>Workspace</h1>
                     </div>
                     <div>
                         <WorkspaceTabs
@@ -151,7 +151,7 @@ const WorkspacePage = () => {
                 </div>
                 <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
                     {isLoading ? (
-                        <div className='flex flex-col justify-center items-center bg-white rounded-[10px] drop-shadow text-white h-[660px] mx-auto'>
+                        <div className='flex flex-col justify-center items-center bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow text-white h-[660px] mx-auto'>
                             <Spinner />
                         </div>
                     ) : (

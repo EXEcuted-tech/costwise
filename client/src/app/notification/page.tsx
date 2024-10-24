@@ -4,18 +4,23 @@ import Header from '@/components/header/Header'
 import { DateSection } from '@/components/pages/notification/DateSection';
 import { NotificationItemProps } from '@/components/pages/notification/NotificationItem';
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
+import { useNotificationContext } from '@/contexts/NotificationContext';
 import api from '@/utils/api';
-import { format, formatDistanceToNow, isThisWeek, isToday, isYesterday, parseISO } from 'date-fns';
+import { format, formatDistanceToNow, isThisWeek, isToday, isYesterday, parseISO, subMonths } from 'date-fns';
 import { SetStateAction, useEffect, useState } from 'react';
-import { FaBell } from "react-icons/fa";
+import { FaBell, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
+import Spinner from '@/components/loaders/Spinner'; // Added import for Spinner component
+import { useUserContext } from '@/contexts/UserContext';
 
 const NotificationPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
     const itemsPerPage = 3;
 
     const [notifications, setNotifications] = useState({});
-    const [hasNewNotifications, setHasNewNotifications] = useState(false);
+    const { hasNewNotifications, setHasNewNotifications } = useNotificationContext();
     const [isOnlyShowUnread, setIsOnlyShowUnread] = useState(false);
+    const [isLoading, setIsLoading] = useState(false); // Added isLoading state
+    const { silentMode, setSilentMode } = useUserContext();
 
     const getIconForAction = (action: string | number) => {
         const actionIcons = {
@@ -45,8 +50,12 @@ const NotificationPage = () => {
     };
 
     useEffect(() => {
+        setIsLoading(true); // Set loading to true at the start of data fetching
         const categorizeNotifications = (notifications: any[]) => {
             const categorized: Record<string, any[]> = {};
+
+            const categories = ['TODAY', 'YESTERDAY', 'THIS WEEK', 'THIS MONTH', 'A MONTH AGO', 'OLDER'];
+            categories.forEach(category => categorized[category] = []);
 
             notifications.forEach(notification => {
                 const date = parseISO(notification.timestamp);
@@ -58,12 +67,12 @@ const NotificationPage = () => {
                     category = 'YESTERDAY';
                 } else if (isThisWeek(date)) {
                     category = 'THIS WEEK';
+                } else if (date > subMonths(new Date(), 1)) {
+                    category = 'THIS MONTH';
+                } else if (date > subMonths(new Date(), 2)) {
+                    category = 'A MONTH AGO';
                 } else {
                     category = 'OLDER';
-                }
-
-                if (!categorized[category]) {
-                    categorized[category] = [];
                 }
 
                 categorized[category].push({
@@ -75,6 +84,12 @@ const NotificationPage = () => {
                     timestamp: date,
                     isRead: notification.read
                 });
+            });
+
+            Object.keys(categorized).forEach(key => {
+                if (categorized[key].length === 0) {
+                    delete categorized[key];
+                }
             });
 
             return categorized;
@@ -97,11 +112,13 @@ const NotificationPage = () => {
                 }
             } catch (error) {
                 console.error('Error fetching notifications:', error);
+            } finally {
+                setIsLoading(false); // Set loading to false after data fetching
             }
         };
 
         fetchNotifications();
-    }, [hasNewNotifications]);
+    }, []);
 
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: SetStateAction<number>) => {
         setCurrentPage(page);
@@ -118,6 +135,9 @@ const NotificationPage = () => {
         const categorizeNotifications = (notifications: any[]) => {
             const categorized: Record<string, any[]> = {};
 
+            const categories = ['TODAY', 'YESTERDAY', 'THIS WEEK', 'THIS MONTH', 'A MONTH AGO', 'OLDER'];
+            categories.forEach(category => categorized[category] = []);
+
             notifications.forEach(notification => {
                 const date = parseISO(notification.timestamp);
                 let category;
@@ -128,12 +148,12 @@ const NotificationPage = () => {
                     category = 'YESTERDAY';
                 } else if (isThisWeek(date)) {
                     category = 'THIS WEEK';
+                } else if (date > subMonths(new Date(), 1)) {
+                    category = 'THIS MONTH';
+                } else if (date > subMonths(new Date(), 2)) {
+                    category = 'A MONTH AGO';
                 } else {
                     category = 'OLDER';
-                }
-
-                if (!categorized[category]) {
-                    categorized[category] = [];
                 }
 
                 categorized[category].push({
@@ -145,6 +165,12 @@ const NotificationPage = () => {
                     timestamp: date,
                     isRead: notification.read
                 });
+            });
+
+            Object.keys(categorized).forEach(key => {
+                if (categorized[key].length === 0) {
+                    delete categorized[key];
+                }
             });
 
             return categorized;
@@ -187,46 +213,65 @@ const NotificationPage = () => {
     return (
         <div>
             <Header icon={FaBell} title="Notifications"></Header>
-            <div className='px-[50px] mt-[36px] ml-[45px]'>
-                <div className='w-full flex justify-end'>
-                    <span className='text-[#ABABAB] mr-[10px]'>Only show unread</span>
-                    <ToggleButton initialState={false} onToggle={handleToggle} />
-                </div>
-                <div className='bg-white w-full rounded-[20px] drop-shadow-lg mt-[15px]'>
-                    <div>
-                        {currentDateSections.length > 0 ? (
-                            currentDateSections.map(([date, dateNotifications], index) => (
-                                <>
-                                    <DateSection
-                                        key={date}
-                                        date={date}
-                                        notifications={dateNotifications as NotificationItemProps[]}
-                                        showMarkAllRead={currentPage === 1 && index === 0}
-                                    />
-                                    {index !== currentDateSections.length - 1 &&
-                                        <div className='flex justify-center w-full'>
-                                            <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                                <path d="M14.6667 29.3333H29.3334V16.5H34.8334V34.8333H9.16675V16.5H14.6667V29.3333Z" fill="#C64141" fill-opacity="0.3" />
-                                                <path d="M9.16675 12.834H34.8334V7.33398H9.16675V12.834Z" fill="#B22222" />
-                                            </svg>
-                                        </div>
-                                    }
-                                </>
-                            ))
-                        ) : (
-                            <div className="text-center py-4 text-[24px] text-[#ABABAB]">No notifications</div>
-                        )}
-                        {currentDateSections.length > 0 && (
-                            <div className="relative py-[1%]">
-                                <PrimaryPagination
-                                    data={dateEntries}
-                                    itemsPerPage={itemsPerPage}
-                                    handlePageChange={handlePageChange}
-                                    currentPage={currentPage}
-                                />
-                            </div>
-                        )}
+            <div className='px-[50px] pb-[50px] mt-[36px] ml-[45px]'>
+                <div className='w-full flex justify-between items-center'>
+                    <div className="flex items-center">
+                        <button
+                            onClick={() => setSilentMode(!silentMode)}
+                            className="text-2xl text-[#ABABAB] dark:text-gray-300 focus:outline-none"
+                        >
+                            {silentMode ? <FaVolumeMute /> : <FaVolumeUp />}
+                        </button>
+                        <span className="ml-2 text-[17px] text-[#ABABAB] dark:text-gray-300">
+                            {silentMode ? "Silent Mode" : "Notification Sound On"}
+                        </span>
                     </div>
+                    <div className="flex items-center">
+                        <span className='text-[#ABABAB] mr-[10px]'>Only show unread</span>
+                        <ToggleButton initialState={false} onToggle={handleToggle} />
+                    </div>
+                </div>
+                <div className='bg-white dark:bg-[#3C3C3C] w-full rounded-[20px] drop-shadow-lg mt-[15px]'>
+                    {isLoading ? (
+                        <div className="flex justify-center items-center h-64">
+                            <Spinner />
+                        </div>
+                    ) : (
+                        <div>
+                            {currentDateSections.length > 0 ? (
+                                currentDateSections.map(([date, dateNotifications], index) => (
+                                    <>
+                                        <DateSection
+                                            key={date}
+                                            date={date}
+                                            notifications={dateNotifications as NotificationItemProps[]}
+                                            showMarkAllRead={currentPage === 1 && index === 0}
+                                        />
+                                        {index !== currentDateSections.length - 1 &&
+                                            <div className='flex justify-center w-full'>
+                                                <svg width="44" height="44" viewBox="0 0 44 44" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                                    <path d="M14.6667 29.3333H29.3334V16.5H34.8334V34.8333H9.16675V16.5H14.6667V29.3333Z" fill="#C64141" fill-opacity="0.3" />
+                                                    <path d="M9.16675 12.834H34.8334V7.33398H9.16675V12.834Z" fill="#B22222" />
+                                                </svg>
+                                            </div>
+                                        }
+                                    </>
+                                ))
+                            ) : (
+                                <div className="text-center py-4 text-[24px] text-[#ABABAB] dark:text-[#d1d1d1]">No notifications to show.</div>
+                            )}
+                            {currentDateSections.length > 0 && (
+                                <div className="relative py-[1%]">
+                                    <PrimaryPagination
+                                        data={dateEntries}
+                                        itemsPerPage={itemsPerPage}
+                                        handlePageChange={handlePageChange}
+                                        currentPage={currentPage}
+                                    />
+                                </div>
+                            )}
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

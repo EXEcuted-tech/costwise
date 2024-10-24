@@ -2,9 +2,11 @@
 namespace App\Http\Controllers;
 
 use App\Models\AuditLog;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use App\Models\User;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
 
 class AuditLogController extends Controller
 {
@@ -118,5 +120,81 @@ class AuditLogController extends Controller
     public function getAuditLogs() {
         $logs = AuditLog::with('user')->get();
         return response()->json($logs);
+    }
+
+
+    public function export(Request $request)
+    {
+        try {
+            $logs = AuditLog::with('user')->get();
+            $logsByMonth = $logs->groupBy(function($log) {
+                return Carbon::parse($log->timestamp)->format('Y-m');
+            });
+
+            $spreadsheet = new Spreadsheet();
+            $monthIndex = 0;
+            // $sheet = $spreadsheet->getActiveSheet();
+            // $sheet->setTitle('Audit Logs');
+
+            foreach ($logsByMonth as $month => $monthLogs) {
+                $sheet = $monthIndex === 0 ? $spreadsheet->getActiveSheet() : $spreadsheet->createSheet($monthIndex);
+                $sheet->setTitle(Carbon::parse($month)->format('F Y'));
+                $this->processSheet($sheet, $monthLogs);
+                $monthIndex++;
+            }
+            // $this->processSheet($sheet, $logs);
+
+            $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
+            $fileName = 'AuditLogs_' . now()->format('Y-m-d') . '.xlsx';
+
+            $tempFile = tempnam(sys_get_temp_dir(), $fileName);
+            $writer->save($tempFile);
+
+            ob_end_clean();
+
+            return response()->download($tempFile, $fileName, [
+                'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+            ])->deleteFileAfterSend(true);
+        } catch (\Exception $e) {
+            \Log::error('Export failed: ' . $e->getMessage());
+            return response()->json(['error' => "Export failed: " . $e->getMessage()], 500);
+        }
+    }
+
+    private function processSheet($sheet, $logs)
+    {
+        $headers = [
+            'Log Id', 'Employee No', 'Name', 'Email', 'Department', 'User Type', 'Action/Event', 'Timestamp'
+        ];
+
+        $sheet->fromArray([$headers], NULL, 'A1');
+        $sheet->getStyle('A1:H1')->getFont()->setBold(true);
+        $sheet->getStyle('A1:H1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+
+        $sheet->freezePane('A2');
+
+        $row = 2;
+        foreach ($logs as $log) {
+            $user = $log->user;
+            $data = [
+                $log->log_id,
+                $user ? $user->employee_number : '',
+                $user ? ($user->first_name . ' ' . $user->last_name) : '',
+                $user ? $user->email_address : '',
+                $user ? $user->department : '',
+                $user ? $user->user_type : '',
+                $log->action . ' | ' . $log->description,
+                $log->timestamp
+            ];
+            $sheet->fromArray([$data], NULL, "A$row");
+            $sheet->getStyle("A$row:H$row")->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+            $row++;
+        }
+
+        foreach(range('A','H') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+
+        $sheet->setAutoFilter($sheet->calculateWorksheetDimension());
     }
 }

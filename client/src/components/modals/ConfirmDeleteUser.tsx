@@ -31,18 +31,16 @@ const ConfirmDeleteUser: React.FC<ConfirmDeleteProps> = ({ user, onClose }) => {
             setAlertStatus('success');
             setAlertMessages([response.data.message])
             
+            const user = localStorage.getItem('currentUser');
+            const parsedUser = JSON.parse(user || '{}');
+
             const auditData = {
-                userId: currentUser?.userId,
+                userId: parsedUser?.userId,
                 action: 'general',
                 act: 'archive',
                 fileName: fullName
             };
-            console.log(auditData);
-            if (currentUser) {
-            console.log('Current User ID:', currentUser?.userId);
-            } else {
-                console.log('Current User is not defined.', currentUser);
-            }
+
             api.post('/auditlogs/logsaudit', auditData)
             .then(response => {
                 console.log('Audit log created successfully:', response.data);
@@ -61,8 +59,8 @@ const ConfirmDeleteUser: React.FC<ConfirmDeleteProps> = ({ user, onClose }) => {
     }
 
     return (
-        <div className='flex justify-center items-center z-[2000] w-full h-full fixed top-0 left-0 p-4 overflow-auto bg-[rgba(0,0,0,0.5)]'>
-            <div className='absolute top-0 right-0 z-[3000]'>
+        <div className='flex justify-center items-center z-[1500] w-full h-full fixed top-0 left-0 p-4 overflow-auto bg-[rgba(0,0,0,0.5)]'>
+            <div className='absolute top-0 right-0 z-[180000]'>
                 {alertMessages && alertMessages.map((msg, index) => (
                 <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
                     setAlertMessages(prev => prev.filter((_, i) => i !== index));
@@ -86,7 +84,7 @@ const ConfirmDeleteUser: React.FC<ConfirmDeleteProps> = ({ user, onClose }) => {
                             <p>Are You Sure?</p>
                         </div>
                         <div className='text-center text-[20px] text-[#9D9D9D] break-words'>
-                            <p>Do you want to delete this user? This process cannot be undone.</p>
+                            <p>Do you want to archive this user? This process cannot be undone.</p>
                         </div>
 
                         {/* Buttons */}

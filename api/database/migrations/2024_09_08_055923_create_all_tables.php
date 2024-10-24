@@ -23,7 +23,7 @@ return new class extends Migration {
             $table->string('password', 255);
             $table->string('phone_number', 255);
             $table->string('department', 255);
-            $table->string('position', 25);
+            $table->string('position', 255);
             $table->longText('display_picture')->nullable();
             $table->longText('sys_role');
             $table->timestamps();
@@ -172,6 +172,17 @@ return new class extends Migration {
             $table->timestamps();
             $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
         });
+
+        // Release Notes Table
+        Schema::create('release_notes', function (Blueprint $table) {
+            $table->increments('note_id');
+            $table->unsignedInteger('user_id')->nullable();
+            $table->string('title', 255);
+            $table->string('version', 255);
+            $table->longText('content');
+            $table->timestamps();
+            $table->foreign('user_id')->references('user_id')->on('users')->onDelete('cascade');
+        });
     }
 
     /**
@@ -191,5 +202,6 @@ return new class extends Migration {
         Schema::dropIfExists('users');
         Schema::dropIfExists('transactions');
         Schema::dropIfExists('events');
+        Schema::dropIfExists('release_notes');
     }
 };

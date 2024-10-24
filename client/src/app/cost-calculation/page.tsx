@@ -16,12 +16,14 @@ import { CostDataEntry, Product } from "@/types/data";
 import { initializeModel, makePrediction } from "@/components/model/sketch";
 import { request } from "http";
 import TrainingLoader from "@/components/loaders/TrainingLoader";
+import { useUserContext } from "@/contexts/UserContext";
 
 const CostCalculation = () => {
   const { isOpen } = useSidebarContext();
   const [selectedFG, setSelectedFG] = useState<string>("Specific-FG");
   const [alertMessages, setAlertMessages] = useState<string[]>([]);
   const [alertStatus, setAlertStatus] = useState<string>("");
+  const { currentUser, setError } = useUserContext();
 
   const [monthYearOptions, setMonthYearOptions] = useState<
     { value: number; label: string }[]
@@ -166,6 +168,12 @@ const CostCalculation = () => {
 
   //Export
   const handleExport = async () => {
+    const sysRoles = currentUser?.roles;
+    if (!sysRoles?.includes(17)) {
+        setError('You are not authorized to export records or files.');
+        return;
+    }
+
     let sheetData = {};
     if (selectedFG === "Specific-FG") {
       sheetData = sheets

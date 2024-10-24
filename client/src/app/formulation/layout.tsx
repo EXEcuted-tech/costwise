@@ -39,7 +39,7 @@ function FormulationContent({ children }: { children: React.ReactNode }) {
             : edit || add ? 'w-[calc(100%-120px)] ml-[120px]'
               : viewFormulas || viewBOM ? 'w-[calc(100%-120px)] 3xl:w-full ml-[120px]'
                 : 'w-[calc(100%-120px)] 2xl:w-full ml-[120px]'} 
-                        min-h-screen font-lato bg-background transition-all duration-400 ease-in-out`}>
+                        min-h-screen font-lato bg-background dark:bg-[#1E1E1E] transition-all duration-400 ease-in-out`}>
         {children}
       </main>
     </div>

@@ -50,7 +50,9 @@ class FileController extends ApiController
     public function retrieveAll()
     {
         try {
-            $allRecords = File::orderBy('created_at', 'desc')->get();
+            $allRecords = File::whereIn('file_type', ['master_file', 'transactional_file'])
+                              ->orderBy('created_at', 'desc')
+                              ->get();
             $this->status = 200;
             $this->response['data'] = $allRecords;
             return $this->getResponse();

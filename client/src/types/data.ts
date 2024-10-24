@@ -200,3 +200,20 @@ export interface ProductEntry {
     monthYear: string;
     products: Product[];
   }
+
+  export interface ReleaseNote {
+    note_id: number;
+    title: string;
+    version: string;
+    content: {
+        added: string[];
+        updated: string[];
+        removed: string[];
+    };
+    user_id: number;
+    created_at: string;
+    user: {
+        user_id: number;
+        name: string;
+    };
+}
