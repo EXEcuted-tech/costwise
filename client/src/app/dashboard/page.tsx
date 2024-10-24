@@ -50,13 +50,13 @@ const DashboardPage = () => {
   const [materialCostPercentageChange, setMaterialCostPercentageChange] = useState(0);
   const [materialCostTrend, setMaterialCostTrend] = useState('');
   const [name, setName] = useState('');
-  const [isLoading, setIsLoading] = useState(true);
 
   const [auditLogs, setAuditLogs] = useState<AuditLogs[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
-    if(storedUser) {
+    if (storedUser) {
       const user = JSON.parse(storedUser);
       setName(user.name);
       fetchAverageCost();
@@ -68,57 +68,67 @@ const DashboardPage = () => {
   }, []);
 
   const fetchAverageCost = async () => {
+    setIsLoading(true);
     const response = await api.get('/finished_goods/average_cost');
     console.log(response.data);
     setAverageCost(parseFloat(response.data.average_cost));
     setFgPercentageChange(response.data.percentage_change);
     setFgTrend(response.data.trend);
+    setIsLoading(false);
   };
 
   const fetchTotalProductionCost = async () => {
+    setIsLoading(true);
     const response = await api.get('/transactions/total_production_cost');
     console.log(response.data);
     const formattedCost = Number(response.data.total_production_cost).toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
+    console.log(formattedCost);
     setTotalProductionCost(formattedCost);
     setProductCostPercentageChange(response.data.percentage_change);
     setProductCostTrend(response.data.trend);
+    setIsLoading(false);
   };
 
   const fetchMaterialCostUtilization = async () => {
+    setIsLoading(true);
     const response = await api.get('/materials/material_cost_utilization');
     console.log(response.data);
     setMaterialCost(response.data.material_cost_utilization);
     setMaterialCostPercentageChange(response.data.percentage_change);
     setMaterialCostTrend(response.data.trend);
+    setIsLoading(false);
   };
 
   const fetchAuditLogs = async () => {
     const interval = setInterval(() => {
+      setIsLoading(true);
       const fetchData = async () => {
-          try {
-              const res = await api.get('/auditlogs');
-              const logs = res.data.map((log: any) => ({
-                  employeeName: `${log.user.first_name} ${log.user.middle_name ? log.user.middle_name.charAt(0) + '. ' : ''}${log.user.last_name}`,
-                  description: log.description,
-                  actionEvent: log.action as ActionType,
-                  profile: log.user.display_picture,
-                  time: new Date(log.timestamp),  // Store the Date object for sorting
+        try {
+          const res = await api.get('/auditlogs');
+          const logs = res.data.map((log: any) => ({
+            employeeName: `${log.user.first_name} ${log.user.middle_name ? log.user.middle_name.charAt(0) + '. ' : ''}${log.user.last_name}`,
+            description: log.description,
+            actionEvent: log.action as ActionType,
+            profile: log.user.display_picture,
+            time: new Date(log.timestamp),  // Store the Date object for sorting
                   formattedTime: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })  // Separate field for display
-              }));
+          }));
               const sortedLogs = logs.sort((a: AuditLogs, b: AuditLogs) => b.time.getTime() - a.time.getTime());
-              setAuditLogs(sortedLogs);
-
-          } catch (error: any) {
-              console.error("Failed to fetch audit logs:", error);
-          }
-        setIsLoading(false);
+          setAuditLogs(sortedLogs);
+          setIsLoading(false);
+        } catch (error: any) {
+          console.error("Failed to fetch audit logs:", error);
+          setIsLoading(false);
+        } finally {
+          setIsLoading(false);
+        }
       }
       fetchData();
-  }, 5000);
-  return () => clearInterval(interval);
+    }, 25000);
+    return () => clearInterval(interval);
   };
 
   const [totalPrediction, setTotalPrediction] = useState<
@@ -128,61 +138,55 @@ const DashboardPage = () => {
 
   return (
     <div
-      className={`${
-        isOpen ? "px-[10px] 2xl:px-[25px]" : "px-[25px]"
-      } bg-background dark:bg-[#1E1E1E] mt-[30px] ml-[45px] transition-all duration-400 ease-in-out`}
+      className={`${isOpen ? "px-[10px] 2xl:px-[25px]" : "px-[25px]"
+        } bg-background dark:bg-[#1E1E1E] mt-[30px] ml-[45px] transition-all duration-400 ease-in-out`}
     >
       <div className="flex justify-between">
         <div className="flex flex-col flex-wrap w-[72%] 4xl:w-[75%]">
           <h1
-            className={`${
-              isOpen
+            className={`${isOpen
                 ? "text-[34px] 2xl:text-[42px] 3xl:text-[52px] 4xl:text-[58px]"
                 : "text-[40px] 2xl:text-[55px] 3xl:text-[68px]"
-            } truncate text-ellipsis text-[#414141] font-bold animate-color-pulse dark:animate-color-pulse-dark`}
+              } truncate text-ellipsis text-[#414141] font-bold animate-color-pulse dark:animate-color-pulse-dark`}
           >
             Good Evening,{" "}
             <span className="animate-color-pulse2 dark:animate-color-pulse-dark2">{name}!</span>
           </h1>
           <p
-            className={`${
-              isOpen
+            className={`${isOpen
                 ? "text-[16px] 2xl:text-[18px] 3xl:text-[22px]"
                 : "text-[18px] 2xl:text-[20px] 3xl:text-[28px]"
-            } font-medium text-[#868686] dark:text-[#C6C6C6]`}
+              } font-medium text-[#868686] dark:text-[#C6C6C6]`}
           >
             Welcome to CostWise: Virginia’s Product Costing System!
           </p>
         </div>
         <div className="w-[27%] 4xl:w-[20%] flex flex-col justify-center mr-[5px]">
           <h2
-            className={`${
-              isOpen
+            className={`${isOpen
                 ? "text-[18px] 2xl:text-[24px]"
                 : "text-[19px] 2xl:text-[25px] 3xl:text-[30px]"
-            } text-[#414141] dark:text-white font-bold text-right`}
+              } text-[#414141] dark:text-white font-bold text-right`}
           >
             {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </h2>
           <p
-            className={`${
-              isOpen
+            className={`${isOpen
                 ? "text-[14px] 2xl:text-[16px]"
                 : "text-[16px] 3xl:text-[21px]"
-            } text-[#414141] italic dark:text-white text-right`}
+              } text-[#414141] italic dark:text-white text-right`}
           >
             {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
           </p>
         </div>
         <div>
           <div
-            className={`${
-              isOpen
+            className={`${isOpen
                 ? "text-[1.2em] 2xl:text-[1.8em]"
                 : "text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]"
-            } text-primary p-3 drop-shadow-lg bg-white rounded-full cursor-pointer hover:text-white hover:bg-primary transition-colors duration-300 ease-in-out`}
-          
-                          onClick={() => setColorMode(colorMode === "light" ? "dark" : "light")}>
+              } text-primary p-3 drop-shadow-lg bg-white rounded-full cursor-pointer hover:text-white hover:bg-primary transition-colors duration-300 ease-in-out`}
+
+            onClick={() => setColorMode(colorMode === "light" ? "dark" : "light")}>
             <MdDarkMode />
           </div>
         </div>
@@ -210,7 +214,9 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <div className='flex flex-col items-center'>
-                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>₱{totalProductionCost}</h1>
+                    <h1 className='text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>
+                      ₱{totalProductionCost}
+                    </h1>
                     <p className='italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]'>Total Production Cost</p>
                   </div>
                 </div>
@@ -228,7 +234,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <div className='flex flex-col items-center'>
-                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>₱{(isNaN(averageCost) ? 0 : averageCost).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
+                    <h1 className='text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>₱{(isNaN(averageCost) ? 0 : averageCost).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
                     <p className='italic text-center font-medium text-[12px] 3xl:text-[14px] text-[#969696]'>Average Cost Per Product</p>
                   </div>
                 </div>
@@ -246,7 +252,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <div className='flex flex-col items-center'>
-                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>₱{materialCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
+                    <h1 className='text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>₱{materialCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
                     <p className='italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]'>Material Cost Utilization</p>
                   </div>
                 </div>
@@ -264,7 +270,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <div className="flex flex-col items-center">
-                    <h1 className="text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white">
+                    <h1 className="text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white">
                       ₱168.35
                     </h1>
                     <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
@@ -278,19 +284,17 @@ const DashboardPage = () => {
         </div>
         <div className="w-[30%]">
           <CustomCalendar
-            className={`${
-              isOpen
+            className={`${isOpen
                 ? "min-h-[366px] 2xl:min-h-[378px]"
                 : "min-h-[355px] 2xl:min-h-[366px]"
-            } w-full`}
+              } w-full`}
           />
         </div>
       </div>
 
       <div
-        className={`${
-          isOpen ? "gap-3" : "gap-8"
-        } flex-col 3xl:flex-row flex my-[30px] justify-between`}
+        className={`${isOpen ? "gap-3" : "gap-8"
+          } flex-col 3xl:flex-row flex my-[30px] justify-between`}
       >
         <div className={`${isAdmin ? "w-full 3xl:w-[70%]" : "w-full"}`}>
           <CardHeader cardName="Projected Costing" />

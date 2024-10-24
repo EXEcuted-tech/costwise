@@ -5,6 +5,7 @@ import { MdOutlineKeyboardArrowLeft, MdOutlineKeyboardArrowRight } from "react-i
 import AddEventModal from '../modals/AddEventModal';
 import ViewEditEventModal from '../modals/ViewEditEventModal';
 import api from '@/utils/api';
+import { useUserContext } from '@/contexts/UserContext';
 
 type CustomCalendarProps = {
     className?: string;
@@ -26,6 +27,8 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
     const [events, setEvents] = useState<Event[]>([]);
     const [calendarDays, setCalendarDays] = useState<(number | null)[]>([]);
     const [selectedEvent, setSelectedEvent] = useState<Event | null>(null);
+    const { currentUser, setError } = useUserContext();
+    const sysRoles = currentUser?.roles;
 
     const daysInMonth = (month: number, year: number) => {
         return new Date(year, month + 1, 0).getDate();
@@ -102,9 +105,22 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
                        event.date.getFullYear() === currentDate.getFullYear();
             });
             if (existingEvent) {
+                if (!sysRoles?.includes(13)) {
+                    setError('You are not authorized to view this event.');
+                    return;
+                }
+
+                if (!sysRoles?.includes(15)) {
+                    setError('You are not authorized to edit this event.');
+                    return;
+                }
                 console.log("Chosen Event: ", existingEvent);
                 setSelectedEvent(existingEvent);
             } else {
+                if (!sysRoles?.includes(14)) {
+                    setError('You are not authorized to create an event.');
+                    return;
+                }
                 setSelectedEvent(null);
             }
             setIsModalOpen(true);

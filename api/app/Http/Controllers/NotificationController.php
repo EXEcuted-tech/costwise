@@ -98,6 +98,42 @@ class NotificationController extends ApiController
         }
     }
 
+    // public function getNewNotifications(Request $request)
+    // {
+    //     try {
+    //         $userId = $request->user()->user_id;
+    //         $lastCheckedAt = $request->input('last_checked_at');
+    //         $timeout = 30; // 30 seconds timeout
+
+    //         $startTime = time();
+
+    //         while (time() - $startTime < $timeout) {
+    //             $newNotifications = AuditLog::where('user_id', $userId)
+    //                 ->where('timestamp', '>', $lastCheckedAt)
+    //                 ->where('read', 0)
+    //                 ->get();
+
+    //             if ($newNotifications->isNotEmpty()) {
+    //                 $this->status = 200;
+    //                 $this->response['data'] = $newNotifications;
+    //                 return $this->getResponse();
+    //             }
+
+    //             // Sleep for a short time before checking again
+    //             usleep(500000); // 0.5 seconds
+    //         }
+
+    //         // If no new notifications after timeout, return an empty response
+    //         $this->status = 200;
+    //         $this->response['data'] = [];
+    //         return $this->getResponse();
+    //     } catch (\Exception $e) {
+    //         $this->status = 500;
+    //         $this->response['message'] = $e->getMessage();
+    //         return $this->getResponse();
+    //     }
+    // }
+
     public function getNewNotifications(Request $request)
     {
         try {

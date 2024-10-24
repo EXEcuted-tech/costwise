@@ -40,3 +40,27 @@ export const refreshToken = async (): Promise<boolean> => {
         return false;
     }
 };
+
+export const setupPeriodicTokenRefresh = (intervalMinutes: number = 5) => {
+    const checkAndRefreshToken = async () => {
+      if (isTokenExpired()) {
+        console.log("Periodic token refresh triggered");
+        const refreshed = await refreshToken();
+        if (!refreshed) {
+          console.log("Periodic refresh failed, logging out");
+          localStorage.clear();
+          await removeTokens();
+          window.location.href = '/';
+        }
+      }
+    };
+  
+    // Initial check
+    checkAndRefreshToken();
+  
+    // Set up interval for periodic checks
+    const intervalId = setInterval(checkAndRefreshToken, intervalMinutes * 60 * 1000);
+  
+    // Return a function to clear the interval when needed
+    return () => clearInterval(intervalId);
+  };

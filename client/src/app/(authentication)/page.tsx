@@ -76,7 +76,8 @@ function LoginPage() {
           name: user.data.first_name, // Can be full name if needed najud
           email: user.data.email_address,
           userType: user.data.user_type,
-          displayPicture: user.data.display_picture
+          displayPicture: user.data.display_picture,
+          roles: user.data.sys_role
         }
 
         setCurrentUser(currentUs);
