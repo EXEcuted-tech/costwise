@@ -326,7 +326,7 @@ const DashboardPage = () => {
               auditLogs.map((data, index) => (
                 <div key={index}>
                   <UserActivity
-                    url="https://i.imgur.com/X7zZFeb.jpg"
+                    url={data.profile}
                     name={data.employeeName}
                     activity={data.action}
                     description={data.description}
