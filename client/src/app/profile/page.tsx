@@ -45,6 +45,7 @@ const ProfilePage = () => {
             try {
                 const user = await api.get('/user');
                 const userInformation = {
+                    user_id: user.data.user_id,
                     fName: user.data.first_name,
                     mName: user.data.middle_name,
                     lName: user.data.last_name,

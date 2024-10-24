@@ -5,6 +5,8 @@ import EditInformation from './EditInformation';
 import PasswordChangeDialog from '@/components/modals/SendEmailDialog';
 import ConfirmChangeInfo from '@/components/modals/ConfirmChangeInfo';
 import Spinner from '@/components/loaders/Spinner';
+import { BsPersonLock } from 'react-icons/bs';
+import ViewUserRoles from '../user-management/ViewUserRoles';
 
 type UserInformationProps ={
     isOpen: boolean;
@@ -16,6 +18,12 @@ const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc, isLo
     const [props, setProps] = useState(false);
     const [dialog, setDialog] = useState(false);
     const [successModal, setSuccessModal] = useState(false);
+    const [showRolesSelectModal, setShowRolesSelectModal] = useState(false);
+
+
+    const handleShowRolesSelectModal = () => {
+        setShowRolesSelectModal(true);
+    }
     
     return (
         <>
@@ -29,16 +37,33 @@ const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc, isLo
             setSuccessModal={setSuccessModal}
             />
         }
+        {showRolesSelectModal && (
+            <ViewUserRoles onClose={() => setShowRolesSelectModal(false)} user_id={userAcc.user_id} />
+
+            )}
         {props ? 
         <EditInformation setProps={setProps} setSuccessModal={setSuccessModal} setDialog={setDialog} isOpen={isOpen} userAcc={userAcc}/>
         :
         <div className="mx-8 2xl:mx-12">
-            <div className={`${isOpen ? 'text-[24px] 2xl:text-[32px]' : 'text-[28px] 2xl:text-[32px]'} flex text-[#8E8E8E] font-semibold mt-3 mb-2`}>
-                User Information
-                <button className={`${isOpen ? 'text-[26px] 2xl:text-[36px]' : 'text-[30px] 2xl:text-[36px]'} px-3 text-black mr-2 mt-1 rounded-lg`} onClick={()=>setProps(true)}>
-                    <MdModeEdit/>
-                </button>
+            <div className='flex justify-between'>
+                <div className={`${isOpen ? 'text-[24px] 2xl:text-[32px]' : 'text-[28px] 2xl:text-[32px]'} flex text-[#8E8E8E] font-semibold mt-3 mb-2`}>
+                    User Information
+                    <button className={`${isOpen ? 'text-[26px] 2xl:text-[36px]' : 'text-[30px] 2xl:text-[36px]'} px-3 text-black mr-2 mt-1 rounded-lg`} onClick={()=>setProps(true)}>
+                        <MdModeEdit/>
+                    </button>
+                </div>
+                {/* Roles */}
+                <div className='flex items-center'>
+                    <button 
+                        className='flex items-center ml-12 bg-gray-100 rounded-lg p-2 px-3 border border-gray-300 hover:bg-gray-200 cursor-pointer transition-colors duration-300 ease-in-out'
+                        onClick={handleShowRolesSelectModal}
+                        >
+                        <BsPersonLock className='text-[1.7em] mr-2 text-[#5B5353]' />
+                        User Roles
+                    </button>  
+                </div>
             </div>
+            
             <div className={`${isOpen ? 'text-[13px] 2xl:text-[17px] 3xl:text-[22px] 4xl:text-[24px]' : 'text-[18px] 2xl:text-[22px] 3xl:text-[24px]'} flex h-[310px] justify-center border-2 border-[#D9D9D9] py-5 text-black rounded-[15px]`}>
                {isLoading? (<div className='flex h-[260px] pt-[100px]'><Spinner className='!size-[50px]'/> </div>) : 
                (
