@@ -16,6 +16,8 @@ import ProductCostChart from '@/components/pages/dashboard/LineChart';
 import UserActivity, { UserActivityProps } from '@/components/pages/dashboard/UserActivity';
 import api from '@/utils/api';
 import { formatDistanceToNow } from 'date-fns';
+import Spinner from '@/components/loaders/Spinner';
+import useColorMode from '@/hooks/useColorMode';
 
 enum ActionType {
   General = 'general',
@@ -31,9 +33,9 @@ export interface AuditLogs {
   description: string;
   time: Date;
   profile: string;
+  formattedTime: string;
 }
-import useColorMode from '@/hooks/useColorMode';
-import Loader from "@/components/loaders/Loader";
+
 
 const DashboardPage = () => {
   const { isOpen, isAdmin } = useSidebarContext();
@@ -111,16 +113,21 @@ const DashboardPage = () => {
             description: log.description,
             actionEvent: log.action as ActionType,
             profile: log.user.display_picture,
-            time: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })
+            time: new Date(log.timestamp),  // Store the Date object for sorting
+                  formattedTime: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })  // Separate field for display
           }));
-          setAuditLogs(logs);
+              const sortedLogs = logs.sort((a: AuditLogs, b: AuditLogs) => b.time.getTime() - a.time.getTime());
+          setAuditLogs(sortedLogs);
           setIsLoading(false);
         } catch (error: any) {
           console.error("Failed to fetch audit logs:", error);
+          setIsLoading(false);
+        } finally {
+          setIsLoading(false);
         }
       }
       fetchData();
-    }, 5000);
+    }, 25000);
     return () => clearInterval(interval);
   };
 
@@ -310,17 +317,25 @@ const DashboardPage = () => {
               id="scroll-style"
               className="bg-white dark:bg-[#3C3C3C] h-[600px] rounded-b-[10px] drop-shadow-lg overflow-y-auto py-[15px]"
             >
-              {auditLogs.map((data, index) => (
+              {isLoading? <div className="flex justify-center items-center h-[550px]"><Spinner className="!size-[60px]"/> </div>
+              : auditLogs.length === 0 ? (
+                <div className="flex justify-center items-center h-[550px] text-xl text-gray-500">
+                  No logs to display.
+                </div>
+              ) :
+              auditLogs.map((data, index) => (
                 <div key={index}>
                   <UserActivity
-                    url="https://i.imgur.com/X7zZFeb.jpg"
+                    url={data.profile}
                     name={data.employeeName}
                     activity={data.action}
                     description={data.description}
-                    time={data.time}
+                    formattedTime={data.formattedTime}
                   />
                 </div>
-              ))}
+                ))
+              }
+              
             </div>
           </div>
         )}
