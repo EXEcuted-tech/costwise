@@ -164,12 +164,12 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
             });
 
             if (response.status === 200) {
-                setAlertMessages(["Release note successfully deleted"]);
+                setAlertMessages(["Release note successfully archived"]);
                 setAlertStatus("success");
                 window.location.reload();
             }
         } catch (error) {
-            setAlertMessages(["Failed to delete release note"]);
+            setAlertMessages(["Failed to archive release note"]);
             setAlertStatus("critical");
         }
     }

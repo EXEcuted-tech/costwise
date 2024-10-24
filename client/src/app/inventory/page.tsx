@@ -7,7 +7,7 @@ import { IoIosArrowBack, IoIosArrowForward, IoIosSearch } from "react-icons/io";
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import MonthSelector from '@/components/modals/MonthSelector';
 import { CiImport } from "react-icons/ci";
-import { IoTrash } from 'react-icons/io5';
+import { HiArchiveBoxXMark } from "react-icons/hi2";
 import { RiFileCloseFill } from "react-icons/ri";
 import ImportInventoryList from '@/components/modals/ImportInventory';
 import api from '@/utils/api';
@@ -339,7 +339,7 @@ const Inventory = () => {
                                     className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
                                     onClick={openDeleteModal}
                                 >
-                                    <IoTrash className="text-[25px] transition-colors duration-250 ease-in-out" />
+                                    <HiArchiveBoxXMark className="text-[22px] transition-colors duration-250 ease-in-out" />
                                 </button>
                             )}
                         </div>

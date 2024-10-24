@@ -1,7 +1,6 @@
 "use client";
 import React, { useState } from 'react';
 import { MdModeEdit } from "react-icons/md";
-import { FaTrashAlt } from "react-icons/fa";
 import EditUserInfo from '@/components/modals/EditUserInfo';
 import { FaUserLargeSlash } from "react-icons/fa6";
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
@@ -10,6 +9,7 @@ import Spinner from '@/components/loaders/Spinner';
 import ConfirmDeleteUser from '@/components/modals/ConfirmDeleteUser';
 import { useUserContext } from '@/contexts/UserContext';
 import Alert from '@/components/alerts/Alert';
+import { HiArchiveBoxXMark } from 'react-icons/hi2';
 
 interface ManageAccountsPageProps {
     fileData: User[];
@@ -116,8 +116,8 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                                                 </button>
                                                 <button
                                                     onClick={() => openDeleteModal(data)}
-                                                    className={`${isOpen ? '4xl:w-[3rem] 4xl:px-[18px] 3xl:w-[2rem] 3xl:px-[10px] 2xl:w-[2rem] 2xl:px-[10px] xl:w-[2rem] xl:px-[10px]' : ' 4xl:w-[3rem] 4xl:px-[18px] 3xl:w-[3rem] 3xl:px-[18px] xl:w-[2rem] xl:px-[10px]'} w-[3rem] h-[2rem] px-[17px] text-[0.9em] bg-[#B22222] text-white flex justify-center items-center rounded-lg hover:bg-[#971c1c] transition-colors duration-300 ease-in-out`}>
-                                                    <FaTrashAlt />
+                                                    className={`${isOpen ? '4xl:w-[3rem] 4xl:px-[12px] 3xl:w-[2rem] 3xl:px-[8px] 2xl:w-[2rem] 2xl:px-[8px] xl:w-[2rem] xl:px-[8px]' : '4xl:w-[3rem] 4xl:px-[12px] 3xl:w-[3rem] 3xl:px-[12px] 2xl:px-[8px] xl:w-[2rem] xl:px-[8px]'} w-[3rem] h-[2rem] text-[1.1em] px-3 bg-[#B22222] text-white flex justify-center items-center rounded-lg hover:bg-[#971c1c] transition-colors duration-300 ease-in-out`}>
+                                                    <HiArchiveBoxXMark className='' />
                                                 </button>
                                             </div>
                                         </td>
