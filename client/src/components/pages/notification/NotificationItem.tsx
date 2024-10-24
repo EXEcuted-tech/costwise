@@ -14,11 +14,11 @@ export interface NotificationItemProps {
   subText: string;
   time: string;
   timestamp: string;
-  isRead: boolean;
+  isRead: number;
 }
 
 export const NotificationItem: React.FC<NotificationItemProps> = ({ id, icon, mainText, subText, time, isRead }) => {
-  const [read, setRead] = useState(isRead);
+  const [read, setRead] = useState(isRead === 0 ? false : true);
 
   const onMarkAsRead = async () => {
     setRead(!read)
@@ -33,7 +33,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ id, icon, ma
   };
 
   return (
-    <div className={`${read && 'bg-[#EAF4FF]'} flex items-center px-[20px] py-[10px] border-b`}>
+    <div className={`${read && 'bg-[#EAF4FF] dark:bg-[#4C4C4C]'} flex items-center px-[20px] py-[10px] border-b`}>
       {/* {icon === 'user' && <FaUser className="size-8 mr-4 text-[#0068A3] drop-shadow" />} */}
       {icon === 'crud' && <IoIosCreate className="size-8 mr-4 text-[#0068A3]" />}
       {icon === 'import' && <FaFileAlt className="size-8 mr-4 text-black" />}
@@ -41,8 +41,8 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ id, icon, ma
       {icon === 'stock' && <GiShoppingCart className="size-8 mr-4 text-[#F6D048]" />}
       {icon === 'general' && <AiFillNotification className="size-8 mr-4 text-[#F6D048]" />}
       <div className="flex-grow hover:cursor-pointer" onClick={onMarkAsRead}>
-        <p className="text-[#757575]">{mainText}<span className="font-light">‎ {subText}</span></p>
-        <p className="text-[13px] text-[#757575] font-light">{time}</p>
+        <p className="text-[#757575] dark:text-white">{mainText}<span className="font-light dark:text-[#d1d1d1]">‎ {subText}</span></p>
+        <p className="text-[13px] text-[#757575] dark:text-[#d1d1d1] font-light">{time}</p>
       </div>
     </div>
   );

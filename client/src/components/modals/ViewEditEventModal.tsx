@@ -3,9 +3,10 @@ import React, { useState, useEffect } from 'react';
 import { FaCalendarAlt, FaEdit, FaTrash } from "react-icons/fa";
 import ConfirmDelete from '@/components/modals/ConfirmDelete';
 import { Router } from 'next/router';
+import { useUserContext } from '@/contexts/UserContext';
 
 type ViewEditEventModalProps = {
-    event: { id: string };
+    event: { id: number };
     onClose: () => void;
 };
 
@@ -19,12 +20,14 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
     const [isLoading, setIsLoading] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
     const [id, setId] = useState(0);
+    const { currentUser, setError } = useUserContext();
+    const sysRoles = currentUser?.roles;
 
     useEffect(() => {
         const fetchEventDetails = async () => {
             try {
                 console.log(event);
-                const response = await api.get(`/events/retrieve`, { params: { col: 'event_id', val: Number(event.id) } });
+                const response = await api.get(`/events/retrieve`, { params: { col: 'event_id', val: event.id } });
                 if (response.data.status === 200) {
                     const eventData = response.data.data;
                     setId(eventData.event_id);
@@ -51,14 +54,23 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
         e.preventDefault();
         setIsLoading(true);
         const updatedEvent = { id: event.id, title, description, startTime, endTime, date: date as Date };
-        const response = await api.post(`/events/update`, updatedEvent);
-        if (response.data.status !== 401) {
-            setIsLoading(false);
-            setIsEditing(false);
+
+        if(date){
+            const adjustedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
+            const updatedEventWithAdjustedDate = { ...updatedEvent, date: adjustedDate };
+            const response = await api.post(`/events/update`, updatedEventWithAdjustedDate);
+            if (response.data.status !== 401) {
+                setIsLoading(false);
+                setIsEditing(false);
+            }
         }
     };
 
     const handleDelete = async () => {
+        if (!sysRoles?.includes(16)) {
+            setError('You are not authorized to delete this event.');
+            return;
+        }
         setIsLoading(true);
         console.log(event);
         const response = await api.post(`/events/delete`, { event_id: id });
@@ -70,58 +82,58 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
 
     return (
         <div className="font-lato fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
-            <div className="animate-pop-out bg-white p-6 rounded-lg w-[50%]">
-                <h2 className="text-xl text-[20px] font-bold mb-4 flex items-center gap-2">
+            <div className="animate-pop-out bg-white dark:bg-[#3C3C3C] p-6 rounded-lg w-[50%]">
+                <h2 className="text-xl text-[20px] font-bold mb-4 flex items-center gap-2 dark:text-white">
                     <FaCalendarAlt className='text-[20px]' />
                     {isEditing ? 'Edit Event' : 'View Event'}
-                    <span className="text-primary text-[20px] font-semibold">{date?.toDateString()}</span>
+                    <span className="text-primary text-[20px] font-semibold dark:text-[#ff4d4d]">{date?.toDateString()}</span>
                 </h2>
                 <form onSubmit={handleSubmit}>
                     <div className="mb-4 flex gap-4">
                         <div className="flex-1">
-                            <label htmlFor="startTime" className="block mb-1 font-semibold text-[17px]">Start Time</label>
+                            <label htmlFor="startTime" className="block mb-1 font-semibold text-[17px] dark:text-white">Start Time</label>
                             <input
                                 type="time"
                                 id="startTime"
                                 value={startTime}
                                 onChange={(e) => setStartTime(e.target.value)}
-                                className="w-full border rounded px-2 py-1"
+                                className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
                                 required
                                 disabled={!isEditing}
                             />
                         </div>
                         <div className="flex-1">
-                            <label htmlFor="endTime" className="block mb-1 font-semibold text-[17px]">End Time</label>
+                            <label htmlFor="endTime" className="block mb-1 font-semibold text-[17px] dark:text-white">End Time</label>
                             <input
                                 type="time"
                                 id="endTime"
                                 value={endTime}
                                 onChange={(e) => setEndTime(e.target.value)}
-                                className="w-full border rounded px-2 py-1"
+                                className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
                                 required
                                 disabled={!isEditing}
                             />
                         </div>
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="title" className="block mb-1 font-semibold text-[17px]">Title</label>
+                        <label htmlFor="title" className="block mb-1 font-semibold text-[17px] dark:text-white">Title</label>
                         <input
                             type="text"
                             id="title"
                             value={title}
                             onChange={(e) => setTitle(e.target.value)}
-                            className="w-full border rounded px-2 py-1"
+                            className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
                             required
                             disabled={!isEditing}
                         />
                     </div>
                     <div className="mb-4">
-                        <label htmlFor="description" className="block mb-1 font-semibold text-[17px]">Description</label>
+                        <label htmlFor="description" className="block mb-1 font-semibold text-[17px] dark:text-white">Description</label>
                         <textarea
                             id="description"
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
-                            className="w-full border rounded px-2 py-1"
+                            className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
                             rows={3}
                             disabled={!isEditing}
                         ></textarea>
@@ -131,7 +143,7 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
                         <button
                             type="button"
                             onClick={onClose}
-                            className="mr-2 px-4 py-2 bg-gray-200 rounded font-semibold transition-colors hover:bg-gray-300"
+                            className="mr-2 px-4 py-2 bg-gray-200 rounded font-semibold transition-colors hover:bg-gray-300 dark:hover:bg-[#4C4C4C]"
                         >
                             Close
                         </button>

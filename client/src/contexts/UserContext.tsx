@@ -1,19 +1,24 @@
-import { createContext, useContext, useState, ReactNode } from 'react';
+import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 
 const UserContext = createContext<UserProps | undefined>(undefined);
 
-type User = {
-    userId: number;
-    empNum: string;
-    name: string; // Can be full name if needed najud
-    email: string;
-    userType: 'Regular' | 'Admin';
-    displayPicture: string;
+export type User = {
+  userId: number;
+  empNum: string;
+  name: string; // Can be full name if needed najud
+  email: string;
+  userType: 'Regular' | 'Admin';
+  displayPicture: string;
+  roles: number[];
 }
 
 export interface UserProps {
   currentUser: User | null;
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
+  setError: React.Dispatch<React.SetStateAction<string>>;
+  error: string;
+  silentMode: boolean;
+  setSilentMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const useUserContext = () => {
@@ -25,10 +30,23 @@ export const useUserContext = () => {
 };
 
 export const UserProvider = ({ children }: { children: ReactNode }) => {
-    const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [currentUser, setCurrentUser] = useState<User | null>(null);
+  const [error, setError] = useState('');
+  const [silentMode, setSilentMode] = useState(false);
+  useEffect(() => {
+    const userString = localStorage.getItem('currentUser');
+    if (userString) {
+      try {
+        const parsedUser = JSON.parse(userString);
+        setCurrentUser(parsedUser);
+      } catch (error) {
+        console.error('Error parsing user data:', error);
+      }
+    }
+  }, []);
 
   return (
-    <UserContext.Provider value={{ currentUser,setCurrentUser }}>
+    <UserContext.Provider value={{ currentUser, setCurrentUser, setError, error, silentMode, setSilentMode }}>
       {children}
     </UserContext.Provider>
   );

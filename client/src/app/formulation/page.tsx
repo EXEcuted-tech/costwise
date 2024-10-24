@@ -43,6 +43,7 @@ const FormulationPage = () => {
     const [filteredData, setFilteredData] = useState<Formulation[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const [exportLoading, setExportLoading] = useState(false);
     const [infoMsg, setInfoMsg] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
 
@@ -119,31 +120,29 @@ const FormulationPage = () => {
                                 const response = await api.post('/formulations/upload', formData);
                                 if (response.data.status == 200) {
                                     resolve(`Successfully uploaded the file!`);
-                                    const fileName = file.name; 
+                                    fetchData();
+
+                                    const fileName = file.name;
+                                    const user = localStorage.getItem('currentUser');
+                                    const parsedUser = JSON.parse(user || '{}');
+
                                     const auditData = {
-                                        userId: currentUser?.userId,
+                                        userId: parsedUser?.userId,
                                         action: 'import',
                                         fileName: fileName
-                                      };
-                                      console.log(auditData);
-                                      if (currentUser) {
-                                      console.log('Current User ID:', currentUser?.userId);
-                                      } else {
-                                          console.log('Current User is not defined.', currentUser);
-                                      }
-                                      api.post('/auditlogs/logsaudit', auditData)
-                                      .then(response => {
-                                          console.log('Audit log created successfully:', response.data);
-                                      })
-                                      .catch(error => {
-                                          console.error('Error audit logs:', error);
-                                      });
+                                    };
+                                    api.post('/auditlogs/logsaudit', auditData)
+                                        .then(response => {
+                                            console.log('Audit log created successfully:', response.data);
+                                        })
+                                        .catch(error => {
+                                            console.error('Error audit logs:', error);
+                                        });
                                 } else {
-                                    reject(`Failed to upload ${file.name}`);
+                                    reject(response.data.data.message);
                                 }
-                            } catch (error) {
-                                console.error(error);
-                                reject(`Failed to upload ${file.name}`);
+                            } catch (error: any) {
+                                reject([error.response.data.message]);
                             }
                         } else {
                             reject(`Error reading ${file.name}`);
@@ -162,6 +161,7 @@ const FormulationPage = () => {
                 const results = await Promise.all(uploadPromises);
                 setInfoMsg(results.join(', '));
             } catch (errors) {
+                console.log("Errors", errors);
                 if (Array.isArray(errors)) {
                     setErrorMsg(errors.join(', '));
                 } else {
@@ -188,36 +188,50 @@ const FormulationPage = () => {
 
     return (
         <>
-            <div className="absolute top-0 right-0">
-                {errorMsg != '' &&
-                    <Alert
-                        className="!relative"
-                        variant='critical'
-                        message={errorMsg}
-                        setClose={() => { setErrorMsg(''); }} />
-                }
-                {infoMsg != '' &&
-                    <Alert
-                        className="!relative"
-                        variant='success'
-                        message={infoMsg}
-                        setClose={() => { setInfoMsg(''); }} />
-                }
+            {(exportLoading) &&
+                <div className='fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-brightness-50 z-[1500]'>
+                    <div className="three-body">
+                        <div className="three-body__dot"></div>
+                        <div className="three-body__dot"></div>
+                        <div className="three-body__dot"></div>
+                    </div>
+                    <p className='text-primary font-light text-[20px] mt-[10px] text-white'>
+                        Exporting file(s)...
+                    </p>
+                </div>
+            }
+            <div className="fixed top-4 right-4 z-50">
+                <div className="flex flex-col items-end space-y-2">
+                    {errorMsg != '' &&
+                        <Alert
+                            className="!relative"
+                            variant='critical'
+                            message={errorMsg}
+                            setClose={() => { setErrorMsg(''); }} />
+                    }
+                    {infoMsg != '' &&
+                        <Alert
+                            className="!relative"
+                            variant='success'
+                            message={infoMsg}
+                            setClose={() => { setInfoMsg(''); }} />
+                    }
+                </div>
             </div>
             <Header icon={HiClipboardList} title={"Formulations"} />
             {compareFormula && <CompareFormulaDialog setCompareFormula={setCompareFormula} />}
             {bomList && <BillOfMaterialsList setBOM={setBomList} />}
-            <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
+            <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px] transition-all duration-400 ease-in-out`}>
                 {(!view && !edit && !viewFormulas && !viewBOM) &&
                     <div className='flex'>
                         {/* Search Component */}
-                        <div className={`${isOpen ? 'w-[40%] 4xl:w-[50%] 4xl:mr-[1%]' : 'w-[45%] 2xl:w-[50%] 3xl:w-[60%] mr-[1%]'} relative`}>
+                        <div className={`${isOpen ? 'w-[40%] 4xl:w-[50%] 4xl:mr-[1%]' : 'w-[45%] 2xl:w-[50%] 3xl:w-[60%] mr-[1%]'} relative transition-all duration-400 ease-in-out`}>
                             <div className="absolute inset-y-0 left-0 flex items-center pl-1 pointer-events-none">
-                                <AiOutlineSearch className={`${isOpen ? 'text-[14px] 2xl:text-[19px] 3xl:text-[22px]' : 'text-[19px] 2xl:text-[22px]'} text-[#575757]`} />
+                                <AiOutlineSearch className={`${isOpen ? 'text-[14px] 2xl:text-[19px] 3xl:text-[22px]' : 'text-[19px] 2xl:text-[22px]'} text-[#575757] dark:bg-[#1E1E1E]`} />
                             </div>
                             <input
                                 type="text"
-                                className={`${isOpen ? 'pl-[25px] 2xl:pl-[35px] w-[70%] 4xl:w-[50%] text-[15px] 2xl:text-[18px] 3xl:text-[21px]' : 'pl-[35px] w-[60%] 3xl:w-[50%] text-[18px] 2xl:text-[21px]'} focus:outline-none pr-[5px] py-[10px] bg-background border-b border-[#868686] placeholder-text-[#777777] text-[#5C5C5C]`}
+                                className={`${isOpen ? 'pl-[25px] 2xl:pl-[35px] w-[70%] 4xl:w-[50%] text-[15px] 2xl:text-[18px] 3xl:text-[21px]' : 'pl-[35px] w-[60%] 3xl:w-[50%] text-[18px] 2xl:text-[21px]'} dark:bg-[#1E1E1E] dark:text-[#d1d1d1] focus:outline-none pr-[5px] py-[10px] bg-background border-b border-[#868686] placeholder-text-[#777777] text-[#5C5C5C]`}
                                 placeholder="Search Formulation"
                                 value={searchTerm}
                                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -225,12 +239,12 @@ const FormulationPage = () => {
                             />
                         </div>
                         <div className={`${isOpen ? 'w-[60%] 4xl:w-[50%]' : 'w-[55%] 2xl:w-[50%] 3xl:w-[40%]'} flex flex-grow items-end justify-end`}>
-                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} mr-[10px] bg-white px-[15px] py-[5px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out`}
+                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} mr-[10px] bg-white dark:bg-[#3C3C3C] dark:text-[#d1d1d1] dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c] px-[15px] py-[5px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out`}
                                 onClick={() => setCompareFormula(true)}>
                                 <MdCompare className='mr-[5px]' />
                                 <span className='font-bold'>Compare</span>
                             </button>
-                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} mr-[10px] bg-white px-[15px] py-[5px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out`}
+                            <button className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} mr-[10px] bg-white dark:bg-[#3C3C3C] dark:text-[#d1d1d1] dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c] px-[15px] py-[5px] rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out`}
                                 onClick={() => setBomList(true)}>
                                 <IoList className={`${isOpen ? 'text-[15px] 2xl:text-[22px]' : 'text-[22px]'} mr-[5px]`} />
                                 <span className='font-bold'>BOM List</span>
@@ -254,7 +268,14 @@ const FormulationPage = () => {
                                             </li>
                                             <hr className='h-[2px] bg-primary opacity-50' />
                                             <li className={`${isOpen ? 'pl-[6px] 3xl:pl-[15px]' : 'pl-[15px]'} flex items-center justify-left py-[5px] cursor-pointer hover:text-[#851313]`}
-                                                onClick={open}>
+                                                onClick={() => {
+                                                    const sysRoles = currentUser?.roles;
+                                                    if (!sysRoles?.includes(10)) {
+                                                        setErrorMsg('You are not authorized to import formulations.');
+                                                        return;
+                                                    }
+                                                    open();
+                                                }}>
                                                 <BiSolidFile className='text-[20px] mr-[5px]' />
                                                 <p>Import Files</p>
                                             </li>
@@ -276,6 +297,7 @@ const FormulationPage = () => {
                         isLoading={isLoading}
                         currentPage={currentPage}
                         handlePageChange={handlePageChange}
+                        setExportLoading={setExportLoading}
                     />
                 </div>
             </div>

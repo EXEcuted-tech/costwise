@@ -56,55 +56,55 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ date, onClose, onAddEvent
                 <Alert message={errorMsg} variant='critical' setClose={() => setErrorMsg('')} />
             }
             <div className="font-lato fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
-                <div className="animate-pop-out bg-white p-6 rounded-lg w-[50%]">
-                    <h2 className="text-xl text-[20px] font-bold mb-4 flex items-center gap-2">
+                <div className="animate-pop-out bg-white dark:bg-[#3C3C3C] p-6 rounded-lg w-[50%]">
+                    <h2 className="text-xl text-[20px] font-bold mb-4 flex items-center gap-2 dark:text-white">
                         <FaCalendarPlus className='text-[20px]' />
                         Add Event for
-                        <span className="text-primary text-[20px] font-semibold">{date.toDateString()}</span>
+                        <span className="text-primary text-[20px] font-semibold dark:text-[#ff4d4d]">{date.toDateString()}</span>
                     </h2>
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4 flex gap-4">
                             <div className="flex-1">
-                                <label htmlFor="startTime" className="block mb-1 font-semibold text-[17px]">Start Time</label>
+                                <label htmlFor="startTime" className="block mb-1 font-semibold text-[17px] dark:text-white">Start Time</label>
                                 <input
                                     type="time"
                                     id="startTime"
                                     value={startTime}
                                     onChange={(e) => setStartTime(e.target.value)}
-                                    className="w-full border rounded px-2 py-1"
+                                    className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
                                     required
                                 />
                             </div>
                             <div className="flex-1">
-                                <label htmlFor="endTime" className="block mb-1 font-semibold text-[17px]">End Time</label>
+                                <label htmlFor="endTime" className="block mb-1 font-semibold text-[17px] dark:text-white">End Time</label>
                                 <input
                                     type="time"
                                     id="endTime"
                                     value={endTime}
                                     onChange={(e) => setEndTime(e.target.value)}
-                                    className="w-full border rounded px-2 py-1"
+                                    className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
                                     required
                                 />
                             </div>
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="title" className="block mb-1 font-semibold text-[17px]">Title</label>
+                            <label htmlFor="title" className="block mb-1 font-semibold text-[17px] dark:text-white">Title</label>
                             <input
                                 type="text"
                                 id="title"
                                 value={title}
                                 onChange={(e) => setTitle(e.target.value)}
-                                className="w-full border rounded px-2 py-1"
+                                className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
                                 required
                             />
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="description" className="block mb-1 font-semibold text-[17px]">Description</label>
+                            <label htmlFor="description" className="block mb-1 font-semibold text-[17px] dark:text-white">Description</label>
                             <textarea
                                 id="description"
                                 value={description}
                                 onChange={(e) => setDescription(e.target.value)}
-                                className="w-full border rounded px-2 py-1"
+                                className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
                                 rows={3}
                             ></textarea>
                         </div>
@@ -122,7 +122,10 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ date, onClose, onAddEvent
                                 className="px-4 py-2 bg-primary text-white rounded font-semibold transition-colors hover:bg-red-800 flex items-center justify-center"
                             >
                                 {isLoading ? (
-                                    <Spinner className="h-5 w-5 mr-2" />
+                                    <div className='flex items-center justify-center'>
+                                        <Spinner className="h-5 w-5 mr-2" />
+                                        Add Event
+                                    </div>
                                 ) : (
                                     'Add Event'
                                 )}

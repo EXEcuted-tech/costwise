@@ -102,14 +102,14 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
   return (
     <>
       <div className={`flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]`}>
-        <div className='mx-[50px] 2xl:mx-0 animate-pop-out bg-white w-[1100px] h-[860px] rounded-[20px]'>
+        <div className='mx-[50px] 2xl:mx-0 animate-pop-out bg-white dark:bg-[#3C3C3C] w-[1100px] h-[860px] rounded-[20px]'>
           {/* Title Section */}
           <div className='flex items-center py-[10px] px-[30px]'>
             <div className='mr-[5px]'>
-              <BiSolidFile className='text-[35px] text-[#383838]' />
+              <BiSolidFile className='text-[35px] text-[#383838] dark:text-[#d1d1d1]' />
             </div>
             <div className='flex-grow'>
-              <h1 className='text-[#383838] font-bold text-[35px]'>{dialogType == 0 ? 'File List' : 'Master File List'}</h1>
+              <h1 className='text-[#383838] font-bold text-[35px] dark:text-[#d1d1d1]'>{dialogType == 0 ? 'File List' : 'Master File List'}</h1>
             </div>
             <div className='ml-auto'>
               <IoClose className='text-[60px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out p-0'
@@ -121,11 +121,11 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
           <div className='flex items-center px-[30px] pb-[20px]'>
             <div className={`w-[50%] relative mr-[1%]`}>
               <div className="absolute inset-y-0 left-0 flex items-center pl-2 pointer-events-none">
-                <AiOutlineSearch className="text-[#B0B0B0] text-[22px]" />
+                <AiOutlineSearch className="text-[#B0B0B0] text-[22px] dark:text-[#d1d1d1]" />
               </div>
               <input
                 type="text"
-                className="w-full pl-[35px] pr-[5px] bg-white border border-[#868686] placeholder-text-[#B0B0B0] text-[#5C5C5C] text-[15px] rounded-[5px] py-[3px]"
+                className="w-full pl-[35px] pr-[5px] bg-white dark:bg-[#3C3C3C] border border-[#868686] dark:border-[#5C5C5C] placeholder-text-[#B0B0B0] text-[#5C5C5C] dark:text-[#d1d1d1] text-[15px] rounded-[5px] py-[3px]"
                 placeholder="Search here..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
@@ -170,7 +170,7 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
                 after:h-[0.6px] 
                 after:bg-[#868686]
               `}>
-                <tr className=''>
+                <tr className='dark:bg-[#3C3C3C] dark:text-[#d1d1d1]'>
                   <th className={`${isOpen ? 'pl-[20px] 2xl:pl-[46px]' : 'pl-[46px]'} py-[5px]`}>Title/Name</th>
                   <th className=''>File Type</th>
                   <th className=''>Date Added</th>
@@ -211,16 +211,16 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
                         });
                       const addedBy = settings.user;
                       return (
-                        <tr key={index} className={`${chosen == fileName && 'bg-[#DFEFFD]'} cursor-pointer hover:bg-[#DFEFFD]
+                        <tr key={index} className={`${chosen == fileName && 'bg-[#DFEFFD]'} cursor-pointer hover:bg-[#DFEFFD] dark:hover:bg-[#4d4d4d]
                           ${index !== filteredData.length - 1 && 'border-b-[0.3px] border-[#d9d9d9] '}`}
                           onClick={() => handleSetFile(fileName,data.file_id,data.file_type)}>
                           <td className={`${isOpen ? 'pl-[20px] 2xl:pl-[46px]' : 'pl-[46px]'} py-2`}>
-                            <p className={`${isOpen ? 'text-[16px] 2xl:text-[18px]' : 'text-[18px]'} text-primary`}>{fileLabel}</p>
-                            <p className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}italic text-[#868686]`}>{fileName}</p>
+                            <p className={`${isOpen ? 'text-[16px] 2xl:text-[18px]' : 'text-[18px]'} text-primary dark:text-[#ff4d4d]`}>{fileLabel}</p>
+                            <p className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}italic text-[#868686] dark:text-[#d1d1d1]`}>{fileName}</p>
                           </td>
-                          <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{fileType}</td>
-                          <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{dateAdded}</td>
-                          <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'}`}>{addedBy}</td>
+                          <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'} dark:text-[#d1d1d1]`}>{fileType}</td>
+                          <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'} dark:text-[#d1d1d1]`}>{dateAdded}</td>
+                          <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'} dark:text-[#d1d1d1]`}>{addedBy}</td>
                         </tr>
                       )
                     }))

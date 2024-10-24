@@ -155,9 +155,9 @@ class BomController extends ApiController
         $rules = [
             'materials' => 'required|array|min:1',
             'materials.*.material_id' => 'sometimes',
-            'materials.*.unit' => 'required|string|max:10',
+            'materials.*.unit' => 'required|string|max:50',
             'formulation_id' => 'required|integer|exists:formulations,formulation_id',
-            'formula_code' => 'required|string|max:50',
+            'formula_code' => 'required|string',
         ];
 
         $messages = [
