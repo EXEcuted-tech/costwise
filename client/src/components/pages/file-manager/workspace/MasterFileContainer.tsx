@@ -375,9 +375,9 @@ const MasterFileContainer = (data: File) => {
           });
 
           if (deleteBulkResponse.data.status !== 200) {
-            setAlertMessages(['Failed to bulk delete Fodl IDs.']);
+            setAlertMessages(['Failed to bulk archive Fodl IDs.']);
           } else {
-            setSuccessMessage("FODL records deleted successfully.");
+            setSuccessMessage("FODL records archived successfully.");
           }
         } catch (deleteBulkError) {
           setAlertMessages(['An error occurred while deleting FODL records.']);
@@ -471,10 +471,10 @@ const MasterFileContainer = (data: File) => {
             const deleteResponse = await api.post('/materials/delete_bulk', deletePayload);
 
             if (deleteResponse.data.status === 200) {
-              setSuccessMessage('Material records deleted successfully.');
+              setSuccessMessage('Material records archived successfully.');
               setRemovedFodlIds([]);
             } else {
-              setAlertMessages(['Failed to bulk delete Material IDs.']);
+              setAlertMessages(['Failed to bulk archive Material IDs.']);
             }
           } catch (deleteError) {
             setAlertMessages(['An error occurred while deleting Material records.']);
@@ -690,9 +690,9 @@ const MasterFileContainer = (data: File) => {
             try {
               const deleteMaterialResponse = await api.post('/formulations/delete_material', payload);
               if (deleteMaterialResponse.data.status === 200) {
-                setSuccessMessage(`Materials are deleted successfully.`);
+                setSuccessMessage(`Materials are archived successfully.`);
               } else {
-                setAlertMessages([`Failed to delete materials for formulation_id ${formulation_id}.`]);
+                setAlertMessages([`Failed to archive materials for formulation_id ${formulation_id}.`]);
               }
             } catch (deleteMaterialError) {
               setAlertMessages([`An error occurred while deleting materials for formulation_id ${formulation_id}.`]);
@@ -732,12 +732,12 @@ const MasterFileContainer = (data: File) => {
             });
 
             if (deleteFgResponse.data.status !== 200) {
-              setAlertMessages(['Failed to delete records.']);
+              setAlertMessages(['Failed to archive records.']);
             } else {
-              setSuccessMessage("Finished Goods deleted successfully.");
+              setSuccessMessage("Finished Goods archived successfully.");
             }
           } catch (deleteFgError) {
-            setAlertMessages(['An error occurred while deleting Finished Goods.']);
+            setAlertMessages(['An error occurred while archiving Finished Goods.']);
           }
         }
 

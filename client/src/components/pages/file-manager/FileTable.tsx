@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import { FaEye, FaPencilAlt } from "react-icons/fa";
 import { TiExport } from "react-icons/ti";
-import { IoTrash } from "react-icons/io5";
+import { HiArchiveBoxXMark } from "react-icons/hi2";
 import { useRouter } from 'next/navigation';
 import { FaFileCircleXmark } from "react-icons/fa6";
 import { useFileManagerContext } from '@/contexts/FileManagerContext';
@@ -104,7 +104,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
     const handleDelete = (data: File) => {
         const sysRoles = currentUser?.roles;
         if (!sysRoles?.includes(8)) {
-            setErrorMsg('You are not authorized to delete/archive files.');
+            setErrorMsg('You are not authorized to archive files.');
             return;
         }
         setFileToDelete(data.file_id);
@@ -175,15 +175,15 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
                                                 onClick={() => handleEdit(data)}>
                                                 <FaPencilAlt />
                                             </div>
-                                            <div className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:text-white
+                                            <div className='flex text-[20px] justify-center items-center border-r-1 border-[#868686] h-full dark:text-white
                                         cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out dark:hover:bg-[#4C4C4C]'
                                                 onClick={() => handleExport(data)}>
                                                 <TiExport />
                                             </div>
-                                            <div className='flex justify-center items-center h-full transition-colors duration-200 ease-in-out
+                                            <div className='flex text-[18px] justify-center items-center h-full transition-colors duration-200 ease-in-out
                                         cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px] dark:text-white'
                                                 onClick={() => handleDelete(data)}>
-                                                <IoTrash />
+                                                <HiArchiveBoxXMark />
                                             </div>
                                         </div>
                                     </td>

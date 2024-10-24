@@ -28,7 +28,7 @@ const ConfirmDelete: React.FC<ConfirmDeleteProps> = ({ onClose, onProceed, subje
                             <p>Are You Sure?</p>
                         </div>
                         <div className='text-center text-[20px] text-[#9D9D9D] dark:text-[#d1d1d1] break-words'>
-                            <p>Do you want to delete this {subject}? This process cannot be undone.</p>
+                            <p>Do you want to archive this {subject}? This process cannot be undone.</p>
                         </div>
 
                         {/* Buttons */}
