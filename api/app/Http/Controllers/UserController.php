@@ -110,6 +110,12 @@ class UserController extends ApiController
         return response()->json($users);
     }
 
+    public function getUserRoles(Request $request)
+    {
+        $user = User::findOrFail($request->user_id);
+        return response()->json($user->sys_role);
+    }
+
     public function updateUser(Request $request, $id)
     {
         Log::info("DATA RECEIVED", $request->all());

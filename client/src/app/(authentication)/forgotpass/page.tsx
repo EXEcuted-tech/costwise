@@ -9,6 +9,7 @@ import Spinner from "@/components/loaders/Spinner";
 import { useState } from "react";
 import api from "@/utils/api";
 import EmailSent from "@/components/modals/EmailSent";
+import Alert from "@/components/alerts/Alert";
 
 
 function ForgotPassPage() {
@@ -18,6 +19,9 @@ function ForgotPassPage() {
   const [employeeNum, setemployeeNum] = useState('');
   const [message, setMessage] = useState('');
 
+  const [alertMessages, setAlertMessages] = useState<string[]>([]);
+  const [errors, setErrors] = useState(false);
+
   const [modal, setModal] = useState(false);
   const [access, setAccess] = useState(false);
 
@@ -25,24 +29,63 @@ function ForgotPassPage() {
     e.preventDefault();
     setModal(true);
     setIsLoading(true);
+
+    let errors: string[] = [];
+
+    if (!email) {
+        errors.push("Email address is required.");
+    } else if (!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email)) {
+        errors.push("Please enter a valid email address.");
+    }
+    if (!employeeNum) {
+        errors.push("Employee number is required.");
+    } else if (!/^\d{10}$/.test(employeeNum)) {
+        errors.push("Employee number should be 10 digits.");
+    }
+
+    if (errors.length > 0) {
+        setAlertMessages(errors);
+        setIsLoading(false);
+        return;
+    }
     try {
       const response = await api.post('/password-reset/email', { email, employeeNum });
-      const respo = "Success!";
-      console.log(respo);
       setAccess(true);
       setMessage(response.data.message);
-    } catch (error) {
-      console.error('Error sending reset email:', error);
-      setMessage('Error sending reset email');
+    } catch (error: any) {
+      setIsLoading(false);
+      if (error.response && error.response.data.errors) {
+        const errorMessages = [];
+        for (const key in error.response.data.errors) {
+          if (error.response.data.errors.hasOwnProperty(key)) {
+            errorMessages.push(...error.response.data.errors[key]);
+          }
+          if (key === 'email' || key === 'employeeNum') {
+            setErrors(true);
+          }
+        }
+        setAlertMessages(errorMessages);
+      } else if (error.response && error.response.data.message) {
+        setErrors(true);
+        setAlertMessages([error.response.data.message]);
+      }
+    }finally{
+      setIsLoading(false);
     }
-    setIsLoading(false);
+    
   };
   return (
     <>
       {access && 
         <EmailSent onClose={setAccess} email={email}/>
       }
-
+      <div className="absolute top-0 right-0">
+        {alertMessages && alertMessages.map((msg, index) => (
+          <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+            setAlertMessages(prev => prev.filter((_, i) => i !== index));
+          }} />
+        ))}
+      </div>
       <div className="font-lato animate-pop-out flex h-full max-h-[670px] z-10">
         <div className="bg-primary p-6 flex flex-col items-center rounded-l-3xl py-[90px] px-[45px] 2xl:p-[55px] !z-1">
           <img
@@ -105,7 +148,7 @@ function ForgotPassPage() {
               <div className="h-[15%] xl:h-[10%] items-end flex justify-center w-[100%]">
                   <div className="relative inline-flex bg-primary overflow-hidden text-primary w-[50%] flex items-center justify-center rounded-[30px] h-[70%] xl:h-[70%] xl:w-[50%] cursor-pointer transition-all rounded hover:border-1 hover:border-primary group"
                     >
-                    <button className="flex items-center text-[1em] xl:text-[1.2em] 2xl:text-[1.4em] font-black" type='submit'>
+                    <button className="flex items-center text-[1em] xl:text-[1.2em] 2xl:text-[1.5em] font-black" type='submit'>
                       <span className="w-full h-48 rounded bg-white absolute bottom-0 left-0 translate-x-full ease-out duration-500 transition-all translate-y-full mb-9 ml-9 group-hover:ml-0 group-hover:mb-32 group-hover:translate-x-0"></span>
                       
                       <span className="relative w-full text-left text-white transition-colors duration-300 ease-in-out group-hover:text-primary">

@@ -15,8 +15,9 @@ class PasswordResetController extends Controller
 {
     public function sendResetLinkEmail(Request $request)
     {
-
-        $user = User::where('email_address', $request->email)->first();
+        $user = User::where('email_address', $request->email)
+                    ->where('employee_number', $request->employeeNum)
+                    ->first();
 
         if (!$user) {
             return response()->json(['message' => 'User not found'], 404);
@@ -50,24 +51,19 @@ class PasswordResetController extends Controller
             'email' => 'required|email|exists:users,email_address',
             'password' => 'required|string|min:8|confirmed',
         ]);
-
         
         $receivedToken = $request->input('token');
 
-        \Log::info('Received Token: ' . $receivedToken);
-
-        // $token = PersonalAccessToken::findToken($receivedToken);
         $token = PersonalAccessToken::where('token', hash('sha256', $receivedToken))
                                 ->first();
-        if ($token) {
-            \Log::info('Token from database (plain): ' . $token->token);
-            \Log::info('Token details from database: ', $token->toArray());
-        } else {
-            \Log::info('No token found in database for the provided token.');
-        }
         
         if (!$token) {
             return response()->json(['message' => 'Invalid or expired token'], 400);
+        }
+
+        $tokenExpiration = 60;
+        if ($token->created_at->addMinutes($tokenExpiration)->isPast()) {
+            return response()->json(['message' => 'Token has expired'], 400);
         }
 
         $user = $token->tokenable;
@@ -86,27 +82,5 @@ class PasswordResetController extends Controller
         $token->delete();
 
         return response()->json(['message' => 'Password has been reset successfully.']);
-        // $request->validate([
-        //     'token' => 'required',
-        //     'email' => 'required|email|exists:users,email_address',
-        //     'password' => 'required|string|confirmed',
-        // ]);
-        
-        // $resetRequest = DB::table('password_resets_token')
-        //     ->where('token', $request->token)
-        //     ->where('email', $request->email)
-        //     ->first();
-
-        // if (!$resetRequest) {
-        //     return response()->json(['message' => 'Invalid token or email'], 400);
-        // }
-
-        // $user = User::where('email_address', $request->email)->first();
-        // $user->password = bcrypt($request->password);
-        // $user->save();
-
-        // DB::table('password_resets_token')->where('email', $request->email)->delete();
-
-        // return response()->json(['message' => 'Password successfully reset']);
     }
 }

@@ -4,7 +4,7 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { BsPersonLock } from 'react-icons/bs';
 import { IoClose, IoCamera } from "react-icons/io5";
 import { RiFolderUserFill } from "react-icons/ri";
-import AddUserRoles, { CheckboxState } from '../pages/user-management/addUserRoles';
+import AddUserRoles, { CheckboxState } from '@/components/pages/user-management/AddUserRoles';
 import Image from 'next/image';
 import config from '@/server/config';
 import api from '@/utils/api';
@@ -31,7 +31,12 @@ const getRoleName = (roleId: number): string => {
         9: 'View Formula',
         10: 'Upload Formula',
         11: 'Edit Formula',
-        12: 'Archive Formula'
+        12: 'Archive Formula',
+        13: 'View Event',
+        14: 'Create Event',
+        15: 'Edit Event',
+        16: 'Archive Event',
+        17: 'Export File/Record'
     };
     return roleNames[roleId] || 'Unknown Role';
 };

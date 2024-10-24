@@ -5,8 +5,9 @@ import { IoIosClose } from "react-icons/io";
 import api from '@/utils/api';
 import { useSearchParams, useParams } from 'next/navigation';
 import { useUserContext } from '@/contexts/UserContext';
-import { Spinner } from '@nextui-org/react';
 import PasswordChangeComplete from '@/components/modals/PasswordChangeComplete';
+import Alert from '@/components/alerts/Alert';
+import Spinner from '@/components/loaders/Spinner';
 
 
 const PasswordReset = () => {
@@ -16,6 +17,8 @@ const PasswordReset = () => {
     const [isLoading, setIsLoading] = useState(false);
     const [access, setAccess] = useState(false);
     const [modal, setModal] = useState(false);
+    const [alertMessages, setAlertMessages] = useState<string[]>([]);
+    
     const { currentUser } = useUserContext();
 //   const router = useRouter();
 //   const { token } = router.query;
@@ -29,6 +32,24 @@ const PasswordReset = () => {
     e.preventDefault();
     setIsLoading(true);
     try {
+
+      let errors: string[] = [];
+
+        if (!password) {
+            errors.push("Password is required.");
+        }
+        if (!passwordConfirmation) {
+            errors.push("Confirm Password is required.");
+        }else if (password != passwordConfirmation){
+            errors.push("Please make sure your passwords match.");
+        }
+    
+        if (errors.length > 0) {
+            setAlertMessages(errors);
+            setIsLoading(false);
+            return;
+        }
+
       const response = await api.post('/password-reset/reset' , {
         token: token as string,
         email: email,
@@ -45,6 +66,13 @@ const PasswordReset = () => {
   return (
     <>
       {access && <PasswordChangeComplete />}
+      <div className="absolute top-0 right-0">
+        {alertMessages && alertMessages.map((msg, index) => (
+          <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+            setAlertMessages(prev => prev.filter((_, i) => i !== index));
+          }} />
+        ))}
+      </div>
       <div className='flex flex-col animate-pop-out bg-white w-[550px] h-auto pb-[30px] rounded-[20px] px-[10px] gap-5'>
       <div className='flex justify-center'>
           <h1 className='font-black text-[30px] mt-[20px]'>Password Change</h1>
