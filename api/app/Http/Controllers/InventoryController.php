@@ -263,6 +263,7 @@ class InventoryController extends ApiController
             }
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
+
         }
     }
 

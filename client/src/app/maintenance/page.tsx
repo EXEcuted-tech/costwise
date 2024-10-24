@@ -16,6 +16,7 @@ import { ReleaseNote, User } from '@/types/data';
 import Alert from '@/components/alerts/Alert';
 import Spinner from '@/components/loaders/Spinner';
 import Loader from '@/components/loaders/Loader';
+import { PiNewspaperLight } from "react-icons/pi";
 
 const SystemMaintenance = () => {
     const { isOpen } = useSidebarContext();
@@ -53,10 +54,12 @@ const SystemMaintenance = () => {
                 if (response.status === 200) {
                     setReleaseNotes(response.data.data);
                     setFilteredReleaseNotes(response.data.data);
+                } else {
+                    setAlertMessages(["Failed to retrieve release notes"]);
+                    setAlertStatus("critical");
                 }
             } catch (error) {
-                setAlertMessages(["Failed to retrieve release notes"]);
-                setAlertStatus("error");
+                console.error('Error retrieving release notes:', error);
             }
         }
 
@@ -120,8 +123,7 @@ const SystemMaintenance = () => {
                 {/* Info Tiles */}
                 <div className='flex mx-16 mt-12 mb-9 gap-[5rem] justify-center'>
                     {/* Database Storage */}
-
-                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]'} flex flex-col p-4 h-[17rem] bg-white rounded-lg drop-shadow-lg`}>
+                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]'} flex flex-col p-4 h-[17rem] bg-white rounded-lg drop-shadow-lg hover:animate-shrink-in2`}>
                         <div className='flex flex-col mb-8'>
                             <div className='flex'>
                                 {isLoading ? <Loader className='h-12 w-[2rem]'/>
@@ -145,7 +147,7 @@ const SystemMaintenance = () => {
                     </div>
 
                     {/* Files */}
-                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]'} flex flex-col p-4 h-[17rem] bg-white rounded-lg drop-shadow-lg`}>
+                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]'} flex flex-col p-4 h-[17rem] bg-white rounded-lg drop-shadow-lg hover:animate-shrink-in2`}>
                         <div className='flex flex-col mb-8'>
                             <div className='flex'>
                                 {isLoading ? <Loader className='h-12 w-[2rem]'/>
@@ -255,8 +257,9 @@ const SystemMaintenance = () => {
                                 />
                             ))}
                             {currentListPage.length === 0 && (
-                                <div className="text-center text-gray-500 mt-8">
-                                    No release notes found matching your search.
+                                <div className="text-center  items-center justify-items-center text-[#555555] mt-20">
+                                    <PiNewspaperLight className='text-[80px] mb-4' />
+                                    <p className='text-[20px]'>No release notes found matching your search.</p>
                                 </div>
                             )}
                         </div>

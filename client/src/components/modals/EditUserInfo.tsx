@@ -208,7 +208,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
         setAlertStatus('critical');
 
         const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        const phoneRegex = /^(\+?[0-9]{1,4})?\s?-?[0-9]{10}$/;
+        const phoneRegex = /^\+63\s?9\d{9}$/;
 
         // Reset errors
         setFirstNameError(false);

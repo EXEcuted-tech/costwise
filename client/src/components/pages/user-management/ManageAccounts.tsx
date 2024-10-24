@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { MdModeEdit } from "react-icons/md";
 import { FaTrashAlt } from "react-icons/fa";
 import EditUserInfo from '@/components/modals/EditUserInfo';
-import ConfirmDelete from '@/components/modals/ConfirmDelete';
+import { FaUserLargeSlash } from "react-icons/fa6";
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import { User } from '@/types/data';
 import Spinner from '@/components/loaders/Spinner';
@@ -92,7 +92,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                         <tbody>
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={7} className="text-center py-6">
+                                    <td colSpan={7} className="text-center pt-[15rem]">
                                         <div className='flex justify-center items-center'>
                                             <Spinner />
                                         </div>
@@ -101,7 +101,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                             ) : fileData.length > 0 ? (
                                 currentListPage.map((data, index) => (
                                     <tr key={index} className={`${isOpen ? 'text-[1.1em] 4xl:text-[1.1em] 3xl:text-[0.9em] 2xl:text-[0.8em] xl:text-[0.7em]' : 'text-[1.2em] 4xl:text-[1.2em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[1em]'} border-b border-[#868686] hover:bg-gray-50`}>
-                                        <td className={`${isOpen ? 'pl-[2rem]' : 'pl-8 xl:pl-6'} break-words capitalize`}>{data.first_name} {data.last_name}</td>
+                                        <td className={`${isOpen ? 'pl-[2rem]' : 'pl-8 xl:pl-6'} break-words capitalize`}>{data.first_name} {data.middle_name} {data.last_name}</td>
                                         <td className="py-5 break-words capitalize">{data.position}</td>
                                         <td className="py-4 break-words">{data.email_address}</td>
                                         <td className="py-4 break-words">{data.phone_number}</td>
@@ -125,8 +125,9 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={7} className="text-center py-8">
-                                        No users to display.
+                                    <td colSpan={7} className="text-center items-center justify-items-center font-semibold pt-[13rem] text-[#555555]">
+                                        <FaUserLargeSlash className='text-[85px] mb-4' />
+                                        <p className='text-[20px]'>No users to display.</p>
                                     </td>
                                 </tr>
                             )}
