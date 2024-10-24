@@ -314,17 +314,17 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
             setAlertMessages([response.data.message]);
             setAlertStatus('success');
             const fullName = `${user.first_name} ${user.last_name}`;
+            
+            const userRetrieved = localStorage.getItem('currentUser');
+            const parsedUser = JSON.parse(userRetrieved || '{}');
+
             const auditData = {
-                userId: currentUser?.userId, 
+                userId: parsedUser?.userId, 
                 action: 'general',
                 act: 'edit_user',
                 fileName: fullName
             };
-            if (currentUser) {
-            console.log('Current User ID:', currentUser?.userId);
-            } else {
-                console.log('Current User is not defined.', currentUser);
-            }
+
             api.post('/auditlogs/logsaudit', auditData)
             .then(response => {
                 console.log('Audit log created successfully:', response.data);
@@ -364,9 +364,9 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
     }
 
     return (
-        <div className='flex justify-center items-center z-[1000] w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)]'>
+        <div className='flex justify-center items-center z-[199999] w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)]'>
             
-            <div className='absolute top-0 right-0'>
+            <div className='absolute top-0 right-0 z-[9999]'>
                 {alertMessages && alertMessages.map((msg, index) => (
                 <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
                     setAlertMessages(prev => prev.filter((_, i) => i !== index));

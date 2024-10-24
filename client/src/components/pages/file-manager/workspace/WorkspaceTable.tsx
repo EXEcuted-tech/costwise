@@ -279,7 +279,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                     </div>
                 }
                 <table className={`${isEdit && 'mt-[50px]'} w-full bg-white border-collapse`}>
-                    <thead className='bg-primary text-white'>
+                    <thead className='bg-primary text-white dark:border-[#5C5C5C]'>
                         <tr>
                             {isEdit && <th className="w-[10px]"></th>}
 
@@ -306,7 +306,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                                         //     </th>
                                         //     :
                                         <th key={key} className={`animate-zoomIn ${key == 'level' || key === 'formulation' || key == 'year' || key == 'month' ? 'text-center' : (key === 'materialCost' || key === 'amount' || key === 'quantity' || key === 'factoryOverhead' || key === 'directLabor') ? 'text-right' : 'text-left'} 
-                                                        whitespace-nowrap font-medium text-[20px] py-2 px-6 border-b border-gray-300`}>
+                                                        whitespace-nowrap font-medium text-[20px] py-2 px-6 border-b border-gray-300 dark:border-[#5C5C5C]`}>
                                             {formatHeader(key)}
                                         </th>
                                     );
@@ -318,8 +318,8 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                             ?
                             tableData.map((row, rowIndex) => (
                                 <tr key={rowIndex} className="animate-pull-down">
-                                    <td className="text-center border-t border-b border-gray-300">
-                                        <IoTrash className="ml-[5px] text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-250 ease-in-out"
+                                    <td className="text-center border-t border-b border-gray-300 dark:bg-[#3C3C3C] dark:border-[#5C5C5C]">
+                                        <IoTrash className="ml-[5px] text-[#717171] dark:text-[#d1d1d1] text-[25px] cursor-pointer hover:text-red-700 dark:hover:text-red-500 transition-colors duration-250 ease-in-out"
                                             onClick={() => {
                                                 console.log(row);
                                                 if (removedIds) {
@@ -364,7 +364,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                                                     key={key}
                                                     className={`
                                             py-2 px-6 
-                                            border-t border-b border-gray-300
+                                            border-t border-b border-gray-300 dark:bg-[#3C3C3C] dark:border-[#5C5C5C]
                                             ${colIndex === 0 ? 'border-l-0' : ''}
                                             ${colIndex === Object.keys(row).length - 1 ? 'border-r-0' : ''}
                                           `}
@@ -374,7 +374,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                                                         onChange={(e) => handleInputChange(rowIndex, key, e.target.value)}
                                                         value={displayValue}
                                                         readOnly={isReadOnly}
-                                                        className={`${isTransaction ? 'w-auto' : 'w-full'} ${textAlignClass} animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                        className={`${isTransaction ? 'w-auto' : 'w-full'} ${textAlignClass} animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] dark:border-[#5C5C5C] bg-[#F9F9F9] dark:bg-[#3C3C3C] text-[20px] text-[#090909] dark:text-[#d1d1d1] px-[5px]`}
                                                     />
                                                 </td>
                                             );
@@ -383,7 +383,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                             ))
                             :
                             tableData.map((row, rowIndex) => (
-                                <tr key={rowIndex} className="border border-gray-300 w-full">
+                                <tr key={rowIndex} className="border border-gray-300 dark:bg-[#3C3C3C] dark:border-[#5C5C5C] dark:text-[#d1d1d1] w-full">
                                     {Object.entries(row) && Object.entries(row)
                                         .filter(([key]) =>
                                             !key.toLowerCase().includes('id') &&
@@ -402,7 +402,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                                             py-2 px-6 
                                             text-[20px] 
                                             ${textAlignClass} 
-                                            border-l border-r border-gray-300
+                                            border-l border-r border-gray-300 dark:border-[#5C5C5C]
                                             ${colIndex === 0 ? 'border-l-0' : ''}
                                             ${colIndex === Object.keys(row).length - 1 ? 'border-r-0' : ''}
                                             whitespace-nowrap

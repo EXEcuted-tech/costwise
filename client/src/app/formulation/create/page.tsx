@@ -184,11 +184,11 @@ const AddFormulationPage = () => {
             </div>
             <Header icon={HiClipboardList} title={"Formulations"} />
             <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
-                <div className='bg-white rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[25px]'>
+                <div className='bg-white dark:bg-[#3c3c3c] rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[25px]'>
                     <div className='flex items-center py-[10px]'>
-                        <IoIosArrowRoundBack className='text-primary text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] transition-colors duration-300 ease-in-out cursor-pointer'
+                        <IoIosArrowRoundBack className='text-primary dark:text-white text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] transition-colors duration-300 ease-in-out cursor-pointer'
                             onClick={handleBack} />
-                        <h1 className='font-bold text-[28px] text-primary'>
+                        <h1 className='font-bold text-[28px] text-primary dark:text-white'>
                             Add Formulation
                         </h1>
                     </div>
@@ -225,26 +225,26 @@ const AddFormulationPage = () => {
                         <table className='table-auto w-full border-collapse'>
                             <thead>
                                 <tr>
-                                    <th className='text-left animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Formula</th>
-                                    <th className='text-center animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Level</th>
-                                    <th className='text-left animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Item Code</th>
-                                    <th className='text-left animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Description</th>
-                                    <th className='text-center animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Formulation</th>
-                                    <th className='text-right animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Batch Qty</th>
-                                    <th className='text-left animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]'>Unit</th>
+                                    <th className='text-left animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC] dark:text-[#d1d1d1] dark:border-[#5C5C5C]'>Formula</th>
+                                    <th className='text-center animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC] dark:text-[#d1d1d1] dark:border-[#5C5C5C]'>Level</th>
+                                    <th className='text-left animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC] dark:text-[#d1d1d1] dark:border-[#5C5C5C]'>Item Code</th>
+                                    <th className='text-left animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC] dark:text-[#d1d1d1] dark:border-[#5C5C5C]'>Description</th>
+                                    <th className='text-center animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC] dark:text-[#d1d1d1] dark:border-[#5C5C5C]'>Formulation</th>
+                                    <th className='text-right animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC] dark:text-[#d1d1d1] dark:border-[#5C5C5C]'>Batch Qty</th>
+                                    <th className='text-left animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC] dark:text-[#d1d1d1] dark:border-[#5C5C5C]'>Unit</th>
                                 </tr>
                             </thead>
                             <tbody>
                                 {formulaData && (
                                     <>
-                                        <tr className='animate-zoomIn text-center font-bold text-black text-[18px] border-b border-[#ACACAC]'>
+                                        <tr className='animate-zoomIn text-center font-bold text-black text-[18px] border-b border-[#ACACAC] dark:text-[#d1d1d1] dark:border-[#5C5C5C]'>
                                             <td className='py-[10px] px-6 text-left'>
                                                 {add ? (
                                                     <input
                                                         type="text"
                                                         onChange={(e) => handleInputChange(0, 'formula', e.target.value)}
                                                         value={formulaData[0]?.formula || ''}
-                                                        className={`text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[160px]`}
+                                                        className={`text-left animate-zoomIn transition-all duration-400 ease-in-out dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1] border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[160px]`}
                                                     />
                                                 ) : (
                                                     <span>{formulaData[0]?.formula || ''}</span>
@@ -257,7 +257,7 @@ const AddFormulationPage = () => {
                                                         type="text"
                                                         onChange={(e) => handleInputChange(0, 'itemCode', e.target.value)}
                                                         value={formulaData[0]?.itemCode || ''}
-                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                     />
                                                 ) : (
                                                     <span className='text-left'>{formulaData[0]?.itemCode || ''}</span>
@@ -269,7 +269,7 @@ const AddFormulationPage = () => {
                                                         type="text"
                                                         onChange={(e) => handleInputChange(0, 'description', e.target.value)}
                                                         value={formulaData[0]?.description || ''}
-                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                        className="text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                     />
                                                 ) : (
                                                     <span>{formulaData[0]?.description}</span>
@@ -281,7 +281,7 @@ const AddFormulationPage = () => {
                                                         type="text"
                                                         onChange={(e) => handleInputChange(0, 'formulation', e.target.value)}
                                                         value={formulaData[0]?.formulation || ''}
-                                                        className={`mx-[5px] text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[80px]`}
+                                                        className={`mx-[5px] text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[80px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
                                                     />
                                                 ) : (
                                                     <span>{formulaData[0]?.formulation || ''}</span>
@@ -293,7 +293,7 @@ const AddFormulationPage = () => {
                                                         type="text"
                                                         onChange={(e) => handleInputChange(0, 'batchQty', e.target.value)}
                                                         value={Number(formulaData[0]?.batchQty).toFixed(2) ?? ''}
-                                                        className={`text-right animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                        className={`text-right animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
                                                     />
                                                 ) : (
                                                     <span>{Number(formulaData[0]?.batchQty).toFixed(2) ?? ''}</span>
@@ -305,7 +305,7 @@ const AddFormulationPage = () => {
                                                         type="text"
                                                         onChange={(e) => handleInputChange(0, 'unit', e.target.value)}
                                                         value={formulaData[0]?.unit || ''}
-                                                        className={`w-full text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[110px]`}
+                                                        className={`w-full text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[110px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
                                                     />
                                                 ) : (
                                                     <span>{formulaData[0]?.unit}</span>
@@ -314,10 +314,10 @@ const AddFormulationPage = () => {
                                         </tr>
 
                                         {formulaData.slice(1).map((item, index) => (
-                                            <tr key={index + 1} className={`${(index + 1) % 2 === 1 && 'bg-[#FCF7F7]'} animate-zoomIn text-center font-medium text-[#6B6B6B] text-[18px]`}>
+                                            <tr key={index + 1} className={`${(index + 1) % 2 === 1 && 'bg-[#FCF7F7] dark:bg-[#4c4c4c]'} animate-zoomIn text-center font-medium text-[#6B6B6B] text-[18px] dark:text-white`}>
                                                 <td className='flex justify-center items-center py-[15px]'>
                                                     {add ? (
-                                                        <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-300 ease-in-out"
+                                                        <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-300 ease-in-out dark:text-[#d1d1d1] dark:hover:text-red-500"
                                                             onClick={() => removeRow(index + 1)} />
                                                     ):(<td></td>)}
                                                 </td>
@@ -327,7 +327,7 @@ const AddFormulationPage = () => {
                                                             type="text"
                                                             onChange={(e) => handleInputChange(index + 1, 'level', e.target.value)}
                                                             value={item.level || ''}
-                                                            className="w-full text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[60px]"
+                                                            className="w-full text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[60px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                         />
                                                     ) : (
                                                         <span>{item.level || ''}</span>
@@ -340,7 +340,7 @@ const AddFormulationPage = () => {
                                                                 type="text"
                                                                 onChange={(e) => handleInputChange(index + 1, 'itemCode', e.target.value)}
                                                                 value={item.itemCode || ''}
-                                                                className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                                className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                             />
                                                         ) : (
                                                             <span>{item.itemCode || ''}</span>
@@ -353,7 +353,7 @@ const AddFormulationPage = () => {
                                                             type="text"
                                                             onChange={(e) => handleInputChange(index + 1, 'description', e.target.value)}
                                                             value={item.description || ''}
-                                                            className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                            className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                         />
                                                     ) : (
                                                         <span>{item.description}</span>
@@ -372,7 +372,7 @@ const AddFormulationPage = () => {
                                                                 }
                                                             }}
                                                             value={item.batchQty !== undefined && item.batchQty !== null ? Number(item.batchQty).toFixed(2) : ''}
-                                                            className="w-full text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                            className="w-full text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                         />
                                                     ) : (
                                                         <span>{item.batchQty !== undefined && item.batchQty !== null ? Number(item.batchQty).toFixed(2) : ''}</span>
@@ -384,7 +384,7 @@ const AddFormulationPage = () => {
                                                             type="text"
                                                             onChange={(e) => handleInputChange(index + 1, 'unit', e.target.value)}
                                                             value={item.unit || ''}
-                                                            className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[100px]"
+                                                            className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[100px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                         />
                                                     ) : (
                                                         <span>{item.unit}</span>

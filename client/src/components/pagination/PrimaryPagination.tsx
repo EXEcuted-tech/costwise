@@ -19,7 +19,7 @@ interface PrimaryPaginationProps {
 
 const PrimaryPagination:React.FC<PrimaryPaginationProps> = ({ data = [], itemsPerPage, handlePageChange, currentPage }) => {
   return (
-    <div className='flex flex-col justify-center items-center'>
+    <div className='flex flex-col justify-center items-center dark:text-white'>
       <ThemeProvider theme={theme}>
         <Pagination
           count={Math.ceil(data.length / itemsPerPage)}
@@ -31,7 +31,7 @@ const PrimaryPagination:React.FC<PrimaryPaginationProps> = ({ data = [], itemsPe
           onChange={handlePageChange}
           page={currentPage}
         />
-        <div className="text-[#969696] text-xs">
+        <div className="text-[#969696] text-xs dark:text-white">
           Page {currentPage} of {Math.ceil(data.length / itemsPerPage)}
         </div>
       </ThemeProvider>

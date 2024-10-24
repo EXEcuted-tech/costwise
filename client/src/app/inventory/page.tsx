@@ -13,7 +13,8 @@ import api from '@/utils/api';
 import { InventoryType } from '@/types/data';
 import Alert from '@/components/alerts/Alert';
 import ConfirmDeleteInventory from '@/components/modals/ConfirmDeleteInventory';
-import { Spinner } from '@nextui-org/react';
+import Spinner from '@/components/loaders/Spinner';
+import { useUserContext } from '@/contexts/UserContext';
 
 const Inventory = () => {
     const { isOpen } = useSidebarContext();
@@ -30,6 +31,7 @@ const Inventory = () => {
     const [selectedMonth, setSelectedMonth] = useState<string>('');
     const [inventoryList, setInventoryList] = useState<InventoryType[][]>([]);
     const currentMonthInventory = inventoryList.find(monthData => monthData[0]?.month_year === selectedMonth) || [];
+    const { currentUser } = useUserContext();
 
     // Search & Filter
     const [searchTerm, setSearchTerm] = useState('');
@@ -38,7 +40,13 @@ const Inventory = () => {
 
     // Modals
     const openImportInventoryListModal = () => {
-        setImportInventoryListModalOpen(true);
+        const sysRoles = currentUser?.roles;
+        if (sysRoles?.includes(6)) {
+            setImportInventoryListModalOpen(true);
+        } else {
+            setAlertMessages(['You are not authorized to import inventory files.']);
+            setAlertStatus('critical');
+        }
     }
 
     const closeImportInventoryListModal = () => {
@@ -54,6 +62,12 @@ const Inventory = () => {
     };
 
     const openDeleteModal = () => {
+        const sysRoles = currentUser?.roles;
+        if (!sysRoles?.includes(8)) {
+            setAlertMessages(['You are not authorized to delete/archive files.']);
+            setAlertStatus('critical');
+            return;
+        }
         setIsDeleteModalOpen(true);
     };
 
@@ -68,8 +82,8 @@ const Inventory = () => {
 
     const convertMonthYear = (monthYear: string[]): { display: string; value: string }[] => {
         const months = ["January", "February", "March", "April", "May", "June", "July", "August",
-             "September", "October", "November", "December"];
-        
+            "September", "October", "November", "December"];
+
         return monthYear.map(date => {
             const [year, monthNumber] = date.split('-');
             const monthIndex = parseInt(monthNumber, 10) - 1;
@@ -81,7 +95,7 @@ const Inventory = () => {
     }
 
     // Retrieve inventory list
-     useEffect(() => {
+    useEffect(() => {
         const fetchInventoryLists = async () => {
             try {
                 const response = await api.get('/inventory/lists');
@@ -117,15 +131,15 @@ const Inventory = () => {
 
                     } else {
                         setAlertMessages(['Error retrieving inventory lists.']);
-                        setAlertStatus('error');
+                        setAlertStatus('critical');
                     }
                 } else {
                     setAlertMessages(['No data retrieved.']);
-                    setAlertStatus('error');
+                    setAlertStatus('critical');
                 }
             } catch (error) {
                 setAlertMessages(['Error retrieving inventory lists.']);
-                setAlertStatus('error');
+                setAlertStatus('critical');
                 setIsLoading(false);
             }
         };
@@ -134,7 +148,7 @@ const Inventory = () => {
 
     useEffect(() => {
         if (monthOptions.length > 0 && !selectedMonth) {
-            setSelectedMonth(monthOptions[0].value); 
+            setSelectedMonth(monthOptions[0].value);
             setCurrentIndex(0);
         }
     }, [monthOptions]);
@@ -159,22 +173,22 @@ const Inventory = () => {
     const filteredAndSearchedInventory = currentMonthInventory.filter((item) => {
         const matchesSearch = item.material_code.toLowerCase().includes(searchTerm.toLowerCase()) ||
             item.material_desc.toLowerCase().includes(searchTerm.toLowerCase());
-            
-        const matchesCategory = filterCategory === '' || filterCategory === 'all' || 
+
+        const matchesCategory = filterCategory === '' || filterCategory === 'all' ||
             item.material_category === filterCategory;
-            
-        const matchesStatus = filterStatus === '' || filterStatus === 'all' || 
+
+        const matchesStatus = filterStatus === '' || filterStatus === 'all' ||
             (filterStatus === 'in-stock' && item.stock_status === 'In Stock') ||
             (filterStatus === 'low-stock' && item.stock_status === 'Low Stock');
-    
+
         return matchesSearch && matchesCategory && matchesStatus;
     });
 
     // Month Pagination
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
-        };
-    
+    };
+
     const handleMonthSelect = (month: string) => {
         setSelectedMonth(month);
         const newIndex = monthOptions.findIndex(option => option.value === month);
@@ -182,7 +196,7 @@ const Inventory = () => {
         setCurrentPage(1);
         closeMonthSelectorModal();
     };
-    
+
     const handlePreviousMonth = () => {
         if (currentIndex > 0) {
             const newIndex = currentIndex - 1;
@@ -191,7 +205,7 @@ const Inventory = () => {
             setCurrentPage(1);
         }
     };
-        
+
     const handleNextMonth = () => {
         if (currentIndex < monthOptions.length - 1) {
             const newIndex = currentIndex + 1;
@@ -219,14 +233,16 @@ const Inventory = () => {
                 <ImportInventoryList onClose={closeImportInventoryListModal} />
             }
 
-            {isDeleteModalOpen && <ConfirmDeleteInventory inventoryList={currentMonthInventory} monthYear={selectedMonth} onClose={closeDeleteModal}/>}
+            {isDeleteModalOpen && <ConfirmDeleteInventory inventoryList={currentMonthInventory} monthYear={selectedMonth} onClose={closeDeleteModal} />}
 
-            <div className='absolute top-0 right-0'>
-            {alertMessages && alertMessages.map((msg, index) => (
-            <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
-                setAlertMessages(prev => prev.filter((_, i) => i !== index));
-            }} />
-                ))}
+            <div className="fixed top-4 right-4 z-50">
+                <div className="flex flex-col items-end space-y-2">
+                    {alertMessages && alertMessages.map((msg, index) => (
+                        <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
+                            setAlertMessages(prev => prev.filter((_, i) => i !== index));
+                        }} />
+                    ))}
+                </div>
             </div>
 
             <div className='w-full'>
@@ -312,20 +328,20 @@ const Inventory = () => {
                             </select>
 
                             {/* Action Buttons */}
-                            <button 
+                            <button
                                 className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[7rem] px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
                                 onClick={openImportInventoryListModal}
                             >
-                                <span><CiImport className='w-[30px] h-[22px]'/></span>
+                                <span><CiImport className='w-[30px] h-[22px]' /></span>
                                 <span className='font-semibold'>Import</span>
                             </button>
-                            <button 
+                            <button
                                 className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
                                 onClick={openDeleteModal}
                             >
                                 <IoTrash className="text-[25px] transition-colors duration-250 ease-in-out" />
                             </button>
-                            
+
                         </div>
                     </div>
 
@@ -345,40 +361,40 @@ const Inventory = () => {
                                 {isLoading ? (
                                     <tr>
                                         <td colSpan={7} className="text-center py-6">
-                                            <Spinner color="danger" size="lg" label="Loading..." />
+                                            <Spinner />
                                         </td>
                                     </tr>
                                 ) : currentPageItems.length > 0 ? (
-                                        currentPageItems.map((data, index) => (
-                                            <tr key={index} className={`${isOpen ? '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[18px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[20px] 2xl:text-[20px] xl:text-[16px]'} text-[20px] text-black text-center border-b border-[#ACACAC] hover:bg-gray-50`}>
-                                                <td className='w-[18rem] py-4 text-left pl-8'>{data.material_code}</td>
-                                                <td className='break-words'>{data.material_desc}</td>
-                                                <td>{data.unit}</td>
-                                                <td className='w-[10%] text-right pr-6'>{numberWithCommas(data.purchased_qty)}</td>
-                                                <td className='text-right pr-6 font-semibold'>{numberWithCommas(data.total_qty)}</td>
-                                                <td className='text-right pr-6'>{numberWithCommas(data.usage_qty)}</td>
-                                                <td>
-                                                    <div className='flex justify-center'>
-                                                        <p
-                                                            className={`${data.stock_status === 'In Stock'
-                                                                ? 'text-[#00930F] bg-[#9EE29E]'
-                                                                : 'text-primary bg-[#F5BABA]'
-                                                                } rounded-2xl w-[9rem]`}
-                                                        >
-                                                            {data.stock_status}
-                                                        </p>
-                                                    </div>
-                                                </td>
-                                            </tr>
-                                        ))
-                                    ) : (
-                                        <tr>
-                                            <td colSpan={columnNames.length} className='text-center py-10 text-[#555555]'>
-                                                No items found.
+                                    currentPageItems.map((data, index) => (
+                                        <tr key={index} className={`${isOpen ? '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[18px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[20px] 2xl:text-[20px] xl:text-[16px]'} text-[20px] text-black text-center border-b border-[#ACACAC] hover:bg-gray-50`}>
+                                            <td className='w-[18rem] py-4 text-left pl-8'>{data.material_code}</td>
+                                            <td className='break-words'>{data.material_desc}</td>
+                                            <td>{data.unit}</td>
+                                            <td className='w-[10%] text-right pr-6'>{numberWithCommas(data.purchased_qty)}</td>
+                                            <td className='text-right pr-6 font-semibold'>{numberWithCommas(data.total_qty)}</td>
+                                            <td className='text-right pr-6'>{numberWithCommas(data.usage_qty)}</td>
+                                            <td>
+                                                <div className='flex justify-center'>
+                                                    <p
+                                                        className={`${data.stock_status === 'In Stock'
+                                                            ? 'text-[#00930F] bg-[#9EE29E]'
+                                                            : 'text-primary bg-[#F5BABA]'
+                                                            } rounded-2xl w-[9rem]`}
+                                                    >
+                                                        {data.stock_status}
+                                                    </p>
+                                                </div>
                                             </td>
                                         </tr>
-                                    )
-                                    
+                                    ))
+                                ) : (
+                                    <tr>
+                                        <td colSpan={columnNames.length} className='text-center py-10 text-[#555555]'>
+                                            No items found.
+                                        </td>
+                                    </tr>
+                                )
+
                                 }
                             </tbody>
                         </table>

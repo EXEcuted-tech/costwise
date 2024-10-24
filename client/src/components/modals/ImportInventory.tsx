@@ -146,17 +146,16 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
             
             setTimeout(function(){location.reload()}, 1000);
 
+            const user = localStorage.getItem('currentUser');
+            const parsedUser = JSON.parse(user || '{}');
+
             const auditData = {
-                userId: currentUser?.userId, 
+                userId: parsedUser?.userId, 
                 action: 'crud',
                 act: 'edit',
                 fileName: fileName,
             };
-            if (currentUser) {
-            console.log('Current User ID:', currentUser?.userId);
-            } else {
-                console.log('Current User is not defined.', currentUser);
-            }
+
             api.post('/auditlogs/logsaudit', auditData)
             .then(response => {
                 console.log('Audit log created successfully:', response.data);

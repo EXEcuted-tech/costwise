@@ -14,6 +14,7 @@ import Loader from '@/components/loaders/Loader';
 import Alert from '@/components/alerts/Alert';
 import { FaRegCalendarDays } from "react-icons/fa6";
 import { useUserContext } from '@/contexts/UserContext';
+import WkspConfirmDialog from '@/components/modals/WkspConfirmDialog';
 
 const FormulationTable: React.FC<{
     setView: React.Dispatch<React.SetStateAction<boolean>>;
@@ -38,141 +39,121 @@ const FormulationTable: React.FC<{
         const [monthYear, setMonthYear] = useState<number>(202401);
 
         useEffect(() => {
+            const retrieveFormulationData = async (formulationId: number) => {
+                setIsLoading(true);
+                try {
+                    const formulationResponse = await api.get('/formulations/retrieve', {
+                        params: { col: 'formulation_id', value: formulationId },
+                    });
+
+                    if (formulationResponse.data.status !== 200) {
+                        throw new Error("Failed to fetch formulation data");
+                    }
+
+                    const formulation = formulationResponse.data.data[0];
+                    const finishedGoodResponse = await api.get('/finished_goods/retrieve', {
+                        params: { col: 'fg_id', value: formulation.fg_id },
+                    });
+
+                    if (finishedGoodResponse.data.status !== 200) {
+                        throw new Error("Failed to fetch finished good data");
+                    }
+
+                    const finishedGood = finishedGoodResponse.data.data[0];
+                    setMonthYear(finishedGood.monthYear);
+                    setFgDesc(finishedGood.fg_desc);
+                    setFormulaCode(formulation.formula_code);
+
+                    const allMaterialIds: number[] = [];
+                    if (formulation.material_qty_list) {
+                        const materialList = JSON.parse(formulation.material_qty_list);
+                        materialList.forEach((material: {}) => {
+                            const materialId = Object.keys(material)[0];
+                            allMaterialIds.push(parseInt(materialId, 10));
+                        });
+                    }
+
+                    const materialResponse = await api.get('/materials/retrieve_batch', {
+                        params: { col: 'material_id', values: allMaterialIds },
+                    });
+
+                    if (materialResponse.data.status !== 200) {
+                        throw new Error("Failed to fetch material data");
+                    }
+
+                    const materialDataArray = materialResponse.data.data;
+
+                    let currentFormulation: FormulationRecord[] = [];
+
+                    if (finishedGood) {
+                        let fgRow: FormulationRecord = {
+                            id: finishedGood.fg_id,
+                            track_id: formulationId,
+                            rowType: 'finishedGood',
+                            formula: formulation.formula_code,
+                            level: null,
+                            itemCode: finishedGood.fg_code,
+                            description: finishedGood.fg_desc,
+                            formulation: parseFloat(finishedGood.formulation_no).toString(),
+                            batchQty: parseFloat(finishedGood.total_batch_qty),
+                            unit: finishedGood.unit,
+                        };
+                        currentFormulation.push(fgRow);
+                    }
+
+                    if (formulation.emulsion) {
+                        const emulsionData = JSON.parse(formulation.emulsion);
+                        if (Object.keys(emulsionData).length !== 0) {
+                            currentFormulation.push({
+                                id: formulationId,
+                                track_id: formulationId,
+                                rowType: 'emulsion',
+                                formula: null,
+                                level: emulsionData.level,
+                                itemCode: null,
+                                description: "EMULSION",
+                                formulation: null,
+                                batchQty: emulsionData.batch_qty,
+                                unit: emulsionData.unit,
+                            });
+                        }
+                    }
+
+                    if (formulation.material_qty_list) {
+                        const materials = JSON.parse(formulation.material_qty_list);
+                        materials.forEach((material: { [key: string]: any }) => {
+                            const materialId = Object.keys(material)[0];
+                            const materialInfo = material[materialId];
+                            const materialDetails = materialDataArray.find((m: { material_id: string; }) => m.material_id == materialId);
+
+                            if (materialDetails) {
+                                currentFormulation.push({
+                                    id: materialDetails.material_id,
+                                    track_id: formulationId,
+                                    rowType: 'material',
+                                    formula: null,
+                                    level: parseFloat(materialInfo.level).toString(),
+                                    itemCode: materialDetails.material_code,
+                                    description: materialDetails.material_desc,
+                                    formulation: null,
+                                    batchQty: materialInfo.qty,
+                                    unit: materialDetails.unit,
+                                });
+                            }
+                        });
+                    }
+                    setFormulaData(currentFormulation);
+                    setIsLoading(false);
+                } catch (error) {
+                    console.error('Error retrieving formulation data:', error);
+                }
+            };
+
             const formulationId = searchParams.get('id');
             if (formulationId) {
                 retrieveFormulationData(parseInt(formulationId));
             }
-        }, [searchParams]);
-
-        const retrieveFormulationData = async (formulationId: number) => {
-            setIsLoading(true);
-            try {
-                const formulationResponse = await api.get('/formulations/retrieve', {
-                    params: { col: 'formulation_id', value: formulationId },
-                });
-
-                if (formulationResponse.data.status !== 200) {
-                    throw new Error("Failed to fetch formulation data");
-                }
-
-                const formulation = formulationResponse.data.data[0];
-                const finishedGoodResponse = await api.get('/finished_goods/retrieve', {
-                    params: { col: 'fg_id', value: formulation.fg_id },
-                });
-
-                if (finishedGoodResponse.data.status !== 200) {
-                    throw new Error("Failed to fetch finished good data");
-                }
-
-                const finishedGood = finishedGoodResponse.data.data[0];
-                setMonthYear(finishedGood.monthYear);
-                setFgDesc(finishedGood.fg_desc);
-                setFormulaCode(formulation.formula_code);
-
-                const allMaterialIds: number[] = [];
-                if (formulation.material_qty_list) {
-                    const materialList = JSON.parse(formulation.material_qty_list);
-                    materialList.forEach((material: {}) => {
-                        const materialId = Object.keys(material)[0];
-                        allMaterialIds.push(parseInt(materialId, 10));
-                    });
-                }
-
-                const materialResponse = await api.get('/materials/retrieve_batch', {
-                    params: { col: 'material_id', values: allMaterialIds },
-                });
-
-                if (materialResponse.data.status !== 200) {
-                    throw new Error("Failed to fetch material data");
-                }
-
-                const materialDataArray = materialResponse.data.data;
-
-                let currentFormulation: FormulationRecord[] = [];
-
-                if (finishedGood) {
-                    let fgRow: FormulationRecord = {
-                        id: finishedGood.fg_id,
-                        track_id: formulationId,
-                        rowType: 'finishedGood',
-                        formula: formulation.formula_code,
-                        level: null,
-                        itemCode: finishedGood.fg_code,
-                        description: finishedGood.fg_desc,
-                        formulation: parseFloat(finishedGood.formulation_no).toString(),
-                        batchQty: parseFloat(finishedGood.total_batch_qty),
-                        unit: finishedGood.unit,
-                    };
-                    currentFormulation.push(fgRow);
-                }
-
-                if (formulation.emulsion) {
-                    const emulsionData = JSON.parse(formulation.emulsion);
-                    if (Object.keys(emulsionData).length !== 0) {
-                        currentFormulation.push({
-                            id: formulationId,
-                            track_id: formulationId,
-                            rowType: 'emulsion',
-                            formula: null,
-                            level: emulsionData.level,
-                            itemCode: null,
-                            description: "EMULSION",
-                            formulation: null,
-                            batchQty: emulsionData.batch_qty,
-                            unit: emulsionData.unit,
-                        });
-                    }
-                }
-
-                if (formulation.material_qty_list) {
-                    const materials = JSON.parse(formulation.material_qty_list);
-                    materials.forEach((material: { [key: string]: any }) => {
-                        const materialId = Object.keys(material)[0];
-                        const materialInfo = material[materialId];
-                        const materialDetails = materialDataArray.find((m: { material_id: string; }) => m.material_id == materialId);
-
-                        if (materialDetails) {
-                            currentFormulation.push({
-                                id: materialDetails.material_id,
-                                track_id: formulationId,
-                                rowType: 'material',
-                                formula: null,
-                                level: parseFloat(materialInfo.level).toString(),
-                                itemCode: materialDetails.material_code,
-                                description: materialDetails.material_desc,
-                                formulation: null,
-                                batchQty: materialInfo.qty,
-                                unit: materialDetails.unit,
-                            });
-                        }
-                    });
-                }
-                const auditData = {
-                    userId: currentUser?.userId, 
-                    action: 'crud',
-                    act: 'edit',
-                    fileName: formulaCode,
-                };
-                if (currentUser) {
-                console.log('Current User ID:', currentUser?.userId);
-                } else {
-                    console.log('Current User is not defined.', currentUser);
-                }
-                api.post('/auditlogs/logsaudit', auditData)
-                .then(response => {
-                    console.log('Audit log created successfully:', response.data);
-                })
-                .catch(error => {
-                    console.error('Error audit logs:', error);
-                });
-                setTimeout(() => {
-                    setIsLoading(false);
-                }, 1000);
-                setFormulaData(currentFormulation);
-            } catch (error) {
-                console.error('Error retrieving formulation data:', error);
-            }
-        };
+        }, [currentUser, formulaCode, searchParams]);
 
         const handleBack = () => {
             setView(false);
@@ -197,21 +178,30 @@ const FormulationTable: React.FC<{
             setFormulaData([...formulaData, emptyRow]);
         };
 
-        const removeRow = (index: number) => {
-            const rowToRemove = formulaData[index];
+        const [confirmDialog, setConfirmDialog] = useState(false);
+        const [rowToRemove, setRowToRemove] = useState<{ index: number } | null>(null);
 
-            const confirmDeletion = window.confirm(
-                'Are you sure you want to delete this record?' // Replace with modal in the future
-            );
-            if (!confirmDeletion) return;
+        const removeRow = (index: number) => {
+            setRowToRemove({ index });
+            setConfirmDialog(true);
+        };
+
+        const confirmRemoveRow = () => {
+            if (rowToRemove === null) return;
+
+            const { index } = rowToRemove;
+            const rowToRemoveData = formulaData[index];
 
             // Remove the row from formulaData
-            const updatedFormulas = formulaData.filter((_, i) => i !== index);
-            setFormulaData(updatedFormulas);
+            setFormulaData(prevData => prevData.filter((_, i) => i !== index));
 
             // Add the removed row to removedRows
-            setRemovedRows(prevRows => [...prevRows, rowToRemove]);
+            setRemovedRows(prevRows => [...prevRows, rowToRemoveData]);
+
+            setConfirmDialog(false);
+            setRowToRemove(null);
         };
+
         // const removeRow = (index: number) => {
         //     const updatedFormulas = formulaData.filter((_, i) => i !== index);
         //     setFormulaData(updatedFormulas);
@@ -367,6 +357,27 @@ const FormulationTable: React.FC<{
                     }
                 }
 
+                const user = localStorage.getItem('currentUser');
+                const parsedUser = JSON.parse(user || '{}');
+
+                const auditData = {
+                    userId: parsedUser?.userId,
+                    action: 'crud',
+                    act: 'edit',
+                    fileName: formulaCode,
+                };
+
+                api.post('/auditlogs/logsaudit', auditData)
+                    .then(response => {
+                        console.log('Audit log created successfully:', response.data);
+                    })
+                    .catch(error => {
+                        console.error('Error audit logs:', error);
+                    });
+                setTimeout(() => {
+                    setIsLoading(false);
+                }, 1000);
+
                 setRemovedRows([]);
                 setSuccessMessage("Formulation saved successfully.");
 
@@ -411,20 +422,30 @@ const FormulationTable: React.FC<{
 
         return (
             <>
-                <div className="absolute top-0 right-0">
-                    {alertMessages && alertMessages.map((msg, index) => (
-                        <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
-                            setAlertMessages(prev => prev.filter((_, i) => i !== index));
-                        }} />
-                    ))}
-                    {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+                <div className="fixed top-4 right-4 z-50">
+                    <div className="flex flex-col items-end space-y-2">
+                        {alertMessages && alertMessages.map((msg, index) => (
+                            <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+                                setAlertMessages(prev => prev.filter((_, i) => i !== index));
+                            }} />
+                        ))}
+                        {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+                    </div>
                 </div>
-                <div className='bg-white rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[25px] mb-[20px]'>
+                {confirmDialog && (
+                    <div className="absolute z-[1000]">
+                        <WkspConfirmDialog
+                            setConfirmDialog={setConfirmDialog}
+                            onConfirm={confirmRemoveRow}
+                        />
+                    </div>
+                )}
+                <div className='bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[25px] mb-[20px]'>
                     {/* header */}
                     <div className='flex items-center py-[10px]'>
-                        <IoIosArrowRoundBack className='text-primary text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] transition-colors duration-200 ease-in-out cursor-pointer'
+                        <IoIosArrowRoundBack className='text-primary dark:text-[#ff4d4d] text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] transition-colors duration-200 ease-in-out cursor-pointer'
                             onClick={handleBack} />
-                        <h1 className='font-bold text-[28px] text-primary'>
+                        <h1 className='font-bold text-[28px] text-primary dark:text-[#ff4d4d]'>
                             {view ? 'View Formulation' : 'Edit Formulation'}
                         </h1>
                     </div>
@@ -435,7 +456,7 @@ const FormulationTable: React.FC<{
                             For the month of
                             {
                                 !isLoading ?
-                                    <span className='font-semibold italic text-primary'>
+                                    <span className='font-semibold italic text-primary dark:text-[#ff4d4d]'>
                                         ‎ {formatMonthYear(monthYear)}
                                     </span>
                                     :
@@ -449,7 +470,7 @@ const FormulationTable: React.FC<{
                         <p className={`${isLoading && 'flex'} ${(isOpen && edit) ? 'w-[80%] 3xl:w-[50%]' : edit ? 'w-[80%] 2xl:w-[50%]' : 'w-full'} pt-[10px] pb-[20px] text-[#8F8F8F] text-[18px]`}>The following formula is shown:
                             {
                                 !isLoading ?
-                                    <span className='font-semibold italic text-black'>
+                                    <span className='font-semibold italic text-black dark:text-white'>
                                         ‎ {fgDesc} ({formulaCode})
                                     </span>
                                     :
@@ -498,7 +519,7 @@ const FormulationTable: React.FC<{
                                                 }
 
                                                 return (
-                                                    <th key={key} className={`${textAlignClass} animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}>
+                                                    <th key={key} className={`${textAlignClass} animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] dark:text-[#d1d1d1] dark:border-b dark:border-[#5C5C5C] py-2 px-6 border-b border-[#ACACAC]`}>
                                                         {formatHeader(key)}{key == 'batchQty' && '.'}
                                                     </th>
                                                 );
@@ -506,13 +527,13 @@ const FormulationTable: React.FC<{
                                     </tr>
                                     :
                                     <tr>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[100px]' /></th>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[100px]' /></th>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[150px]' /></th>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[160px]' /></th>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[100px]' /></th>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[120px]' /></th>
-                                        <th className='py-2 px-6 border-b border-[#ACACAC]'><Loader className='h-[30px] w-[100px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[100px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[100px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[150px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[160px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[100px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[120px]' /></th>
+                                        <th className='py-2 px-6 border-b border-[#ACACAC] dark:border-[#5C5C5C]'><Loader className='h-[30px] w-[100px]' /></th>
                                     </tr>
                                 }
                             </thead>
@@ -522,7 +543,7 @@ const FormulationTable: React.FC<{
                                         {!edit ?
                                             <>
                                                 {formulaData.map((item, index) => (
-                                                    <tr key={index} className={`${index % 2 === 1 ? 'bg-[#FCF7F7]' : ''} animate-zoomIn text-center ${index === 0 ? 'font-bold text-black' : 'font-medium text-[#6B6B6B]'} text-[18px] ${index === 0 ? 'border-b border-[#ACACAC]' : ''}`}>
+                                                    <tr key={index} className={`${index % 2 === 1 ? 'bg-[#FCF7F7] dark:bg-[#4C4C4C]' : ''} animate-zoomIn text-center ${index === 0 ? 'font-bold text-black dark:text-white' : 'font-medium text-[#6B6B6B] dark:text-[#d1d1d1]'} text-[18px] ${index === 0 ? 'border-b border-[#ACACAC]' : ''}`}>
                                                         <td className='py-[10px] px-6 text-left'>{index === 0 ? item.formula : ''}</td>
                                                         <td className='py-[10px] px-6'>{index === 0 ? '' : item.level}</td>
                                                         <td className='py-[10px] px-6 text-left'>{item.itemCode}</td>
@@ -537,7 +558,7 @@ const FormulationTable: React.FC<{
                                             <>
                                                 {formulaData && (
                                                     <>
-                                                        <tr className='animate-zoomIn text-center font-bold text-black text-[18px] border-b border-[#ACACAC]'>
+                                                        <tr className='animate-zoomIn text-center font-bold text-black text-[18px] border-b border-[#ACACAC] dark:border-[#5C5C5C] dark:text-[#d1d1d1]'>
                                                             <td className='w-[150px] py-[10px] px-6 text-left'>{formulaData[0]?.formula}</td>
                                                             <td></td>
                                                             <td className='px-6 text-left'>
@@ -545,7 +566,7 @@ const FormulationTable: React.FC<{
                                                                     type="text"
                                                                     onChange={(e) => handleInputChange(0, 'itemCode', e.target.value)}
                                                                     value={formulaData[0]?.itemCode || ''}
-                                                                    className={`text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]`}
+                                                                    className={`text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
                                                                 />
                                                             </td>
                                                             <td className='px-6 text-left'>
@@ -553,7 +574,7 @@ const FormulationTable: React.FC<{
                                                                     type="text"
                                                                     onChange={(e) => handleInputChange(0, 'description', e.target.value)}
                                                                     value={formulaData[0]?.description || ''}
-                                                                    className={`text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                                    className={`text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
                                                                 />
                                                             </td>
                                                             <td className='px-6 text-center'>
@@ -561,7 +582,7 @@ const FormulationTable: React.FC<{
                                                                     type="text"
                                                                     onChange={(e) => handleInputChange(0, 'formulation', e.target.value)}
                                                                     value={formulaData[0]?.formulation || ''}
-                                                                    className={`text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[80px]`} // Set width for formulation
+                                                                    className={`text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[80px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`} // Set width for formulation
                                                                 />
                                                             </td>
                                                             <td className='px-6 text-right'>
@@ -569,7 +590,7 @@ const FormulationTable: React.FC<{
                                                                     type="text"
                                                                     onChange={(e) => handleInputChange(0, 'batchQty', e.target.value)}
                                                                     value={Number(formulaData[0]?.batchQty).toFixed(2) ?? ''}
-                                                                    className={`text-right animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px]`}
+                                                                    className={`text-right animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
                                                                 />
                                                             </td>
                                                             <td className='px-6 text-left'>
@@ -577,15 +598,15 @@ const FormulationTable: React.FC<{
                                                                     type="text"
                                                                     onChange={(e) => handleInputChange(0, 'unit', e.target.value)}
                                                                     value={formulaData[0]?.unit || ''}
-                                                                    className={`w-full text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[110px]`}
+                                                                    className={`w-full text-left animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] w-[110px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
                                                                 />
                                                             </td>
                                                         </tr>
 
                                                         {formulaData.slice(1).map((item, index) => (
-                                                            <tr key={index + 1} className={`${(index + 1) % 2 === 1 && 'bg-[#FCF7F7]'} animate-zoomIn text-center font-medium text-[#6B6B6B] text-[18px]`}>
+                                                            <tr key={index + 1} className={`${(index + 1) % 2 === 1 && 'bg-[#FCF7F7] dark:bg-[#4C4C4C]'} animate-zoomIn text-center font-medium text-[#6B6B6B] dark:text-[#d1d1d1] text-[18px]`}>
                                                                 <td className='flex justify-center items-center py-[15px]'>
-                                                                    <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-300 ease-in-out"
+                                                                    <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-300 ease-in-out dark:text-[#d1d1d1] dark:hover:text-red-500"
                                                                         onClick={() => removeRow(index + 1)} />
                                                                 </td>
                                                                 <td className='text-center px-6 py-[10px]'>
@@ -593,7 +614,7 @@ const FormulationTable: React.FC<{
                                                                         type="text"
                                                                         onChange={(e) => handleInputChange(index + 1, 'level', e.target.value)}
                                                                         value={item.level || ''}
-                                                                        className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[60px]"
+                                                                        className="text-center animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[60px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                                     />
                                                                 </td>
                                                                 {item.description?.toLowerCase() !== 'emulsion' ? (
@@ -602,7 +623,7 @@ const FormulationTable: React.FC<{
                                                                             type="text"
                                                                             onChange={(e) => handleInputChange(index + 1, 'itemCode', e.target.value)}
                                                                             value={item.itemCode || ''}
-                                                                            className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                                            className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                                         />
                                                                     </td>
                                                                 ) : <td></td>}
@@ -611,7 +632,7 @@ const FormulationTable: React.FC<{
                                                                         type="text"
                                                                         onChange={(e) => handleInputChange(index + 1, 'description', e.target.value)}
                                                                         value={item.description || ''}
-                                                                        className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                                        className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                                     />
                                                                 </td>
                                                                 <td>
@@ -626,7 +647,7 @@ const FormulationTable: React.FC<{
                                                                             }
                                                                         }}
                                                                         value={item.batchQty !== undefined && item.batchQty !== null ? Number(item.batchQty).toFixed(2) : ''}
-                                                                        className="w-full text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909]"
+                                                                        className="w-full text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                                     />
                                                                 </td>
                                                                 <td className='px-6 text-left'>
@@ -634,7 +655,7 @@ const FormulationTable: React.FC<{
                                                                         type="text"
                                                                         onChange={(e) => handleInputChange(index + 1, 'unit', e.target.value)}
                                                                         value={item.unit || ''}
-                                                                        className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[100px]"
+                                                                        className="w-full text-left px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] w-[100px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
                                                                     />
                                                                 </td>
                                                             </tr>

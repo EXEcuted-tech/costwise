@@ -177,14 +177,14 @@ const BOMListContainer = () => {
   }, [fetchData, selectedBomId]);
 
   return (
-    <div className='bg-white rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[20px]'>
+    <div className='bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[20px]'>
       {/* header */}
       <div className='flex items-center py-[10px]'>
-        <IoIosArrowRoundBack className='text-primary text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] cursor-pointer'
+        <IoIosArrowRoundBack className='text-primary dark:text-[#ff4d4d] text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] cursor-pointer'
           onClick={() => {
             setViewBOM(false);
           }} />
-        <h1 className='font-bold text-[28px] text-primary'>
+        <h1 className='font-bold text-[28px] text-primary dark:text-[#ff4d4d]'>
           Bill of Materials
         </h1>
       </div>
@@ -195,8 +195,8 @@ const BOMListContainer = () => {
           <Loader className='w-[200px] h-[30px]' />
         ) : (
           <>
-            <p className='text-black text-[25px] font-black underline underline-offset-4 mr-[5px]'>{data?.bom_name} </p>
-            <p className='text-[25px] text-[#8F8F8F] font-semibold italic'>({data?.formulations[0]?.description})</p>
+            <p className='text-black text-[25px] font-black underline underline-offset-4 mr-[5px] dark:text-white'>{data?.bom_name} </p>
+            <p className='text-[25px] text-[#8F8F8F] font-semibold italic dark:text-[#d1d1d1]'>({data?.formulations[0]?.description})</p>
           </>
         )}
       </div>
@@ -206,7 +206,7 @@ const BOMListContainer = () => {
           For the month of
           {
             !isLoading ?
-              <span className='font-semibold italic text-primary'>
+              <span className='font-semibold italic text-primary dark:text-[#ff4d4d]'>
                 ‎ {formatMonthYear(monthYear)}
               </span>
               :
@@ -228,14 +228,14 @@ const BOMListContainer = () => {
           data?.formulations
             .filter(item => item.rowType === 'finishedGood')
             .map((info, index, array) => (
-              <p key={index} className='italic font-semibold text-[18px]'>
+              <p key={index} className='italic font-semibold text-[18px] dark:text-white'>
                 {info.description} ({info.formula})
                 {index !== array.length - 1 && ',\u00A0'}
               </p>
             ))
         )}
       </div>
-      <div className='rounded-[5px] border border-[#656565] overflow-x-auto mt-[10px]'>
+      <div className='rounded-[5px] border border-[#656565] dark:border-[#5C5C5C] #overflow-x-auto mt-[10px]'>
         <table className='table-auto w-full border-collapse'>
           <thead>
             <tr>
@@ -257,7 +257,7 @@ const BOMListContainer = () => {
                   }
 
                   return (
-                    <th key={key} className={`${textAlignClass} animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] py-2 px-6`}>
+                    <th key={key} className={`${textAlignClass} animate-zoomIn whitespace-nowrap font-bold text-[20px] text-[#6B6B6B] dark:text-[#d1d1d1] py-2 px-6`}>
                       {formatHeader(key)}{key == 'batchQty' && '.'}
                     </th>
                   );
@@ -282,7 +282,7 @@ const BOMListContainer = () => {
               }, []).map((group, groupIndex) => (
                 <React.Fragment key={groupIndex}>
                   {group.map((info, index) => (
-                    <tr key={index} className={`${info.rowType === 'finishedGood' ? (info.isLeastCost === 1 ? 'bg-[#fff873]' : 'text-black') : (index % 2 === 1 ? 'bg-[#FCF7F7]' : '')} animate-zoomIn text-center ${info.rowType === 'finishedGood' ? 'font-bold' : 'font-medium'} ${info.rowType === 'finishedGood' ? 'text-black' : 'text-[#6B6B6B]'} text-[18px] ${info.rowType === 'finishedGood' ? 'border-y border-[#ACACAC]' : ''}`}>
+                    <tr key={index} className={`${info.rowType === 'finishedGood' ? (info.isLeastCost === 1 ? 'bg-[#fff873] dark:text-black' : 'text-black') : (index % 2 === 1 ? 'bg-[#FCF7F7] dark:bg-[#4C4C4C]' : '')} animate-zoomIn text-center ${info.rowType === 'finishedGood' ? 'font-bold' : 'font-medium'} ${info.rowType === 'finishedGood' ? 'text-black dark:text-white' : 'text-[#6B6B6B] dark:text-[#d1d1d1]'} text-[18px] ${info.rowType === 'finishedGood' ? 'border-y border-[#ACACAC]' : ''}`}>
                       <td className={`py-[10px] ${info.rowType === 'finishedGood' ? 'relative text-left px-6' : ''}`}>
                         {info.rowType === 'finishedGood' && (
                           <>

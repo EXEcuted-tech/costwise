@@ -33,16 +33,15 @@ const ConfirmDeleteInventory: React.FC<ConfirmDeleteProps> = ({ onClose, invento
             setAlertMessages([response.data.message]);
             setAlertStatus('success');
 
+            const user = localStorage.getItem('currentUser');
+            const parsedUser = JSON.parse(user || '{}');
+
             const auditData = {
-                userId: currentUser?.userId, 
+                userId: parsedUser?.userId, 
                 action: 'crud',
                 act: 'archive_inventory'
               };
-              if (currentUser) {
-              console.log('Current User ID:', currentUser?.userId);
-              } else {
-                  console.log('Current User is not defined.', currentUser);
-              }
+
               api.post('/auditlogs/logsaudit', auditData)
               .then(response => {
                   console.log('Audit log created successfully:', response.data);

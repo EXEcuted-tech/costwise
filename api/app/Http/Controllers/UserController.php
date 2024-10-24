@@ -22,6 +22,12 @@ class UserController extends ApiController
         return response()->json($user->toArray());
     }
 
+    public function retrieveUser(Request $request)
+    {
+        $user = User::findOrFail($request->user_id);
+        return response()->json($user->toArray());
+    }
+
     public function editUserInfo(Request $request)
     {
         $user = Auth::user();

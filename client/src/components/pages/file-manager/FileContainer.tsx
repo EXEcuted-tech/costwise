@@ -5,6 +5,7 @@ import FileTable from './FileTable';
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import api from '@/utils/api';
 import { File } from '@/types/data';
+import { useUserContext } from '@/contexts/UserContext';
 
 interface FileContainerProps {
     tab: string;
@@ -14,6 +15,8 @@ interface FileContainerProps {
     allData: File[];
     masterFileData: File[];
     transactionData: File[];
+    setErrorMsg: React.Dispatch<React.SetStateAction<string>>;
+    setExportLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const FileContainer: React.FC<FileContainerProps> = ({
@@ -24,6 +27,8 @@ const FileContainer: React.FC<FileContainerProps> = ({
     allData,
     masterFileData,
     transactionData,
+    setErrorMsg,
+    setExportLoading
 }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
@@ -125,6 +130,8 @@ const FileContainer: React.FC<FileContainerProps> = ({
                     isOpen={isOpen}
                     isLoading={isLoading}
                     setIsLoading={setIsLoading}
+                    setExportLoading={setExportLoading}
+                    setErrorMsg={setErrorMsg}
                 />
             </div>
         </div>
