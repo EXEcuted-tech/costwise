@@ -28,28 +28,47 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
     const [suffix, setSuffix] = useState(userAcc?.suffix || '');
 
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
+    const [firstNameError, setFirstNameError] = useState(false);
+    const [lastNameError, setLastNameError] = useState(false);
+    const [emailError, setEmailError] = useState(false);
+    const [phoneNumberError, setPhoneNumberError] = useState(false);
 
     const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         setIsLoading(true);
 
+        //Reset errors
+        setFirstNameError(false);
+        setLastNameError(false);
+        setEmailError(false);
+        setPhoneNumberError(false);
+
+        const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        const phoneRegex = /^\+63\s?9\d{9}$/;
+
         let errors: string[] = [];
 
         if (!fName) {
+            setFirstNameError(true);
             errors.push("First name is required.");
         }
         if (!lName) {
+            setLastNameError(true);
             errors.push("Last name is required.");
         }
         if (!email) {
+            setEmailError(true);
             errors.push("Email address is required.");
-        } else if (!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email)) {
+        } else if (!emailRegex.test(email)) {
+            setEmailError(true);
             errors.push("Please enter a valid email address.");
         }
         if (!phoneNum) {
+            setPhoneNumberError(true);
             errors.push("Phone number is required.");
-        } else if (!/^\d{10}$/.test(phoneNum)) {
-            errors.push("Phone number should be 10 digits.");
+        } else if (!phoneRegex.test(phoneNum)) {
+            setPhoneNumberError(true);
+            errors.push("Please enter a valid phone number.");
         }
     
         if (errors.length > 0) {
@@ -81,11 +100,13 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
         <>
             
             <form onSubmit={handleSubmit}>
-                {alertMessages && alertMessages.map((msg, index) => (
-                <Alert className="absolute right-0 top-[206px] right-[80px] z-10 !rounded" variant='critical' key={index} message={msg} setClose={() => {
-                    setAlertMessages(prev => prev.filter((_, i) => i !== index));
-                }} />
-                ))}
+                <div className='absolute top-0 right-0'>
+                    {alertMessages && alertMessages.map((msg, index) => (
+                    <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+                        setAlertMessages(prev => prev.filter((_, i) => i !== index));
+                    }} />
+                    ))}
+                </div>
                 <div className={`${isOpen ? 'text-[15px] 2xl:text-[18px] 3xl:text-[24px] mt-[30px] 2xl:mt-[30px]' : 'text-[18px] 2xl:text-[22px] 3xl:text-[24px] mt-[30px]'} flex justify-center mx-[3%] 2xl:mx-[5%]`}>
                     <button className='flex text-[1.3em] mt-[0.3rem] ml-3' onClick={()=> setProps(false)}>
                         <IoIosArrowRoundBack className='text-[#6D6D6D] text-[40px] mr-[15px] hover:text-[#D13131] cursor-pointer'/>
@@ -100,6 +121,7 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
                                         className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white h-12 w-[95%] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
                                         type="fname"
                                         name="fname"
+                                        value={fName}
                                         required
                                         onChange={(e) => setFName(e.target.value)}
                                         placeholder={userAcc?.fName}
@@ -117,6 +139,7 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
                                         type="email"
                                         name="email"
                                         required
+                                        value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder={userAcc?.email}
                                     />
@@ -150,6 +173,7 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
                                         className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[95%] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
                                         type="mname"
                                         name="mname"
+                                        value={mName}
                                         onChange={(e) => setMName(e.target.value)}
                                         placeholder={userAcc?.mName}
                                     />
@@ -166,6 +190,7 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
                                         type="contactnum"
                                         name="contactnum"
                                         required
+                                        value={phoneNum}
                                         onChange={(e) => setPhoneNum(e.target.value)}
                                         placeholder={userAcc?.phoneNum}
                                     />
@@ -200,6 +225,7 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
                                         type="lname"
                                         name="lname"
                                         required
+                                        value={lName}
                                         onChange={(e) => setLName(e.target.value)}
                                         placeholder={userAcc?.lName}
                                     />
@@ -215,6 +241,7 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
                                         className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[95%] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
                                         type="suffix"
                                         name="suffix"
+                                        value={suffix}
                                         onChange={(e) => setSuffix(e.target.value)}
                                         placeholder={userAcc?.suffix}
                                     />
