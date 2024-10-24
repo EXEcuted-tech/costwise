@@ -66,14 +66,14 @@ const CostCalculation = () => {
   const [trained, setTrained] = useState(false);
   const [lossHistory, setLossHistory] = useState<number[]>([0]);
   const [trainingSpeed, setTrainingSpeed] = useState<number>(0);
-  const addNewData = (newData: CostDataEntry[]) => {
-    try {
-      setCostData((prevData) => [...prevData, ...newData]);
-    } finally {
-      console.log(costData)
-      updateTraininingData();
-    }
-  };
+  // const addNewData = (newData: CostDataEntry[]) => {
+  //   try {
+  //     setCostData((prevData) => [...prevData, ...newData]);
+  //   } finally {
+  //     console.log(costData)
+  //     updateTraininingData();
+  //   }
+  // };
   const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = async () => {
@@ -236,17 +236,20 @@ const CostCalculation = () => {
           monthYear: currentMonthYear,
           products: products,
         };
-        addNewData([newData]);
+
+        const updatedCostData = [...costData, newData];
+        setCostData(updatedCostData);
+        updateTraininingData(updatedCostData);
       }
     }
   };
 
-  const updateTraininingData = async () => {
+  const updateTraininingData = async (updatedData: any[]) => {
     setIsLoading(true);
     try {
-      console.log("Cost Data", costData)
+      console.log("Cost Data", updatedData)
       const response = await api.post("/training/update", {
-        settings: JSON.stringify(costData),
+        settings: JSON.stringify(updatedData),
       });
 
       console.log("Successfully updated training Data: ", response.data.data.settings)
