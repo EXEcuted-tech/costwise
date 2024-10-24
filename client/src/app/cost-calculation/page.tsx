@@ -170,8 +170,8 @@ const CostCalculation = () => {
   const handleExport = async () => {
     const sysRoles = currentUser?.roles;
     if (!sysRoles?.includes(17)) {
-        setError('You are not authorized to export records or files.');
-        return;
+      setError("You are not authorized to export records or files.");
+      return;
     }
 
     let sheetData = {};
@@ -247,13 +247,15 @@ const CostCalculation = () => {
   const updateTraininingData = async (updatedData: any[]) => {
     setIsLoading(true);
     try {
-      console.log("Cost Data", updatedData)
+      console.log("Cost Data", updatedData);
       const response = await api.post("/training/update", {
         settings: JSON.stringify(updatedData),
       });
 
-      console.log("Successfully updated training Data: ", response.data.data.settings)
-
+      console.log(
+        "Successfully updated training Data: ",
+        response.data.data.settings
+      );
     } catch (err) {
       console.log("Error updating training data was unsuccessful.", err);
     } finally {
@@ -268,12 +270,12 @@ const CostCalculation = () => {
       console.log("After initialized model here are the data: ", trained);
       console.log("Model Data", model);
     }
-  }
+  };
 
   useEffect(() => {
     makePrediction(trained, model, costData);
     setIsLoading(false);
-    console.log("Cost Data After Training:", costData)
+    console.log("Cost Data After Training:", costData);
   }, [trained]);
 
   //Retrieve month and year options
@@ -360,17 +362,19 @@ const CostCalculation = () => {
                   className="!relative"
                   variant={
                     alertStatus as
-                    | "default"
-                    | "information"
-                    | "warning"
-                    | "critical"
-                    | "success"
-                    | undefined
+                      | "default"
+                      | "information"
+                      | "warning"
+                      | "critical"
+                      | "success"
+                      | undefined
                   }
                   key={index}
                   message={msg}
                   setClose={() => {
-                    setAlertMessages((prev) => prev.filter((_, i) => i !== index));
+                    setAlertMessages((prev) =>
+                      prev.filter((_, i) => i !== index)
+                    );
                   }}
                 />
               ))}
@@ -415,9 +419,10 @@ const CostCalculation = () => {
                 <div
                   onClick={() => handleFGClick("Specific-FG")}
                   className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-l-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                    ${selectedFG === "Specific-FG"
-                      ? "bg-[#B22222] text-white"
-                      : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
+                    ${
+                      selectedFG === "Specific-FG"
+                        ? "bg-[#B22222] text-white"
+                        : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
                     }`}
                 >
                   Specific-FG
@@ -425,9 +430,10 @@ const CostCalculation = () => {
                 <div
                   onClick={() => handleFGClick("All-FG")}
                   className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-r-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                    ${selectedFG === "All-FG"
-                      ? "bg-[#B22222] text-white"
-                      : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
+                    ${
+                      selectedFG === "All-FG"
+                        ? "bg-[#B22222] text-white"
+                        : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
                     }`}
                 >
                   All-FG
@@ -499,7 +505,6 @@ const CostCalculation = () => {
       )}
     </>
   );
-
 };
 
 export default CostCalculation;
