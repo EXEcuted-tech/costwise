@@ -343,7 +343,7 @@ const FileManagerPage = () => {
             <div className="three-body__dot"></div>
           </div>
           <p className='text-primary font-light text-[20px] mt-[10px] text-white'>
-            Exporting files...
+            Exporting file(s)...
           </p>
         </div>
       }
@@ -409,6 +409,7 @@ const FileManagerPage = () => {
             isLoading={isLoading}
             setIsLoading={setIsLoading}
             setErrorMsg={setErrorMsg}
+            setExportLoading={setExportLoading}
             allData={allData}
             masterFileData={masterFileData}
             transactionData={transactionData}

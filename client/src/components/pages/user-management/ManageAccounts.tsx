@@ -64,6 +64,9 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
     return (
         <>
             {errorMsg && <Alert setClose={() => setErrorMsg('')} variant='critical' message={errorMsg} />}
+            {/* Modals */}
+            {isEditModalOpen && <EditUserInfo user={selectedUser} onClose={closeEditModal} />}
+            {isDeleteModalOpen && <ConfirmDeleteUser user={selectedUser} onClose={closeDeleteModal} />}
             <div className="flex flex-col w-auto h-[44rem] rounded-lg shadow-md shadow-gray-300">
                 {/* Main Content */}
                 <div className="animate-fade-in3 flex flex-col w-auto h-[38rem] xl:h-[40rem] 2xl:h-[38rem] 3xl:h-[38rem] 4xl:h-[38rem]">
@@ -130,10 +133,6 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                         </tbody>
                     </table>
                 </div>
-
-                {/* Modals */}
-                {isEditModalOpen && <EditUserInfo user={selectedUser} onClose={closeEditModal} />}
-                {isDeleteModalOpen && <ConfirmDeleteUser user={selectedUser} onClose={closeDeleteModal} />}
 
                 {/* Footer */}
                 <div className="flex w-full justify-center h-[5rem] mt-4 rounded-b-xl bg-white border-[#868686]">

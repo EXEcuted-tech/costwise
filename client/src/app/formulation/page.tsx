@@ -43,6 +43,7 @@ const FormulationPage = () => {
     const [filteredData, setFilteredData] = useState<Formulation[]>([]);
     const [searchTerm, setSearchTerm] = useState('');
 
+    const [exportLoading, setExportLoading] = useState(false);
     const [infoMsg, setInfoMsg] = useState('');
     const [errorMsg, setErrorMsg] = useState('');
 
@@ -121,7 +122,7 @@ const FormulationPage = () => {
                                     resolve(`Successfully uploaded the file!`);
                                     fetchData();
 
-                                    const fileName = file.name; 
+                                    const fileName = file.name;
                                     const user = localStorage.getItem('currentUser');
                                     const parsedUser = JSON.parse(user || '{}');
 
@@ -129,14 +130,14 @@ const FormulationPage = () => {
                                         userId: parsedUser?.userId,
                                         action: 'import',
                                         fileName: fileName
-                                      };
-                                      api.post('/auditlogs/logsaudit', auditData)
-                                      .then(response => {
-                                          console.log('Audit log created successfully:', response.data);
-                                      })
-                                      .catch(error => {
-                                          console.error('Error audit logs:', error);
-                                      });
+                                    };
+                                    api.post('/auditlogs/logsaudit', auditData)
+                                        .then(response => {
+                                            console.log('Audit log created successfully:', response.data);
+                                        })
+                                        .catch(error => {
+                                            console.error('Error audit logs:', error);
+                                        });
                                 } else {
                                     reject(response.data.data.message);
                                 }
@@ -187,21 +188,35 @@ const FormulationPage = () => {
 
     return (
         <>
-            <div className="absolute top-0 right-0">
-                {errorMsg != '' &&
-                    <Alert
-                        className="!relative"
-                        variant='critical'
-                        message={errorMsg}
-                        setClose={() => { setErrorMsg(''); }} />
-                }
-                {infoMsg != '' &&
-                    <Alert
-                        className="!relative"
-                        variant='success'
-                        message={infoMsg}
-                        setClose={() => { setInfoMsg(''); }} />
-                }
+            {(exportLoading) &&
+                <div className='fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-brightness-50 z-[1500]'>
+                    <div className="three-body">
+                        <div className="three-body__dot"></div>
+                        <div className="three-body__dot"></div>
+                        <div className="three-body__dot"></div>
+                    </div>
+                    <p className='text-primary font-light text-[20px] mt-[10px] text-white'>
+                        Exporting file(s)...
+                    </p>
+                </div>
+            }
+            <div className="fixed top-4 right-4 z-50">
+                <div className="flex flex-col items-end space-y-2">
+                    {errorMsg != '' &&
+                        <Alert
+                            className="!relative"
+                            variant='critical'
+                            message={errorMsg}
+                            setClose={() => { setErrorMsg(''); }} />
+                    }
+                    {infoMsg != '' &&
+                        <Alert
+                            className="!relative"
+                            variant='success'
+                            message={infoMsg}
+                            setClose={() => { setInfoMsg(''); }} />
+                    }
+                </div>
             </div>
             <Header icon={HiClipboardList} title={"Formulations"} />
             {compareFormula && <CompareFormulaDialog setCompareFormula={setCompareFormula} />}
@@ -253,7 +268,7 @@ const FormulationPage = () => {
                                             </li>
                                             <hr className='h-[2px] bg-primary opacity-50' />
                                             <li className={`${isOpen ? 'pl-[6px] 3xl:pl-[15px]' : 'pl-[15px]'} flex items-center justify-left py-[5px] cursor-pointer hover:text-[#851313]`}
-                                                onClick={()=>{
+                                                onClick={() => {
                                                     const sysRoles = currentUser?.roles;
                                                     if (!sysRoles?.includes(10)) {
                                                         setErrorMsg('You are not authorized to import formulations.');
@@ -282,6 +297,7 @@ const FormulationPage = () => {
                         isLoading={isLoading}
                         currentPage={currentPage}
                         handlePageChange={handlePageChange}
+                        setExportLoading={setExportLoading}
                     />
                 </div>
             </div>

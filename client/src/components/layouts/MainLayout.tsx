@@ -9,6 +9,7 @@ import api from '@/utils/api';
 import { useNotificationContext } from '@/contexts/NotificationContext';
 import { useUserContext } from '@/contexts/UserContext';
 import Alert from '../alerts/Alert';
+import { useTokenRefresh } from '@/hooks/useTokenRefresh';
 
 const MainLayout = () => {
   const { isOpen, setIsOpen } = useSidebarContext();
@@ -18,6 +19,8 @@ const MainLayout = () => {
 
   const notificationSoundSrc = '/notification-ring.mp3';
 
+  useTokenRefresh(5);
+  
   useEffect(() => {
     setNotificationSound(new Audio(notificationSoundSrc));
   }, []);

@@ -33,6 +33,7 @@ export interface AuditLogs {
   profile: string;
 }
 import useColorMode from '@/hooks/useColorMode';
+import Loader from "@/components/loaders/Loader";
 
 const DashboardPage = () => {
   const { isOpen, isAdmin } = useSidebarContext();
@@ -49,6 +50,7 @@ const DashboardPage = () => {
   const [name, setName] = useState('');
 
   const [auditLogs, setAuditLogs] = useState<AuditLogs[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
@@ -64,35 +66,43 @@ const DashboardPage = () => {
   }, []);
 
   const fetchAverageCost = async () => {
+    setIsLoading(true);
     const response = await api.get('/finished_goods/average_cost');
     console.log(response.data);
     setAverageCost(parseFloat(response.data.average_cost));
     setFgPercentageChange(response.data.percentage_change);
     setFgTrend(response.data.trend);
+    setIsLoading(false);
   };
 
   const fetchTotalProductionCost = async () => {
+    setIsLoading(true);
     const response = await api.get('/transactions/total_production_cost');
     console.log(response.data);
     const formattedCost = Number(response.data.total_production_cost).toLocaleString('en-US', {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2
     });
+    console.log(formattedCost);
     setTotalProductionCost(formattedCost);
     setProductCostPercentageChange(response.data.percentage_change);
     setProductCostTrend(response.data.trend);
+    setIsLoading(false);
   };
 
   const fetchMaterialCostUtilization = async () => {
+    setIsLoading(true);
     const response = await api.get('/materials/material_cost_utilization');
     console.log(response.data);
     setMaterialCost(response.data.material_cost_utilization);
     setMaterialCostPercentageChange(response.data.percentage_change);
     setMaterialCostTrend(response.data.trend);
+    setIsLoading(false);
   };
 
   const fetchAuditLogs = async () => {
     const interval = setInterval(() => {
+      setIsLoading(true);
       const fetchData = async () => {
         try {
           const res = await api.get('/auditlogs');
@@ -104,7 +114,7 @@ const DashboardPage = () => {
             time: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })
           }));
           setAuditLogs(logs);
-
+          setIsLoading(false);
         } catch (error: any) {
           console.error("Failed to fetch audit logs:", error);
         }
@@ -197,7 +207,9 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <div className='flex flex-col items-center'>
-                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>₱{totalProductionCost}</h1>
+                    <h1 className='text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>
+                      ₱{totalProductionCost}
+                    </h1>
                     <p className='italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]'>Total Production Cost</p>
                   </div>
                 </div>
@@ -215,7 +227,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <div className='flex flex-col items-center'>
-                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>₱{(isNaN(averageCost) ? 0 : averageCost).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
+                    <h1 className='text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>₱{(isNaN(averageCost) ? 0 : averageCost).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
                     <p className='italic text-center font-medium text-[12px] 3xl:text-[14px] text-[#969696]'>Average Cost Per Product</p>
                   </div>
                 </div>
@@ -233,7 +245,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <div className='flex flex-col items-center'>
-                    <h1 className='text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>₱{materialCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
+                    <h1 className='text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>₱{materialCost.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</h1>
                     <p className='italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]'>Material Cost Utilization</p>
                   </div>
                 </div>
@@ -251,7 +263,7 @@ const DashboardPage = () => {
                     </p>
                   </div>
                   <div className="flex flex-col items-center">
-                    <h1 className="text-[16px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white">
+                    <h1 className="text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white">
                       ₱168.35
                     </h1>
                     <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">

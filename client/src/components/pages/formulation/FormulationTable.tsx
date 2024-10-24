@@ -14,6 +14,7 @@ import Loader from '@/components/loaders/Loader';
 import Alert from '@/components/alerts/Alert';
 import { FaRegCalendarDays } from "react-icons/fa6";
 import { useUserContext } from '@/contexts/UserContext';
+import WkspConfirmDialog from '@/components/modals/WkspConfirmDialog';
 
 const FormulationTable: React.FC<{
     setView: React.Dispatch<React.SetStateAction<boolean>>;
@@ -44,25 +45,25 @@ const FormulationTable: React.FC<{
                     const formulationResponse = await api.get('/formulations/retrieve', {
                         params: { col: 'formulation_id', value: formulationId },
                     });
-    
+
                     if (formulationResponse.data.status !== 200) {
                         throw new Error("Failed to fetch formulation data");
                     }
-    
+
                     const formulation = formulationResponse.data.data[0];
                     const finishedGoodResponse = await api.get('/finished_goods/retrieve', {
                         params: { col: 'fg_id', value: formulation.fg_id },
                     });
-    
+
                     if (finishedGoodResponse.data.status !== 200) {
                         throw new Error("Failed to fetch finished good data");
                     }
-    
+
                     const finishedGood = finishedGoodResponse.data.data[0];
                     setMonthYear(finishedGood.monthYear);
                     setFgDesc(finishedGood.fg_desc);
                     setFormulaCode(formulation.formula_code);
-    
+
                     const allMaterialIds: number[] = [];
                     if (formulation.material_qty_list) {
                         const materialList = JSON.parse(formulation.material_qty_list);
@@ -71,19 +72,19 @@ const FormulationTable: React.FC<{
                             allMaterialIds.push(parseInt(materialId, 10));
                         });
                     }
-    
+
                     const materialResponse = await api.get('/materials/retrieve_batch', {
                         params: { col: 'material_id', values: allMaterialIds },
                     });
-    
+
                     if (materialResponse.data.status !== 200) {
                         throw new Error("Failed to fetch material data");
                     }
-    
+
                     const materialDataArray = materialResponse.data.data;
-    
+
                     let currentFormulation: FormulationRecord[] = [];
-    
+
                     if (finishedGood) {
                         let fgRow: FormulationRecord = {
                             id: finishedGood.fg_id,
@@ -99,7 +100,7 @@ const FormulationTable: React.FC<{
                         };
                         currentFormulation.push(fgRow);
                     }
-    
+
                     if (formulation.emulsion) {
                         const emulsionData = JSON.parse(formulation.emulsion);
                         if (Object.keys(emulsionData).length !== 0) {
@@ -117,14 +118,14 @@ const FormulationTable: React.FC<{
                             });
                         }
                     }
-    
+
                     if (formulation.material_qty_list) {
                         const materials = JSON.parse(formulation.material_qty_list);
                         materials.forEach((material: { [key: string]: any }) => {
                             const materialId = Object.keys(material)[0];
                             const materialInfo = material[materialId];
                             const materialDetails = materialDataArray.find((m: { material_id: string; }) => m.material_id == materialId);
-    
+
                             if (materialDetails) {
                                 currentFormulation.push({
                                     id: materialDetails.material_id,
@@ -177,21 +178,30 @@ const FormulationTable: React.FC<{
             setFormulaData([...formulaData, emptyRow]);
         };
 
-        const removeRow = (index: number) => {
-            const rowToRemove = formulaData[index];
+        const [confirmDialog, setConfirmDialog] = useState(false);
+        const [rowToRemove, setRowToRemove] = useState<{ index: number } | null>(null);
 
-            const confirmDeletion = window.confirm(
-                'Are you sure you want to delete this record?' // Replace with modal in the future
-            );
-            if (!confirmDeletion) return;
+        const removeRow = (index: number) => {
+            setRowToRemove({ index });
+            setConfirmDialog(true);
+        };
+
+        const confirmRemoveRow = () => {
+            if (rowToRemove === null) return;
+
+            const { index } = rowToRemove;
+            const rowToRemoveData = formulaData[index];
 
             // Remove the row from formulaData
-            const updatedFormulas = formulaData.filter((_, i) => i !== index);
-            setFormulaData(updatedFormulas);
+            setFormulaData(prevData => prevData.filter((_, i) => i !== index));
 
             // Add the removed row to removedRows
-            setRemovedRows(prevRows => [...prevRows, rowToRemove]);
+            setRemovedRows(prevRows => [...prevRows, rowToRemoveData]);
+
+            setConfirmDialog(false);
+            setRowToRemove(null);
         };
+
         // const removeRow = (index: number) => {
         //     const updatedFormulas = formulaData.filter((_, i) => i !== index);
         //     setFormulaData(updatedFormulas);
@@ -351,19 +361,19 @@ const FormulationTable: React.FC<{
                 const parsedUser = JSON.parse(user || '{}');
 
                 const auditData = {
-                    userId: parsedUser?.userId, 
+                    userId: parsedUser?.userId,
                     action: 'crud',
                     act: 'edit',
                     fileName: formulaCode,
                 };
 
                 api.post('/auditlogs/logsaudit', auditData)
-                .then(response => {
-                    console.log('Audit log created successfully:', response.data);
-                })
-                .catch(error => {
-                    console.error('Error audit logs:', error);
-                });
+                    .then(response => {
+                        console.log('Audit log created successfully:', response.data);
+                    })
+                    .catch(error => {
+                        console.error('Error audit logs:', error);
+                    });
                 setTimeout(() => {
                     setIsLoading(false);
                 }, 1000);
@@ -412,14 +422,24 @@ const FormulationTable: React.FC<{
 
         return (
             <>
-                <div className="absolute top-0 right-0">
-                    {alertMessages && alertMessages.map((msg, index) => (
-                        <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
-                            setAlertMessages(prev => prev.filter((_, i) => i !== index));
-                        }} />
-                    ))}
-                    {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+                <div className="fixed top-4 right-4 z-50">
+                    <div className="flex flex-col items-end space-y-2">
+                        {alertMessages && alertMessages.map((msg, index) => (
+                            <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+                                setAlertMessages(prev => prev.filter((_, i) => i !== index));
+                            }} />
+                        ))}
+                        {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+                    </div>
                 </div>
+                {confirmDialog && (
+                    <div className="absolute z-[1000]">
+                        <WkspConfirmDialog
+                            setConfirmDialog={setConfirmDialog}
+                            onConfirm={confirmRemoveRow}
+                        />
+                    </div>
+                )}
                 <div className='bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[25px] mb-[20px]'>
                     {/* header */}
                     <div className='flex items-center py-[10px]'>

@@ -190,17 +190,26 @@ const CompareFormulaContainer = () => {
 
     const handleSaveToBOMList = async () => {
         setIsLoading(true);
+        if (bomName === '') {
+            setAlertMessages(prev => [...prev, 'Please provide a name for this BOM.']);
+            setIsLoading(false);
+            return;
+        }
         try {
             const response = await api.post('/boms/create', { formulation_ids: selectedChoices, bom_name: bomName });
             if (response.data.status !== 201) {
-                setAlertMessages(prev => [...prev, 'Failed to delete BOM']);
+                setAlertMessages(prev => [...prev, 'Failed to save BOM']);
+                return;
             }
 
         } catch (error) {
-            setAlertMessages(prev => [...prev, 'Failed to delete BOM']);
+            setAlertMessages(prev => [...prev, 'Failed to save BOM']);
+            return;
         } finally {
             setIsLoading(false);
             setSuccessMessage('Saved to BOM List successfully');
+            setSaveBomName(false);
+            router.push('/formulation');
         }
     };
 

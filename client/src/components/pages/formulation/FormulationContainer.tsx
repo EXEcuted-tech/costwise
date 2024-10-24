@@ -43,6 +43,7 @@ export interface FormulationProps {
     isLoading: boolean;
     currentPage: number;
     handlePageChange: (e: React.ChangeEvent<unknown>, page: number) => void;
+    setExportLoading: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const FormulationContainer: React.FC<FormulationProps> = ({
@@ -52,6 +53,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
     isLoading,
     currentPage,
     handlePageChange,
+    setExportLoading,
     setFilteredData
 }) => {
     const { edit, setEdit, viewFormulas, viewBOM } = useFormulationContext();
@@ -98,7 +100,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
             setError('You are not authorized to export records or files.');
             return;
         }
-
+        setExportLoading(true);
         try {
             const formulationId = id;
 
@@ -121,7 +123,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
             a.click();
             a.remove();
             window.URL.revokeObjectURL(url);
-
+            setExportLoading(false);
             const user = localStorage.getItem('currentUser');
             const parsedUser = JSON.parse(user || '{}');
 

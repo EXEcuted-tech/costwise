@@ -18,9 +18,10 @@ interface FileTableComponentProps {
     isLoading: boolean;
     setIsLoading: (value: boolean) => void;
     setErrorMsg: (value: string) => void;
+    setExportLoading: (value: boolean) => void;
 }
 
-const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoading, setIsLoading, setErrorMsg }) => {
+const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoading, setIsLoading, setErrorMsg, setExportLoading }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const { currentUser, setError } = useUserContext();
     const { setDeleteModal, setFileToDelete, setFileSettings } = useFileManagerContext();
@@ -60,7 +61,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
         try {
             const fileId = data.file_id;
 
-            setIsLoading(true);
+            setExportLoading(true);
 
             const response = await api.post('/files/export',
                 { file_id: fileId },
@@ -76,7 +77,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
             a.click();
             a.remove();
             window.URL.revokeObjectURL(url);
-            setIsLoading(false);
+            setExportLoading(false);
 
             const user = localStorage.getItem('currentUser');
             const parsedUser = JSON.parse(user || '{}');

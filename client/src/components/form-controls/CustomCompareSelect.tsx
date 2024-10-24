@@ -7,6 +7,7 @@ import { useFormulationContext } from '@/contexts/FormulationContext';
 interface CustomCompareSelectProps {
   setSelectedOptions: React.Dispatch<React.SetStateAction<string[]>>;
   selectedOptions: string[];
+  setAlertMessages?: React.Dispatch<React.SetStateAction<string[]>>;
 }
 
 interface Option {
@@ -24,6 +25,7 @@ interface SelectedOption {
 const CustomCompareSelect: React.FC<CustomCompareSelectProps> = ({
   setSelectedOptions,
   selectedOptions,
+  setAlertMessages
 }) => {
   const ref = useOutsideClick(() => setIsDropdownOpen(false));
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -73,7 +75,7 @@ const CustomCompareSelect: React.FC<CustomCompareSelectProps> = ({
         if (prevOptions.length < 10) {
           return [...prevOptions, { text: optionText, formulation_id: option.formulation_id }];
         } else {
-          alert('You can only select up to 10 options.');
+          setAlertMessages && setAlertMessages(prev => [...prev, 'You can only select up to 10 options.']);
           return prevOptions;
         }
       }

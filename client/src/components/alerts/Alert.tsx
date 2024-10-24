@@ -59,8 +59,8 @@ const Alert: React.FC<AlertProps> = ({ className, variant = 'default', message, 
     );
 
     return (
-        <div className={`absolute top-0 right-0 ${className}`}>
-            <div className="relative right-6 mt-4 z-[2000]">
+        <div className={`absolute top-0 right-0 z-[99999] ${className}`}>
+            <div className="relative right-6 mt-4 z-[99999]">
                 <div className={`animate-shake rounded-b-[10px] px-4 py-3 relative overflow-hidden ${outerElement}`}>
                     <div
                         className={`absolute top-0 left-0 h-1 ${loadingStyle} transition-all duration-300 ease-out`}
