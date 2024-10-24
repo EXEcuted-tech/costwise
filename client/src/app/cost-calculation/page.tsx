@@ -15,6 +15,7 @@ import Alert from "@/components/alerts/Alert";
 import { CostDataEntry, Product } from "@/types/data";
 import { initializeModel, makePrediction } from "@/components/model/sketch";
 import { request } from "http";
+import TrainingLoader from "@/components/loaders/TrainingLoader";
 
 const CostCalculation = () => {
   const { isOpen } = useSidebarContext();
@@ -64,8 +65,14 @@ const CostCalculation = () => {
   const [lossHistory, setLossHistory] = useState<number[]>([0]);
   const [trainingSpeed, setTrainingSpeed] = useState<number>(0);
   const addNewData = (newData: CostDataEntry[]) => {
-    setCostData((prevData) => [...prevData, ...newData]);
+    try {
+      setCostData((prevData) => [...prevData, ...newData]);
+    } finally {
+      console.log(costData)
+      updateTraininingData();
+    }
   };
+  const [isLoading, setIsLoading] = useState(false);
 
   const fetchData = async () => {
     try {
@@ -79,7 +86,7 @@ const CostCalculation = () => {
       if (costData.length === 0) {
         setCostData(parsedData);
       }
-      console.log(parsedData);
+      console.log("Pared Data", parsedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -207,7 +214,6 @@ const CostCalculation = () => {
     } catch (error) {
       console.error("Error exporting workbook:", error);
     } finally {
-      console.log("Cost Data: ", costData);
       if (
         selectedFG === "All-FG" &&
         !costData.some((entry) => entry.monthYear === currentMonthYear)
@@ -222,31 +228,41 @@ const CostCalculation = () => {
           monthYear: currentMonthYear,
           products: products,
         };
-
         addNewData([newData]);
-        api.post("/training/update", {
-          settings: costData,
-        });
-        try {
-          initializeModel(
-            costData,
-            model,
-            setModel,
-            setTrained,
-            setTrainingSpeed,
-            setLossHistory
-          );
-          console.log("After initialized model here are the data: ", trained);
-          console.log("Model Data", model);
-        } catch (err) {
-          console.log("Model training was unsuccessful.");
-        }
       }
     }
   };
 
+  const updateTraininingData = async () => {
+    setIsLoading(true);
+    try {
+      console.log("Cost Data", costData)
+      const response = await api.post("/training/update", {
+        settings: JSON.stringify(costData),
+      });
+
+      console.log("Successfully updated training Data: ", response.data.data.settings)
+
+    } catch (err) {
+      console.log("Error updating training data was unsuccessful.", err);
+    } finally {
+      initializeModel(
+        costData,
+        model,
+        setModel,
+        setTrained,
+        setTrainingSpeed,
+        setLossHistory
+      );
+      console.log("After initialized model here are the data: ", trained);
+      console.log("Model Data", model);
+    }
+  }
+
   useEffect(() => {
     makePrediction(trained, model, costData);
+    setIsLoading(false);
+    console.log("Cost Data After Training:", costData)
   }, [trained]);
 
   //Retrieve month and year options
@@ -322,156 +338,157 @@ const CostCalculation = () => {
 
   return (
     <>
-      <div className="absolute top-0 right-0">
-        {alertMessages &&
-          alertMessages.map((msg, index) => (
-            <Alert
-              className="!relative"
-              variant={
-                alertStatus as
-                  | "default"
-                  | "information"
-                  | "warning"
-                  | "critical"
-                  | "success"
-                  | undefined
-              }
-              key={index}
-              message={msg}
-              setClose={() => {
-                setAlertMessages((prev) => prev.filter((_, i) => i !== index));
-              }}
-            />
-          ))}
-      </div>
-      <div className="w-full">
-        <div>
+      {isLoading ? ( // Conditionally render loading component
+        <TrainingLoader />
+      ) : (
+        <div className="w-full">
+          <div className="absolute top-0 right-0">
+            {alertMessages &&
+              alertMessages.map((msg, index) => (
+                <Alert
+                  className="!relative"
+                  variant={
+                    alertStatus as
+                    | "default"
+                    | "information"
+                    | "warning"
+                    | "critical"
+                    | "success"
+                    | undefined
+                  }
+                  key={index}
+                  message={msg}
+                  setClose={() => {
+                    setAlertMessages((prev) => prev.filter((_, i) => i !== index));
+                  }}
+                />
+              ))}
+          </div>
+
           <Header icon={BiSolidReport} title="Cost Calculation" />
-        </div>
 
-        <div className="flex mt-[30px] ml-[80px] mr-[35px]">
-          <div className="w-[30rem] pb-8">
-            {/* Date Range */}
-            <div className="flex">
-              <div className="text-[19px] mr-5 pt-4">
-                Month & Year{" "}
-                <span className="text-[#B22222] ml-1 font-bold">*</span>
-              </div>
-            </div>
-            <div className="mt-2">
-              <BiCalendarEvent className="absolute text-[30px] text-[#6b6b6b82] mt-[6px] ml-2 z-[3]" />
-              <select
-                className="w-[220px] h-[45px] text-[21px] pl-[42px] pr-4 text-[#000000] bg-white border-1 border-[#929090] rounded-md drop-shadow-md cursor-pointer"
-                name="Month & Year"
-                defaultValue=""
-                onChange={(e) =>
-                  handleMonthYear(
-                    e.target.value,
-                    e.target.options[e.target.selectedIndex].text
-                  )
-                }
-              >
-                <option value="" disabled>
-                  mm-yyyy
-                </option>
-                {monthYearOptions.map((option, index) => (
-                  <option key={index} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {/* FG Selector */}
-            <div className="flex mt-4">
-              <div
-                onClick={() => handleFGClick("Specific-FG")}
-                className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-l-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                    ${
-                                      selectedFG === "Specific-FG"
-                                        ? "bg-[#B22222] text-white"
-                                        : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
-                                    }`}
-              >
-                Specific-FG
-              </div>
-              <div
-                onClick={() => handleFGClick("All-FG")}
-                className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-r-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                    ${
-                                      selectedFG === "All-FG"
-                                        ? "bg-[#B22222] text-white"
-                                        : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
-                                    }`}
-              >
-                All-FG
-              </div>
-            </div>
-          </div>
-
-          <div className="flex flex-col ml-auto">
-            {/* Export Button */}
-            <div className="flex ml-auto">
-              <div className="text-[19px] mr-5 pt-4">Export File</div>
-            </div>
-            <div className="flex mt-2 ml-auto">
-              <select
-                className="w-[95px] h-[45px] text-[21px] pl-[10px] text-[#000000] bg-white border-1 border-[#929090] rounded-l-md drop-shadow-md cursor-pointer"
-                name="fromDate"
-                value={exportType}
-                onChange={(e) => setExportType(e.target.value)}
-              >
-                <option value="xlsx">XLSX</option>
-                <option value="csv">CSV</option>
-              </select>
-
-              <button
-                className="w-[40px] h-[45px] bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out px-[5px] rounded-r-md cursor-pointer"
-                onClick={handleExport}
-              >
-                <MdDownloadForOffline className="text-white text-[30px] hover:animate-shake-tilt" />
-              </button>
-            </div>
-
-            {/* Add Sheet Button */}
-            <div className="h-[45px] mt-4">
-              {selectedFG === "Specific-FG" && (
-                <div
-                  onClick={handleAddSheet}
-                  className="flex items-center w-[170px] px-4 h-[45px] text-white bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out rounded-md cursor-pointer"
-                >
-                  <IoMdAdd className="text-[28px] mr-3" />{" "}
-                  <p className="text-[21px] font-bold">FG Sheet</p>
+          <div className="flex mt-[30px] ml-[80px] mr-[35px]">
+            <div className="w-[30rem] pb-8">
+              {/* Date Range */}
+              <div className="flex">
+                <div className="text-[19px] mr-5 pt-4">
+                  Month & Year{" "}
+                  <span className="text-[#B22222] ml-1 font-bold">*</span>
                 </div>
-              )}
+              </div>
+              <div className="mt-2">
+                <BiCalendarEvent className="absolute text-[30px] text-[#6b6b6b82] mt-[6px] ml-2 z-[3]" />
+                <select
+                  className="w-[220px] h-[45px] text-[21px] pl-[42px] pr-4 text-[#000000] bg-white border-1 border-[#929090] rounded-md drop-shadow-md cursor-pointer"
+                  name="Month & Year"
+                  defaultValue=""
+                  onChange={(e) =>
+                    handleMonthYear(
+                      e.target.value,
+                      e.target.options[e.target.selectedIndex].text
+                    )
+                  }
+                >
+                  <option value="" disabled>
+                    mm-yyyy
+                  </option>
+                  {monthYearOptions.map((option, index) => (
+                    <option key={index} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </div>
+              {/* FG Selector */}
+              <div className="flex mt-4">
+                <div
+                  onClick={() => handleFGClick("Specific-FG")}
+                  className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-l-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
+                    ${selectedFG === "Specific-FG"
+                      ? "bg-[#B22222] text-white"
+                      : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
+                    }`}
+                >
+                  Specific-FG
+                </div>
+                <div
+                  onClick={() => handleFGClick("All-FG")}
+                  className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-r-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
+                    ${selectedFG === "All-FG"
+                      ? "bg-[#B22222] text-white"
+                      : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
+                    }`}
+                >
+                  All-FG
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col ml-auto">
+              {/* Export Button */}
+              <div className="flex ml-auto">
+                <div className="text-[19px] mr-5 pt-4">Export File</div>
+              </div>
+              <div className="flex mt-2 ml-auto">
+                <select
+                  className="w-[95px] h-[45px] text-[21px] pl-[10px] text-[#000000] bg-white border-1 border-[#929090] rounded-l-md drop-shadow-md cursor-pointer"
+                  name="fromDate"
+                  value={exportType}
+                  onChange={(e) => setExportType(e.target.value)}
+                >
+                  <option value="xlsx">XLSX</option>
+                  <option value="csv">CSV</option>
+                </select>
+
+                <button
+                  className="w-[40px] h-[45px] bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out px-[5px] rounded-r-md cursor-pointer"
+                  onClick={handleExport}
+                >
+                  <MdDownloadForOffline className="text-white text-[30px] hover:animate-shake-tilt" />
+                </button>
+              </div>
+
+              {/* Add Sheet Button */}
+              <div className="h-[45px] mt-4">
+                {selectedFG === "Specific-FG" && (
+                  <div
+                    onClick={handleAddSheet}
+                    className="flex items-center w-[170px] px-4 h-[45px] text-white bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out rounded-md cursor-pointer"
+                  >
+                    <IoMdAdd className="text-[28px] mr-3" />{" "}
+                    <p className="text-[21px] font-bold">FG Sheet</p>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
-        </div>
 
-        <div>
-          {selectedFG === "All-FG" ? (
-            <AllFG
-              title={`Cost Summary Report: ${monthYear.label}`}
-              isOpen={isOpen}
-              sheetData={allFGData}
-            />
-          ) : (
-            sheets.map((sheet) => (
-              <SpecificFG
-                key={sheet.id}
-                id={sheet.id}
-                removeSheet={handleRemoveSheet}
-                updateSheetData={updateSheetData}
+          <div>
+            {selectedFG === "All-FG" ? (
+              <AllFG
+                title={`Cost Summary Report: ${monthYear.label}`}
                 isOpen={isOpen}
-                monthYear={monthYear}
-                FGOptions={FGOptions}
+                sheetData={allFGData}
               />
-            ))
-          )}
-          {/*  */}
+            ) : (
+              sheets.map((sheet) => (
+                <SpecificFG
+                  key={sheet.id}
+                  id={sheet.id}
+                  removeSheet={handleRemoveSheet}
+                  updateSheetData={updateSheetData}
+                  isOpen={isOpen}
+                  monthYear={monthYear}
+                  FGOptions={FGOptions}
+                />
+              ))
+            )}
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
+
 };
 
 export default CostCalculation;

@@ -140,7 +140,7 @@ export async function initializeModel(
   ]);
 
   const earlyStopping = tf.callbacks.earlyStopping({
-    monitor: "val_loss", // Monitor the validation loss for early stopping
+    monitor: "val_loss",
     patience: 5,
     minDelta: 0.01,
   });
@@ -156,6 +156,8 @@ export async function initializeModel(
       callbacks: {
         onEpochEnd: (epoch, logs) => {
           currentLossHistory.push(logs.loss);
+          console.log("This is epoch number: ", epoch)
+          console.log("This is the loss value", logs)
         },
         ...[earlyStopping],
       },
@@ -241,7 +243,6 @@ function TrainingModel() {
   const [model, setModel] = useState<tf.Sequential | null>(null);
   const [trained, setTrained] = useState(false);
   const [lossHistory, setLossHistory] = useState<number[]>([0]);
-  const [latestDate, setLatestDate] = useState(0);
   let currentMonthYear = () => {
     const date = new Date();
     const month = (date.getMonth() + 1).toString().padStart(2, "0");
