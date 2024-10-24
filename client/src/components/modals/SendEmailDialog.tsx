@@ -29,8 +29,9 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
       
     } catch (error) {
       console.error('Error sending reset email:', error);
+    }finally {
+      setIsLoading(false);
     }
-    setIsLoading(false);
   };
 
   return (
