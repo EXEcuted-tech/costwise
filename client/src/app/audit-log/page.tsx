@@ -70,80 +70,48 @@ const AuditLogPage = () => {
     const indexOfFirstItem = indexOfLastItem - 8;
     const currentListPage = auditLogs ? auditLogs.slice(indexOfFirstItem, indexOfLastItem) : [];
 
-
-    // useEffect(() => {
-    //     const storedUser = localStorage.getItem('currentUser');
-    //     if (storedUser) {
-    //         try {
-    //             const parsedUser = JSON.parse(storedUser);
-    //             setCurrentUser(parsedUser);
-    //         } catch (error) {
-    //             console.error("Error parsing stored user:", error);
-    //         }
-    //     }
-
-    //     const fetchData = async () => {
-    //         try {
-    //             const res = await api.get('/auditlogs');
-    //             const logs = res.data.map((log: any) => ({
-    //                 dateTimeAdded: new Date(log.timestamp),
-    //                 employeeName: `${log.user.first_name} ${log.user.middle_name ? log.user.middle_name.charAt(0) + '. ' : ''}${log.user.last_name}`,
-    //                 employeeNo: log.user.employee_number,
-    //                 userType: log.user.user_type,
-    //                 userEmail: log.user.email_address,
-    //                 description: log.description,
-    //                 actionEvent: log.action as ActionType,
-    //                 department: log.user.department
-    //             }));
-    //             setAuditLogs(logs);
-    //             setIsLoading(false);
-    //         } catch (error: any) {
-    //             console.error("Failed to fetch audit logs:", error);
-    //         }
-    //     }
-
-    //     fetchData();
-    // }, [setCurrentUser]);
-
-    // useEffect(() => {
-    //     const storedUser = localStorage.getItem('currentUser');
-    //     if (storedUser) {
-    //         try {
-    //             const parsedUser = JSON.parse(storedUser);
-    //             setCurrentUser(parsedUser);
-    //         } catch (error) {
-    //             console.error("Error parsing stored user:", error);
-    //         }
-    //     }
-
-    //     const interval = setInterval(() => {
-    //         const fetchData = async () => {
-    //             try {
-    //                 const res = await api.get('/auditlogs');
-    //                 const logs = res.data.map((log: any) => ({
-    //                     // log_id: log.log_id,
-    //                     // user_id: log.user_id,
-    //                     // action: log.action as ActionType,
-    //                     // timestamp: new Date(log.timestamp),
-    //                     dateTimeAdded: new Date(log.timestamp),
-    //                     employeeName: `${log.user.first_name} ${log.user.middle_name ? log.user.middle_name.charAt(0) + '. ' : ''}${log.user.last_name}`,
-    //                     employeeNo: log.user.employee_number,
-    //                     userType: log.user.user_type,
-    //                     userEmail: log.user.email_address,
-    //                     description: log.description,
-    //                     actionEvent: log.action as ActionType,
-    //                     department: log.user.department
-    //                 }));
-    //                 setAuditLogs(logs);
-    //                 setIsLoading(false);
-    //             } catch (error: any) {
-    //                 console.error("Failed to fetch audit logs:", error);
-    //             }
-    //         }
-    //         fetchData();
-    //     }, 5000);
-    //     return () => clearInterval(interval);
-    // }, [setCurrentUser]);
+        
+    useEffect(() => {
+        const storedUser = localStorage.getItem('currentUser');
+        if (storedUser) {
+            try {
+                const parsedUser = JSON.parse(storedUser);
+                setCurrentUser(parsedUser);
+            } catch (error) {
+                console.error("Error parsing stored user:", error);
+            }
+        }
+        console.log(currentUser);
+        const interval = setInterval(() => {
+            const fetchData = async () => {
+                try {
+                    const res = await api.get('/auditlogs');
+                    const logs = res.data.map((log: any) => ({
+                        // log_id: log.log_id,
+                        // user_id: log.user_id,
+                        // action: log.action as ActionType,
+                        // timestamp: new Date(log.timestamp),
+                        dateTimeAdded: new Date(log.timestamp),
+                        employeeName: `${log.user.first_name} ${log.user.middle_name ? log.user.middle_name.charAt(0) + '. ' : ''}${log.user.last_name}`,
+                        employeeNo: log.user.employee_number,
+                        userType: log.user.user_type,
+                        userEmail: log.user.email_address,
+                        description: log.description,
+                        actionEvent: log.action as ActionType,
+                        department: log.user.department
+                    }));
+                    const sortedLogs = logs.sort((a: AuditTableProps, b: AuditTableProps) => b.dateTimeAdded.getTime() - a.dateTimeAdded.getTime());
+                    setAuditLogs(logs);
+                } catch (error: any) {
+                    console.error("Failed to fetch audit logs:", error);
+                } finally {
+                    setIsLoading(false);
+                }
+            }
+            fetchData();
+        }, 25000);
+        return () => clearInterval(interval);
+    }, []);
 
     const sortAuditLogs = () => {
         const sortedLogs = [...auditLogs].sort((a, b) => {

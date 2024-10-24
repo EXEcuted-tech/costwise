@@ -15,7 +15,7 @@ const MainLayout = () => {
   const { isOpen, setIsOpen } = useSidebarContext();
   const { setHasNewNotifications } = useNotificationContext();
   const [notificationSound, setNotificationSound] = useState<HTMLAudioElement | null>(null);
-  const { setError, error } = useUserContext();
+  const { setError, error, silentMode } = useUserContext();
 
   const notificationSoundSrc = '/notification-ring.mp3';
 
@@ -36,7 +36,9 @@ const MainLayout = () => {
 
         if (response.data.data.length > 0) {
           setHasNewNotifications(true);
-          notificationSound?.play()
+          if(!silentMode){
+            notificationSound?.play()
+          }
         } else {
           setHasNewNotifications(false);
         }

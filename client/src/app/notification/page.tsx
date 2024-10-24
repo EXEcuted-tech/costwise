@@ -8,8 +8,9 @@ import { useNotificationContext } from '@/contexts/NotificationContext';
 import api from '@/utils/api';
 import { format, formatDistanceToNow, isThisWeek, isToday, isYesterday, parseISO, subMonths } from 'date-fns';
 import { SetStateAction, useEffect, useState } from 'react';
-import { FaBell } from "react-icons/fa";
+import { FaBell, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import Spinner from '@/components/loaders/Spinner'; // Added import for Spinner component
+import { useUserContext } from '@/contexts/UserContext';
 
 const NotificationPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -19,6 +20,7 @@ const NotificationPage = () => {
     const { hasNewNotifications, setHasNewNotifications } = useNotificationContext();
     const [isOnlyShowUnread, setIsOnlyShowUnread] = useState(false);
     const [isLoading, setIsLoading] = useState(false); // Added isLoading state
+    const { silentMode, setSilentMode } = useUserContext();
 
     const getIconForAction = (action: string | number) => {
         const actionIcons = {
@@ -212,9 +214,22 @@ const NotificationPage = () => {
         <div>
             <Header icon={FaBell} title="Notifications"></Header>
             <div className='px-[50px] pb-[50px] mt-[36px] ml-[45px]'>
-                <div className='w-full flex justify-end'>
-                    <span className='text-[#ABABAB] mr-[10px]'>Only show unread</span>
-                    <ToggleButton initialState={false} onToggle={handleToggle} />
+                <div className='w-full flex justify-between items-center'>
+                    <div className="flex items-center">
+                        <button
+                            onClick={() => setSilentMode(!silentMode)}
+                            className="text-2xl text-[#ABABAB] dark:text-gray-300 focus:outline-none"
+                        >
+                            {silentMode ? <FaVolumeMute /> : <FaVolumeUp />}
+                        </button>
+                        <span className="ml-2 text-[17px] text-[#ABABAB] dark:text-gray-300">
+                            {silentMode ? "Silent Mode" : "Notification Sound On"}
+                        </span>
+                    </div>
+                    <div className="flex items-center">
+                        <span className='text-[#ABABAB] mr-[10px]'>Only show unread</span>
+                        <ToggleButton initialState={false} onToggle={handleToggle} />
+                    </div>
                 </div>
                 <div className='bg-white dark:bg-[#3C3C3C] w-full rounded-[20px] drop-shadow-lg mt-[15px]'>
                     {isLoading ? (

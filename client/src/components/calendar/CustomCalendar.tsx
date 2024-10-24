@@ -75,7 +75,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
             }
         };
         fetchEvents();
-    }, [currentDate]);
+    }, [isModalOpen, currentDate]);
 
     const handlePreviousMonth = () => {
         setCurrentDate(prevDate => {
@@ -189,7 +189,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
                 selectedEvent ? (
                     <ViewEditEventModal
                         event={{
-                            id: selectedEvent.id.toString(),
+                            id: selectedEvent.id,
                         }}
                         onClose={() => setIsModalOpen(false)}
                     />
