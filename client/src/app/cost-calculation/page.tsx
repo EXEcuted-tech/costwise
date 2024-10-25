@@ -34,6 +34,10 @@ const CostCalculation = () => {
   const [allFGData, setAllFGData] = useState<AllFinishedGood[]>([]);
   const [fileName, setFileName] = useState<string>("sample");
   const [exportType, setExportType] = useState<string>("xlsx");
+  const [selectedGoods, setSelectedGoods] = useState<{ id: number; name: string }[]>([]);
+  const [prevSheets, setPrevSheets] = useState<
+    { id: number; data: SpecificFinishedGood | null }[]
+  >([{ id: 0, data: null }]);
   const [sheets, setSheets] = useState<
     { id: number; data: SpecificFinishedGood | null }[]
   >([{ id: 0, data: null }]);
@@ -45,11 +49,20 @@ const CostCalculation = () => {
   // Sheet functions
   const handleAddSheet = () => {
     setSheets((prevSheets) => {
-      if (prevSheets.length >= FGOptions.length) {
-        setAlertMessages([
-          "Cannot add more sheets. All finished goods have been added.",
-        ]);
-        setAlertStatus("warning");
+      if ((prevSheets.length >= FGOptions.length) && prevSheets.length != 0) {
+        if (FGOptions.length == 0) {
+          setAlertMessages([
+            "Choose Month Year first!",
+          ]);
+          setAlertStatus("critical");
+        } else {
+          setAlertMessages([
+            "Cannot add more sheets. All finished goods have been added.",
+          ]);
+          setAlertStatus("warning");
+        }
+
+
         return prevSheets;
       }
 
@@ -61,38 +74,63 @@ const CostCalculation = () => {
         return [...prevSheets, { id: newId, data: null }];
       }
       setAlertMessages([
-        "Cannot add more sheets. All finished goods have been added.",
+        "Choose a Finished Good first!",
       ]);
       setAlertStatus("critical");
       return prevSheets;
     });
   };
+
   const handleRemoveSheet = (id: number) => {
+
+    const sheetToRemove = sheets.find(sheet => sheet.id === id);
     setSheets(sheets.filter((sheet) => sheet.id !== id));
+    if (sheetToRemove) {
+      setSelectedGoods(prev => {
+        return prev.filter(goodId => goodId.name !== sheetToRemove.data?.desc);
+      });
+    }
   };
 
   const updateSheetData = (id: number, data: SpecificFinishedGood) => {
+    const previousSheets = sheets;
+    setPrevSheets(sheets);
     setSheets((prevSheets) => {
       const existingIndex = prevSheets.findIndex(
         (sheet) => sheet.data?.code === data.code
       );
 
-      if (existingIndex !== -1) {
-        return prevSheets.map((sheet, index) =>
+      const newSheets = existingIndex !== -1
+        ? prevSheets.map((sheet, index) =>
           index === existingIndex ? { ...sheet, data } : sheet
-        );
-      } else {
-        return prevSheets.map((sheet) =>
+        )
+        : prevSheets.map((sheet) =>
           sheet.id === id ? { ...sheet, data } : sheet
         );
-      }
+
+      previousSheets.forEach((previousSheet, index) => {
+        if ((previousSheet.data === null || newSheets[index].data === null)) {
+          return;
+        }
+
+        if (previousSheet.data !== null && newSheets[index].data !== null) {
+          if (previousSheet.data.desc != newSheets[index].data.desc) {
+            setSelectedGoods(prev => {
+              return prev.filter(goodId => goodId.name !== previousSheet.data?.desc);
+            });
+          }
+        }
+      });
+      return newSheets;
     });
+
   };
 
   const handleMonthYear = (value: string, label: string) => {
     const numericValue = parseInt(value, 10);
     if (!isNaN(numericValue)) {
       setMonthYear({ value: numericValue, label: label });
+      // retrieveFGOptions(numericValue);
     }
   };
 
@@ -111,8 +149,8 @@ const CostCalculation = () => {
   const handleExport = async () => {
     const sysRoles = currentUser?.roles;
     if (!sysRoles?.includes(17)) {
-        setError('You are not authorized to export records or files.');
-        return;
+      setError('You are not authorized to export records or files.');
+      return;
     }
 
     let sheetData = {};
@@ -129,8 +167,6 @@ const CostCalculation = () => {
     } else {
       sheetData = allFGData;
     }
-
-    console.log("Sheet Data", sheetData);
 
     try {
       const response = await api.post(
@@ -245,12 +281,12 @@ const CostCalculation = () => {
               className="!relative"
               variant={
                 alertStatus as
-                  | "default"
-                  | "information"
-                  | "warning"
-                  | "critical"
-                  | "success"
-                  | undefined
+                | "default"
+                | "information"
+                | "warning"
+                | "critical"
+                | "success"
+                | undefined
               }
               key={index}
               message={msg}
@@ -302,22 +338,20 @@ const CostCalculation = () => {
               <div
                 onClick={() => handleFGClick("Specific-FG")}
                 className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-l-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                    ${
-                                      selectedFG === "Specific-FG"
-                                        ? "bg-[#B22222] text-white"
-                                        : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
-                                    }`}
+                                    ${selectedFG === "Specific-FG"
+                    ? "bg-[#B22222] text-white"
+                    : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
+                  }`}
               >
                 Specific-FG
               </div>
               <div
                 onClick={() => handleFGClick("All-FG")}
                 className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-r-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                    ${
-                                      selectedFG === "All-FG"
-                                        ? "bg-[#B22222] text-white"
-                                        : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
-                                    }`}
+                                    ${selectedFG === "All-FG"
+                    ? "bg-[#B22222] text-white"
+                    : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
+                  }`}
               >
                 All-FG
               </div>
@@ -363,7 +397,7 @@ const CostCalculation = () => {
           </div>
         </div>
 
-        <div>
+        <div className="bg-background pb-[15px]">
           {selectedFG === "All-FG" ? (
             <AllFG
               title={`Cost Summary Report: ${monthYear.label}`}
@@ -380,6 +414,8 @@ const CostCalculation = () => {
                 isOpen={isOpen}
                 monthYear={monthYear}
                 FGOptions={FGOptions}
+                setSelectedGoods={setSelectedGoods}
+                selectedGoods={selectedGoods}
               />
             ))
           )}

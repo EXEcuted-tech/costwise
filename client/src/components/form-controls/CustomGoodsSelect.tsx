@@ -1,18 +1,22 @@
 "use client"
 import React, { useState, useRef, useEffect } from 'react';
+import { FaBoxOpen } from "react-icons/fa6";
 
 interface CustomGoodsSelectProps {
-  options: {value: number, label: string}[];
+  options: { value: number, label: string }[];
   placeholder: string;
   isOpen: boolean;
-  onChange: (selectedValue: {name: string, id: number}) => void;
+  onChange: (selectedValue: { name: string, id: number }) => void;
+  disabledOptions: { name: string, id: number }[];
 }
 
-const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placeholder, isOpen, onChange }) => {
-  const [selectedOption, setSelectedOption] = useState<{name: string, id: number} | null>(null);
+const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placeholder, isOpen, onChange, disabledOptions }) => {
+  const [selectedOption, setSelectedOption] = useState<{ name: string, id: number } | null>(null);
   const [width, setWidth] = useState<number>(0);
   const textRef = useRef<HTMLSpanElement>(null);
+  const [previousSelectedOption, setPreviousSelectedOption] = useState<any>();
 
+  const numberDisabledOptions = disabledOptions.map(option => option.id);
   useEffect(() => {
     if (textRef.current) {
       setWidth(textRef.current.offsetWidth);
@@ -25,10 +29,20 @@ const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placehol
     const selectedOption = options.find(option => option.value === selectedId);
     if (selectedOption) {
       const newSelectedValue = { name: selectedOption.label, id: selectedOption.value };
+      setPreviousSelectedOption(selectedOption);
       setSelectedOption(newSelectedValue);
       onChange(newSelectedValue);
     }
   };
+
+  const [filteredOptions, setFilteredOptions] = useState(numberDisabledOptions);
+
+  useEffect(() => {
+    const filtered = filteredOptions.filter(option => {
+      return !numberDisabledOptions.includes(option) && !filteredOptions.includes(option);
+    });
+    setFilteredOptions(filtered);
+  }, [])
 
   const xlWidth = isOpen ? width + 10 : width + 150;
   const defaultWidth = width + 150;
@@ -49,10 +63,16 @@ const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placehol
           transition: 'width 0.3s ease',
         }}
       >
-        <option value="" disabled selected className='truncate bg-gray-200'>{placeholder}</option>
+        <option value="" disabled selected className='truncate bg-gray-200 text-gray-600 font-bold flex items-center'>
+        📦 {placeholder}
+        </option>
         {options.map((option) => (
-          <option key={option.value} value={option.value} className='text-[#ACACAC] truncate'>
-            {option.label}
+          <option 
+            key={option.value} 
+            value={option.value} 
+            className={`${numberDisabledOptions.includes(option.value) && 'font-medium bg-secondary text-gray-700'} text-[#ACACAC] truncate`}
+            disabled={numberDisabledOptions.includes(option.value)}>
+            {numberDisabledOptions.includes(option.value) && '📋'}{option.label}
           </option>
         ))}
       </select>
