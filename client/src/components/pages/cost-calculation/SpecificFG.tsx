@@ -67,6 +67,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
 
         if (response.status === 200) {
           const fgData = response.data.data;
+          console.log(fgData);
           setSelectedFGDetails([fgData]);
           setIsLoading(false);
           updateSheetData(id, fgData);
@@ -84,29 +85,30 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
 
   return (
     <>
-      <div className="absolute top-0 right-0">
-        {alertMessages &&
-          alertMessages.map((msg, index) => (
-            <Alert
-              className="!relative"
-              variant={
-                alertStatus as
-                | "default"
-                | "information"
-                | "warning"
-                | "critical"
-                | "success"
-                | undefined
-              }
-              key={index}
-              message={msg}
-              setClose={() => {
-                setAlertMessages((prev) => prev.filter((_, i) => i !== index));
-              }}
-            />
-          ))}
+      <div className="fixed top-4 right-4 z-50">
+        <div className="flex flex-col items-end space-y-2">
+          {alertMessages &&
+            alertMessages.map((msg, index) => (
+              <Alert
+                className="!relative"
+                variant={
+                  alertStatus as
+                  | "default"
+                  | "information"
+                  | "warning"
+                  | "critical"
+                  | "success"
+                  | undefined
+                }
+                key={index}
+                message={msg}
+                setClose={() => {
+                  setAlertMessages((prev) => prev.filter((_, i) => i !== index));
+                }}
+              />
+            ))}
+        </div>
       </div>
-
       <div
         className={`${isOpen ? "" : ""
           } relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white rounded-2xl border-1 border-[#656565] shadow-md animate-pull-down`}
@@ -161,9 +163,9 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                 <>
                   <tr className={`text-[#6B6B6B] bg-[#ffebeb] font-semibold`}>
                     <td className="text-center px-6 py-2">
-                      {selectedFGDetails[0].formulation_no}
+                      {selectedFGDetails[0].formula_code}
                     </td>
-                    <td className="text-center">1</td>
+                    <td className="text-center"></td>
                     <td>{selectedFGDetails[0].code}</td>
                     <td>{selectedFGDetails[0].desc}</td>
                     <td className="text-right pr-12">

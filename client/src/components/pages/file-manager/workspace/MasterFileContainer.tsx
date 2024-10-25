@@ -373,12 +373,12 @@ const MasterFileContainer = (data: File) => {
           });
 
           if (deleteBulkResponse.data.status !== 200) {
-            setAlertMessages([deleteBulkResponse.data.data.message] ?? ['Failed to bulk archive Fodl IDs.']);
+            setAlertMessages([deleteBulkResponse.data.data.message]);
           } else {
             setSuccessMessage("FODL records archived and saved successfully.");
           }
         } catch (deleteBulkError:any) {
-          setAlertMessages([deleteBulkError.response.data.message] ?? ['An error occurred while deleting FODL records.']);
+          setAlertMessages([deleteBulkError.response.data.message]);
         }
 
         setRemovedFodlIds([]);
@@ -476,6 +476,8 @@ const MasterFileContainer = (data: File) => {
           } catch (deleteError) {
             setAlertMessages(['An error occurred while deleting Material records.']);
           }
+
+          setRemovedMaterialIds([]);
         } else {
           setSuccessMessage('Material sheet saved successfully.');
         }

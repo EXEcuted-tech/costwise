@@ -69,11 +69,11 @@ const DashboardPage = () => {
         (prediction: { monthYear: string }) => prediction.monthYear === targetMonthYear
       );
 
-      const totalCostForMonth = selectedMonthPredictions.reduce((acc, prediction) => {
+      const totalCostForMonth = selectedMonthPredictions.reduce((acc: number, prediction: { cost: string; }) => {
         const parsedCost = parseFloat(prediction.cost);
         return acc + parsedCost;
       }, 0);
-      
+      t
       const formattedPredictions = [{
         monthYear: targetMonthYear,
         cost: totalCostForMonth.toFixed(2),
@@ -254,7 +254,7 @@ const DashboardPage = () => {
                   </div>
                   <div className='flex flex-col items-center'>
                     <h1 className='text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>
-                      ₱{totalProductionCost}
+                      ₱{totalProductionCost ? totalProductionCost : '0.00'}
                     </h1>
                     <p className='italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]'>Total Production Cost</p>
                   </div>
@@ -310,7 +310,7 @@ const DashboardPage = () => {
                   </div>
                   <div className="flex flex-col items-center">
                     <h1 className="text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white">
-                      ₱{totalPrediction[0]?.cost}
+                      ₱{totalPrediction.length > 0 ? totalPrediction[0]?.cost : '0.00'}
                     </h1>
                     <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
                       Total Prediction Cost
