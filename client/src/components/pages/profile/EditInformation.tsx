@@ -17,7 +17,7 @@ type EditInformationprops = {
     userAcc?: any;
 };
 
-const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, setSuccessModal, isOpen, userAcc} ) => {
+const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, setSuccessModal, isOpen, userAcc }) => {
     const [isLoading, setIsLoading] = useState(false);
 
     const [fName, setFName] = useState(userAcc?.fName || '');
@@ -70,7 +70,7 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
             setPhoneNumberError(true);
             errors.push("Please enter a valid phone number.");
         }
-    
+
         if (errors.length > 0) {
             setAlertMessages(errors);
             setIsLoading(false);
@@ -85,31 +85,33 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
             phoneNum,
             suffix
         };
-        try{
+        try {
             await api.put('/user/update', payload);
             setSuccessModal(true);
-        }catch(error: any){
+        } catch (error: any) {
             console.log("Error updating user info", error);
-        }finally {
+        } finally {
             setIsLoading(false);
         }
-        
+
     }
-    
+
     return (
         <>
-            
+
             <form onSubmit={handleSubmit}>
-                <div className='absolute top-0 right-0'>
-                    {alertMessages && alertMessages.map((msg, index) => (
-                    <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
-                        setAlertMessages(prev => prev.filter((_, i) => i !== index));
-                    }} />
-                    ))}
+                <div className="fixed top-4 right-4 z-50">
+                    <div className="flex flex-col items-end space-y-2">
+                        {alertMessages && alertMessages.map((msg, index) => (
+                            <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+                                setAlertMessages(prev => prev.filter((_, i) => i !== index));
+                            }} />
+                        ))}
+                    </div>
                 </div>
-                <div className={`${isOpen ? 'text-[15px] 2xl:text-[18px] 3xl:text-[24px] mt-[30px] 2xl:mt-[30px]' : 'text-[18px] 2xl:text-[22px] 3xl:text-[24px] mt-[30px]'} flex justify-center mx-[3%] 2xl:mx-[5%]`}>
-                    <button className='flex text-[1.3em] mt-[0.3rem] ml-3' onClick={()=> setProps(false)}>
-                        <IoIosArrowRoundBack className='text-[#6D6D6D] text-[40px] mr-[15px] hover:text-[#D13131] cursor-pointer'/>
+                <div className={`${isOpen ? 'text-[15px] 2xl:text-[18px] 3xl:text-[24px] mt-[30px] 2xl:mt-[30px]' : 'text-[18px] 2xl:text-[22px] 3xl:text-[24px] mt-[30px]'} animate-crop-left-to-right flex justify-center mx-[3%] 2xl:mx-[5%]`}>
+                    <button className='flex text-[1.3em] mt-[0.3rem] ml-3' onClick={() => setProps(false)}>
+                        <IoIosArrowRoundBack className='text-[#6D6D6D] text-[40px] mr-[15px] hover:text-[#D13131] cursor-pointer' />
                     </button>
                     {/* 1st Col */}
                     <div className='flex flex-col ml-3 mr-8 w-[30%] gap-4'>
@@ -265,15 +267,15 @@ const EditInformation: React.FC<EditInformationprops> = ( {setProps, setDialog, 
                         </div>
                     </div>
                 </div>
-                
+
                 {/* Buttons */}
-                <div className={`${isOpen ? 'mt-[15px] 3xl:mt-[37px]' : 'mt-[37px]'} flex flex-col w-full justify-center items-center`}>
-                    <button type="submit" className={`${isLoading ? 'bg-black': ''} flex justify-center items-center w-[25%] 2xl:w-[20%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] bg-primary text-white rounded-xl hover:bg-[#9c1c1c]`}
-                    onClick={() => {handleSubmit}}
+                <div className={`${isOpen ? 'mt-[15px] 3xl:mt-[37px]' : 'mt-[37px]'} flex flex-col w-full justify-center items-center animate-pop-out`}>
+                    <button type="submit" className={`${isLoading ? 'bg-black' : ''} flex justify-center items-center w-[25%] 2xl:w-[20%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] bg-primary text-white rounded-xl hover:bg-[#9c1c1c]`}
+                        onClick={() => { handleSubmit }}
                     >
                         {isLoading && <Spinner className="group-hover:!text-white mr-1 !size-[25px]" />}
                         <span>
-                            Update Profile 
+                            Update Profile
                         </span>
                     </button>
                     <div className="text-[#8F8F8F] text-[14px] 3xl:text-[19px] underline underline-offset-[7px] cursor-pointer hover:text-[#5B5353]"

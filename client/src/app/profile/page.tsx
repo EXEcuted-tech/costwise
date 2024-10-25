@@ -15,6 +15,7 @@ import { removeTokens } from "@/utils/removeTokens";
 import fs from 'fs/promises';
 import path from 'path';
 import config from "@/server/config";
+import Loader from "@/components/loaders/Loader";
 
 interface UserProps {
     fName: string;
@@ -153,14 +154,14 @@ const ProfilePage = () => {
                             className="hidden"
                         />
                         <button
-                            className="w-10 h-10 absolute right-0 bottom-0 bg-[#A60000] rounded-full border-3 border-white p-[0.3rem] text-white text-[1.6em]"
+                            className="hover:bg-primary w-10 h-10 absolute right-0 bottom-0 bg-[#A60000] rounded-full border-3 border-white p-[0.3rem] text-white text-[1.6em]"
                             onClick={handleCameraClick}
                         >
                             <IoCamera />
                         </button>
                         <div className='w-28 h-28 bg-red-200 border-4 border-[#A60000] rounded-full overflow-hidden'>
                             {profilePicture ? (
-                                <div 
+                                <div
                                     className="w-full h-full object-cover"
                                     style={{
                                         backgroundImage: `url(${getProfilePictureUrl(profilePicture) || '/default-profile.png'})`,
@@ -177,8 +178,22 @@ const ProfilePage = () => {
                         </div>
                     </div>
                     <div>
-                        <div className='text-[25px] 2xl:text-[30px] font-semibold'> {userAcc?.fName} {userAcc?.lName}</div>
-                        <div className='text-[22px] 2xl:text-[24px]'> {userAcc?.position} </div>
+                        {isLoading ?
+                            <>
+                                <div className="w-[120px]">
+                                    <Loader className="h-[25px] mb-[10px]" />
+                                </div>
+                                <div className="w-[75px]">
+                                    <Loader className="h-[19px]" />
+                                </div>
+                            </>
+                            :
+                            <>
+                                <div className='text-[25px] 2xl:text-[30px] font-semibold'> {userAcc?.fName} {userAcc?.lName}</div>
+                                <div className='text-[22px] 2xl:text-[24px]'> {userAcc?.position} </div>
+                            </>
+                        }
+
                         <button className="text-[22px] 2xl:text-[24px] text-primary cursor-pointer hover:opacity-65"
                             onClick={handleLogout}>
                             Logout

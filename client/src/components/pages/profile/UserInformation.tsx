@@ -49,7 +49,7 @@ const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc, isLo
                 <div className={`${isOpen ? 'text-[24px] 2xl:text-[32px]' : 'text-[28px] 2xl:text-[32px]'} flex text-[#8E8E8E] font-semibold mt-3 mb-2`}>
                     User Information
                     <button className={`${isOpen ? 'text-[26px] 2xl:text-[36px]' : 'text-[30px] 2xl:text-[36px]'} px-3 text-black mr-2 mt-1 rounded-lg`} onClick={()=>setProps(true)}>
-                        <MdModeEdit/>
+                        <MdModeEdit className='hover:text-primary hover:animate-shake-tilt'/>
                     </button>
                 </div>
                 {/* Roles */}
@@ -64,7 +64,7 @@ const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc, isLo
                 </div>
             </div>
             
-            <div className={`${isOpen ? 'text-[13px] 2xl:text-[17px] 3xl:text-[22px] 4xl:text-[24px]' : 'text-[18px] 2xl:text-[22px] 3xl:text-[24px]'} flex h-[310px] justify-center border-2 border-[#D9D9D9] py-5 text-black rounded-[15px]`}>
+            <div className={`${isOpen ? 'text-[13px] 2xl:text-[17px] 3xl:text-[22px] 4xl:text-[24px]' : 'text-[18px] 2xl:text-[22px] 3xl:text-[24px]'} flex h-[310px] justify-center border-2 border-[#D9D9D9] py-5 text-black rounded-[15px] transition-all duration-400 ease-in`}>
                {isLoading? (<div className='flex h-[260px] pt-[100px]'><Spinner className='!size-[50px]'/> </div>) : 
                (
                 <div className='flex w-full justify-center gap-[10%]'>
@@ -90,7 +90,7 @@ const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc, isLo
                     <div className='flex flex-col'>
                         <div className='flex flex-col justify-start mb-4'>
                             <p className={`${!userAcc?.mName ? 'opacity-25' : 'text-[#808080]'} font-semibold`}>Middle Name</p>
-                            <p>{!userAcc?.mName ? "‎" : userAcc?.mName}</p>
+                            <p className={`${!userAcc?.mName && 'opacity-25'}`}>{!userAcc?.mName ? "N/A" : userAcc?.mName}</p>
                         </div>
 
                         <div className='flex flex-col justify-start mb-4'>
@@ -113,7 +113,7 @@ const UserInformation: React.FC<UserInformationProps> = ( {isOpen, userAcc, isLo
 
                         <div className='flex flex-col justify-start mb-4'>
                             <p className={`${!userAcc?.suffix ? 'opacity-25' : 'text-[#808080]'} font-semibold`}>Suffix</p>
-                            <p>{!userAcc?.suffix ? "‎" : userAcc?.suffix}</p>
+                            <p className={`${!userAcc?.suffix && 'opacity-25'}`}>{!userAcc?.suffix ? "N/A" : userAcc?.suffix}</p>
                         </div>
 
                         <div className='flex flex-col justify-start mb-4'>
