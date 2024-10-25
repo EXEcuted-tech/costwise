@@ -35,12 +35,10 @@ const CostCalculation = () => {
   const [fileName, setFileName] = useState<string>("sample");
   const [exportType, setExportType] = useState<string>("xlsx");
   const [selectedGoods, setSelectedGoods] = useState<{ id: number; name: string }[]>([]);
-  const [prevSheets, setPrevSheets] = useState<
-    { id: number; data: SpecificFinishedGood | null }[]
-  >([{ id: 0, data: null }]);
   const [sheets, setSheets] = useState<
     { id: number; data: SpecificFinishedGood | null }[]
   >([{ id: 0, data: null }]);
+  const [exportLoading, setExportLoading] = useState(false);
 
   const handleFGClick = (fg: React.SetStateAction<string>) => {
     setSelectedFG(fg);
@@ -61,8 +59,6 @@ const CostCalculation = () => {
           ]);
           setAlertStatus("warning");
         }
-
-
         return prevSheets;
       }
 
@@ -94,7 +90,7 @@ const CostCalculation = () => {
 
   const updateSheetData = (id: number, data: SpecificFinishedGood) => {
     const previousSheets = sheets;
-    setPrevSheets(sheets);
+
     setSheets((prevSheets) => {
       const existingIndex = prevSheets.findIndex(
         (sheet) => sheet.data?.code === data.code
@@ -152,7 +148,7 @@ const CostCalculation = () => {
       setError('You are not authorized to export records or files.');
       return;
     }
-
+    setExportLoading(true);
     let sheetData = {};
     if (selectedFG === "Specific-FG") {
       sheetData = sheets
@@ -189,14 +185,16 @@ const CostCalculation = () => {
         a.click();
         a.remove();
         window.URL.revokeObjectURL(url);
-
+        setExportLoading(false);
         setAlertMessages(["Report exported successfully."]);
         setAlertStatus("success");
       } else {
+        setExportLoading(false);
         setAlertMessages(["Error exporting workbook:", response.data.message]);
         setAlertStatus("critical");
       }
     } catch (error) {
+      setExportLoading(false);
       console.error("Error exporting workbook:", error);
     }
   };
@@ -274,27 +272,41 @@ const CostCalculation = () => {
 
   return (
     <>
-      <div className="absolute top-0 right-0">
-        {alertMessages &&
-          alertMessages.map((msg, index) => (
-            <Alert
-              className="!relative"
-              variant={
-                alertStatus as
-                | "default"
-                | "information"
-                | "warning"
-                | "critical"
-                | "success"
-                | undefined
-              }
-              key={index}
-              message={msg}
-              setClose={() => {
-                setAlertMessages((prev) => prev.filter((_, i) => i !== index));
-              }}
-            />
-          ))}
+      {(exportLoading) &&
+        <div className='fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-brightness-50 z-[1500]'>
+          <div className="three-body">
+            <div className="three-body__dot"></div>
+            <div className="three-body__dot"></div>
+            <div className="three-body__dot"></div>
+          </div>
+          <p className='text-primary font-light text-[20px] mt-[10px] text-white'>
+            Exporting file(s)...
+          </p>
+        </div>
+      }
+      <div className="fixed top-4 right-4 z-50">
+        <div className="flex flex-col items-end space-y-2">
+          {alertMessages &&
+            alertMessages.map((msg, index) => (
+              <Alert
+                className="!relative"
+                variant={
+                  alertStatus as
+                  | "default"
+                  | "information"
+                  | "warning"
+                  | "critical"
+                  | "success"
+                  | undefined
+                }
+                key={index}
+                message={msg}
+                setClose={() => {
+                  setAlertMessages((prev) => prev.filter((_, i) => i !== index));
+                }}
+              />
+            ))}
+        </div>
       </div>
       <div className="w-full">
         <div>
