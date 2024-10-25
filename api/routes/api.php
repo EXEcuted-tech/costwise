@@ -13,7 +13,6 @@ use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\SystemController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\CostCalcController;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\UserController;
@@ -42,6 +41,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     Route::prefix('/user')->group(function () {
         Route::get('', [UserController::class, 'getCurrentUser']);
         Route::get('retrieve', [UserController::class, 'retrieveUser']);
+        Route::get('roles', [UserController::class, 'getUserRoles']);
         Route::post('update/{id}', [UserController::class, 'updateUser']);
         Route::delete('archive/{id}', [UserController::class, 'archiveUser']);
         Route::put('update', [UserController::class, 'editUserInfo']);
@@ -59,6 +59,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
 
     Route::prefix('/finished_goods')->group(function () {
         Route::get('retrieve_all', [FinishedGoodController::class, 'retrieveAll']);
+        Route::get('retrieve_allFG', [FinishedGoodController::class, 'retrieveAllFGData']);
         Route::get('retrieve', [FinishedGoodController::class, 'retrieve']);
         Route::get('retrieve_first', [FinishedGoodController::class, 'retrieveFirst']);
         Route::get('retrieve_batch', [FinishedGoodController::class, 'retrieveBatch']);
@@ -154,25 +155,12 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('export', [CostCalcController::class, 'export']);
     });
 
-    Route::prefix('/training')->group(function () {
-        Route::post('/upload', [FileController::class, 'uploadTrainingData']);
-        Route::get('/data', [FileController::class, 'getData']);
-    });
-
-    Route::prefix('/fg')->group(function () {
-        Route::post('/upload', [FGController::class, 'uploadFG']);
-        Route::get('/data', [FGController::class, 'getFGData']);
-    });
-
-    Route::prefix('/prediction')->group(function () {
-        Route::post('/upload', [PredictionController::class, 'uploadPrediction']);
-        Route::post('/data', [PredictionController::class, 'getPrediction']);
-    });
 
     Route::prefix('/article')->group(function () {
-        // Route::post('/upload', [ArticleController::class, 'uploadArticle']);
-        Route::post('/data', [ArticleController::class, 'getArticle']);
-        Route::post('/update', [ArticleController::class, 'updateArticle']);
+        Route::post('upload', [ArticleController::class, 'uploadArticle']);
+        Route::get('all', [ArticleController::class, 'getAll']);
+        Route::post('data', [ArticleController::class, 'getArticle']);
+        Route::post('update', [ArticleController::class, 'updateArticle']);
     });
 
     Route::prefix('/system')->group(function () {
@@ -186,4 +174,16 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('update', [ReleaseNoteController::class, 'updateNote']);
         Route::post('delete', [ReleaseNoteController::class, 'deleteNote']);
     });
+});
+
+Route::prefix('/training')->group(function () {
+    Route::post('upload', [FileController::class, 'uploadTrainingData']);
+    Route::get('data', [FileController::class, 'getData']);
+    Route::post('update', [FileController::class, 'updateTrainingData']);
+});
+
+Route::prefix('/prediction')->group(function () {
+    Route::post('/upload', [PredictionController::class, 'uploadPrediction']);
+    Route::post('/data', [PredictionController::class, 'getPrediction']);
+    Route::post('/current_data', [PredictionController::class, 'getCurrentPrediction']);
 });

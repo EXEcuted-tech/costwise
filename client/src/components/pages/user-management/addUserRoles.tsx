@@ -17,6 +17,8 @@ export interface CheckboxState {
   audit: boolean;
   files: boolean;
   formulations: boolean;
+  events: boolean;
+  export: boolean;
 }
 
 const AddUserRoles: React.FC<AddUserRolesProps> = ({ 
@@ -47,7 +49,9 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
         accounts: roles.some(r => [0,1,2,3].includes(r)),
         audit: roles.includes(4),
         files: roles.some(r => [5,6,7,8].includes(r)),
-        formulations: roles.some(r => [9,10,11,12].includes(r))
+        formulations: roles.some(r => [9,10,11,12].includes(r)),
+        events: roles.some(r => [13,14,15,16].includes(r)),
+        export: roles.includes(17)
     };
 }
 
@@ -56,6 +60,8 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
     audit: { ids: [4], names: ['View Audit Log'] },
     files: { ids: [5, 6, 7, 8], names: ['View File', 'Upload File', 'Edit File', 'Archive File'] },
     formulations: { ids: [9, 10, 11, 12], names: ['View Formula', 'Upload Formula', 'Edit Formula', 'Archive Formula'] },
+    events : { ids: [13, 14, 15, 16], names: ['View Event', 'Create Event', 'Edit Event', 'Archive Event'] },
+    export: { ids: [17], names: ['Export File/Record'] }
   };
 
   const handleCheckCategory = (category: keyof CheckboxState, e: React.ChangeEvent<HTMLInputElement>) => {
@@ -67,11 +73,11 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
       if (isChecked) {
         setSelectedRoles(Object.values(roleMap).flatMap(r => r.names));
         setSelectedRoleValues(Object.values(roleMap).flatMap(r => r.ids));
-        setCheckboxStates({ allRoles: true, accounts: true, audit: true, files: true, formulations: true });
+        setCheckboxStates({ allRoles: true, accounts: true, audit: true, files: true, formulations: true, events: true, export: true });
       } else {
         setSelectedRoles([]);
         setSelectedRoleValues([]);
-        setCheckboxStates({ allRoles: false, accounts: false, audit: false, files: false, formulations: false });
+        setCheckboxStates({ allRoles: false, accounts: false, audit: false, files: false, formulations: false, events: false, export: false });
       }
     } else {
       const { ids, names } = roleMap[category];
@@ -87,7 +93,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
   const handleClearAll = () => {
     setSelectedRoles([]);
     setSelectedRoleValues([]);
-    setCheckboxStates({ allRoles: false, accounts: false, audit: false, files: false, formulations: false });
+    setCheckboxStates({ allRoles: false, accounts: false, audit: false, files: false, formulations: false, events: false, export: false });
     setIsAllChecked(false);
   };
 
@@ -111,7 +117,6 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
 
         {/* Role Select */}
         <div className='flex flex-row justify-between px-[30px] mt-2'>
-          
           <div className='w-[48%]'>
             <h2 className='font-bold text-[22px] mb-3'>Select Roles</h2>
             <CustomRoleSelect 
@@ -122,7 +127,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
             />
             {/* CheckBoxes */}
             <div className='flex mt-4 ml-1 gap-[6rem]'>
-              <div className='flex flex-col gap-4'>
+              <div className='grid grid-cols-2 gap-5'>
                 <div className='flex items-center'>
                     <input 
                       type="checkbox"
@@ -176,19 +181,41 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
                     />
                     <label className='text-[17px]'>All Formulations Roles</label>
                   </div>
-                </div>  
-                <div className='flex items-end'>
-                  <button 
-                    className='text-[17px] bg-gray-200 text-[#5B5353] px-4 py-1 rounded-lg border border-gray-300 hover:bg-gray-300 cursor-pointer transition-colors duration-300 ease-in-out'
-                    onClick={handleClearAll}
-                  >Clear All</button>
+
+                  <div className='flex items-center'>
+                    <input 
+                      type="checkbox"
+                      className='w-5 h-5 mr-3 rounded bg-primary text-primary focus:ring-primary focus:ring-1'
+                      onChange={(e) => handleCheckCategory('events', e)}
+                      disabled={isAllChecked}
+                      checked={checkboxStates.events}
+                    />
+                    <label className='text-[17px]'>All Events Roles</label>
+                  </div>
+
+                  <div className='flex items-center'>
+                    <input 
+                      type="checkbox"
+                      className='w-5 h-5 mr-3 rounded bg-primary text-primary focus:ring-primary focus:ring-1'
+                      onChange={(e) => handleCheckCategory('export', e)}
+                      disabled={isAllChecked}
+                      checked={checkboxStates.export}
+                    />
+                    <label className='text-[17px]'>Export Files/Records</label>
                 </div>
               </div>
+            </div>
           </div>
 
           {/* Selected Roles */}
           <div className='w-[48%]'>
-            <h2 className='font-bold text-[22px] mb-3'>Selected Roles</h2>
+            <div className='flex justify-between mb-3'>
+              <h2 className='font-bold text-[22px]'>Selected Roles</h2>
+                <button 
+                  className='text-[17px] bg-gray-200 text-[#5B5353] px-4 py-1 rounded-lg border border-gray-300 hover:bg-gray-300 cursor-pointer transition-colors duration-300 ease-in-out'
+                  onClick={handleClearAll}
+                >Clear All</button>
+            </div>
             <div className='border border-[#B6B6B6] px-4 rounded-lg h-[250px] overflow-y-auto'>
               <div className='grid grid-cols-2 gap-x-4 gap-y-2 p-3'>
                 {selectedRoles.map((role, index) => (

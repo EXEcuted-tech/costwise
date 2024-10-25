@@ -4,7 +4,7 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { BsPersonLock } from 'react-icons/bs';
 import { IoClose, IoCamera } from "react-icons/io5";
 import { RiFolderUserFill } from "react-icons/ri";
-import AddUserRoles, { CheckboxState } from '../pages/user-management/addUserRoles';
+import AddUserRoles, { CheckboxState } from '@/components/pages/user-management/AddUserRoles';
 import Image from 'next/image';
 import config from '@/server/config';
 import api from '@/utils/api';
@@ -31,7 +31,12 @@ const getRoleName = (roleId: number): string => {
         9: 'View Formula',
         10: 'Upload Formula',
         11: 'Edit Formula',
-        12: 'Archive Formula'
+        12: 'Archive Formula',
+        13: 'View Event',
+        14: 'Create Event',
+        15: 'Edit Event',
+        16: 'Archive Event',
+        17: 'Export File/Record'
     };
     return roleNames[roleId] || 'Unknown Role';
 };
@@ -208,7 +213,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
         setAlertStatus('critical');
 
         const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        const phoneRegex = /^(\+?[0-9]{1,4})?\s?-?[0-9]{10}$/;
+        const phoneRegex = /^\+63\s?9\d{9}$/;
 
         // Reset errors
         setFirstNameError(false);

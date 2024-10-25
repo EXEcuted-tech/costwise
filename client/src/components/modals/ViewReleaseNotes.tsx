@@ -8,7 +8,7 @@ import { ReleaseNote } from '@/types/data';
 import api from '@/utils/api';
 import Loader from '../loaders/Loader';
 import Alert from '../alerts/Alert';
-import { secondsToMinutes } from 'date-fns';
+import ConfirmChanges from './ConfirmChanges';
 
 interface ViewReleaseNotesProps {
     note_id: number;
@@ -20,6 +20,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
     const [note, setNote] = useState<ReleaseNote>();
     const [editedNote, setEditedNote] = useState<ReleaseNote>();
 
+    const [showConfirmChanges, setShowConfirmChanges] = useState(false);
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
     const [isLoading, setIsLoading] = useState(true);
@@ -32,6 +33,9 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
         retrieveReleaseNote();
     }, [note_id]);
 
+    const handleClose = () => {
+        setShowConfirmChanges(true);
+    }
     //Retrieve release note data
     const retrieveReleaseNote = async () => {
         try {
@@ -59,8 +63,8 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
     }  
 
     const handleCancelEdit = () => {
+        setShowConfirmChanges(true);
         setIsEditing(false);
-        secondsToMinutes
         setEditedNote(note);
     }
 
@@ -135,12 +139,11 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
         setEditedNote(prev => {
             if (!prev) return undefined;
             if (name === 'version') {
-                // For version, allow only positive numbers with up to one decimal place
                 const numValue = parseFloat(value);
                 if (!isNaN(numValue) && numValue > 0) {
                     return {...prev, [name]: numValue.toFixed(1)};
                 }
-                return prev; // If invalid, don't update
+                return prev; 
             }
             return {...prev, [name]: value};
         });
@@ -161,12 +164,12 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
             });
 
             if (response.status === 200) {
-                setAlertMessages(["Release note successfully deleted"]);
+                setAlertMessages(["Release note successfully archived"]);
                 setAlertStatus("success");
                 window.location.reload();
             }
         } catch (error) {
-            setAlertMessages(["Failed to delete release note"]);
+            setAlertMessages(["Failed to archive release note"]);
             setAlertStatus("critical");
         }
     }
@@ -205,6 +208,15 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                 }} />
                 ))}
             </div>
+            {showConfirmChanges && (
+                <ConfirmChanges 
+                    setConfirmChanges={setShowConfirmChanges} 
+                    onConfirm={() => {
+                        setShowConfirmChanges(false);
+                        setViewNotes(false);
+                    }}
+                />
+            )}
             <div className="flex flex-col w-[60%] h-[750px] bg-white rounded-[20px] animate-pop-out drop-shadow">
                 {/* Header */}
                 <div className='flex items-center rounded-t-[10px] h-[10%] bg-[#F5F5F5] text-[22px]'>
@@ -230,7 +242,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                         )}
                     </div>
                     <IoIosClose className='mt-[2px] text-[70px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out'
-                        onClick={()=>setViewNotes(false)}/>
+                        onClick={handleClose}/>
                 </div>
 
                 {/* Main Content Area */}

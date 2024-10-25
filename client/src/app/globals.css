@@ -895,3 +895,170 @@ input[type="date"] {
   }
  }
  
+/* Robot animation */
+.robot-animation {
+  position: relative;
+  width: 100px;
+  height: 200px;
+}
+
+.robot-body {
+  position: relative;
+  width: 60px;
+  height: 100px;
+  background-color: #B22222;
+  border-radius: 10px;
+  margin: 0 auto;
+  animation: bob 1s infinite;
+}
+
+.robot-head {
+  width: 60px;
+  height: 60px;
+  background-color: #333;
+  border-radius: 50%;
+  position: absolute;
+  top: -30px;
+  left: 0;
+  animation: shake 10s infinite alternate;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+}
+
+.robot-eye {
+  width: 10px;
+  height: 10px;
+  background-color: white;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.inside-eye {
+  width: 5px;
+  height: 5px;
+  background-color: black;
+  border-radius: 50%;
+  position: absolute;
+}
+
+.left-eye {
+  left: 18px;
+}
+
+.right-eye {
+  right: 18px;
+}
+
+.robot-arm {
+  position: absolute;
+  width: 20px;
+  height: 50px;
+  background-color: #555;
+  top: 30px;
+  border-radius: 10px;
+}
+
+.left-arm {
+  left: -25px;
+  animation: swing-left 1s infinite alternate;
+}
+
+.right-arm {
+  right: -25px;
+  animation: swing-right 1s infinite alternate;
+}
+
+.robot-hand {
+  width: 12px;
+  height: 12px;
+  background-color: #333;
+  border-radius: 50%;
+  position: absolute;
+  bottom: -6px;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+.wrench {
+  position: absolute;
+  width: 4px;
+  height: 25px;
+  background-color: #FFD700;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%) rotate(45deg);
+  border-radius: 2px;
+  transform-origin: bottom;
+  animation: fix 1s infinite;
+}
+
+.robot-pants {
+  position: absolute;
+  bottom: 0;
+  width: 60px;
+  height: 20px;
+  background-color: #333;
+  border-radius: 5px;
+}
+
+.table {
+  position: absolute;
+  bottom: 80px;
+  width: 150px;
+  height: 30px;
+  background-color: #657388;
+  border-radius: 5px;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index:100;
+}
+
+@keyframes bob {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+@keyframes shake {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(10deg); }
+}
+
+@keyframes swing-left {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(-20deg); }
+}
+
+@keyframes swing-right {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(20deg); }
+}
+
+@keyframes fix {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(15deg); }
+}
+
+/* Dots Animation */
+@keyframes dot-appear {
+  0% {
+    content: "";
+  }
+  33% {
+    content: ".";
+  }
+  66% {
+    content: "..";
+  }
+  100% {
+    content: "...";
+  }
+}
+
+.loading-dots::after {
+  content: "";
+  display: inline-block;
+  width: 1em; /* Adjust width to prevent layout shift */
+  text-align: left;
+  animation: dot-appear 1s steps(3, end) infinite;
+}

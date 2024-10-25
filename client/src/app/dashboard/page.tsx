@@ -54,6 +54,39 @@ const DashboardPage = () => {
   const [auditLogs, setAuditLogs] = useState<AuditLogs[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  //Prediction Fetch
+  const fetchPredictions = async () => {
+    try {
+      const response = await api.post("/prediction/data", {
+        numberOfProducts: 4,
+      });
+
+      const predictionData = response.data.data;
+
+      const targetMonthYear = predictionData[0]?.monthYear;
+
+      const selectedMonthPredictions = predictionData.filter(
+        (prediction: { monthYear: string }) => prediction.monthYear === targetMonthYear
+      );
+
+      const totalCostForMonth = selectedMonthPredictions.reduce((acc, prediction) => {
+        const parsedCost = parseFloat(prediction.cost);
+        return acc + parsedCost;
+      }, 0);
+      t
+      const formattedPredictions = [{
+        monthYear: targetMonthYear,
+        cost: totalCostForMonth.toFixed(2),
+      }];
+
+      console.log("Formatted Predictions Data", formattedPredictions);
+
+      setTotalPrediction(formattedPredictions);
+    } catch (error) {
+      console.error("Failed to load models:", error);
+    }
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
@@ -63,6 +96,7 @@ const DashboardPage = () => {
       fetchTotalProductionCost();
       fetchMaterialCostUtilization();
       fetchAuditLogs();
+      fetchPredictions()
     }
     setLastUpdate(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
   }, []);
@@ -114,9 +148,9 @@ const DashboardPage = () => {
             actionEvent: log.action as ActionType,
             profile: log.user.display_picture,
             time: new Date(log.timestamp),  // Store the Date object for sorting
-                  formattedTime: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })  // Separate field for display
+            formattedTime: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })  // Separate field for display
           }));
-              const sortedLogs = logs.sort((a: AuditLogs, b: AuditLogs) => b.time.getTime() - a.time.getTime());
+          const sortedLogs = logs.sort((a: AuditLogs, b: AuditLogs) => b.time.getTime() - a.time.getTime());
           setAuditLogs(sortedLogs);
           setIsLoading(false);
         } catch (error: any) {
@@ -127,6 +161,7 @@ const DashboardPage = () => {
         }
       }
       fetchData();
+      console.log("Total Prediction", totalPrediction)
     }, 25000);
     return () => clearInterval(interval);
   };
@@ -145,8 +180,8 @@ const DashboardPage = () => {
         <div className="flex flex-col flex-wrap w-[72%] 4xl:w-[75%]">
           <h1
             className={`${isOpen
-                ? "text-[34px] 2xl:text-[42px] 3xl:text-[52px] 4xl:text-[58px]"
-                : "text-[40px] 2xl:text-[55px] 3xl:text-[68px]"
+              ? "text-[34px] 2xl:text-[42px] 3xl:text-[52px] 4xl:text-[58px]"
+              : "text-[40px] 2xl:text-[55px] 3xl:text-[68px]"
               } truncate text-ellipsis text-[#414141] font-bold animate-color-pulse dark:animate-color-pulse-dark`}
           >
             Good Evening,{" "}
@@ -154,8 +189,8 @@ const DashboardPage = () => {
           </h1>
           <p
             className={`${isOpen
-                ? "text-[16px] 2xl:text-[18px] 3xl:text-[22px]"
-                : "text-[18px] 2xl:text-[20px] 3xl:text-[28px]"
+              ? "text-[16px] 2xl:text-[18px] 3xl:text-[22px]"
+              : "text-[18px] 2xl:text-[20px] 3xl:text-[28px]"
               } font-medium text-[#868686] dark:text-[#C6C6C6]`}
           >
             Welcome to CostWise: Virginia’s Product Costing System!
@@ -164,16 +199,16 @@ const DashboardPage = () => {
         <div className="w-[27%] 4xl:w-[20%] flex flex-col justify-center mr-[5px]">
           <h2
             className={`${isOpen
-                ? "text-[18px] 2xl:text-[24px]"
-                : "text-[19px] 2xl:text-[25px] 3xl:text-[30px]"
+              ? "text-[18px] 2xl:text-[24px]"
+              : "text-[19px] 2xl:text-[25px] 3xl:text-[30px]"
               } text-[#414141] dark:text-white font-bold text-right`}
           >
             {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </h2>
           <p
             className={`${isOpen
-                ? "text-[14px] 2xl:text-[16px]"
-                : "text-[16px] 3xl:text-[21px]"
+              ? "text-[14px] 2xl:text-[16px]"
+              : "text-[16px] 3xl:text-[21px]"
               } text-[#414141] italic dark:text-white text-right`}
           >
             {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
@@ -182,8 +217,8 @@ const DashboardPage = () => {
         <div>
           <div
             className={`${isOpen
-                ? "text-[1.2em] 2xl:text-[1.8em]"
-                : "text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]"
+              ? "text-[1.2em] 2xl:text-[1.8em]"
+              : "text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]"
               } text-primary p-3 drop-shadow-lg bg-white rounded-full cursor-pointer hover:text-white hover:bg-primary transition-colors duration-300 ease-in-out`}
 
             onClick={() => setColorMode(colorMode === "light" ? "dark" : "light")}>
@@ -271,10 +306,10 @@ const DashboardPage = () => {
                   </div>
                   <div className="flex flex-col items-center">
                     <h1 className="text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white">
-                      ₱168.35
+                      ₱{totalPrediction[0]?.cost}
                     </h1>
                     <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
-                      Recent Cost Trend
+                      Total Prediction Cost
                     </p>
                   </div>
                 </div>
@@ -285,8 +320,8 @@ const DashboardPage = () => {
         <div className="w-[30%]">
           <CustomCalendar
             className={`${isOpen
-                ? "min-h-[366px] 2xl:min-h-[378px]"
-                : "min-h-[355px] 2xl:min-h-[366px]"
+              ? "min-h-[366px] 2xl:min-h-[378px]"
+              : "min-h-[355px] 2xl:min-h-[366px]"
               } w-full`}
           />
         </div>
@@ -300,7 +335,7 @@ const DashboardPage = () => {
           <CardHeader cardName="Projected Costing" />
           <div
             className={`${isOpen ? "3xl:px-[20px]" : "px-[5px] 2xl:px-[20px]"
-              } flex flex-grow bg-white dark:bg-[#3C3C3C] h-[600px] rounded-b-[10px] drop-shadow-lg`}
+              } flex flex-grow bg-white dark:bg-[#3C3C3C] h-[600px] rounded-b-[10px] drop-shadow-lg items-center justify-center`}
           >
             <ProductCostChart selectedHalf="Second" selectedYear="2024"
               className={`${isOpen ? "w-full 3xl:w-[60%]" : "w-full"}`}
@@ -317,25 +352,25 @@ const DashboardPage = () => {
               id="scroll-style"
               className="bg-white dark:bg-[#3C3C3C] h-[600px] rounded-b-[10px] drop-shadow-lg overflow-y-auto py-[15px]"
             >
-              {isLoading? <div className="flex justify-center items-center h-[550px]"><Spinner className="!size-[60px]"/> </div>
-              : auditLogs.length === 0 ? (
-                <div className="flex justify-center items-center h-[550px] text-xl text-gray-500">
-                  No logs to display.
-                </div>
-              ) :
-              auditLogs.map((data, index) => (
-                <div key={index}>
-                  <UserActivity
-                    url={data.profile}
-                    name={data.employeeName}
-                    activity={data.action}
-                    description={data.description}
-                    formattedTime={data.formattedTime}
-                  />
-                </div>
-                ))
+              {isLoading ? <div className="flex justify-center items-center h-[550px]"><Spinner className="!size-[60px]" /> </div>
+                : auditLogs.length === 0 ? (
+                  <div className="flex justify-center items-center h-[550px] text-xl text-gray-500">
+                    No logs to display.
+                  </div>
+                ) :
+                  auditLogs.map((data, index) => (
+                    <div key={index}>
+                      <UserActivity
+                        url={data.profile}
+                        name={data.employeeName}
+                        activity={data.action}
+                        description={data.description}
+                        formattedTime={data.formattedTime}
+                      />
+                    </div>
+                  ))
               }
-              
+
             </div>
           </div>
         )}
