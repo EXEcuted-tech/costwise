@@ -365,8 +365,6 @@ const MasterFileContainer = (data: File) => {
         }
       }
 
-      setSuccessMessage("FODL sheets saved successfully.");
-
       if (removedFodlIds.length > 0) {
         try {
           const deleteBulkResponse = await api.post('/fodls/delete_bulk', {
@@ -375,17 +373,18 @@ const MasterFileContainer = (data: File) => {
           });
 
           if (deleteBulkResponse.data.status !== 200) {
-            setAlertMessages(['Failed to bulk archive Fodl IDs.']);
+            setAlertMessages([deleteBulkResponse.data.data.message] ?? ['Failed to bulk archive Fodl IDs.']);
           } else {
-            setSuccessMessage("FODL records archived successfully.");
+            setSuccessMessage("FODL records archived and saved successfully.");
           }
-        } catch (deleteBulkError) {
-          setAlertMessages(['An error occurred while deleting FODL records.']);
+        } catch (deleteBulkError:any) {
+          setAlertMessages([deleteBulkError.response.data.message] ?? ['An error occurred while deleting FODL records.']);
         }
 
         setRemovedFodlIds([]);
+      } else {
+        setSuccessMessage("FODL sheets saved successfully.");
       }
-
       // await fetchFodlSheet();
 
       const user = localStorage.getItem('currentUser');
@@ -460,8 +459,6 @@ const MasterFileContainer = (data: File) => {
       const saveResponse = await api.post('/materials/update_batch', payload);
 
       if (saveResponse.data.status === 200) {
-        setSuccessMessage('Material sheet saved successfully.');
-
         if (removedMaterialIds.length > 0) {
           try {
             const deletePayload = {
@@ -471,7 +468,7 @@ const MasterFileContainer = (data: File) => {
             const deleteResponse = await api.post('/materials/delete_bulk', deletePayload);
 
             if (deleteResponse.data.status === 200) {
-              setSuccessMessage('Material records archived successfully.');
+              setSuccessMessage('Material records archived and saved successfully.');
               setRemovedFodlIds([]);
             } else {
               setAlertMessages(['Failed to bulk archive Material IDs.']);
@@ -479,6 +476,8 @@ const MasterFileContainer = (data: File) => {
           } catch (deleteError) {
             setAlertMessages(['An error occurred while deleting Material records.']);
           }
+        } else {
+          setSuccessMessage('Material sheet saved successfully.');
         }
       } else {
         const errorMsg = saveResponse.data.message || 'Failed to save material sheet.';

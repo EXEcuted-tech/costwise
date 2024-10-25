@@ -724,13 +724,8 @@ class FormulationController extends ApiController
                 }
             }
 
-            $formulationsToDelete->each(function ($formulation) {
-                $formulation->delete();
-            });
-
-            $finishedGoodsToDelete->each(function ($finishedGood) {
-                $finishedGood->delete();
-            });
+            Formulation::whereIn('formulation_id', $formulationIds)->delete();
+            FinishedGood::whereIn('fg_id', $fgIds)->delete();
 
             return [
                 'status' => 200,
