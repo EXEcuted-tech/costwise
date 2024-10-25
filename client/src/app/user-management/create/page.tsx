@@ -317,7 +317,7 @@ const AccountCreation = () => {
     }
 
     return (
-        <div className="w-full h-full flex font-lato animate-fade-in">
+        <div className="w-full h-full flex flex-row font-lato animate-fade-in">
             <div className='absolute top-0 right-0'>
                 {alertMessages && alertMessages.map((msg, index) => (
                 <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
@@ -344,12 +344,12 @@ const AccountCreation = () => {
                 />
             )}
             
-            <div className='flex h-full bg-cover bg-center w-[550px]' style={{ backgroundImage: `url(${background.src})` }} />
+            <div className='hidden 2xl:flex h-full bg-cover bg-center 2xl:w-[30%]' style={{ backgroundImage: `url(${background.src})` }} />
             {/* Wait lang butngan panig margin */}
             <div className={` ${isOpen ? 'w-full' : 'w-full'} 
                     h-full bg-white shadow-2xl`}>
                 {/* Title */}
-                <div className={`${isOpen ? '' : 'pt-5 3xl:pt-2'} flex flex-col w-full h-[7.3rem] justify-center items-center`}>
+                <div className={` flex flex-col w-full h-[7.3rem] justify-center items-center`}>
                     <div className='flex w-full items-center'>
                         <div className='flex ml-4 mt-2 text-[2.5em] text-[#B22222] hover:text-[#7e2a2a] transition-colors duration-300 ease-in-out'>
                             <IoMdArrowRoundBack 
@@ -361,7 +361,7 @@ const AccountCreation = () => {
                             Account Creation</p>
                     </div>
                     <div className='mb-2 text-[1.1em] 3xl:text-[1.4em]'> Create an employee account </div>
-                    <div className='w-full h-full bg-[#B22222]'></div>
+                    <div className='w-full h-[15px] bg-[#B22222]'></div>
                 </div>
 
                 {/* Upload Picture */}
@@ -470,7 +470,7 @@ const AccountCreation = () => {
                 </div>
 
                 {/* Form */}
-                <div className={`${isOpen ? '' : ''} flex mt-6 text-[#5B5353] text-[0.8em] 2xl:text-[1.2em] mx-[30px] 2xl:mx-[50px] mb-12 2xl:mb-9 justify-between`}>
+                <div className={`${isOpen ? '' : ''} flex mt-6 text-[#5B5353] text-[16px] ml-[50px] mb-12 2xl:mb-6 justify-between`}>
                     {/* 1st Col */}
                     <div className={` ${isOpen ? '' : ''} flex flex-col flex-1 mr-5 2xl:mr-9 gap-10`}>
                         <div className='flex flex-col justify-start'>
@@ -478,7 +478,7 @@ const AccountCreation = () => {
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
+                                        className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
                                         type="fname"
                                         name="fname"
                                         value={first_name}
@@ -493,7 +493,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                         type="email"
                                         name="email"
                                         placeholder=""
@@ -509,7 +509,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <select
-                                        className={` ${departmentError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        className={` ${departmentError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                         defaultValue=""
                                         value={department}
                                         onChange={(e) => updateField(setDepartment)(e)}
@@ -531,7 +531,7 @@ const AccountCreation = () => {
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${isOpen ? '' : ''} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline text-[13px] 2xl:text-base capitalize `}
+                                        className={` ${isOpen ? '' : ''} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline capitalize `}
                                         type="mname"
                                         name="mname"
                                         placeholder=""
@@ -547,7 +547,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${employeeNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        className={` ${employeeNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                         type="enum"
                                         name="enum"
                                         placeholder=""
@@ -563,7 +563,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                         type="contactnum"
                                         name="contactnum"
                                         placeholder=""
@@ -582,7 +582,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
+                                        className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
                                         type="lname"
                                         name="lname"
                                         placeholder=""
@@ -598,7 +598,7 @@ const AccountCreation = () => {
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${suffixError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
+                                        className={` ${suffixError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
                                         type="suffix"
                                         name="suffix"
                                         placeholder=""
@@ -614,7 +614,7 @@ const AccountCreation = () => {
                         <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${positionError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
+                                        className={` ${positionError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
                                         type="position"
                                         name="position"
                                         placeholder=""
@@ -626,19 +626,18 @@ const AccountCreation = () => {
                         </div>
                     </div>
                 </div>
-
-                {/* Buttons */}
-                <div className='flex flex-col w-full mt-3 text-[1.1em] 2xl:text-[1.2em] items-center gap-[10px]'>
-                    <div className="relative bg-primary overflow-hidden text-white w-[240px] h-[2.5em] 4xl:h-[3rem] flex items-center justify-center rounded-[10px] cursor-pointer transition-all hover:border-1 hover:border-primary group">
-                        <button 
-                            className="font-black"
-                            type="submit"
-                            onClick={handleSubmit}
-                        >
-                            <span className="w-full h-48 rounded bg-white absolute bottom-0 left-0 translate-x-full ease-out duration-500 transition-all translate-y-full mb-9 ml-9 group-hover:ml-0 group-hover:mb-32 group-hover:translate-x-0"></span>
-                            <span className="relative w-full text-left text-white transition-colors duration-300 ease-in-out group-hover:text-primary">Confirm</span>
-                        </button>
-                    </div>
+            </div>
+            {/* Buttons */}
+            <div className='flex flex-col w-full text-[1.1em] 2xl:text-[1.2em] items-center gap-[10px]'>
+                <div className="relative bg-primary overflow-hidden text-white w-[240px] h-[2.5em] 4xl:h-[3rem] flex items-center justify-center rounded-[10px] cursor-pointer transition-all hover:border-1 hover:border-primary group">
+                    <button 
+                        className="font-black"
+                        type="submit"
+                        onClick={handleSubmit}
+                    >
+                        <span className="w-full h-48 rounded bg-white absolute bottom-0 left-0 translate-x-full ease-out duration-500 transition-all translate-y-full mb-9 ml-9 group-hover:ml-0 group-hover:mb-32 group-hover:translate-x-0"></span>
+                        <span className="relative w-full text-left text-white transition-colors duration-300 ease-in-out group-hover:text-primary">Confirm</span>
+                    </button>
                 </div>
             </div>
         </div>

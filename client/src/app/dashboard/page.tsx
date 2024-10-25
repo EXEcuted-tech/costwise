@@ -58,11 +58,11 @@ const DashboardPage = () => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       const user = JSON.parse(storedUser);
+      fetchAuditLogs();
       setName(user.name);
       fetchAverageCost();
       fetchTotalProductionCost();
       fetchMaterialCostUtilization();
-      fetchAuditLogs();
     }
     setLastUpdate(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
   }, []);
@@ -102,33 +102,37 @@ const DashboardPage = () => {
     setIsLoading(false);
   };
 
+  const fetchData = async () => {
+    try {
+      const res = await api.get('/auditlogs');
+      const logs = res.data.map((log: any) => ({
+        employeeName: `${log.user.first_name} ${log.user.middle_name ? log.user.middle_name.charAt(0) + '. ' : ''}${log.user.last_name}`,
+        description: log.description,
+        actionEvent: log.action as ActionType,
+        profile: log.user.display_picture,
+        time: new Date(log.timestamp),  // Store the Date object for sorting
+              formattedTime: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })  // Separate field for display
+      }));
+          const sortedLogs = logs.sort((a: AuditLogs, b: AuditLogs) => b.time.getTime() - a.time.getTime());
+      setAuditLogs(sortedLogs);
+      setIsLoading(false);
+    } catch (error: any) {
+      console.error("Failed to fetch audit logs:", error);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
   const fetchAuditLogs = async () => {
-    const interval = setInterval(() => {
-      setIsLoading(true);
-      const fetchData = async () => {
-        try {
-          const res = await api.get('/auditlogs');
-          const logs = res.data.map((log: any) => ({
-            employeeName: `${log.user.first_name} ${log.user.middle_name ? log.user.middle_name.charAt(0) + '. ' : ''}${log.user.last_name}`,
-            description: log.description,
-            actionEvent: log.action as ActionType,
-            profile: log.user.display_picture,
-            time: new Date(log.timestamp),  // Store the Date object for sorting
-                  formattedTime: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })  // Separate field for display
-          }));
-              const sortedLogs = logs.sort((a: AuditLogs, b: AuditLogs) => b.time.getTime() - a.time.getTime());
-          setAuditLogs(sortedLogs);
-          setIsLoading(false);
-        } catch (error: any) {
-          console.error("Failed to fetch audit logs:", error);
-          setIsLoading(false);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-      fetchData();
-    }, 25000);
-    return () => clearInterval(interval);
+    const initialFetchTimeout = setTimeout(fetchData, 2000);
+
+    const fetchInterval = setInterval(fetchData, 30000);
+
+    return () => {
+        clearTimeout(initialFetchTimeout);
+        clearInterval(fetchInterval);
+    };
   };
 
   const [totalPrediction, setTotalPrediction] = useState<

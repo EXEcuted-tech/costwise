@@ -121,7 +121,7 @@ const GettingStartedPage = () => {
                                                 name="heading"
                                                 value={section.heading}
                                                 onChange={(e) => handleChange(e, index)}
-                                                className="border p-2 mb-2 w-full"
+                                                className="border p-2 mb-2 w-full font-bold"
                                                 placeholder="Section Heading"
                                             />
                                             <button onClick={() => removeSection(index)}>
@@ -129,7 +129,7 @@ const GettingStartedPage = () => {
                                             </button>
                                         </div>
                                     ) : (
-                                        <h1>{section.heading}</h1>
+                                        <h1 className="font-bold">{section.heading}</h1>
                                     )}
                                     <div className="flex flex-col text-[24px] pt-[10px] text-tertiary">
                                         {isEditing ? (
