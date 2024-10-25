@@ -73,7 +73,6 @@ const DashboardPage = () => {
         const parsedCost = parseFloat(prediction.cost);
         return acc + parsedCost;
       }, 0);
-      t
       const formattedPredictions = [{
         monthYear: targetMonthYear,
         cost: totalCostForMonth.toFixed(2),
