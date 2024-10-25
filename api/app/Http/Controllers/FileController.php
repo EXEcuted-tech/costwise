@@ -822,7 +822,7 @@ class FileController extends ApiController
     {
         try {
             $files = File::all();
-    
+
             if ($files->isEmpty()) {
                 \Log::info('No files to export');
                 return response()->json(['message' => 'No files to export'], 404);
@@ -840,7 +840,7 @@ class FileController extends ApiController
             if ($zip->open($zipFilePath, ZipArchive::CREATE | ZipArchive::OVERWRITE) !== TRUE) {
                 throw new \RuntimeException("Unable to create zip file");
             }
-    
+
             foreach ($files as $file) {
                 $spreadsheet = new Spreadsheet();
 
@@ -865,7 +865,7 @@ class FileController extends ApiController
                 unset($spreadsheet);
                 gc_collect_cycles();
             }
-    
+
             $zip->close();
 
             return response()->download($zipFilePath, $zipFileName, [
@@ -1301,6 +1301,47 @@ class FileController extends ApiController
 
         return $parsedCostData;
     }
+
+    public function updateTrainingData(Request $request)
+    {
+        try {
+            $validator = Validator::make(
+                $request->all(),
+                [
+                    'settings' => 'required',
+                ]
+            );
+
+            if ($validator->fails()) {
+                $this->status = 401;
+                $this->response['error'] = $validator->errors();
+                return $this->getResponse("Incorrect input details.");
+            }
+
+            $file = File::on(connection: 'archive_mysql')->where('file_type', 'training_file')->first();
+            if (!$file) {
+                $this->status = 404;
+                return $this->getResponse("Training file not found.");
+            }
+
+            if (!is_string($request->settings)) {
+                $file->settings = json_encode($request->settings);
+            } else {
+                $file->settings = $request->settings;
+            }
+
+            $file->save();
+
+            $this->status = 201;
+            $this->response['data'] = $file;
+            return $this->getResponse("Training file updated successfully.");
+        } catch (\Throwable $th) {
+            $this->status = $th->getCode();
+            $this->response['message'] = $th->getMessage();
+            return $this->getResponse();
+        }
+    }
+
 
 
     public function getData()

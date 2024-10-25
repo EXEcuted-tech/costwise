@@ -193,7 +193,7 @@ export interface ProductEntry {
     monthYear: string;
   }
   
-  interface Product {
+  export interface Product {
     productName: string;
     cost: number;
   }
