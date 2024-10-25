@@ -86,7 +86,7 @@ const ConfirmDeleteInventory: React.FC<ConfirmDeleteProps> = ({ onClose, invento
                             <p>Are You Sure?</p>
                         </div>
                         <div className='text-center text-[20px] text-[#9D9D9D] break-words'>
-                            <p>Do you want to delete this inventory list? It will be archived and removed from the database.</p>
+                            <p>Do you want to archive this inventory list? It will be archived and removed from the database.</p>
                         </div>
 
                         {/* Buttons */}

@@ -265,10 +265,10 @@ const TransactionFileContainer = (data: File) => {
         const deleteResponse = await api.post('/transactions/delete_bulk', deletePayload);
 
         if (deleteResponse.data.status === 200) {
-          setSuccessMessage('Transaction/s deleted successfully.');
+          setSuccessMessage('Transaction/s archived successfully.');
           setRemovedIds([]);
         } else {
-          setAlertMessages(['Failed to bulk delete Transactions.']);
+          setAlertMessages(['Failed to bulk archive Transactions.']);
         }
       } catch (error: any) {
         if (error.response?.data?.message) {

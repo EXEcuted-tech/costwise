@@ -13,7 +13,7 @@ import api from '@/utils/api';
 import Alert from "@/components/alerts/Alert";
 import { useRouter } from 'next/navigation';
 import ConfirmChanges from '@/components/modals/ConfirmChanges';
-import AddUserRoles from '@/components/pages/user-management/addUserRoles';
+import AddUserRoles from '@/components/pages/user-management/AddUserRoles';
 // import dotenv from "dotenv";
 import { useUserContext } from '@/contexts/UserContext';
 
@@ -146,7 +146,7 @@ const AccountCreation = () => {
         setAlertStatus('critical');
                 
         const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        const phoneRegex = /^(\+?[0-9]{1,4})?\s?-?[0-9]{10}$/;
+        const phoneRegex = /^\+63\s?9\d{9}$/;
 
         // Reset errors
         setFirstNameError(false);
@@ -243,8 +243,6 @@ const AccountCreation = () => {
             if (profileImage) {
                 formData.append('display_picture', profileImage);
             }
-
-            console.log(formData)
             
             //Api call
             const response = await api.post('/register', formData, {
@@ -550,7 +548,7 @@ const AccountCreation = () => {
                                         className={` ${employeeNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                         type="enum"
                                         name="enum"
-                                        placeholder=""
+                                        placeholder="0123456789"
                                         value={employee_number}
                                         onChange={(e) => updateField(setEmployee_number)(e)}
                                     />
@@ -566,7 +564,7 @@ const AccountCreation = () => {
                                         className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                         type="contactnum"
                                         name="contactnum"
-                                        placeholder=""
+                                        placeholder="+63 9123456789"
                                         value={phone_number}
                                         onChange={(e) => updateField(setPhone_number)(e)}
                                     />

@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react'
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import { FaEye } from "react-icons/fa";
 import { FaPencilAlt } from "react-icons/fa";
-import { IoTrash } from "react-icons/io5";
 import { TiExport } from "react-icons/ti";
 import { useRouter } from 'next/navigation';
 import FormulationTable from './FormulationTable';
@@ -18,6 +17,7 @@ import Alert from '@/components/alerts/Alert';
 import { formatMonthYear } from '@/utils/costwiseUtils';
 import { useUserContext } from '@/contexts/UserContext';
 import { useSidebarContext } from '@/contexts/SidebarContext';
+import { HiArchiveBoxXMark } from 'react-icons/hi2';
 
 export interface FormulationContainerProps {
     number: string;
@@ -152,7 +152,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
     const handleDeleteClick = (formulationId: number, formulationCode: string) => {
         const sysRoles = currentUser?.roles;
         if (!sysRoles?.includes(12)) {
-            setAlertMessages(['You are not authorized to delete formulations.']);
+            setAlertMessages(['You are not authorized to archive formulations.']);
             return;
         }
         setFormulationToDelete(formulationId);
@@ -166,7 +166,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                 await api.post(`/formulations/delete`, { formulation_id: formulationToDelete });
                 const updatedList = filteredData.filter(item => item.formulation_id !== formulationToDelete);
                 setFilteredData(updatedList);
-                setSuccessMessage('Formulation deleted successfully');
+                setSuccessMessage('Formulation archived successfully');
 
                 const user = localStorage.getItem('currentUser');
                 const parsedUser = JSON.parse(user || '{}');
@@ -186,7 +186,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                         console.error('Error audit logs:', error);
                     });
             } catch (error) {
-                setAlertMessages(prev => [...prev, 'Failed to delete formulation']);
+                setAlertMessages(prev => [...prev, 'Failed to archive formulation']);
             } finally {
                 setDeleteModal(false);
                 setFormulationToDelete(null);
@@ -267,7 +267,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                                                         <div className='flex justify-center items-center h-full dark:border-[#5C5C5C]
                                                                 cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleDeleteClick(data.formulation_id, data.formula_code)}>
-                                                            <IoTrash className='!size-[12px] 2xl:!size-[16px]' />
+                                                            <HiArchiveBoxXMark />
                                                         </div>
                                                     </div>
                                                 </td>

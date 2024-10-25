@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Illuminate\Support\Facades\Log;
 
@@ -318,19 +319,34 @@ class CostCalcController extends ApiController
         $sheet = $spreadsheet->createSheet();
         $sheet->setTitle('Cost Calculation Summary');
 
-        $sheet->mergeCells('A1:F1');
-        $sheet->setCellValue('A1', 'Cost Calculation for the month of ' . $monthYear);
+        $sheet->setShowGridlines(false);
 
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->mergeCells('A1:F1');
+        $sheet->setCellValue('A1', 'Summary of Product Costing');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13)->setName('Arial')->getColor()->setRGB('B22222');
+
+        $sheet->getRowDimension(1)->setRowHeight(16.5);
+        $sheet->getRowDimension(4)->setRowHeight(39.5);
+
+        $sheet->getColumnDimension('A')->setWidth(12.71);
+        $sheet->getColumnDimension('B')->setWidth(19.43);
+        $sheet->getColumnDimension('C')->setWidth(11.43);
+        $sheet->getColumnDimension('D')->setWidth(19.29);
+        $sheet->getColumnDimension('E')->setWidth(12.57);
+        $sheet->getColumnDimension('F')->setWidth(11.43);
+        
+        $sheet->mergeCells('A2:F2');
+        $sheet->setCellValue('A2', 'for the month of ' . $monthYear);
+        $sheet->getStyle('A2')->getFont()->setSize(10)->setName('Arial')->setBold(true)->setItalic(true);
 
         $headers = ['Item Code', 'Item Description', 'RM Cost', 'Factory Overhead', 'Direct Labor', 'TOTAL'];
-        $sheet->fromArray($headers, NULL, 'A2');
+        $sheet->fromArray($headers, NULL, 'A4');
 
-        $sheet->getStyle('A2:F2')->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-        $sheet->getStyle('A2:F2')->getFont()->setBold(true);
+        $sheet->getStyle('A4:F4')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_MEDIUM);
+        $sheet->getStyle('A4:F4')->getFont()->setBold(true);
+        $sheet->getStyle('A4:F4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->freezePane('A5');
 
-        $sheet->setAutoFilter('A2:F2');
         $sheet->getColumnDimension('A')->setWidth(15);
         $sheet->getColumnDimension('B')->setWidth(25);
         $sheet->getColumnDimension('C')->setWidth(12);
@@ -338,7 +354,7 @@ class CostCalcController extends ApiController
         $sheet->getColumnDimension('E')->setWidth(15);
         $sheet->getColumnDimension('F')->setWidth(12);
 
-        $row = 3;
+        $row = 5;
         foreach ($data as $fg) {
             $fgCode = $fg['fg_code'];
             $fgDesc = $fg['fg_desc'];
@@ -349,16 +365,21 @@ class CostCalcController extends ApiController
 
             $sheet->setCellValue("A$row", $fgCode);
             $sheet->setCellValue("B$row", $fgDesc);
-            $sheet->setCellValue("C$row", $rmCost);
-            $sheet->setCellValue("D$row", $factoryOverhead);
-            $sheet->setCellValue("E$row", $directLabor);
-            $sheet->setCellValue("F$row", $totalCost);
+            $sheet->setCellValue("C$row", number_format($rmCost, 2));
+            $sheet->setCellValue("D$row", number_format($factoryOverhead, 2));
+            $sheet->setCellValue("E$row", number_format($directLabor, 2));
+            $sheet->setCellValue("F$row", number_format($totalCost, 2));
 
-            $sheet->getStyle("A$row:F$row")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+            $sheet->getStyle("A$row:B$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+            $sheet->getStyle("C$row:F$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+            // Add borders for each row
+            $sheet->getStyle("A$row:F$row")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
             $row++;
         }
 
+        // Auto-size columns A to F
         foreach (range('A', 'F') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }

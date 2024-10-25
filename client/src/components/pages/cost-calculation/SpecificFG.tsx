@@ -15,6 +15,8 @@ type SpecificFGProps = {
   monthYear: { value: number; label: string };
   updateSheetData: (id: number, data: SpecificFinishedGood) => void;
   FGOptions: { name: string; id: number }[];
+  selectedGoods: { name: string; id: number }[];
+  setSelectedGoods: (goods: { name: string; id: number }[]) => void;
 };
 
 const SpecificFG: React.FC<SpecificFGProps> = ({
@@ -24,6 +26,8 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
   monthYear,
   updateSheetData,
   FGOptions,
+  selectedGoods,
+  setSelectedGoods
 }) => {
   const columnNames = [
     "Formula",
@@ -52,7 +56,10 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
     try {
       if (selectedValue.id) {
         setSelectedFG(selectedValue);
-
+        const combinedArray = [...selectedGoods];
+        combinedArray.push(selectedValue)
+        const distinctArray = Array.from(new Set(combinedArray));
+        setSelectedGoods(distinctArray);
         const response = await api.get(
           "/cost_calculation/retrieve_fg_details",
           { params: { fg_id: selectedValue.id } }
@@ -84,12 +91,12 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
               className="!relative"
               variant={
                 alertStatus as
-                  | "default"
-                  | "information"
-                  | "warning"
-                  | "critical"
-                  | "success"
-                  | undefined
+                | "default"
+                | "information"
+                | "warning"
+                | "critical"
+                | "success"
+                | undefined
               }
               key={index}
               message={msg}
@@ -101,9 +108,8 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
       </div>
 
       <div
-        className={`${
-          isOpen ? "" : ""
-        } relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white rounded-2xl border-1 border-[#656565] shadow-md animate-pull-down`}
+        className={`${isOpen ? "" : ""
+          } relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white rounded-2xl border-1 border-[#656565] shadow-md animate-pull-down`}
       >
         {/* Header */}
         <div className="flex h-14 rounded-t-2xl bg-[#B22222] text-white text-[26px] font-bold py-2 pl-7 drop-shadow-xl">
@@ -112,6 +118,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
             placeholder="Choose Finished Good"
             isOpen={isOpen}
             onChange={handleChange}
+            disabledOptions={selectedGoods}
           />
 
           {/* Delete Button */}
@@ -174,7 +181,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                   {/* Emulsion row */}
                   {selectedFGDetails[0]?.components[0] &&
                     Object.keys(selectedFGDetails[0].components[0]).length >
-                      0 && (
+                    0 && (
                       <tr className={`text-[#6B6B6B]`}>
                         <td className="text-center px-6 py-3"></td>
                         <td className="text-center">

@@ -6,6 +6,7 @@ import { AiFillNotification } from "react-icons/ai";
 import { PiFilesFill } from "react-icons/pi";
 import { IoIosCreate } from "react-icons/io";
 import api from "@/utils/api";
+import { useNotificationContext } from "@/contexts/NotificationContext";
 
 export interface NotificationItemProps {
   id: string;
@@ -19,6 +20,7 @@ export interface NotificationItemProps {
 
 export const NotificationItem: React.FC<NotificationItemProps> = ({ id, icon, mainText, subText, time, isRead }) => {
   const [read, setRead] = useState(isRead === 0 ? false : true);
+  const {hasNewNotifications,setHasNewNotifications}=useNotificationContext();
 
   const onMarkAsRead = async () => {
     setRead(!read)
@@ -26,6 +28,7 @@ export const NotificationItem: React.FC<NotificationItemProps> = ({ id, icon, ma
       const response = await api.post('/notifications/mark_as_read', {
         log_id: id
       });
+      setHasNewNotifications(!hasNewNotifications);
     } catch (error) {
       console.error('Error marking notification as read:', error);
       throw error;

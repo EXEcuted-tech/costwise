@@ -54,6 +54,39 @@ const DashboardPage = () => {
   const [auditLogs, setAuditLogs] = useState<AuditLogs[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
+  //Prediction Fetch
+  const fetchPredictions = async () => {
+    try {
+      const response = await api.post("/prediction/data", {
+        numberOfProducts: 4,
+      });
+
+      const predictionData = response.data.data;
+
+      const targetMonthYear = predictionData[0]?.monthYear;
+
+      const selectedMonthPredictions = predictionData.filter(
+        (prediction: { monthYear: string }) => prediction.monthYear === targetMonthYear
+      );
+
+      const totalCostForMonth = selectedMonthPredictions.reduce((acc, prediction) => {
+        const parsedCost = parseFloat(prediction.cost);
+        return acc + parsedCost;
+      }, 0);
+      
+      const formattedPredictions = [{
+        monthYear: targetMonthYear,
+        cost: totalCostForMonth.toFixed(2),
+      }];
+
+      console.log("Formatted Predictions Data", formattedPredictions);
+
+      setTotalPrediction(formattedPredictions);
+    } catch (error) {
+      console.error("Failed to load models:", error);
+    }
+  };
+
   useEffect(() => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
@@ -63,6 +96,8 @@ const DashboardPage = () => {
       fetchAverageCost();
       fetchTotalProductionCost();
       fetchMaterialCostUtilization();
+      fetchAuditLogs();
+      fetchPredictions()
     }
     setLastUpdate(new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }));
   }, []);
@@ -275,10 +310,10 @@ const DashboardPage = () => {
                   </div>
                   <div className="flex flex-col items-center">
                     <h1 className="text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white">
-                      ₱168.35
+                      ₱{totalPrediction[0]?.cost}
                     </h1>
                     <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
-                      Recent Cost Trend
+                      Total Prediction Cost
                     </p>
                   </div>
                 </div>
@@ -289,8 +324,8 @@ const DashboardPage = () => {
         <div className="w-[30%]">
           <CustomCalendar
             className={`${isOpen
-                ? "min-h-[366px] 2xl:min-h-[378px]"
-                : "min-h-[355px] 2xl:min-h-[366px]"
+              ? "min-h-[366px] 2xl:min-h-[378px]"
+              : "min-h-[355px] 2xl:min-h-[366px]"
               } w-full`}
           />
         </div>
@@ -304,7 +339,7 @@ const DashboardPage = () => {
           <CardHeader cardName="Projected Costing" />
           <div
             className={`${isOpen ? "3xl:px-[20px]" : "px-[5px] 2xl:px-[20px]"
-              } flex flex-grow bg-white dark:bg-[#3C3C3C] h-[600px] rounded-b-[10px] drop-shadow-lg`}
+              } flex flex-grow bg-white dark:bg-[#3C3C3C] h-[600px] rounded-b-[10px] drop-shadow-lg items-center justify-center`}
           >
             <ProductCostChart selectedHalf="Second" selectedYear="2024"
               className={`${isOpen ? "w-full 3xl:w-[60%]" : "w-full"}`}
@@ -321,23 +356,23 @@ const DashboardPage = () => {
               id="scroll-style"
               className="bg-white dark:bg-[#3C3C3C] h-[600px] rounded-b-[10px] drop-shadow-lg overflow-y-auto py-[15px]"
             >
-              {isLoading? <div className="flex justify-center items-center h-[550px]"><Spinner className="!size-[60px]"/> </div>
-              : auditLogs.length === 0 ? (
-                <div className="flex justify-center items-center h-[550px] text-xl text-gray-500">
-                  No logs to display.
-                </div>
-              ) :
-              auditLogs.map((data, index) => (
-                <div key={index}>
-                  <UserActivity
-                    url={data.profile}
-                    name={data.employeeName}
-                    activity={data.action}
-                    description={data.description}
-                    formattedTime={data.formattedTime}
-                  />
-                </div>
-                ))
+              {isLoading ? <div className="flex justify-center items-center h-[550px]"><Spinner className="!size-[60px]" /> </div>
+                : auditLogs.length === 0 ? (
+                  <div className="flex justify-center items-center h-[550px] text-xl text-gray-500">
+                    No logs to display.
+                  </div>
+                ) :
+                  auditLogs.map((data, index) => (
+                    <div key={index}>
+                      <UserActivity
+                        url={data.profile}
+                        name={data.employeeName}
+                        activity={data.action}
+                        description={data.description}
+                        formattedTime={data.formattedTime}
+                      />
+                    </div>
+                  ))
               }
               
             </div>
@@ -349,45 +384,3 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
-
-// const fakeData: UserActivityProps[] = [
-//   {
-//     url: "https://i.imgur.com/AZOtzD7.jpg",
-//     name: "Kathea Mari Mayol",
-//     activity: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-//     time: "2 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/SeymIUb.jpg",
-//     name: "John Doe",
-//     activity:
-//       "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-//     time: "5 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/dm51tBF.jpg",
-//     name: "Jane Smith",
-//     activity:
-//       "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-//     time: "10 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/AN69p1a.jpg",
-//     name: "Michael Johnson",
-//     activity:
-//       "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.",
-//     time: "15 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/zb1h8kj.jpg",
-//     name: "Emily Davis",
-//     activity: "Excepteur sint occaecat cupidatat non proident, sunt in culpa.",
-//     time: "20 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/nzcwr8x.jpg",
-//     name: "Chris Lee",
-//     activity: "Mollit anim id est laborum.",
-//     time: "25 minutes ago",
-//   },
-// ];

@@ -1,15 +1,15 @@
 "use client";
 import React, { useState } from 'react';
 import { MdModeEdit } from "react-icons/md";
-import { FaTrashAlt } from "react-icons/fa";
 import EditUserInfo from '@/components/modals/EditUserInfo';
-import ConfirmDelete from '@/components/modals/ConfirmDelete';
+import { FaUserLargeSlash } from "react-icons/fa6";
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import { User } from '@/types/data';
 import Spinner from '@/components/loaders/Spinner';
 import ConfirmDeleteUser from '@/components/modals/ConfirmDeleteUser';
 import { useUserContext } from '@/contexts/UserContext';
 import Alert from '@/components/alerts/Alert';
+import { HiArchiveBoxXMark } from 'react-icons/hi2';
 
 interface ManageAccountsPageProps {
     fileData: User[];
@@ -92,7 +92,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                         <tbody>
                             {isLoading ? (
                                 <tr>
-                                    <td colSpan={7} className="text-center py-6">
+                                    <td colSpan={7} className="text-center pt-[15rem]">
                                         <div className='flex justify-center items-center'>
                                             <Spinner />
                                         </div>
@@ -100,8 +100,8 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                                 </tr>
                             ) : fileData.length > 0 ? (
                                 currentListPage.map((data, index) => (
-                                    <tr key={index} className={`${isOpen ? 'text-[14px] 4xl:text-[1.2em] 3xl:text-[0.9em] 2xl:text-[0.8em]' : 'text-[14px] 4xl:text-[1.2em] 3xl:text-[1.2em] 2xl:text-[1.1em]'} border-b border-[#868686] hover:bg-gray-50`}>
-                                        <td className={`${isOpen ? 'pl-[2rem]' : 'pl-8 xl:pl-6'} break-words capitalize`}>{data.first_name} {data.last_name}</td>
+                                    <tr key={index} className={`${isOpen ? 'text-[1.1em] 4xl:text-[1.1em] 3xl:text-[0.9em] 2xl:text-[0.8em] xl:text-[0.7em]' : 'text-[1.2em] 4xl:text-[1.2em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[1em]'} border-b border-[#868686] hover:bg-gray-50`}>
+                                        <td className={`${isOpen ? 'pl-[2rem]' : 'pl-8 xl:pl-6'} break-words capitalize`}>{data.first_name} {data.middle_name} {data.last_name}</td>
                                         <td className="py-5 break-words capitalize">{data.position}</td>
                                         <td className="py-4 break-words">{data.email_address}</td>
                                         <td className="py-4 break-words">{data.phone_number}</td>
@@ -116,8 +116,8 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                                                 </button>
                                                 <button
                                                     onClick={() => openDeleteModal(data)}
-                                                    className={`${isOpen ? '4xl:w-[3rem] 4xl:px-[18px] 3xl:w-[2rem] 3xl:px-[10px] 2xl:w-[2rem] 2xl:px-[10px] xl:w-[2rem] xl:px-[10px]' : ' 4xl:w-[3rem] 4xl:px-[18px] 3xl:w-[3rem] 3xl:px-[18px] xl:w-[2rem] xl:px-[10px]'} w-[3rem] h-[2rem] px-[17px] text-[0.9em] bg-[#B22222] text-white flex justify-center items-center rounded-lg hover:bg-[#971c1c] transition-colors duration-300 ease-in-out`}>
-                                                    <FaTrashAlt />
+                                                    className={`${isOpen ? '4xl:w-[3rem] 4xl:px-[12px] 3xl:w-[2rem] 3xl:px-[8px] 2xl:w-[2rem] 2xl:px-[8px] xl:w-[2rem] xl:px-[8px]' : '4xl:w-[3rem] 4xl:px-[12px] 3xl:w-[3rem] 3xl:px-[12px] 2xl:px-[8px] xl:w-[2rem] xl:px-[8px]'} w-[3rem] h-[2rem] text-[1.1em] px-3 bg-[#B22222] text-white flex justify-center items-center rounded-lg hover:bg-[#971c1c] transition-colors duration-300 ease-in-out`}>
+                                                    <HiArchiveBoxXMark className='' />
                                                 </button>
                                             </div>
                                         </td>
@@ -125,8 +125,9 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={7} className="text-center py-8">
-                                        No users to display.
+                                    <td colSpan={7} className="text-center items-center justify-items-center font-semibold pt-[13rem] text-[#555555]">
+                                        <FaUserLargeSlash className='text-[85px] mb-4' />
+                                        <p className='text-[20px]'>No users to display.</p>
                                     </td>
                                 </tr>
                             )}
