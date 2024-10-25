@@ -4,7 +4,7 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { BsPersonLock } from 'react-icons/bs';
 import { IoClose, IoCamera } from "react-icons/io5";
 import { RiFolderUserFill } from "react-icons/ri";
-import AddUserRoles, { CheckboxState } from '@/components/pages/user-management/AddUserRoles';
+import AddUserRoles, { CheckboxState } from '@/components/pages/user-management/addUserRoles';
 import Image from 'next/image';
 import config from '@/server/config';
 import api from '@/utils/api';
