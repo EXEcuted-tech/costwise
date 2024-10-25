@@ -6,6 +6,7 @@ use App\Http\Controllers\ApiController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Models\Prediction;
+use Carbon\Carbon;
 
 class PredictionController extends ApiController
 {
@@ -30,18 +31,43 @@ class PredictionController extends ApiController
             }
 
             $validatedData = $validator->validated();
-            $prediction = Prediction::create($validatedData);
+            $monthYear = $validatedData['monthYear'];
+
+            $currentMonthYear = Carbon::now()->format('F Y');
+
+            if ($monthYear === $currentMonthYear) {
+                Prediction::where('monthYear', $monthYear)
+                    ->where('product_num', $validatedData['product_num'])
+                    ->delete();
+
+                $this->status = 200;
+                $this->response['message'] = "Current month's prediction deleted successfully.";
+                return $this->getResponse();
+            }
+
+            $existingPrediction = Prediction::where('monthYear', $monthYear)
+                ->where('product_num', $validatedData['product_num'])
+                ->first();
+
+            if ($existingPrediction) {
+                $existingPrediction->update($validatedData);
+                $prediction = $existingPrediction;
+                $this->response['message'] = "Prediction record updated successfully.";
+            } else {
+                $prediction = Prediction::create($validatedData);
+                $this->response['message'] = "Prediction record created successfully.";
+            }
 
             $this->status = 200;
             $this->response['data'] = $prediction;
-            $this->response['message'] = "Prediction records updated successfully.";
+
+            return $this->getResponse();
         } catch (\Throwable $th) {
             $this->status = 500;
             $this->response['message'] = $th->getMessage();
             return $this->getResponse();
         }
     }
-
     public function getPrediction(Request $request)
     {
         try {

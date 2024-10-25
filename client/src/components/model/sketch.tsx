@@ -243,12 +243,6 @@ function TrainingModel() {
   const [model, setModel] = useState<tf.Sequential | null>(null);
   const [trained, setTrained] = useState(false);
   const [lossHistory, setLossHistory] = useState<number[]>([0]);
-  let currentMonthYear = () => {
-    const date = new Date();
-    const month = (date.getMonth() + 1).toString().padStart(2, "0");
-    const year = date.getFullYear().toString();
-    return `${year}-${month}`;
-  };
   const [trainingSpeed, setTrainingSpeed] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true); // Loading state
 
@@ -329,7 +323,7 @@ function TrainingModel() {
   };
 
   useEffect(() => {
-    if (costData.length > 0) {
+    if (costData.length > 1) {
       setIsLoading(true);
       try {
         initializeModel(

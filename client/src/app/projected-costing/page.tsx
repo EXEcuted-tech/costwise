@@ -79,7 +79,6 @@ const ProjectedCostPage = () => {
       }));
       setpItemCost(formattedData);
 
-      console.log("Formatted Data:", formattedData);
     } catch (error) {
       console.log("Error Retrieving Data: ", error);
     }
@@ -123,11 +122,7 @@ const ProjectedCostPage = () => {
 
   useEffect(() => {
     fetchMonth();
-    try {
-      fetchPredictions();
-    } catch (error) {
-      console.log("Error Fetching Predictions data: ", error)
-    }
+    fetchPredictions();
   }, []);
 
   useEffect(() => {
