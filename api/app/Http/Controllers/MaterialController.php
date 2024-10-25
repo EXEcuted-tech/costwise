@@ -2,7 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bom;
 use App\Models\File;
+use App\Models\Formulation;
 use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -241,6 +243,27 @@ class MaterialController extends ApiController
                         $file->settings = json_encode($settings);
                         $file->save();
                     }
+                }
+            }
+
+            $formulationsCheck = Formulation::all();
+
+            foreach ($formulationsCheck as $formulation) {
+                $formulationRecord = Formulation::where('formulation_id', $formulation->formulation_id)->first();
+
+                if ($formulationRecord) {
+                    $materialQtyList = json_decode($formulationRecord->material_qty_list);
+
+                    foreach ($materialQtyList as $key => $details) {
+                        $materialId = key($details);
+
+                        if (in_array($materialId, $materialIds)) {
+                            unset($materialQtyList[$key]);
+                        }
+                    }
+                    $materialQtyList = array_values($materialQtyList);
+                    $formulationRecord->material_qty_list = json_encode($materialQtyList);
+                    $formulationRecord->save();
                 }
             }
 

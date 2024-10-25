@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Validator;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
+use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\Style\Fill;
 use Illuminate\Support\Facades\Log;
 
@@ -71,16 +72,15 @@ class CostCalcController extends ApiController
         $fg_id = $request->query('fg_id');
 
         try {
-
             $fgRecord = FinishedGood::where('fg_id', $fg_id)->first();
 
             //Retrieve formulation
-            $formulation = Formulation::where('formulation_id', $fgRecord->formulation_no)->first();
+            $formulation = Formulation::where('fg_id', $fgRecord->fg_id)->first();
             $materialQtyList = json_decode($formulation->material_qty_list);
 
             //Store fg data
             $fgData = [
-                'formulation_no' => $fgRecord->formulation_no,
+                'formula_code' => $formulation->formula_code,
                 'code' => $fgRecord->fg_code,
                 'desc' => $fgRecord->fg_desc,
                 'batch_qty' => $fgRecord->total_batch_qty,
@@ -92,7 +92,7 @@ class CostCalcController extends ApiController
 
             //Retrieve emulsion data
             $emulsion = json_decode($formulation->emulsion);
-            if ($emulsion) {
+            if (!empty(get_object_vars($emulsion))) {
                 $fgData['components'][] = [
                     'level' => $emulsion->level,
                     'qty' => $emulsion->batch_qty,
@@ -182,8 +182,8 @@ class CostCalcController extends ApiController
                     foreach ($data as $fg) {
                         // Write FG row
                         fputcsv($handle, [
-                            $fg['formulation_no'],
-                            1,
+                            $fg['formula_code'],
+                            '',
                             $fg['code'],
                             $fg['desc'],
                             $fg['batch_qty'],
@@ -194,17 +194,30 @@ class CostCalcController extends ApiController
 
                         // Write component rows
                         foreach ($fg['components'] as $component) {
-                            fputcsv($handle, [
-                                '',
-                                $component['level'] ?? '',
-                                $component['item_code'] ?? '',
-                                $component['description'] ?? 'EMULSION',
-                                $component['batch_quantity'] ?? $component['qty'] ?? '',
-                                $component['unit'] ?? '',
-                                $component['cost'] ?? '',
-                                $component['total_cost'] ?? ''
-                            ]);
+                            if (!empty($component)) {
+                                fputcsv($handle, [
+                                    '',
+                                    $component['level'] ?? '',
+                                    $component['item_code'] ?? '',
+                                    $component['description'] ?? 'EMULSION',
+                                    $component['batch_quantity'] ?? $component['qty'] ?? '',
+                                    $component['unit'] ?? '',
+                                    $component['cost'] ?? '',
+                                    $component['total_cost'] ?? ''
+                                ]);
+                            }
                         }
+
+                        fputcsv($handle, [
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            ''
+                        ]);
                     }
                     fclose($handle);
                 };
@@ -272,7 +285,7 @@ class CostCalcController extends ApiController
         $row = 2;
 
         //Add FG Row
-        $sheet->setCellValue("A$row", $fg['formulation_no']);
+        $sheet->setCellValue("A$row", $fg['formula_code']);
         $sheet->setCellValue("B$row", 1);
         $sheet->setCellValue("C$row", $fg['code']);
         $sheet->setCellValue("D$row", $fg['desc']);
@@ -287,25 +300,29 @@ class CostCalcController extends ApiController
         $row++;
 
         // Add components
+
         foreach ($fg['components'] as $component) {
-            $sheet->setCellValue("A$row", "");
-            $sheet->setCellValue("B$row", $component['level']);
-            $sheet->setCellValue("C$row", $component['item_code'] ?? "");
+            if (!empty($component)) {
+                $sheet->setCellValue("A$row", "");
+                $sheet->setCellValue("B$row", $component['level'] ?? "");
+                $sheet->setCellValue("C$row", $component['item_code'] ?? "");
 
-            if (!isset($component['description']) && isset($component['qty'])) {
-                $sheet->setCellValue("D$row", "EMULSION");
-                $sheet->setCellValue("E$row", $component['qty']);
-            } else {
-                $sheet->setCellValue("D$row", $component['description'] ?? "");
-                $sheet->setCellValue("E$row", $component['batch_quantity'] ?? "");
+                if (!isset($component['description']) && isset($component['qty'])) {
+                    $sheet->setCellValue("D$row", "EMULSION");
+                    $sheet->setCellValue("E$row", $component['qty']);
+                } else {
+                    $sheet->setCellValue("D$row", $component['description'] ?? "");
+                    $sheet->setCellValue("E$row", $component['batch_quantity'] ?? "");
+                }
+
+                $sheet->setCellValue("F$row", $component['unit'] ?? "");
+                $sheet->setCellValue("G$row", $component['cost'] ?? "");
+                $sheet->setCellValue("H$row", $component['total_cost'] ?? "");
+                $sheet->getStyle("A$row:H$row")->getFont()->setSize(8)->setName('Open Sans');
+                $row++;
             }
-
-            $sheet->setCellValue("F$row", $component['unit']);
-            $sheet->setCellValue("G$row", $component['cost'] ?? "");
-            $sheet->setCellValue("H$row", $component['total_cost'] ?? "");
-            $sheet->getStyle("A$row:H$row")->getFont()->setSize(8)->setName('Open Sans');
-            $row++;
         }
+
 
         // Apply number formatting
         $sheet->getStyle('E2:E' . ($row - 1))->getNumberFormat()->setFormatCode('0.00');
@@ -318,19 +335,34 @@ class CostCalcController extends ApiController
         $sheet = $spreadsheet->createSheet();
         $sheet->setTitle('Cost Calculation Summary');
 
-        $sheet->mergeCells('A1:F1');
-        $sheet->setCellValue('A1', 'Cost Calculation for the month of ' . $monthYear);
+        $sheet->setShowGridlines(false);
 
-        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
-        $sheet->getStyle('A1')->getAlignment()->setHorizontal(\PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER);
+        $sheet->mergeCells('A1:F1');
+        $sheet->setCellValue('A1', 'Summary of Product Costing');
+        $sheet->getStyle('A1')->getFont()->setBold(true)->setSize(13)->setName('Arial')->getColor()->setRGB('B22222');
+
+        $sheet->getRowDimension(1)->setRowHeight(16.5);
+        $sheet->getRowDimension(4)->setRowHeight(39.5);
+
+        $sheet->getColumnDimension('A')->setWidth(12.71);
+        $sheet->getColumnDimension('B')->setWidth(19.43);
+        $sheet->getColumnDimension('C')->setWidth(11.43);
+        $sheet->getColumnDimension('D')->setWidth(19.29);
+        $sheet->getColumnDimension('E')->setWidth(12.57);
+        $sheet->getColumnDimension('F')->setWidth(11.43);
+
+        $sheet->mergeCells('A2:F2');
+        $sheet->setCellValue('A2', 'for the month of ' . $monthYear);
+        $sheet->getStyle('A2')->getFont()->setSize(10)->setName('Arial')->setBold(true)->setItalic(true);
 
         $headers = ['Item Code', 'Item Description', 'RM Cost', 'Factory Overhead', 'Direct Labor', 'TOTAL'];
-        $sheet->fromArray($headers, NULL, 'A2');
+        $sheet->fromArray($headers, NULL, 'A4');
 
-        $sheet->getStyle('A2:F2')->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
-        $sheet->getStyle('A2:F2')->getFont()->setBold(true);
+        $sheet->getStyle('A4:F4')->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_MEDIUM);
+        $sheet->getStyle('A4:F4')->getFont()->setBold(true);
+        $sheet->getStyle('A4:F4')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
+        $sheet->freezePane('A5');
 
-        $sheet->setAutoFilter('A2:F2');
         $sheet->getColumnDimension('A')->setWidth(15);
         $sheet->getColumnDimension('B')->setWidth(25);
         $sheet->getColumnDimension('C')->setWidth(12);
@@ -338,7 +370,7 @@ class CostCalcController extends ApiController
         $sheet->getColumnDimension('E')->setWidth(15);
         $sheet->getColumnDimension('F')->setWidth(12);
 
-        $row = 3;
+        $row = 5;
         foreach ($data as $fg) {
             $fgCode = $fg['fg_code'];
             $fgDesc = $fg['fg_desc'];
@@ -349,16 +381,21 @@ class CostCalcController extends ApiController
 
             $sheet->setCellValue("A$row", $fgCode);
             $sheet->setCellValue("B$row", $fgDesc);
-            $sheet->setCellValue("C$row", $rmCost);
-            $sheet->setCellValue("D$row", $factoryOverhead);
-            $sheet->setCellValue("E$row", $directLabor);
-            $sheet->setCellValue("F$row", $totalCost);
+            $sheet->setCellValue("C$row", number_format($rmCost, 2));
+            $sheet->setCellValue("D$row", number_format($factoryOverhead, 2));
+            $sheet->setCellValue("E$row", number_format($directLabor, 2));
+            $sheet->setCellValue("F$row", number_format($totalCost, 2));
 
-            $sheet->getStyle("A$row:F$row")->getBorders()->getAllBorders()->setBorderStyle(\PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN);
+            $sheet->getStyle("A$row:B$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
+            $sheet->getStyle("C$row:F$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
+
+            // Add borders for each row
+            $sheet->getStyle("A$row:F$row")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
             $row++;
         }
 
+        // Auto-size columns A to F
         foreach (range('A', 'F') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }

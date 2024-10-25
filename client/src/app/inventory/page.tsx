@@ -7,7 +7,8 @@ import { IoIosArrowBack, IoIosArrowForward, IoIosSearch } from "react-icons/io";
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import MonthSelector from '@/components/modals/MonthSelector';
 import { CiImport } from "react-icons/ci";
-import { IoTrash } from 'react-icons/io5';
+import { HiArchiveBoxXMark } from "react-icons/hi2";
+import { RiFileCloseFill } from "react-icons/ri";
 import ImportInventoryList from '@/components/modals/ImportInventory';
 import api from '@/utils/api';
 import { InventoryType } from '@/types/data';
@@ -99,7 +100,7 @@ const Inventory = () => {
         const fetchInventoryLists = async () => {
             try {
                 const response = await api.get('/inventory/lists');
-                if (response.data && response.data.data) {
+                if (response.data.data) {
                     const inventoryData = response.data.data;
 
                     if (Array.isArray(inventoryData)) {
@@ -138,8 +139,6 @@ const Inventory = () => {
                     setAlertStatus('critical');
                 }
             } catch (error) {
-                setAlertMessages(['Error retrieving inventory lists.']);
-                setAlertStatus('critical');
                 setIsLoading(false);
             }
         };
@@ -250,7 +249,7 @@ const Inventory = () => {
                     <Header icon={MdTrolley} title="Inventory" />
                 </div>
 
-                <div className={`${isOpen ? '4xl:h-[47rem] 3xl:h-[45rem] 2xl:h-[45rem] xl:h-[44rem]' : '4xl:h-[47rem] 3xl:h-[47rem] 2xl:h-[47rem] xl:h-[43rem]'} relative w-auto h-[47rem] ml-[4rem] mr-[3rem] my-[3rem] rounded-2xl bg-white border-1 border-[#656565] shadow-md animate-fade-in2`}>
+                <div className={`${isOpen ? '4xl:h-[47rem] 3xl:h-[47rem] 2xl:h-[45rem] xl:h-[44rem]' : '4xl:h-[47rem] 3xl:h-[47rem] 2xl:h-[45rem] xl:h-[47rem]'} relative w-auto h-[47rem] ml-[4rem] mr-[3rem] my-[3rem] rounded-2xl bg-white border-1 border-[#656565] shadow-md animate-fade-in2`}>
                     {/* Header */}
                     <div className='flex h-14 rounded-t-2xl bg-[#B22222] text-white text-[26px] font-bold py-2 pl-5'>
 
@@ -292,7 +291,7 @@ const Inventory = () => {
                                 <IoIosSearch />
                             </div>
                             <input
-                                className={`${isOpen ? '4xl:w-[30rem] 3xl:w-[25rem] 2xl:w-[20rem] xl:w-[12rem]' : '4xl:w-[30rem] 3xl:w-[30rem] 2xl:w-[30rem] xl:w-[15rem]'} w-[30rem] bg-white h-8  px-5 pl-9 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
+                                className={`${isOpen ? '4xl:w-[20rem] 3xl:w-[16rem] 2xl:w-[12rem] xl:w-[8rem]' : '4xl:w-[30rem] 3xl:w-[30rem] 2xl:w-[20rem] xl:w-[15rem]'} w-[30rem] bg-white h-8  px-5 pl-9 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
                                 type="search"
                                 name="search"
                                 placeholder="Search here..."
@@ -302,7 +301,7 @@ const Inventory = () => {
 
                         <div className='flex mt-[0.8em] mr-4 ml-auto text-gray-400 gap-4'>
                             <select
-                                className={`${isOpen ? '4xl:w-[20rem] 3xl:w-[20rem] 2xl:w-[15rem] xl:w-[10rem]' : ''} bg-white h-8 w-[20rem] pl-3 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
+                                className={`${isOpen ? '4xl:w-[20rem] 3xl:w-[16rem] 2xl:w-[12rem] xl:w-[7rem]' : '4xl:w-[20rem] 3xl:w-[20rem] 2xl:w-[15rem] xl:w-[10rem]'} bg-white h-8 w-[20rem] pl-3 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
                                 onChange={handleFilterCategory}
                             >
                                 <option selected value="" disabled hidden>Item Category</option>
@@ -329,29 +328,30 @@ const Inventory = () => {
 
                             {/* Action Buttons */}
                             <button
-                                className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[7rem] px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
+                                className={`${isOpen ? 'text-[15px] 3xl:text-[18px] 2xl:text-[17px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[7rem] pl-[4px] pr-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center justify-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
                                 onClick={openImportInventoryListModal}
                             >
                                 <span><CiImport className='w-[30px] h-[22px]' /></span>
                                 <span className='font-semibold'>Import</span>
                             </button>
-                            <button
-                                className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
-                                onClick={openDeleteModal}
-                            >
-                                <IoTrash className="text-[25px] transition-colors duration-250 ease-in-out" />
-                            </button>
-
+                            {inventoryList.length > 0 && (
+                                <button
+                                    className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
+                                    onClick={openDeleteModal}
+                                >
+                                    <HiArchiveBoxXMark className="text-[22px] transition-colors duration-250 ease-in-out" />
+                                </button>
+                            )}
                         </div>
                     </div>
 
                     {/* Main Content Area */}
-                    <div className={`${isOpen ? '4xl:h-[552px] 3xl:h-[525px] 2xl:h-[525px] xl:h-[515px]' : '4xl:h-[552px] 3xl:h-[552px] 2xl:h-[552px] xl:h-[500px]'} h-[552px] overflow-x-auto`}>
+                    <div className={`${isOpen ? '4xl:h-[552px] 3xl:h-[552px] 2xl:h-[525px] xl:h-[515px]' : '4xl:h-[552px] 3xl:h-[542px] 2xl:h-[512px] xl:h-[550px]'} h-[552px] overflow-x-auto`}>
                         <table className='table-auto w-full border-collapse'>
                             <thead>
                                 <tr>
                                     {columnNames.map((columnName, index) => (
-                                        <th key={index} className={`${isOpen ? '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[18px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[20px] 2xl:text-[20px] xl:text-[16px]'} text-[20px] text-center animate-zoomIn whitespace-nowrap font-bold  text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}>
+                                        <th key={index} className={`${isOpen ? '4xl:text-[19px] 3xl:text-[18px] 2xl:text-[16px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[17px] xl:text-[16px]'} text-[20px] text-center animate-zoomIn whitespace-nowrap font-bold  text-[#6B6B6B] py-2 px-4 border-b border-[#ACACAC]`}>
                                             {columnName}
                                         </th>
                                     ))}
@@ -360,26 +360,29 @@ const Inventory = () => {
                             <tbody>
                                 {isLoading ? (
                                     <tr>
-                                        <td colSpan={7} className="text-center py-6">
-                                            <Spinner />
+                                        <td colSpan={7} className="text-center pt-[15rem]">
+                                            <div className='flex justify-center items-center'>
+                                                <Spinner/>
+                                            </div>
                                         </td>
                                     </tr>
                                 ) : currentPageItems.length > 0 ? (
                                     currentPageItems.map((data, index) => (
-                                        <tr key={index} className={`${isOpen ? '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[18px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[20px] 2xl:text-[20px] xl:text-[16px]'} text-[20px] text-black text-center border-b border-[#ACACAC] hover:bg-gray-50`}>
-                                            <td className='w-[18rem] py-4 text-left pl-8'>{data.material_code}</td>
+                                        <tr key={index} className={`${isOpen ? '4xl:text-[19px] 3xl:text-[18px] 2xl:text-[16px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[17px] xl:text-[16px]'} text-[20px] text-black text-center border-b border-[#ACACAC] hover:bg-gray-50`}>
+                                            <td className={`${isOpen ? '2xl:py-6' : '4xl:w-[18rem] 3xl:w-[17rem] 2xl:w-[15rem]'} w-[18rem] py-4 text-left pl-8`}>
+                                                {data.material_code}</td>
                                             <td className='break-words'>{data.material_desc}</td>
                                             <td>{data.unit}</td>
-                                            <td className='w-[10%] text-right pr-6'>{numberWithCommas(data.purchased_qty)}</td>
+                                            <td className='w-[10%] text-right pr-4'>{numberWithCommas(data.purchased_qty)}</td>
                                             <td className='text-right pr-6 font-semibold'>{numberWithCommas(data.total_qty)}</td>
                                             <td className='text-right pr-6'>{numberWithCommas(data.usage_qty)}</td>
-                                            <td>
+                                            <td className={`${isOpen ? '4xl:pr-2 3xl:pr-4 2xl:pr-4 xl:pr-2': '4xl:pr-2 3xl:pr-4 2xl:pr-4 xl:pr-2'}`}>
                                                 <div className='flex justify-center'>
                                                     <p
                                                         className={`${data.stock_status === 'In Stock'
                                                             ? 'text-[#00930F] bg-[#9EE29E]'
                                                             : 'text-primary bg-[#F5BABA]'
-                                                            } rounded-2xl w-[9rem]`}
+                                                            } rounded-2xl w-[9rem] ${isOpen ? '4xl:w-[8rem] 3xl:w-[8rem] 2xl:w-[6rem] xl:w-[5rem]' : '4xl:w-[9rem] 3xl:w-[8rem] 2xl:w-[6rem] xl:w-[5rem]'}`}
                                                     >
                                                         {data.stock_status}
                                                     </p>
@@ -389,8 +392,9 @@ const Inventory = () => {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan={columnNames.length} className='text-center py-10 text-[#555555]'>
-                                            No items found.
+                                        <td colSpan={columnNames.length} className='items-center justify-items-center text-center font-semibold pt-[13rem] text-[#555555]'>
+                                            <RiFileCloseFill className='text-[85px] mb-4' />
+                                            <p className='text-[20px]'> No inventory lists found.</p>
                                         </td>
                                     </tr>
                                 )

@@ -1,9 +1,10 @@
 import api from '@/utils/api';
 import React, { useState, useEffect } from 'react';
-import { FaCalendarAlt, FaEdit, FaTrash } from "react-icons/fa";
+import { FaCalendarAlt, FaEdit } from "react-icons/fa";
 import ConfirmDelete from '@/components/modals/ConfirmDelete';
 import { Router } from 'next/router';
 import { useUserContext } from '@/contexts/UserContext';
+import { HiArchiveBoxXMark } from 'react-icons/hi2';
 
 type ViewEditEventModalProps = {
     event: { id: number };
@@ -68,7 +69,7 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
 
     const handleDelete = async () => {
         if (!sysRoles?.includes(16)) {
-            setError('You are not authorized to delete this event.');
+            setError('You are not authorized to archive this event.');
             return;
         }
         setIsLoading(true);
@@ -170,7 +171,7 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
                                     className="px-4 py-2 bg-primary text-white rounded font-semibold transition-colors hover:bg-red-600"
                                     disabled={isLoading}
                                 >
-                                    <FaTrash className="inline-block mr-1" /> Delete
+                                    <HiArchiveBoxXMark className="inline-block mr-1" /> Archive
                                 </button>
                             </>
                         )}

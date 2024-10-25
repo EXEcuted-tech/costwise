@@ -4,7 +4,7 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { BsPersonLock } from 'react-icons/bs';
 import { IoClose, IoCamera } from "react-icons/io5";
 import { RiFolderUserFill } from "react-icons/ri";
-import AddUserRoles, { CheckboxState } from '../pages/user-management/addUserRoles';
+import AddUserRoles, { CheckboxState } from '@/components/pages/user-management/addUserRoles';
 import Image from 'next/image';
 import config from '@/server/config';
 import api from '@/utils/api';
@@ -31,7 +31,12 @@ const getRoleName = (roleId: number): string => {
         9: 'View Formula',
         10: 'Upload Formula',
         11: 'Edit Formula',
-        12: 'Archive Formula'
+        12: 'Archive Formula',
+        13: 'View Event',
+        14: 'Create Event',
+        15: 'Edit Event',
+        16: 'Archive Event',
+        17: 'Export File/Record'
     };
     return roleNames[roleId] || 'Unknown Role';
 };
@@ -208,7 +213,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
         setAlertStatus('critical');
 
         const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-        const phoneRegex = /^(\+?[0-9]{1,4})?\s?-?[0-9]{10}$/;
+        const phoneRegex = /^\+63\s?9\d{9}$/;
 
         // Reset errors
         setFirstNameError(false);
@@ -364,9 +369,9 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
     }
 
     return (
-        <div className='flex justify-center items-center z-[199999] w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)]'>
+        <div className='flex justify-center items-center z-[9999] w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)]'>
             
-            <div className='absolute top-0 right-0 z-[9999]'>
+            <div className='absolute top-0 right-0 z-[99999]'>
                 {alertMessages && alertMessages.map((msg, index) => (
                 <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
                     setAlertMessages(prev => prev.filter((_, i) => i !== index));

@@ -7,8 +7,13 @@ import { IoIosInformationCircle } from "react-icons/io";
 import ProductCost from "@/components/charts/LineChart";
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import api from "@/utils/api";
-import TrainingModel from "../../components/model/sketch";
+import TrainingModel, {
+  numberToMonthYear,
+  monthYearToNumber,
+} from "../../components/model/sketch";
 import { ProductEntry, CostDataEntry } from "@/types/data";
+import useOutsideClick from '@/hooks/useOutsideClick';
+import { Tooltip } from "@nextui-org/react";
 
 const ProjectedCostPage = () => {
   const { isOpen } = useSidebarContext();
@@ -21,6 +26,24 @@ const ProjectedCostPage = () => {
     product_name: " ",
     cost: 0,
   });
+  const monthNames = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const currentDate = new Date();
+  const currentMonthName = monthNames[currentDate.getMonth()];
+  const currentYear = currentDate.getFullYear();
+  const currentMonthYear = `${currentMonthName} ${currentYear}`;
   const [yearList, setyearList] = useState([
     { year: "2022" },
     { year: "2023" },
@@ -30,81 +53,86 @@ const ProjectedCostPage = () => {
 
   const [recentCost, setRecentCost] = useState<number>(0);
 
-  const [currentMonthYear, setCurrentMonthYear] = useState("January 2025");
-
   const [pItemCost, setpItemCost] = useState<ProductEntry[]>([
-    { product_num: 0, product_name: "(Empty)", cost: 0, monthYear: "Random" },
+    {
+      product_num: 0,
+      product_name: "(Empty)",
+      cost: 0,
+      monthYear: currentMonthYear,
+    },
   ]);
 
-  // Month-Year conversion to number
-  function monthYearToNumber(monthYearValue: string): number {
-    const [month, year] = monthYearValue.split(" ");
-    const monthIndex =
-      new Date(Date.parse(month + " 1, " + year)).getMonth() + 1;
-    return (parseInt(year) - 2022) * 12 + monthIndex;
-  }
-
-  useEffect(() => {
-    const fetchPredictions = async () => {
-      const response = api.post("/prediction/data", {
-        monthYear: "January 2025",
+  const fetchPredictions = async () => {
+    try {
+      let projectedMonthYear = numberToMonthYear(
+        monthYearToNumber(currentMonthYear) + 1
+      );
+      const response = api.post("/prediction/current_data", {
+        monthYear: projectedMonthYear,
       });
 
-      setpItemCost((await response).data.data);
-    };
+      const listItemCost = (await response).data.data;
 
+      const formattedData: ProductEntry[] = listItemCost.map((item: any) => ({
+        product_num: item.product_num,
+        product_name: item.product_name,
+        cost: parseFloat(item.cost),
+        monthYear: item.monthYear,
+      }));
+      setpItemCost(formattedData);
+
+    } catch (error) {
+      console.log("Error Retrieving Data: ", error);
+    }
+  };
+  const recentTotalCost = () => {
+    let initialSum = 0;
+    pItemCost.forEach((cost) => {
+      initialSum +=
+        typeof cost.cost === "string" ? parseFloat(cost.cost) : cost.cost;
+    });
+    setRecentCost(initialSum);
+  };
+  const fetchMonth = async () => {
+    try {
+      const response = await api.get("/training/data");
+
+      const dataString = response.data.data[0].settings;
+
+      let parsedData: CostDataEntry[];
+
+      if (typeof dataString === "string") {
+        parsedData = JSON.parse(dataString);
+      } else {
+        parsedData = dataString;
+      }
+
+      let monthYearList: any[] = [];
+
+      parsedData.map((entry) => {
+        const [month, year] = entry.monthYear.split(" ");
+        if (!monthYearList.some((item) => item.year === year)) {
+          monthYearList.push({ year: year });
+        }
+      });
+
+      setyearList(monthYearList);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  };
+
+  useEffect(() => {
+    fetchMonth();
     fetchPredictions();
   }, []);
 
   useEffect(() => {
-    const recentTotalCost = () => {
-      let initialSum = 0;
-      pItemCost.forEach((cost) => {
-        initialSum +=
-          typeof cost.cost === "string" ? parseFloat(cost.cost) : cost.cost;
-      });
-      setRecentCost(initialSum);
-    };
-
     recentTotalCost();
-  });
+  }, [pItemCost])
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await api.get("/training/data");
-
-        const dataString = response.data.data[0].settings;
-
-        let parsedData: CostDataEntry[];
-
-        if (typeof dataString === "string") {
-          parsedData = JSON.parse(dataString);
-        } else {
-          parsedData = dataString;
-        }
-
-        console.log("Parsed Data: ", parsedData);
-
-        let monthYearList: any[] = [];
-
-        parsedData.map((entry) => {
-          const [month, year] = entry.monthYear.split(" ");
-          if (!monthYearList.some((item) => item.year === year)) {
-            monthYearList.push({ year: year });
-          }
-        });
-
-        setyearList(monthYearList);
-
-        console.log("List of Months from previous Data:", yearList);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
+  const ref = useOutsideClick(() => setIsActiveStart(false));
+  const ref2 = useOutsideClick(() => setIsActiveEnd(false));
 
   return (
     <div className="overflow-auto overflow-x-hidden bg-cover bg-center items-center justify-center bg-[#FFFAF8] bg-opacity-20">
@@ -112,10 +140,10 @@ const ProjectedCostPage = () => {
         <Header icon={MdOutlineAnalytics} title={"Projected Costing"} />
       </div>
       <div className="w-full ml-[60px] pr-[45px] h-full 2xl:h-[90vh] flex flex-col items-start justify-start pt-[15px] py-[15px]">
-        <p className="text-[30px] text-tertiary">Equipment Costs</p>
+        <p className="text-[30px] text-tertiary">Projected Product Costs</p>
         <div className="flex flex-row h-[10%] w-full items-start justify-start flex-wrap">
           {/* Dropdown List Start*/}
-          <div className="min-w-[200px] relative mt-[15px] text-[16px]">
+          <div ref={ref} className="min-w-[200px] relative mt-[15px] text-[16px]">
             <div
               className="text-tertiary flex justify-between border border-[#D9D9D9] rounded-xl p-[5px] cursor-pointer transition items-start hover:border-primary hover:text-primary"
               onClick={() => {
@@ -131,8 +159,8 @@ const ProjectedCostPage = () => {
               </span>
               <ul
                 className={`list-none px-[1px] absolute border border-gray-300 rounded-lg top-[2.7em] left-50% w-full translate-[-50%] transition z-1 overflow-hidden bg-white shadow-md ${!isActiveStart
-                    ? "opacity-0 pointer-events-none"
-                    : "block opacity-100"
+                  ? "opacity-0 pointer-events-none"
+                  : "block opacity-100"
                   } ${yearList.length < 6 ? " " : "overflow-y-scroll h-[175px]"}`}
               >
                 {yearList.map((date) => (
@@ -142,6 +170,7 @@ const ProjectedCostPage = () => {
                       }`}
                     onClick={() => {
                       setActiveStart(date.year);
+                      setIsActiveStart(false);
                     }}
                   >
                     {date.year}
@@ -151,7 +180,7 @@ const ProjectedCostPage = () => {
             </div>
           </div>
           {/* Dropdown List End*/}
-          <div className="min-w-[200px] relative ml-[50px] mt-[15px] text-[16px]">
+          <div ref={ref2} className="min-w-[200px] relative ml-[50px] mt-[15px] text-[16px]">
             <div
               className="text-tertiary flex justify-between border border-[#D9D9D9] rounded-xl p-[5px] cursor-pointer transition items-start hover:border-primary hover:text-primary"
               onClick={() => {
@@ -177,6 +206,7 @@ const ProjectedCostPage = () => {
                     }`}
                   onClick={() => {
                     setActiveEnd(half.half);
+                    setIsActiveEnd(false);
                   }}
                 >
                   {half.half}
@@ -192,9 +222,9 @@ const ProjectedCostPage = () => {
           {/* Left Div */}
           <div
             className={`${isOpen ? "w-full 4xl:w-[65%]" : "w-full 2xl:w-[65%]"
-              } flex flex-col h-full rounded-lg shadow-xl`}
+              } flex flex-col h-full rounded-lg shadow-lg`}
           >
-            <div className="flex text-[30px]  font-bold h-[10%] bg-white items-center justify-start border-b-2 pl-10">
+            <div className="flex text-[30px] font-bold h-[10%] bg-white rounded-t-[20px] items-center justify-start border-b-2 pl-10">
               <p className="w-[95%] text-[#585858]">Graph</p>
             </div>
             <div className="flex items-center justify-center h-[500px] lg:h-[50%] w-[100%] bg-white p-2">
@@ -205,9 +235,11 @@ const ProjectedCostPage = () => {
             </div>
             <div className="flex text-[30px] text-[#585858] font-bold h-[10%] bg-white items-center justify-start border-y-2 pl-10">
               <p className="w-[95%]">Estimated Summary</p>
-              <IoIosInformationCircle className="text-[35px] text-[#625F5F]" />
+              <Tooltip content="Key metrics overview from the model's performance" placement="right">
+                <span><IoIosInformationCircle className="text-[35px] text-[#625F5F] hover:brightness-50" /></span>
+              </Tooltip>
             </div>
-            <div className="flex items-center justify-center h-[30%] bg-white p-10 2xl:p-0">
+            <div className="flex items-center justify-center h-[30%] bg-white p-10 2xl:p-0 rounded-b-[20px] shadow-b-lg">
               <TrainingModel />
             </div>
           </div>
@@ -218,8 +250,8 @@ const ProjectedCostPage = () => {
           >
             <div
               className={`${isOpen
-                  ? "flex flex-col 2xl:flex-row 4xl:flex-col"
-                  : "flex flex-row 2xl:flex-col"
+                ? "flex flex-col 2xl:flex-row 4xl:flex-col"
+                : "flex flex-row 2xl:flex-col"
                 } gap-[20px] w-full`}
             >
               {/* Predictions Section */}
@@ -231,7 +263,9 @@ const ProjectedCostPage = () => {
                   <p className="text-[24px] font-bold w-[95%]">
                     Prediction: {activeFG.product_name}
                   </p>
-                  <IoIosInformationCircle className="text-[35px] text-[#625F5F]" />
+                  <Tooltip content="Projected cost and cost percentage overview based on the model's predictions" placement="left">
+                    <span><IoIosInformationCircle className="text-[35px] text-[#625F5F] hover:brightness-50" /></span>
+                  </Tooltip>
                 </div>
                 <div className="flex flex-row w-full h-full items-center justify-center">
                   <div className="flex flex-col w-full items-center justify-center text-[#005898] font-bold">
@@ -254,9 +288,11 @@ const ProjectedCostPage = () => {
             <div className="flex flex-col bg-white p-[10px] m-1 h-full rounded-lg shadow-lg">
               <div className="flex flex-row p-[5px]">
                 <p className="text-[24px] font-bold w-[95%]">
-                  Projected Final Goods Cost
+                  Projected Finished Goods Cost
                 </p>
-                <IoIosInformationCircle className="text-[35px] text-[#625F5F]" />
+                <Tooltip content="Lists the predicted cost for each item or finished good" placement="left">
+                  <span><IoIosInformationCircle className="text-[35px] text-[#625F5F] hover:brightness-50" /></span>
+                </Tooltip>
               </div>
               <div className="table-container overflow-x-auto">
                 <table className="table-auto w-full">
@@ -272,15 +308,15 @@ const ProjectedCostPage = () => {
                   </thead>
                   <tbody className="overflow-y-auto max-h-96 w-full">
                     {pItemCost
-                      .filter((item) => item.monthYear === currentMonthYear)
+
                       .map((item) => (
                         <tr
                           key={item.product_num}
                           className={`text-[#383838] ${item.product_name === activeFG.product_name
-                              ? "bg-primary font-bold text-white"
-                              : item.product_num % 2 === 0
-                                ? "bg-[#F6EBEB]"
-                                : ""
+                            ? "bg-primary font-bold text-white"
+                            : item.product_num % 2 === 0
+                              ? "bg-[#F6EBEB]"
+                              : ""
                             } w-full cursor-pointer`}
                           onClick={() => setActiveFG(item)}
                         >

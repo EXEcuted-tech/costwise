@@ -162,7 +162,7 @@ const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateActio
                                                         onClick={() => {
                                                             setBomToDelete({ id: options.bom_id, index });
                                                             setDeleteModal(true);
-                                                        }}>Delete</p>
+                                                        }}>Archive</p>
                                                 </div>
                                             )}
                                         </div>

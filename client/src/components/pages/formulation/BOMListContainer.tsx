@@ -177,7 +177,7 @@ const BOMListContainer = () => {
   }, [fetchData, selectedBomId]);
 
   return (
-    <div className='bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[20px]'>
+    <div className='bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[20px] w-full'>
       {/* header */}
       <div className='flex items-center py-[10px]'>
         <IoIosArrowRoundBack className='text-primary dark:text-[#ff4d4d] text-[45px] pt-[5px] mr-[5px] hover:text-[#D13131] cursor-pointer'
@@ -235,7 +235,7 @@ const BOMListContainer = () => {
             ))
         )}
       </div>
-      <div className='rounded-[5px] border border-[#656565] dark:border-[#5C5C5C] #overflow-x-auto mt-[10px]'>
+      <div className='rounded-[5px] border border-[#656565] dark:border-[#5C5C5C] overflow-x-auto mt-[10px]'>
         <table className='table-auto w-full border-collapse'>
           <thead>
             <tr>

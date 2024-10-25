@@ -33,6 +33,11 @@ const CustomRoleSelect: React.FC<CustomRoleSelectProps> = ({
     { role: 'Upload Formula', description: 'User can upload formulas.', value: 10 },
     { role: 'Edit Formula', description: 'User can edit formulas.', value: 11 },
     { role: 'Archive Formula', description: 'User can archive formulas.', value: 12 },
+    { role: 'View Event', description: 'User can view events.', value: 13 },
+    { role: 'Create Event', description: 'User can create events.', value: 14 },
+    { role: 'Edit Event', description: 'User can edit events.', value: 15 },
+    { role: 'Archive Event', description: 'User can archive events.', value: 16 },
+    { role: 'Export Files/Records', description: 'User can export files/records.', value: 17 },
   ];
 
   const handleOptionClick = (option: { role: string, value: number; description: string }) => {
@@ -42,10 +47,10 @@ const CustomRoleSelect: React.FC<CustomRoleSelectProps> = ({
       if (prevOptions.includes(optionText)) {
         return prevOptions.filter(item => item !== optionText);
       } else {
-        if (prevOptions.length < 12) {
+        if (prevOptions.length < 17) {
           return [...prevOptions, optionText];
         } else {
-          alert('You can only select up to 12 options.');
+          alert('You can only select up to 17 options.');
           return prevOptions;
         }
       }
@@ -55,10 +60,10 @@ const CustomRoleSelect: React.FC<CustomRoleSelectProps> = ({
       if (prevValues.includes(option.value)) {
         return prevValues.filter(value => value !== option.value);
       } else {
-        if (prevValues.length < 12) {
+        if (prevValues.length < 17) {
           return [...prevValues, option.value];
         } else {
-          alert('You can only select up to 12 options.');
+          alert('You can only select up to 17 options.');
           return prevValues;
         }
       }

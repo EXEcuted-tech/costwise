@@ -341,7 +341,7 @@ const FormulationTable: React.FC<{
 
                         const deleteMaterialResponse = await api.post('/formulations/delete_material', payload);
                         if (deleteMaterialResponse.data.status !== 200) {
-                            throw new Error('Failed to delete materials');
+                            throw new Error('Failed to archive materials');
                         }
                     }
 

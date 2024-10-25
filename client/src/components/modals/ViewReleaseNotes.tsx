@@ -8,7 +8,7 @@ import { ReleaseNote } from '@/types/data';
 import api from '@/utils/api';
 import Loader from '../loaders/Loader';
 import Alert from '../alerts/Alert';
-import { secondsToMinutes } from 'date-fns';
+import ConfirmChanges from './ConfirmChanges';
 
 interface ViewReleaseNotesProps {
     note_id: number;
@@ -20,6 +20,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
     const [note, setNote] = useState<ReleaseNote>();
     const [editedNote, setEditedNote] = useState<ReleaseNote>();
 
+    const [showConfirmChanges, setShowConfirmChanges] = useState(false);
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
     const [isLoading, setIsLoading] = useState(true);
@@ -32,6 +33,9 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
         retrieveReleaseNote();
     }, [note_id]);
 
+    const handleClose = () => {
+        setShowConfirmChanges(true);
+    }
     //Retrieve release note data
     const retrieveReleaseNote = async () => {
         try {
@@ -59,8 +63,8 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
     }  
 
     const handleCancelEdit = () => {
+        setShowConfirmChanges(true);
         setIsEditing(false);
-        secondsToMinutes
         setEditedNote(note);
     }
 
@@ -135,12 +139,11 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
         setEditedNote(prev => {
             if (!prev) return undefined;
             if (name === 'version') {
-                // For version, allow only positive numbers with up to one decimal place
                 const numValue = parseFloat(value);
                 if (!isNaN(numValue) && numValue > 0) {
                     return {...prev, [name]: numValue.toFixed(1)};
                 }
-                return prev; // If invalid, don't update
+                return prev; 
             }
             return {...prev, [name]: value};
         });
@@ -161,12 +164,12 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
             });
 
             if (response.status === 200) {
-                setAlertMessages(["Release note successfully deleted"]);
+                setAlertMessages(["Release note successfully archived"]);
                 setAlertStatus("success");
                 window.location.reload();
             }
         } catch (error) {
-            setAlertMessages(["Failed to delete release note"]);
+            setAlertMessages(["Failed to archive release note"]);
             setAlertStatus("critical");
         }
     }
@@ -205,12 +208,21 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                 }} />
                 ))}
             </div>
+            {showConfirmChanges && (
+                <ConfirmChanges 
+                    setConfirmChanges={setShowConfirmChanges} 
+                    onConfirm={() => {
+                        setShowConfirmChanges(false);
+                        setViewNotes(false);
+                    }}
+                />
+            )}
             <div className="flex flex-col w-[60%] h-[750px] bg-white dark:bg-[#3C3C3C] rounded-[20px] animate-pop-out drop-shadow">
                 {/* Header */}
                 <div className='flex items-center rounded-t-[10px] h-[10%] bg-[#F5F5F5] dark:bg-[#121212] text-[22px]'>
-                    <div className='flex items-center justify-center w-[10%] h-full bg-[#F1F1F1] dark:bg-[#121212] border-r-[2px] rounded-tl-[10px] px-[10px]'>
+                    <div className='flex items-center justify-center w-[17%] 2xl:w-[15%] 3xl:w-[12%] 4xl:w-[10%] h-full bg-[#F1F1F1] dark:bg-[#121212] border-r-[2px] rounded-tl-[10px] px-[10px]'>
                         {isLoading ? <Loader className='h-6 w-4'/>
-                            : <p className='dark:text-white'>{formatDateShort(note?.created_at as string)}</p>
+                            : <p className='dark:text-white text-[22px]'>{formatDateShort(note?.created_at as string)}</p>
                         }
                     </div>
                     <div className='flex items-center w-[80%] h-full text-[25px] font-semibold  ml-[20px] gap-[10px]'>
@@ -230,14 +242,14 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                         )}
                     </div>
                     <IoIosClose className='mt-[2px] text-[70px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out'
-                        onClick={()=>setViewNotes(false)}/>
+                        onClick={handleClose}/>
                 </div>
 
                 {/* Main Content Area */}
                 <div className="h-[80%]">
                     <div className='flex h-[10%] items-end text-[24px] dark:text-white pb-2 pl-[30px] border-b-[4px]'>
                         {isLoading ? (
-                            <Loader className='h-6'/>
+                            <Loader className='h-6 !w-[300px]'/>
                         ) : isEditing ? (
                             <div className="flex items-center">
                                 <span>Version</span>
@@ -268,7 +280,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                                     onClick={handleEdit}/>
                             </div>
                         }
-                    </div>      
+                    </div>
 
                     {/* Release Note Content */}
                     <div className='h-[540px] text-[20px] p-7 pb-[10px] border-b-[4px] overflow-y-scroll dark:text-white'>
@@ -301,7 +313,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
 
                 {/* Footer */}
                 <div className='flex h-[5rem] items-center text-[24px] rounded-b-[10px]'>
-                    <div className='flex items-center justify-center w-[7%] h-full bg-[#F1F1F1] dark:bg-[#121212] border-r-[2px] rounded-bl-[10px] hover:bg-[#921B1BFF] group transition-colors duration-250 ease-in-out'>
+                    <div className='flex items-center justify-center w-[7%] h-full bg-[#F1F1F1] border-t-[3px] dark:bg-[#121212] border-r-[2px] rounded-bl-[10px] hover:bg-[#921B1BFF] group transition-colors duration-250 ease-in-out'>
                         <RiDeleteBinLine 
                             className='text-[28px] text-[#5B5353] dark:text-[#d1d1d1] cursor-pointer group-hover:text-white group-hover:animate-shake transition-colors duration-250 ease-in-out'
                             onClick={deleteReleaseNote}

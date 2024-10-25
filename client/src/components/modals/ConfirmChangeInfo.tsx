@@ -13,7 +13,7 @@ const SuccessChangeInfo: React.FC<SuccessChangeInfoProps> = ({ setSuccessModal }
     const handleConfirm = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         setSuccessModal(false);
-        router.push('/dashboard');
+        window.location.reload();
 
     }
 

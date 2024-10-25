@@ -15,6 +15,8 @@ type SpecificFGProps = {
   monthYear: { value: number; label: string };
   updateSheetData: (id: number, data: SpecificFinishedGood) => void;
   FGOptions: { name: string; id: number }[];
+  selectedGoods: { name: string; id: number }[];
+  setSelectedGoods: (goods: { name: string; id: number }[]) => void;
 };
 
 const SpecificFG: React.FC<SpecificFGProps> = ({
@@ -24,6 +26,8 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
   monthYear,
   updateSheetData,
   FGOptions,
+  selectedGoods,
+  setSelectedGoods
 }) => {
   const columnNames = [
     "Formula",
@@ -52,7 +56,10 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
     try {
       if (selectedValue.id) {
         setSelectedFG(selectedValue);
-
+        const combinedArray = [...selectedGoods];
+        combinedArray.push(selectedValue)
+        const distinctArray = Array.from(new Set(combinedArray));
+        setSelectedGoods(distinctArray);
         const response = await api.get(
           "/cost_calculation/retrieve_fg_details",
           { params: { fg_id: selectedValue.id } }
@@ -60,6 +67,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
 
         if (response.status === 200) {
           const fgData = response.data.data;
+          console.log(fgData);
           setSelectedFGDetails([fgData]);
           setIsLoading(false);
           updateSheetData(id, fgData);
@@ -77,33 +85,33 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
 
   return (
     <>
-      <div className="absolute top-0 right-0">
-        {alertMessages &&
-          alertMessages.map((msg, index) => (
-            <Alert
-              className="!relative"
-              variant={
-                alertStatus as
+      <div className="fixed top-4 right-4 z-50">
+        <div className="flex flex-col items-end space-y-2">
+          {alertMessages &&
+            alertMessages.map((msg, index) => (
+              <Alert
+                className="!relative"
+                variant={
+                  alertStatus as
                   | "default"
                   | "information"
                   | "warning"
                   | "critical"
                   | "success"
                   | undefined
-              }
-              key={index}
-              message={msg}
-              setClose={() => {
-                setAlertMessages((prev) => prev.filter((_, i) => i !== index));
-              }}
-            />
-          ))}
+                }
+                key={index}
+                message={msg}
+                setClose={() => {
+                  setAlertMessages((prev) => prev.filter((_, i) => i !== index));
+                }}
+              />
+            ))}
+        </div>
       </div>
-
       <div
-        className={`${
-          isOpen ? "" : ""
-        } relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white rounded-2xl border-1 border-[#656565] shadow-md animate-pull-down`}
+        className={`${isOpen ? "" : ""
+          } relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white rounded-2xl border-1 border-[#656565] shadow-md animate-pull-down`}
       >
         {/* Header */}
         <div className="flex h-14 rounded-t-2xl bg-[#B22222] text-white text-[26px] font-bold py-2 pl-7 drop-shadow-xl">
@@ -112,6 +120,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
             placeholder="Choose Finished Good"
             isOpen={isOpen}
             onChange={handleChange}
+            disabledOptions={selectedGoods}
           />
 
           {/* Delete Button */}
@@ -154,9 +163,9 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                 <>
                   <tr className={`text-[#6B6B6B] bg-[#ffebeb] font-semibold`}>
                     <td className="text-center px-6 py-2">
-                      {selectedFGDetails[0].formulation_no}
+                      {selectedFGDetails[0].formula_code}
                     </td>
-                    <td className="text-center">1</td>
+                    <td className="text-center"></td>
                     <td>{selectedFGDetails[0].code}</td>
                     <td>{selectedFGDetails[0].desc}</td>
                     <td className="text-right pr-12">
@@ -174,7 +183,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                   {/* Emulsion row */}
                   {selectedFGDetails[0]?.components[0] &&
                     Object.keys(selectedFGDetails[0].components[0]).length >
-                      0 && (
+                    0 && (
                       <tr className={`text-[#6B6B6B]`}>
                         <td className="text-center px-6 py-3"></td>
                         <td className="text-center">

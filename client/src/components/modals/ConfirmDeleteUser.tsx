@@ -59,7 +59,7 @@ const ConfirmDeleteUser: React.FC<ConfirmDeleteProps> = ({ user, onClose }) => {
     }
 
     return (
-        <div className='flex justify-center items-center z-[99999] w-full h-full fixed top-0 left-0 p-4 overflow-auto bg-[rgba(0,0,0,0.5)]'>
+        <div className='flex justify-center items-center z-[3500] w-full h-full fixed top-0 left-0 p-4 overflow-auto bg-[rgba(0,0,0,0.5)]'>
             <div className='absolute top-0 right-0 z-[180000]'>
                 {alertMessages && alertMessages.map((msg, index) => (
                 <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
@@ -84,7 +84,7 @@ const ConfirmDeleteUser: React.FC<ConfirmDeleteProps> = ({ user, onClose }) => {
                             <p>Are You Sure?</p>
                         </div>
                         <div className='text-center text-[20px] text-[#9D9D9D] break-words'>
-                            <p>Do you want to delete this user? This process cannot be undone.</p>
+                            <p>Do you want to archive this user? This process cannot be undone.</p>
                         </div>
 
                         {/* Buttons */}

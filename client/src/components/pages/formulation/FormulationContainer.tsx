@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react'
 import PrimaryPagination from '@/components/pagination/PrimaryPagination';
 import { FaEye } from "react-icons/fa";
 import { FaPencilAlt } from "react-icons/fa";
-import { IoTrash } from "react-icons/io5";
 import { TiExport } from "react-icons/ti";
 import { useRouter } from 'next/navigation';
 import FormulationTable from './FormulationTable';
@@ -17,6 +16,8 @@ import Spinner from '@/components/loaders/Spinner';
 import Alert from '@/components/alerts/Alert';
 import { formatMonthYear } from '@/utils/costwiseUtils';
 import { useUserContext } from '@/contexts/UserContext';
+import { useSidebarContext } from '@/contexts/SidebarContext';
+import { HiArchiveBoxXMark } from 'react-icons/hi2';
 
 export interface FormulationContainerProps {
     number: string;
@@ -63,6 +64,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
     const { formulaCode, setFormulaCode } = useFormulationContext();
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [successMessage, setSuccessMessage] = useState('');
+    const { isOpen } = useSidebarContext();
 
     const itemsPerPage = 10;
     const indexOfLastItem = currentPage * itemsPerPage;
@@ -150,7 +152,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
     const handleDeleteClick = (formulationId: number, formulationCode: string) => {
         const sysRoles = currentUser?.roles;
         if (!sysRoles?.includes(12)) {
-            setAlertMessages(['You are not authorized to delete formulations.']);
+            setAlertMessages(['You are not authorized to archive formulations.']);
             return;
         }
         setFormulationToDelete(formulationId);
@@ -164,7 +166,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                 await api.post(`/formulations/delete`, { formulation_id: formulationToDelete });
                 const updatedList = filteredData.filter(item => item.formulation_id !== formulationToDelete);
                 setFilteredData(updatedList);
-                setSuccessMessage('Formulation deleted successfully');
+                setSuccessMessage('Formulation archived successfully');
 
                 const user = localStorage.getItem('currentUser');
                 const parsedUser = JSON.parse(user || '{}');
@@ -184,7 +186,7 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                         console.error('Error audit logs:', error);
                     });
             } catch (error) {
-                setAlertMessages(prev => [...prev, 'Failed to delete formulation']);
+                setAlertMessages(prev => [...prev, 'Failed to archive formulation']);
             } finally {
                 setDeleteModal(false);
                 setFormulationToDelete(null);
@@ -208,19 +210,19 @@ const FormulationContainer: React.FC<FormulationProps> = ({
             {(view || edit) ? <FormulationTable view={view} setView={setView} /> :
                 viewFormulas ? <CompareFormulaContainer /> :
                     viewBOM ? <BOMListContainer /> :
-                        <div className='w-full font-lato bg-white dark:bg-[#3C3C3C] mt-[20px] px-[20px] rounded-lg drop-shadow-lg'>
-                            <table className='w-full '>
+                        <div className={`${isOpen? '3xl:px-[20px]' : '3xl:px-[20px]'} w-full font-lato bg-white dark:bg-[#3C3C3C] mt-[20px] rounded-lg drop-shadow-lg mb-[20px]`}>
+                            <table className='w-full'>
                                 <thead className='border-b border-b-[#c4c4c4]'>
-                                    <tr className='text-[#777777] font-bold text-[18px] dark:text-[#d1d1d1]'>
-                                        <th className='py-[10px] px-[15px] text-left'>FORMULA CODE</th>
-                                        <th className='px-[15px] text-left'>ITEM CODE</th>
-                                        <th className='px-[15px] text-left'>DESCRIPTION</th>
-                                        <th className='px-[15px] text-left'>UNIT</th>
-                                        <th className='px-[15px] text-center'>FORMULATION NO.</th>
-                                        <th className='px-[15px] text-left'>MONTH-YEAR</th>
-                                        <th className='px-[15px] text-right'>BATCH QTY.</th>
-                                        <th className='px-[15px] text-right'>COST</th>
-                                        <th className='px-[15px]'>MANAGE</th>
+                                    <tr className='text-[#777777] font-bold xl:text-[14px] 2xl:text-[18px] dark:text-[#d1d1d1]'>
+                                        <th className='py-[10px] px-[8px] 2xl:px-[15px] text-left'>FORMULA CODE</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-left`}>ITEM CODE</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-left`}>DESCRIPTION</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-left`}>UNIT</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-center`}>FORMULATION NO.</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-left`}>MONTH-YEAR</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-right`}>BATCH QTY.</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-right`}>COST</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' }`}>MANAGE</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -235,36 +237,37 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                                     ) :
                                         currentListPage.length > 0 &&
                                         (currentListPage.map((data, index) => (
-                                            <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7] dark:bg-[#4c4c4c]'} dark:text-white`}>
-                                                <td className='py-[15px] px-[15px]'>{data.formula_code}</td>
-                                                <td className='px-[15px]'>{data.finishedGood.fg_code}</td>
-                                                <td className='px-[15px]'>{data.finishedGood.fg_desc}</td>
-                                                <td className='px-[15px] text-left'>{data.finishedGood.unit}</td>
-                                                <td className='px-[15px] text-center'>{data.finishedGood.formulation_no}</td>
-                                                <td className='px-[15px] text-left'>{formatMonthYear(data.finishedGood.monthYear)}</td>
-                                                <td className='px-[15px] text-right'>{data.finishedGood.total_batch_qty}</td>
-                                                <td className='px-[15px] text-right'>{data.finishedGood.total_cost ?? 'N/A'}</td>
-                                                <td className='px-[15px]'>
+                                            <tr key={index} className={`${index % 2 == 1 && 'bg-[#FCF7F7] dark:bg-[#4c4c4c]'} dark:text-white text-[14px] 2xl:text-[16px]`}>
+                                                
+                                                <td className='py-[15px] xl:px-[8px] 2xl:px-[15px]'>{data.formula_code}</td>
+                                                <td className='px-[15px] xl:px-[8px]'>{data.finishedGood.fg_code}</td>
+                                                <td className='px-[15px] xl:px-[8px]'>{data.finishedGood.fg_desc}</td>
+                                                <td className='px-[15px] xl:px-[8px] text-left'>{data.finishedGood.unit}</td>
+                                                <td className='px-[15px] xl:px-[8px] text-center'>{data.finishedGood.formulation_no}</td>
+                                                <td className='px-[15px] xl:px-[8px] text-left'>{formatMonthYear(data.finishedGood.monthYear)}</td>
+                                                <td className='px-[15px] xl:px-[8px] text-right'>{data.finishedGood.total_batch_qty}</td>
+                                                <td className='px-[15px] xl:px-[8px] text-right'>{data.finishedGood.total_cost ?? 'N/A'}</td>
+                                                <td className='px-[15px] xl:px-[8px]'>
                                                     <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
                                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c]
                                                                 cursor-pointer hover:bg-[#f7f7f7] rounded-l-[5px] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleView(data.formulation_id)}>
-                                                            <FaEye />
+                                                            <FaEye className='!size-[11px] 2xl:!size-[16px]'/>
                                                         </div>
                                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c]
                                                                 cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleEdit(data.formulation_id, data.formula_code)}>
-                                                            <FaPencilAlt />
+                                                            <FaPencilAlt className='!size-[10px] 2xl:!size-[16px]' />
                                                         </div>
                                                         <div className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c]
                                                                 cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleExport(data.formulation_id)}>
-                                                            <TiExport />
+                                                            <TiExport className='!size-[11px] 2xl:!size-[16px]' />
                                                         </div>
                                                         <div className='flex justify-center items-center h-full dark:border-[#5C5C5C]
                                                                 cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleDeleteClick(data.formulation_id, data.formula_code)}>
-                                                            <IoTrash />
+                                                            <HiArchiveBoxXMark />
                                                         </div>
                                                     </div>
                                                 </td>

@@ -10,70 +10,245 @@ import {
 import LoadingAnimation from "../loaders/LoadingAnimation";
 import { CostDataEntry } from "@/types/data";
 
+tf.setBackend("webgl");
+
+// Helper function to convert Month-Year to number
+export function monthYearToNumber(monthYearValue: string): number {
+  const [month, year] = monthYearValue.split(" ");
+  const monthIndex = new Date(Date.parse(month + " 1, " + year)).getMonth() + 1;
+  return (parseInt(year) - 2022) * 12 + monthIndex;
+}
+
+// Helper function to convert number to Month-Year
+export function numberToMonthYear(value: number): string {
+  const months = [
+    "January",
+    "February",
+    "March",
+    "April",
+    "May",
+    "June",
+    "July",
+    "August",
+    "September",
+    "October",
+    "November",
+    "December",
+  ];
+  const monthIndex = (value - 1) % 12;
+  const year = Math.floor((value - 1) / 12) + 2022;
+  const month = months[monthIndex];
+  return `${month} ${year}`;
+}
+
+// Helper function for uploading predictions
+const uploadPredictions = async (
+  product_num: number,
+  cost: number,
+  monthYear: string,
+  product_name: string
+) => {
+  try {
+    const response = await api.post("/prediction/upload", {
+      product_num,
+      product_name,
+      cost,
+      monthYear,
+    });
+    console.log(
+      `Uploaded predictions for ${monthYear}, product ${product_name}:`,
+      response.data.data
+    );
+  } catch (error: any) {
+    console.error("Error uploading predictions:", error);
+  }
+};
+
+// Model Creation Function
+export function createModel() {
+  const newModel = tf.sequential();
+  // L2 regularization to the first dense layer
+  newModel.add(
+    tf.layers.dense({
+      units: 16,
+      inputShape: [1],
+      activation: "relu",
+      kernelRegularizer: tf.regularizers.l2({ l2: 0.01 }),
+    })
+  );
+
+  newModel.add(tf.layers.batchNormalization());
+
+  newModel.add(tf.layers.dropout({ rate: 0.2 }));
+
+  newModel.add(
+    tf.layers.dense({
+      units: 16,
+      activation: "relu",
+      kernelRegularizer: tf.regularizers.l2({ l2: 0.01 }),
+    })
+  );
+
+  newModel.add(tf.layers.batchNormalization());
+
+  newModel.add(tf.layers.dropout({ rate: 0.2 }));
+
+  newModel.add(tf.layers.dense({ units: 4 }));
+  newModel.compile({
+    optimizer: tf.train.adam(0.5),
+    loss: "meanSquaredError",
+  });
+  return newModel;
+}
+
+// Model Initialization Function
+export async function initializeModel(
+  costData: CostDataEntry[],
+  model: tf.Sequential | null,
+  setModel: React.Dispatch<React.SetStateAction<tf.Sequential | null>>,
+  setTrained: React.Dispatch<React.SetStateAction<boolean>>,
+  setTrainingSpeed: React.Dispatch<React.SetStateAction<number>>,
+  setLossHistory: React.Dispatch<React.SetStateAction<number[]>>
+) {
+  console.log("Currently training model, please wait for results...");
+
+  const monthYears = costData.map((d) => monthYearToNumber(d.monthYear));
+  let currentLossHistory: number[] = [];
+
+  const productNames = _.uniq(
+    costData.flatMap((entry) =>
+      entry.products.map((product) => product.productName)
+    )
+  );
+
+  const getProductCosts = (productName: string) =>
+    costData.flatMap((entry) =>
+      entry.products
+        .filter((product) => product.productName === productName)
+        .map((product) => product.cost)
+    );
+
+  const costs = productNames.map(getProductCosts);
+
+  const newModel = model || createModel();
+
+  // Wrapping tensor creation and model fitting in tf.tidy
+  const inputTensor = tf.tensor2d(monthYears, [monthYears.length, 1]);
+  const labelTensor = tf.tensor2d(costs, [
+    productNames.length,
+    monthYears.length,
+  ]);
+
+  const earlyStopping = tf.callbacks.earlyStopping({
+    monitor: "val_loss",
+    patience: 5,
+    minDelta: 0.01,
+  });
+
+  const startTime = performance.now();
+
+  console.log(`Number of active tensors: ${tf.memory().numTensors}`);
+
+  try {
+    await newModel.fit(inputTensor, labelTensor.transpose(), {
+      epochs: 1000,
+      validationSplit: 0.2,
+      callbacks: {
+        onEpochEnd: (epoch, logs) => {
+          currentLossHistory.push(logs.loss);
+          console.log("This is epoch number: ", epoch)
+          console.log("This is the loss value", logs)
+        },
+        ...[earlyStopping],
+      },
+    });
+
+    const endTime = performance.now();
+    const duration = (endTime - startTime) / 1000;
+
+    console.log("Training complete");
+    console.log(`Model training complete in ${duration.toFixed(2)} seconds`);
+    console.log(currentLossHistory);
+
+    setTrained(true);
+    setModel(newModel);
+    setTrainingSpeed(duration);
+    setLossHistory(currentLossHistory);
+  } catch (error) {
+    console.error("An error occurred during model training:", error);
+  } finally {
+    inputTensor.dispose();
+    labelTensor.dispose();
+    // newModel.dispose();
+    console.log(
+      `Number of active tensors after disposal: ${tf.memory().numTensors}`
+    );
+  }
+}
+
+// Exported function
+export const makePrediction = async (
+  trained: boolean,
+  model: tf.Sequential | null,
+  costData: CostDataEntry[]
+) => {
+  if (trained && model) {
+    // Dynamically get product names from the last entry in costData
+    const productNames = costData[costData.length - 1].products.map(
+      (product) => product.productName
+    );
+
+    const lastMonthYearNumber = monthYearToNumber(
+      costData[costData.length - 1].monthYear
+    );
+
+    for (let i = lastMonthYearNumber + 1; i <= lastMonthYearNumber + 3; i++) {
+      const predictionTensor = model.predict(tf.tensor2d([[i]])) as tf.Tensor;
+      const predictionArray: any = await predictionTensor.array();
+
+      const monthYear = numberToMonthYear(i);
+      let totalPredictionForMonth = 0;
+
+      for (
+        let productIndex = 0;
+        productIndex < productNames.length;
+        productIndex++
+      ) {
+        const productName = productNames[productIndex];
+        const productPrediction = predictionArray[0][productIndex];
+        totalPredictionForMonth += productPrediction;
+
+        await uploadPredictions(
+          productIndex,
+          productPrediction,
+          monthYear,
+          productName
+        );
+
+        console.log(
+          `Prediction for ${productName}, ${monthYear}:`,
+          productPrediction
+        );
+      }
+    }
+    model.dispose();
+    console.log("Predictions complete.");
+  } else {
+    console.log("Model is not yet trained.");
+  }
+};
+
 function TrainingModel() {
   const [costData, setCostData] = useState<CostDataEntry[]>([]);
   const [model, setModel] = useState<tf.Sequential | null>(null);
   const [trained, setTrained] = useState(false);
   const [lossHistory, setLossHistory] = useState<number[]>([0]);
-  const [latestDate, setLatestDate] = useState(0);
-  let currentMonthYear: string = "";
   const [trainingSpeed, setTrainingSpeed] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true); // Loading state
-  const [error, setError] = useState(null); // Error state
-
-  const addNewData = (newData: CostDataEntry[]) => {
-    setCostData((prevData) => [...prevData, ...newData]);
-  };
 
   const [totalPrediction, setTotalPrediction] = useState<
     { monthYear: string; cost: number }[]
   >([]);
-
-  const [metrics, setMetrics] = useState({
-    mse: 0,
-    precision: 0,
-    accuracy: 0,
-  });
-
-  // Month-Year conversion to number
-  function monthYearToNumber(monthYearValue: string): number {
-    const [month, year] = monthYearValue.split(" ");
-    const monthIndex =
-      new Date(Date.parse(month + " 1, " + year)).getMonth() + 1;
-    return (parseInt(year) - 2022) * 12 + monthIndex;
-  }
-
-  // Numbert to Month-Year coversion
-  function numberToMonthYear(value: number): string {
-    const months = [
-      "January",
-      "February",
-      "March",
-      "April",
-      "May",
-      "June",
-      "July",
-      "August",
-      "September",
-      "October",
-      "November",
-      "December",
-    ];
-
-    const monthIndex = (value - 1) % 12;
-    const year = Math.floor((value - 1) / 12) + 2022;
-
-    const month = months[monthIndex];
-    return `${month} ${year}`;
-  }
-
-  function measurePerformance(callback: () => Promise<void>, label: string) {
-    const start = performance.now();
-    return callback().then(() => {
-      const end = performance.now();
-      console.log(`${label} took ${(end - start).toFixed(2)} milliseconds`);
-    });
-  }
 
   // Helper function for cost extraction
   const getProductCosts = (productName: string): number[] =>
@@ -82,204 +257,64 @@ function TrainingModel() {
         .filter((product) => product.productName === productName)
         .map((product) => product.cost)
     );
-
-  // Initialize or retrain the model with the current dataset
-  const initializeModel = async () => {
-    console.log("Currently training model, please wait for results...");
-
-    const monthYears = costData.map((d) => monthYearToNumber(d.monthYear));
-    const currentLossHistory: number[] = [];
-
-    // Extract costs for each product
-    const vch250gCost = getProductCosts("VIRGINIA Cocktail Hotdog 250g");
-    const sh250gCost = getProductCosts("VIRGINIA Sweet Ham 250g");
-    const vChH250gCost = getProductCosts("VIRGINIA Chicken Hotdog 250g");
-    const cdcH250gCost = getProductCosts("VIRGINIA Chorizo de Cebu 250g");
-
-    const newModel = model || createModel();
-
-    const inputTensor = tf.tensor2d(monthYears, [monthYears.length, 1]);
-    const labelTensor = tf.tensor2d(
-      [vch250gCost, sh250gCost, vChH250gCost, cdcH250gCost],
-      [4, monthYears.length]
-    );
-
-    const earlyStopping = tf.callbacks.earlyStopping({
-      monitor: "loss",
-      patience: 5,
-    });
-
-    const startTime = performance.now();
-
-    newModel
-      .fit(inputTensor, labelTensor.transpose(), {
-        epochs: 1000,
-        validationSplit: 0.2,
-        callbacks: {
-          onEpochEnd: (epoch, logs) => {
-            if (logs?.loss)
-              currentLossHistory.push(
-                parseFloat((logs.loss / costData.length).toFixed(6))
-              );
-          },
-          ...[earlyStopping],
-        },
-      })
-      .then(async () => {
-        const endTime = performance.now();
-        const duration = (endTime - startTime) / 1000;
-        console.log("Training complete");
-        setTrainingSpeed(parseFloat(duration.toFixed(2)));
-        console.log(
-          `Model training complete in ${duration.toFixed(2)} seconds`
-        );
-        setModel(newModel);
-        setTrained(true);
-        setLossHistory(currentLossHistory);
-      });
-  };
-
-  const makePrediction = async () => {
-    if (trained && model) {
-      await measurePerformance(async () => {
-        const productNames = [
-          "VIRGINIA Cocktail Hotdog 250g",
-          "VIRGINIA Sweet Ham 250g",
-          "VIRGINIA Chicken Hotdog 250g",
-          "VIRGINIA Chorizo de Cebu 250g",
-        ];
-
-        // Get the last monthYear from costData
-        const lastMonthYearNumber = monthYearToNumber(
-          costData[costData.length - 1].monthYear
-        );
-
-        for (
-          let i = lastMonthYearNumber + 1;
-          i <= lastMonthYearNumber + 3;
-          i++
-        ) {
-          const predictionTensor = model.predict(
-            tf.tensor2d([[i]])
-          ) as tf.Tensor;
-          const predictionArray:any = await predictionTensor.array();
-
-          const monthYear = numberToMonthYear(i);
-          let totalPredictionForMonth = 0;
-
-          for (
-            let productIndex = 0;
-            productIndex < productNames.length;
-            productIndex++
-          ) {
-            const productName = productNames[productIndex];
-            const productPrediction = predictionArray[0][productIndex];
-            totalPredictionForMonth += productPrediction;
-
-            await uploadPredictions(
-              productIndex,
-              productPrediction,
-              monthYear,
-              productName
-            );
-
-            console.log(
-              `Prediction for ${productName}, ${monthYear}:`,
-              productPrediction
-            );
-          }
-        }
-
-        console.log("Predictions complete.");
-      }, "Model prediction");
-    } else {
-      console.log("Model is not yet trained.");
-    }
-  };
-
-  // Model Creation Function
-  function createModel(): tf.Sequential {
-    const newModel = tf.sequential();
-    // L2 regularization to the first dense layer
-    newModel.add(
-      tf.layers.dense({
-        units: 16,
-        inputShape: [1],
-        activation: "relu",
-        kernelRegularizer: tf.regularizers.l2({ l2: 0.01 }),
-      })
-    );
-
-    newModel.add(tf.layers.batchNormalization());
-
-    newModel.add(tf.layers.dropout({ rate: 0.2 }));
-
-    newModel.add(
-      tf.layers.dense({
-        units: 16,
-        activation: "relu",
-        kernelRegularizer: tf.regularizers.l2({ l2: 0.01 }),
-      })
-    );
-
-    newModel.add(tf.layers.batchNormalization());
-
-    newModel.add(tf.layers.dropout({ rate: 0.2 }));
-
-    newModel.add(tf.layers.dense({ units: 4 }));
-    newModel.compile({
-      optimizer: "adam",
-      loss: "meanSquaredError",
-    });
-    return newModel;
-  }
-
-  const uploadPredictions = async (
-    product_num: number,
-    cost: number,
-    monthYear: string,
-    product_name: string
-  ) => {
+  const fetchData = async () => {
     try {
-      const response = await api.post("/prediction/upload", {
-        product_num,
-        product_name,
-        cost,
-        monthYear,
-      });
-      console.log(
-        `Uploaded predictions for ${monthYear}, product ${product_name}:`,
-        response.data.data
-      );
-    } catch (error: any) {
-      console.error("Error uploading predictions:", error);
+      const response = await api.get("/training/data");
+
+      const dataString = response.data.data[0].settings;
+      let parsedData: CostDataEntry[];
+
+      parsedData = JSON.parse(dataString);
+
+      if (costData.length === 0) {
+        setCostData(parsedData);
+      }
+    } catch (error) {
+      console.error("Error fetching data:", error);
     }
   };
+
+  useEffect(() => {
+    fetchData();
+  }, []);
 
   const fetchPredictions = async () => {
-    const months = ["January 2025", "February 2025", "March 2025"];
+    console.log("Test Data", costData);
+    const numProd = costData[costData.length - 1].products.length;
+
+    console.log("Number of data", numProd);
 
     try {
-      const responses = await Promise.all(
-        months.map((month) =>
-          api.post("/prediction/data", { monthYear: month })
-        )
-      );
+      const response = await api.post("/prediction/data", {
+        numberOfProducts: numProd,
+      });
 
-      const predictionData = responses.map((res) => res.data.data);
+      const predictionData = response.data.data;
 
-      const formattedPredictions = predictionData.map(
-        (monthPredictions, index) => {
-          const totalCost = monthPredictions.reduce((acc: number, prediction: { cost: string; }) => {
-            return acc + parseFloat(prediction.cost);
-          }, 0);
+      const predictionsMap: { [key: string]: number } = {};
 
-          return {
-            monthYear: months[index],
-            cost: totalCost.toFixed(2),
-          };
+      predictionData.forEach(
+        (prediction: { monthYear: string; cost: string }) => {
+          const { monthYear, cost } = prediction;
+          const parsedCost = parseFloat(cost);
+
+          if (predictionsMap[monthYear]) {
+            predictionsMap[monthYear] += parsedCost;
+          } else {
+            predictionsMap[monthYear] = parsedCost;
+          }
         }
       );
+
+      // Format the predictions into the desired array format
+      const formattedPredictions = Object.entries(predictionsMap).map(
+        ([monthYear, totalCost]) => ({
+          monthYear,
+          cost: totalCost.toFixed(2),
+        })
+      );
+
+      console.log("Formatted Predictions Data", formattedPredictions);
 
       setTotalPrediction(formattedPredictions);
     } catch (error) {
@@ -288,46 +323,34 @@ function TrainingModel() {
   };
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await api.get("/training/data");
-
-        const dataString = response.data.data[0].settings;
-        let parsedData: CostDataEntry[];
-
-        if (typeof dataString === "string") {
-          parsedData = JSON.parse(dataString);
-        } else {
-          parsedData = dataString;
-        }
-        addNewData(parsedData);
-      } catch (error) {
-        console.error("Error fetching data:", error);
-      }
-    };
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    fetchPredictions();
-  }, []);
-
-  useEffect(() => {
-    if (costData.length > 0) {
+    if (costData.length > 1) {
       setIsLoading(true);
-      initializeModel();
+      try {
+        initializeModel(
+          costData,
+          model,
+          setModel,
+          setTrained,
+          setTrainingSpeed,
+          setLossHistory
+        );
+      } catch (error) {
+        console.log("Error Creating model: ", error);
+      } finally {
+        model?.dispose();
+        fetchPredictions();
+      }
     }
   }, [costData]);
 
   useEffect(() => {
-    if (trainingSpeed > 0 && lossHistory.length > 0) {
+    if (trainingSpeed > 0 || lossHistory.length > 0) {
       setIsLoading(false);
     }
-  }, [trainingSpeed, lossHistory]);
+  }, [trainingSpeed, lossHistory, trained]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
-  const itemsPerPage = 1; // Number of items to display at once
+  const itemsPerPage = 1;
 
   const next = () => {
     setCurrentIndex((prevIndex) =>
@@ -351,7 +374,9 @@ function TrainingModel() {
               <MdModelTraining className="2xl:text-4xl text-4xl font-semibold text-primary mr-2" />
               Training Duration
             </h2>
-            <p className="text-5xl font-bold text-primary">{trainingSpeed}s</p>
+            <p className="text-5xl font-bold text-primary">
+              {trainingSpeed.toFixed(2)}s
+            </p>
             <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
               Duration of model training
             </p>
@@ -363,7 +388,7 @@ function TrainingModel() {
               Average Loss
             </h2>
             <p className="text-5xl font-bold text-primary">
-              {lossHistory[lossHistory.length - 1]}
+              {(lossHistory[lossHistory.length - 1] / 4).toFixed(6)}
             </p>
             <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
               Average loss of all predictions
