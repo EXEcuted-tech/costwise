@@ -15,9 +15,20 @@ interface ManageAccountsPageProps {
     fileData: User[];
     isOpen?: boolean;
     isLoading: boolean;
+    selectedUser: User;
+    setSelectedUser: React.Dispatch<React.SetStateAction<User>>;
+    setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, isLoading }) => {
+const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ 
+    fileData, 
+    isOpen, 
+    isLoading, 
+    selectedUser, 
+    setSelectedUser, 
+    setIsEditModalOpen,
+    setIsDeleteModalOpen }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
@@ -27,10 +38,6 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
     const indexOfFirstItem = indexOfLastItem - 8;
     const currentListPage = fileData.slice(indexOfFirstItem, indexOfLastItem);
 
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-    const [selectedUser, setSelectedUser] = useState<User>({} as User);
     const [errorMsg, setErrorMsg] = useState<string>('');
     const { currentUser } = useUserContext();
     const sysRoles = currentUser?.roles;
@@ -44,9 +51,6 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
         setIsEditModalOpen(true);
     };
 
-    const closeEditModal = () => {
-        setIsEditModalOpen(false);
-    };
 
     const openDeleteModal = (user: User) => {
         if (!sysRoles?.includes(3)) {
@@ -57,16 +61,10 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
         setIsDeleteModalOpen(true);
     };
 
-    const closeDeleteModal = () => {
-        setIsDeleteModalOpen(false);
-    };
-
     return (
         <>
             {errorMsg && <Alert setClose={() => setErrorMsg('')} variant='critical' message={errorMsg} />}
             {/* Modals */}
-            {isEditModalOpen && <EditUserInfo user={selectedUser} onClose={closeEditModal} />}
-            {isDeleteModalOpen && <ConfirmDeleteUser user={selectedUser} onClose={closeDeleteModal} />}
             <div className="flex flex-col w-auto h-[44rem] rounded-lg shadow-md shadow-gray-300">
                 {/* Main Content */}
                 <div className="animate-fade-in3 flex flex-col w-auto h-[38rem] xl:h-[40rem] 2xl:h-[38rem] 3xl:h-[38rem] 4xl:h-[38rem]">

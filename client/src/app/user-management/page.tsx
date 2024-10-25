@@ -12,6 +12,8 @@ import { User } from '@/types/data';
 import { useRouter } from 'next/navigation';
 import { useUserContext } from '@/contexts/UserContext';
 import Alert from '@/components/alerts/Alert';
+import EditUserInfo from '@/components/modals/EditUserInfo';
+import ConfirmDeleteUser from '@/components/modals/ConfirmDeleteUser';
 
 const UserManagement = () => {
     const router = useRouter();
@@ -22,6 +24,9 @@ const UserManagement = () => {
     const [searchTerm, setSearchTerm] = useState('');
     const { currentUser } = useUserContext();
     const [errorMsg, setErrorMsg] = useState<string>('');
+    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [selectedUser, setSelectedUser] = useState<User>({} as User);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
 
     useEffect(() => {
         //Get all users
@@ -64,10 +69,20 @@ const UserManagement = () => {
         }
     }, [searchTerm, users]);
 
+    
+    const closeEditModal = () => {
+        setIsEditModalOpen(false);
+    };
+
+    const closeDeleteModal = () => {
+        setIsDeleteModalOpen(false);
+    };
 
     return (
         <>
             {errorMsg && <Alert setClose={() => setErrorMsg('')} variant='critical' message={errorMsg} />}
+            {isEditModalOpen && <EditUserInfo user={selectedUser} onClose={closeEditModal} />}
+            {isDeleteModalOpen && <ConfirmDeleteUser user={selectedUser} onClose={closeDeleteModal} />}
             <div className="w-full animate-fade-in">
                 <div>
                     <Header icon={RiShieldUserFill} title="User Management"></Header>
@@ -107,7 +122,15 @@ const UserManagement = () => {
 
                 {/* Main Content Area */}
                 <div className={`${isOpen ? '' : ''} flex flex-col w-auto mr-[2rem] h-auto ml-[4rem] mt-5 rounded-xl bg-white shadow-md shadow-gray-300`}>
-                    <ManageAccounts fileData={filteredUsers || []} isOpen={isOpen} isLoading={isLoading} />
+                    <ManageAccounts 
+                        fileData={filteredUsers || []} 
+                        isOpen={isOpen} 
+                        isLoading={isLoading} 
+                        selectedUser={selectedUser}
+                        setSelectedUser={setSelectedUser}
+                        setIsEditModalOpen={setIsEditModalOpen}
+                        setIsDeleteModalOpen={setIsDeleteModalOpen}
+                    />
                 </div>
             </div>
         </>
