@@ -36,13 +36,8 @@ const UserActivity: React.FC<UserActivityProps> = ({ url, name, activity, descri
     };
 
     return (
-        <div className='flex px-[20px] py-[18px] bg-[#FFFAF8] dark:bg-[#3C3C3C]'>
+        <div className='flex px-[20px] py-[18px] bg-white dark:bg-[#3C3C3C]'>
             <div className='mr-[15px] flex justify-center'>
-                {/* <div
-                    className='mt-[2px] size-[40px] rounded-full bg-cover bg-center'
-                    style={{ backgroundImage: `url(${url})` }}
-                /> */}
-
                 {url != null ? (
                     <div
                         className='flex justify-center items-center size-[40px] rounded-full border border-white hover:brightness-90 cursor-pointer overflow-hidden'

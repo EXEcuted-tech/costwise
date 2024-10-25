@@ -70,6 +70,31 @@ const AuditLogPage = () => {
     const indexOfFirstItem = indexOfLastItem - 8;
     const currentListPage = auditLogs ? auditLogs.slice(indexOfFirstItem, indexOfLastItem) : [];
 
+    const fetchData = async () => {
+        try {
+            const res = await api.get('/auditlogs');
+            const logs = res.data.map((log: any) => ({
+                // log_id: log.log_id,
+                // user_id: log.user_id,
+                // action: log.action as ActionType,
+                // timestamp: new Date(log.timestamp),
+                dateTimeAdded: new Date(log.timestamp),
+                employeeName: `${log.user.first_name} ${log.user.middle_name ? log.user.middle_name.charAt(0) + '. ' : ''}${log.user.last_name}`,
+                employeeNo: log.user.employee_number,
+                userType: log.user.user_type,
+                userEmail: log.user.email_address,
+                description: log.description,
+                actionEvent: log.action as ActionType,
+                department: log.user.department
+            }));
+            const sortedLogs = logs.sort((a: AuditTableProps, b: AuditTableProps) => b.dateTimeAdded.getTime() - a.dateTimeAdded.getTime());
+            setAuditLogs(logs);
+        } catch (error: any) {
+            console.error("Failed to fetch audit logs:", error);
+        } finally {
+            setIsLoading(false);
+        }
+    }
         
     useEffect(() => {
         const storedUser = localStorage.getItem('currentUser');
@@ -81,36 +106,15 @@ const AuditLogPage = () => {
                 console.error("Error parsing stored user:", error);
             }
         }
-        console.log(currentUser);
-        const interval = setInterval(() => {
-            const fetchData = async () => {
-                try {
-                    const res = await api.get('/auditlogs');
-                    const logs = res.data.map((log: any) => ({
-                        // log_id: log.log_id,
-                        // user_id: log.user_id,
-                        // action: log.action as ActionType,
-                        // timestamp: new Date(log.timestamp),
-                        dateTimeAdded: new Date(log.timestamp),
-                        employeeName: `${log.user.first_name} ${log.user.middle_name ? log.user.middle_name.charAt(0) + '. ' : ''}${log.user.last_name}`,
-                        employeeNo: log.user.employee_number,
-                        userType: log.user.user_type,
-                        userEmail: log.user.email_address,
-                        description: log.description,
-                        actionEvent: log.action as ActionType,
-                        department: log.user.department
-                    }));
-                    const sortedLogs = logs.sort((a: AuditTableProps, b: AuditTableProps) => b.dateTimeAdded.getTime() - a.dateTimeAdded.getTime());
-                    setAuditLogs(logs);
-                } catch (error: any) {
-                    console.error("Failed to fetch audit logs:", error);
-                } finally {
-                    setIsLoading(false);
-                }
-            }
-            fetchData();
-        }, 25000);
-        return () => clearInterval(interval);
+
+        const initialFetchTimeout = setTimeout(fetchData, 5000);
+
+        const fetchInterval = setInterval(fetchData, 30000);
+
+        return () => {
+            clearTimeout(initialFetchTimeout);
+            clearInterval(fetchInterval);
+        };
     }, []);
 
     const sortAuditLogs = () => {
@@ -218,13 +222,11 @@ const AuditLogPage = () => {
                                 <td className="flex flex-col w-[23.5%]">
                                     #{auditLogs.employeeNo}
                                 </td>
-                                <td className="flex w-[34.5%] 4xl:w-[37.5%] text-[14px] 4xl:text-[18px] items-center">
+                                <td className="flex w-[34.5%] 4xl:w-[37.5%] text-[14px] 4xl:text-[18px] items-center break-all">
                                     <span className="font-bold uppercase">
-                                        {auditLogs.actionEvent}:
+                                        {auditLogs.actionEvent}:<span className="ml-1 font-normal normal-case">{auditLogs.description}</span>
                                     </span>
-                                    <span className="ml-1">
-                                        {auditLogs.description}
-                                    </span>
+                                    
                                 </td>
                                 <td className="flex items-center">
                                     <span onClick={() => handleShowMore(auditLogs)} className="cursor-pointer font-bold text-primary hover:text-[#851818] transition-colors duration-300 ease-in-out">

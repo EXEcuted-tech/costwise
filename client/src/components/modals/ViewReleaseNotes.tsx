@@ -220,9 +220,9 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
             <div className="flex flex-col w-[60%] h-[750px] bg-white rounded-[20px] animate-pop-out drop-shadow">
                 {/* Header */}
                 <div className='flex items-center rounded-t-[10px] h-[10%] bg-[#F5F5F5] text-[22px]'>
-                    <div className='flex items-center justify-center w-[10%] h-full bg-[#F1F1F1] border-r-[2px] rounded-tl-[10px] px-[10px]'>
+                    <div className='flex items-center justify-center w-[17%] 2xl:w-[15%] 3xl:w-[12%] 4xl:w-[10%] h-full bg-[#F1F1F1] border-r-[2px] rounded-tl-[10px] px-[10px]'>
                         {isLoading ? <Loader className='h-6 w-4'/>
-                            : <p>{formatDateShort(note?.created_at as string)}</p>
+                            : <p className='text-[22px]'>{formatDateShort(note?.created_at as string)}</p>
                         }
                     </div>
                     <div className='flex items-center w-[80%] h-full text-[25px] font-semibold  ml-[20px] gap-[10px]'>
@@ -249,7 +249,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                 <div className="h-[80%]">
                     <div className='flex h-[10%] items-end text-[24px] pb-2 pl-[30px] border-b-[4px]'>
                         {isLoading ? (
-                            <Loader className='h-6'/>
+                            <Loader className='h-6 !w-[300px]'/>
                         ) : isEditing ? (
                             <div className="flex items-center">
                                 <span>Version</span>
@@ -280,7 +280,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                                     onClick={handleEdit}/>
                             </div>
                         }
-                    </div>      
+                    </div>
 
                     {/* Release Note Content */}
                     <div className='h-[540px] text-[20px] p-7 pb-[10px] border-b-[4px] overflow-y-scroll'>
@@ -313,7 +313,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
 
                 {/* Footer */}
                 <div className='flex h-[5rem] items-center text-[24px] rounded-b-[10px]'>
-                    <div className='flex items-center justify-center w-[7%] h-full bg-[#F1F1F1] border-r-[2px] rounded-bl-[10px] hover:bg-[#921B1BFF] group transition-colors duration-250 ease-in-out'>
+                    <div className='flex items-center justify-center w-[7%] h-full bg-[#F1F1F1] border-t-[3px] border-r-[2px] rounded-bl-[10px] hover:bg-[#921B1BFF] group transition-colors duration-250 ease-in-out'>
                         <RiDeleteBinLine 
                             className='text-[28px] text-[#5B5353] cursor-pointer group-hover:text-white group-hover:animate-shake transition-colors duration-250 ease-in-out'
                             onClick={deleteReleaseNote}

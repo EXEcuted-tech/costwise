@@ -328,7 +328,7 @@ const Inventory = () => {
 
                             {/* Action Buttons */}
                             <button
-                                className={`${isOpen ? 'text-[15px] 3xl:text-[18px] 2xl:text-[17px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[7rem] px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
+                                className={`${isOpen ? 'text-[15px] 3xl:text-[18px] 2xl:text-[17px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[7rem] pl-[4px] pr-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center justify-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
                                 onClick={openImportInventoryListModal}
                             >
                                 <span><CiImport className='w-[30px] h-[22px]' /></span>
@@ -351,7 +351,7 @@ const Inventory = () => {
                             <thead>
                                 <tr>
                                     {columnNames.map((columnName, index) => (
-                                        <th key={index} className={`${isOpen ? '4xl:text-[19px] 3xl:text-[18px] 2xl:text-[16px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[17px] xl:text-[16px]'} text-[20px] text-center animate-zoomIn whitespace-nowrap font-bold  text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}>
+                                        <th key={index} className={`${isOpen ? '4xl:text-[19px] 3xl:text-[18px] 2xl:text-[16px] xl:text-[16px]' : '4xl:text-[20px] 3xl:text-[18px] 2xl:text-[17px] xl:text-[16px]'} text-[20px] text-center animate-zoomIn whitespace-nowrap font-bold  text-[#6B6B6B] py-2 px-4 border-b border-[#ACACAC]`}>
                                             {columnName}
                                         </th>
                                     ))}
@@ -373,7 +373,7 @@ const Inventory = () => {
                                                 {data.material_code}</td>
                                             <td className='break-words'>{data.material_desc}</td>
                                             <td>{data.unit}</td>
-                                            <td className='w-[10%] text-right pr-6'>{numberWithCommas(data.purchased_qty)}</td>
+                                            <td className='w-[10%] text-right pr-4'>{numberWithCommas(data.purchased_qty)}</td>
                                             <td className='text-right pr-6 font-semibold'>{numberWithCommas(data.total_qty)}</td>
                                             <td className='text-right pr-6'>{numberWithCommas(data.usage_qty)}</td>
                                             <td className={`${isOpen ? '4xl:pr-2 3xl:pr-4 2xl:pr-4 xl:pr-2': '4xl:pr-2 3xl:pr-4 2xl:pr-4 xl:pr-2'}`}>
