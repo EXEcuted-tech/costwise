@@ -148,6 +148,7 @@ export interface SpecificFinishedGood {
     rm_cost: number;
     total_cost: number;
     components: Component[];
+    desc?: string;
 }
 
 export interface AllFinishedGood {

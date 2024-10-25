@@ -2,93 +2,36 @@ import React from 'react';
 
 const TrainingLoader = () => {
     return (
-        <div className="flex flex-col items-center justify-center h-screen">
-            <p className="text-3xl mb-4">
-                We are currently retraining our prediction model. Please wait until we finish it. Thank you!
-            </p>
-            <div className="robot-animation">
-                <div className="robot-body">
-                    <div className="robot-head"></div>
-                    <div className="robot-arm left-arm"></div>
-                    <div className="robot-arm right-arm"></div>
+        <div className="fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-brightness-50 z-[1500]">
+            <div className="ml-[10px] flex flex-col items-center justify-center h-screen">
+                <p className="ml-[15px] text-3xl text-center font-black text-white drop-shadow-lg animate-color-pulse-dark2">
+                    Prediction model retraining in progress
+                    <span className="loading-dots"></span>
+                </p>
+                <p className="ml-[15px] text-3xl font-medium italic text-center text-white drop-shadow-lg">
+                    Please standby while we optimize the system. Thank you!
+                </p>
+                <div className="ml-[10px] mt-[50px] robot-animation">
+                    <div className="table"></div>
+                    <div className="robot-body">
+                        <div className="robot-head">
+                            <div className="robot-eye left-eye"><span className='inside-eye'></span></div>
+                            <div className="robot-eye right-eye"><span className='inside-eye'></span></div>
+                        </div>
+                        <div className="robot-arm left-arm">
+                            <div className="robot-hand left-hand">
+                                <div className="wrench"></div>
+                            </div>
+                        </div>
+                        <div className="robot-arm right-arm">
+                            <div className="robot-hand right-hand">
+                                <div className="wrench"></div>
+                            </div>
+                        </div>
+                        <div className="robot-pants"></div>
+                    </div>
                 </div>
-                <div className="wrench"></div>
             </div>
-            <style jsx>{`
-                p {
-                    color: #333;
-                    text-align: center;
-                }
-                .robot-animation {
-                    position: relative;
-                    width: 100px;
-                    height: 160px;
-                }
-                .robot-body {
-                    position: relative;
-                    width: 60px;
-                    height: 100px;
-                    background-color: #B22222;
-                    border-radius: 10px;
-                    margin: 0 auto;
-                    animation: bob 1s infinite;
-                }
-                .robot-head {
-                    width: 60px;
-                    height: 60px;
-                    background-color: #333;
-                    border-radius: 50%;
-                    position: absolute;
-                    top: -30px; /* Position head */
-                    left: 0;
-                    animation: shake 1s infinite alternate;
-                }
-                .robot-arm {
-                    position: absolute;
-                    width: 20px;
-                    height: 40px;
-                    background-color: #555;
-                    bottom: 0;
-                }
-                .left-arm {
-                    left: -20px; /* Left arm */
-                    animation: swing-left 1s infinite alternate;
-                }
-                .right-arm {
-                    right: -20px; /* Right arm */
-                    animation: swing-right 1s infinite alternate;
-                }
-                .wrench {
-                    position: absolute;
-                    width: 10px;
-                    height: 30px;
-                    background-color: #FFD700;
-                    left: 60px; /* Position to the right */
-                    bottom: 40px;
-                    transform-origin: top;
-                    animation: fix 1s infinite;
-                }
-                @keyframes bob {
-                    0%, 100% { transform: translateY(0); }
-                    50% { transform: translateY(-5px); }
-                }
-                @keyframes shake {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(10deg); }
-                }
-                @keyframes swing-left {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(-20deg); }
-                }
-                @keyframes swing-right {
-                    0% { transform: rotate(0deg); }
-                    100% { transform: rotate(20deg); }
-                }
-                @keyframes fix {
-                    0%, 100% { transform: rotate(0deg); }
-                    50% { transform: rotate(15deg); }
-                }
-            `}</style>
         </div>
     );
 };
