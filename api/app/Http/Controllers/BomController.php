@@ -187,126 +187,109 @@ class BomController extends ApiController
 
         \DB::beginTransaction();
 
+        try {
+            $formulation = Formulation::find($formulationId);
+            if (!$formulation) {
+                $this->status = 404;
+                return $this->getResponse("Formulation not found.");
+            }
 
-        // try {
-        // Retrieve the Formulation
-        $formulation = Formulation::find($formulationId);
-        if (!$formulation) {
-            $this->status = 404; // Not Found
-            return $this->getResponse("Formulation not found.");
-        }
+            $formulation->formula_code = $formulaCode;
+            $formulation->save();
 
-        $formulation->formula_code = $formulaCode;
-        $formulation->save();
-
-        // Update or Create Emulsion
-        $emulsion = json_decode($formulation->emulsion, true); // Decode as associative array
-
-        if (empty($emulsionData)) {
-            $emulsion = new \stdClass();
-        } else {
-            $emulsion = [
-                'level' => $emulsionData['level'],
-                'batch_qty' => number_format(floatval($emulsionData['batch_qty']), 2, '.', ''),
-                'unit' => $emulsionData['unit'],
-            ];
-        }
-
-        $updatedEmulsionJson = json_encode($emulsion);
-        $formulation->emulsion = $updatedEmulsionJson;
-        $formulation->save();
-
-        $materialQtyList = json_decode($formulation->material_qty_list, true);
-        $materialQtyMap = [];
-
-        // Iterate through each entry in material_qty_list
-        foreach ($materialQtyList as $item) {
-            foreach ($item as $material_id => $details) {
-                $materialQtyMap[$material_id] = [
-                    'level' => $details['level'],
-                    'qty' => $details['qty'],
+            $emulsion = json_decode($formulation->emulsion, true);
+            if (empty($emulsionData)) {
+                $emulsion = new \stdClass();
+            } else {
+                $emulsion = [
+                    'level' => $emulsionData['level'],
+                    'batch_qty' => number_format(floatval($emulsionData['batch_qty']), 2, '.', ''),
+                    'unit' => $emulsionData['unit'],
                 ];
             }
-        }
 
-        // Update Materials
-        foreach ($materialsData as $materialData) {
-            // Retrieve the Material
-            $material = Material::find($materialData['material_id']);
-            if ($material) {
-                $material->material_code = $materialData['material_code'];
-                $material->material_desc = $materialData['material_desc'];
-                $material->unit = $materialData['unit'];
-                $material->save();
-            } else {
-                $existingCode = Material::where('material_code', $materialData['material_code'])->first();
+            $updatedEmulsionJson = json_encode($emulsion);
+            $formulation->emulsion = $updatedEmulsionJson;
+            $formulation->save();
 
-                if ($existingCode) {
-                    $materialData['material_id'] = $existingCode->material_id;
-                } else {
-                    if ($materialData['material_desc'] == 'EMULSION') {
-                        continue;
-                    } else {
-                        $this->status = 404;
-                        return $this->getResponse("Material code does not exist.");
-                    }
+            $materialQtyList = json_decode($formulation->material_qty_list, true);
+            $materialQtyMap = [];
 
-                    // Material::create([
-                    //     'material_code' => $materialData['material_code'],
-                    //     'material_desc' => $materialData['material_desc'],
-                    //     'material_cost' => $materialData['material_cost'],
-                    //     'unit' => $materialData['unit'],
-                    //     'date' => $materialData['date'],
-                    // ]);
+            foreach ($materialQtyList as $item) {
+                foreach ($item as $material_id => $details) {
+                    $materialQtyMap[$material_id] = [
+                        'level' => $details['level'],
+                        'qty' => $details['qty'],
+                    ];
                 }
             }
 
-            $materialID = $materialData['material_id'];
-            if (isset($materialQtyMap[$materialID])) {
-                $materialQtyMap[$materialID]['level'] = (int) $materialData['level'];
-                $materialQtyMap[$materialID]['qty'] = $materialData['batchQty'];
-            } else {
-                $materialQtyMap[$materialID] = [
-                    'level' => $materialData['level'],
-                    'qty' => $materialData['batchQty'],
+            foreach ($materialsData as $materialData) {
+
+                $material = Material::find($materialData['material_id']);
+                if ($material) {
+                    $material->material_code = $materialData['material_code'];
+                    $material->material_desc = $materialData['material_desc'];
+                    $material->unit = $materialData['unit'];
+                    $material->save();
+                } else {
+                    $existingCode = Material::where('material_code', $materialData['material_code'])->first();
+
+                    if ($existingCode) {
+                        $materialData['material_id'] = $existingCode->material_id;
+                    } else {
+                        if ($materialData['material_desc'] == 'EMULSION') {
+                            continue;
+                        } else {
+                            $this->status = 404;
+                            return $this->getResponse("Material code does not exist.");
+                        }
+                    }
+                }
+
+                $materialID = $materialData['material_id'];
+                if (isset($materialQtyMap[$materialID])) {
+                    $materialQtyMap[$materialID]['level'] = (int) $materialData['level'];
+                    $materialQtyMap[$materialID]['qty'] = $materialData['batchQty'];
+                } else {
+                    $materialQtyMap[$materialID] = [
+                        'level' => $materialData['level'],
+                        'qty' => $materialData['batchQty'],
+                    ];
+                }
+                ;
+            }
+
+            $updatedMaterialQtyList = [];
+
+            foreach ($materialQtyMap as $material_id => $details) {
+                $updatedMaterialQtyList[] = [
+                    $material_id => [
+                        'level' => $details['level'],
+                        'qty' => $details['qty'],
+                    ],
                 ];
             }
-            ;
+
+            $updatedMaterialQtyJson = json_encode($updatedMaterialQtyList);
+            $formulation->material_qty_list = $updatedMaterialQtyJson;
+
+            $formulation->save();
+
+            \DB::commit();
+
+            $this->status = 200;
+            $this->response['message'] = "BOM batch updated successfully.";
+            return $this->getResponse();
+
+        } catch (\Exception $e) {
+            \DB::rollBack();
+
+            $this->status = 500;
+            $this->response['message'] = "An error occurred while updating the BOM batch.";
+            $this->response['error'] = $e->getMessage();
+            return $this->getResponse();
         }
-
-
-        $updatedMaterialQtyList = [];
-
-        foreach ($materialQtyMap as $material_id => $details) {
-            $updatedMaterialQtyList[] = [
-                $material_id => [
-                    'level' => $details['level'],
-                    'qty' => $details['qty'],
-                ],
-            ];
-        }
-
-        $updatedMaterialQtyJson = json_encode($updatedMaterialQtyList);
-        $formulation->material_qty_list = $updatedMaterialQtyJson;
-
-        $formulation->save();
-
-        \DB::commit();
-
-        $this->status = 200; // OK
-        $this->response['message'] = "BOM batch updated successfully.";
-        return $this->getResponse();
-
-        // } catch (\Exception $e) {
-        //     // Rollback the transaction on error
-        //     DB::rollBack();
-
-        //     // Set error response
-        //     $this->status = 500; // Internal Server Error
-        //     $this->response['message'] = "An error occurred while updating the BOM batch.";
-        //     $this->response['error'] = $e->getMessage(); // Optionally include the error message
-        //     return $this->getResponse();
-        // }
     }
 
     public function updateOrCreateBatch(Request $request)
@@ -351,7 +334,6 @@ class BomController extends ApiController
         \DB::beginTransaction();
 
         try {
-            // Retrieve or create the Formulation
             $isNewFormulation = false;
 
             $formulation = Formulation::find($formulationId);
@@ -364,7 +346,6 @@ class BomController extends ApiController
             $formulation->fg_id = $fgId;
             $formulation->formula_code = $formulaCode;
 
-            // Update or Create Emulsion
             if (empty($emulsionData)) {
                 $emulsion = new \stdClass();
             } else {
@@ -379,12 +360,11 @@ class BomController extends ApiController
             $formulation->emulsion = $updatedEmulsionJson;
 
             $materialQtyMap = [];
-            // Update or Create Materials
             foreach ($materialsData as $materialData) {
                 if (strtoupper($materialData['material_desc']) == 'EMULSION') {
                     continue;
                 }
-                
+
                 $finishedGood = FinishedGood::findOrFail($fgId);
 
                 $date = date('Y-m-d', strtotime(substr($finishedGood->monthYear, 0, 4) . '-' . substr($finishedGood->monthYear, 4, 2) . '-01'));

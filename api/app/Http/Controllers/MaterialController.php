@@ -27,7 +27,6 @@ class MaterialController extends ApiController
 
     public function retrieve(Request $request)
     {
-        // To be removed pa ang mga unnecessary fields
         $allowedColumns = [
             'material_id',
             'material_code',
@@ -239,7 +238,7 @@ class MaterialController extends ApiController
                     $newCount = count($settings['material_ids']);
 
                     if ($newCount < $originalCount) {
-                        $settings['material_ids'] = array_values($settings['material_ids']); // Reindex the array
+                        $settings['material_ids'] = array_values($settings['material_ids']);
                         $file->settings = json_encode($settings);
                         $file->save();
                     }
@@ -315,7 +314,7 @@ class MaterialController extends ApiController
                     $newCount = count($settings['material_ids']);
 
                     if ($newCount < $originalCount) {
-                        $settings['material_ids'] = array_values($settings['material_ids']); // Reindex the array
+                        $settings['material_ids'] = array_values($settings['material_ids']);
                         $file->settings = json_encode($settings);
                         $file->save();
                     }

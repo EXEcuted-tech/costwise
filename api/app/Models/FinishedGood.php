@@ -29,10 +29,4 @@ class FinishedGood extends Model
     {
         return $this->belongsTo(Fodl::class, 'fodl_id', 'fodl_id');
     }
-
-    // // Relationship to BillOfMaterials (Option 1)
-    // public function billOfMaterials()
-    // {
-    //     return $this->belongsTo(BillOfMaterials::class, 'bom_id', 'bom_id');
-    // }
 }

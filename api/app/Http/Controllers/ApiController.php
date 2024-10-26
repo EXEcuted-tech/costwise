@@ -31,7 +31,6 @@ class ApiController extends Controller
         $this->response['status'] = $status;
         $this->response['message'] = $customMessage ?? $this->getMessage($status);
 
-        // $finalResponse = array_merge($this->response, $additionalFields);
         return response()->json($this->response, $status);
     }
 
