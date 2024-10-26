@@ -217,7 +217,7 @@ const ProjectedCostPage = () => {
         </div>
         <div
           className={`${isOpen ? "flex flex-col 4xl:flex-row" : "flex flex-col 3xl:flex-row"
-            } w-[97%] h-full gap-[2%] rounded-xl mt-[10px] 2xl:mt-0`}
+            } w-[97%] h-full gap-[2%] rounded-xl mt-[10px] 2xl:mt-0 bg-white`}
         >
           {/* Left Div */}
           <div
@@ -227,7 +227,7 @@ const ProjectedCostPage = () => {
             <div className="flex text-[30px] font-bold h-[10%] bg-white rounded-t-[20px] items-center justify-start border-b-2 pl-10">
               <p className="w-[95%] text-[#585858]">Graph</p>
             </div>
-            <div className="flex items-center justify-center h-[500px] lg:h-[50%] w-[100%] bg-white p-2">
+            <div className="flex items-center justify-center h-[500px] lg:h-full w-full bg-white p-2">
               <ProductCost
                 selectedYear={activeStart}
                 selectedHalf={activeEnd}
@@ -236,11 +236,11 @@ const ProjectedCostPage = () => {
             <div className="flex text-[30px] text-[#585858] font-bold bg-white items-center justify-start border-y-2 pl-10">
               <p className="w-[95%]">Estimated Summary</p>
               <Tooltip content="Key metrics overview from the model's performance" placement="right">
-                <span><IoIosInformationCircle className="text-[35px] text-[#625F5F] hover:brightness-50" /></span>
+                <span><IoIosInformationCircle className="text-[35px] text-[#625F5F] hover:brightness-50 mr-[10px]" /></span>
               </Tooltip>
             </div>
             <div className="flex items-center justify-center bg-white p-2 2xl:p-2 rounded-b-[20px] shadow-b-lg">
-              <TrainingModel />
+              <TrainingModel isOpen={isOpen}/>
             </div>
           </div>
           {/* Right Div */}

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import _ from "lodash";
+import * as _ from 'lodash';
 import * as tf from "@tensorflow/tfjs";
 import api from "@/utils/api";
 import {
@@ -238,7 +238,7 @@ export const makePrediction = async (
   }
 };
 
-function TrainingModel() {
+function TrainingModel({ isOpen }: { isOpen: boolean }) {
   const [costData, setCostData] = useState<CostDataEntry[]>([]);
   const [model, setModel] = useState<tf.Sequential | null>(null);
   const [trained, setTrained] = useState(false);
@@ -246,9 +246,7 @@ function TrainingModel() {
   const [trainingSpeed, setTrainingSpeed] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true); // Loading state
 
-  const [totalPrediction, setTotalPrediction] = useState<
-    { monthYear: string; cost: number }[]
-  >([]);
+  const [totalPrediction, setTotalPrediction] = useState<{ monthYear: string; cost: number }[]>([]);
 
   // Helper function for cost extraction
   const getProductCosts = (productName: string): number[] =>
@@ -369,7 +367,7 @@ function TrainingModel() {
       ) : (
         <div className="mx-auto p-5 flex flex-col xl:flex-row gap-6 h-[90%]">
           {/* Left Section */}
-          <div className="w-[500px] flex-1 bg-white shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
+          <div className="w-[30%] flex-1 bg-white shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
             <h2 className="flex items-center 3xl:text-[20px] text-2xl font-semibold text-primary mb-4 xl:mb-2">
               <MdModelTraining className="3xl:text-4xl text-3xl font-semibold text-primary mr-2" />
               Training Duration
@@ -382,12 +380,12 @@ function TrainingModel() {
             </p>
           </div>
 
-          <div className="flex-1 bg-white shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
+          <div className="w-[30%] flex-1 bg-white shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
             <h2 className="flex items-center 3xl:text-[20px] text-2xl font-semibold text-primary mb-4 xl:mb-2">
               <MdOutlineCalculate className="3xl:text-4xl text-3xl font-semibold text-primary mr-2" />
               Average Loss
             </h2>
-            <p className="text-5xl font-bold text-primary">
+            <p className="text-[40px] font-bold text-primary">
               {(lossHistory[lossHistory.length - 1] / 4).toFixed(6)}
             </p>
             <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
@@ -396,7 +394,7 @@ function TrainingModel() {
           </div>
 
           {/* Right Section */}
-          <div className="flex-1 bg-primary shadow-lg rounded-lg p-2 grid grid-cols-1 gap-4 items-center justify-center">
+          <div className="w-[30%] flex-1 bg-primary shadow-lg rounded-lg p-2 grid grid-cols-1 gap-4 items-center justify-center">
             <h2 className="flex items-center text-xl font-semibold text-white">
               <MdOnlinePrediction className="text-4xl font-semibold text-white mr-2" />
               Total Cost Prediction
@@ -406,7 +404,7 @@ function TrainingModel() {
               <button
                 onClick={prev}
                 disabled={currentIndex === 0}
-                className="p-1 pl-[10%] text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200"
+                className={`${isOpen? 'pl-[0px]': 'pl-[5%]'} p-1 text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200`}
                 aria-label="Previous predictions"
               >
                 &#9664; {/* Left arrow */}
@@ -433,7 +431,7 @@ function TrainingModel() {
               <button
                 onClick={next}
                 disabled={currentIndex + itemsPerPage >= totalPrediction.length}
-                className="p-1 pr-[10%] text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200"
+                className={`${isOpen? 'pr-[0px]': 'pr-[5%]'} p-1 text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200`}
                 aria-label="Next predictions"
               >
                 &#9654; {/* Right arrow */}
