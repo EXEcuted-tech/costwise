@@ -272,6 +272,25 @@ const CostCalculation = () => {
         setExportLoading(false);
         setAlertMessages(["Report exported successfully."]);
         setAlertStatus("success");
+
+        const user = localStorage.getItem('currentUser');
+        const parsedUser = JSON.parse(user || '{}');
+
+        const auditData = {
+            userId: parsedUser?.userId,
+            action: 'crud',
+            act: 'files',
+            fileName: fileName,
+        };
+
+        api.post('/auditlogs/logsaudit', auditData)
+            .then(response => {
+                console.log('Audit log created successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error audit logs:', error);
+            });
+
       } else {
         setExportLoading(false);
         setAlertMessages(["Error exporting workbook:", response.data.message]);

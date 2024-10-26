@@ -58,7 +58,7 @@ class AuditLogController extends Controller
                         $description = "$firstName $middleInitial $lastName archived user $fileName.";
                         break;
                     default:
-                        $description = "";
+                        $description = "Unknown source or action.";
                         break;
                 }
             }
@@ -84,7 +84,7 @@ class AuditLogController extends Controller
                         $description = "$firstName $middleInitial $lastName archived the entire inventory list.";
                         break;     
                     default:
-                        $description = "";
+                        $description = "Unknown source or action.";
                         break;
                 }
             }
@@ -103,8 +103,11 @@ class AuditLogController extends Controller
                     case "formulation_file":
                         $description = "$firstName $middleInitial $lastName exported $fileName.";
                         break;
+                    case "logs":
+                        $description = "$firstName $middleInitial $lastName exported all existing audit logs.";
+                        break;
                     default:
-                        $description = "";
+                        $description = "Unknown source or action.";
                         break;
                 }
             }
