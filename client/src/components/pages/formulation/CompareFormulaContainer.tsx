@@ -316,7 +316,7 @@ const CompareFormulaContainer = () => {
                                 }, []).map((group, groupIndex) => (
                                     <React.Fragment key={groupIndex}>
                                         {group.map((info, index) => (
-                                            <tr key={index} className={`${info.rowType === 'finishedGood' ? (Number(info.cost) === minProductCost ? 'bg-[#fff873] dark:text-black' : 'text-black') : (index % 2 === 1 ? 'bg-[#FCF7F7] dark:bg-[#4C4C4C]' : '')} animate-zoomIn text-center ${info.rowType === 'finishedGood' ? 'font-bold' : 'font-medium'} ${info.rowType === 'finishedGood' ? 'text-black dark:text-white' : 'text-[#6B6B6B] dark:text-[#d1d1d1]'} text-[18px] ${info.rowType === 'finishedGood' ? 'border-y border-[#ACACAC]' : ''}`}>
+                                            <tr key={index} className={`${info.rowType === 'finishedGood' ? (Number(info.cost) === minProductCost ? 'bg-[#fff873] text-black dark:text-black' : 'text-black dark:text-white') : (index % 2 === 1 ? 'bg-[#FCF7F7] dark:bg-[#4C4C4C]' : '')} animate-zoomIn text-center ${info.rowType === 'finishedGood' ? 'font-bold' : 'font-medium'} ${info.rowType === 'finishedGood' ? '' : 'text-[#6B6B6B] dark:text-[#d1d1d1]'} text-[18px] ${info.rowType === 'finishedGood' ? 'border-y border-[#ACACAC]' : ''}`}>
                                                 <td className={`py-[10px] ${info.rowType === 'finishedGood' ? 'relative text-left px-6' : ''}`}>
                                                     {info.rowType === 'finishedGood' && (
                                                         <>

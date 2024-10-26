@@ -244,7 +244,7 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
                     <div className="flex flex-col w-[50%]">
                         <div className='flex flex-col'>
                             <label className='text-[#5B5353] font-bold text-[22px] mb-3 dark:text-white'>Uploaded File <span className='text-[#B22222] ml-1 font-bold'>*</span></label>
-                            <div className="relative w-full h-[2rem] p-6 flex items-center justify-start border-2 border-[#B3B3B3] rounded-xl hover:border-[#B22222] hover:bg-gray-100 hover:bg-[#3c3c3c] transition-all duration-300 ease-in-out">
+                            <div className="relative w-full h-[2rem] p-6 flex items-center justify-start border-2 border-[#B3B3B3] rounded-xl hover:border-[#B22222] hover:bg-gray-100 dark:hover:bg-[#3c3c3c] transition-all duration-300 ease-in-out">
                                 <div className='flex w-full'>
                                     {fileName === '' ? (
                                         <>
@@ -253,13 +253,13 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
                                         </>
                                     ) : file ? (
                                         <>
-                                            <FaFileCircleCheck className='text-[#35AD3E] text-[25px] mr-4' />
-                                            <p className='font-semibold mt-[2px] w-full'>{fileNameWithExt}</p>
+                                            <FaFileCircleCheck className='text-[#35AD3E] dark:brightness-200 text-[25px] mr-4' />
+                                            <p className='font-semibold mt-[2px] w-full dark:text-white'>{fileNameWithExt}</p>
                                         </>
                                     ) :
                                         <>
-                                            <FaFileCircleXmark className='text-primary text-[25px] mr-4' />
-                                            <p className='italic mt-[2px]'>File upload unsuccessful.</p>
+                                            <FaFileCircleXmark className='text-primary text-[25px] mr-4 dark:brightness-200' />
+                                            <p className='italic mt-[2px] dark:text-white'>File upload unsuccessful.</p>
                                         </>
                                     }
                                 </div>
@@ -273,7 +273,7 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
                             <label className='text-[#5B5353] font-bold text-[22px] mb-3 dark:text-white'>Month and Year <span className='text-[#B22222] ml-1 font-bold'>*</span></label>
                             <input
                                 type="month"
-                                className='w-[400px] h-[2rem] py-6 px-4 text-[17px] dark:bg-[#3c3c3c] font-semibold border-2 border-[#B3B3B3] rounded-xl hover:border-[#B22222] hover:bg-gray-100 dark:hover:bg-[#3c3c3c] dark:text-white transition-all duration-300 ease-in-out'
+                                className='w-[400px] h-[2rem] py-6 px-4 text-[17px] dark:bg-[#3c3c3c] font-semibold border-2 border-[#B3B3B3] rounded-xl hover:border-[#B22222] dark:hover:bg-[#3C3C3C] hover:bg-gray-100 dark:text-white transition-all duration-300 ease-in-out'
                                 value={monthYear}
                                 onChange={handleMonthYear}
                             />
