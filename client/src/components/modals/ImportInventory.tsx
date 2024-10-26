@@ -9,9 +9,10 @@ import { useUserContext } from '@/contexts/UserContext';
 
 interface ImportInventoryListProps {
     onClose: () => void;
+    setIsImport: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) => {
+const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, setIsImport }) => {
     const { currentUser } = useUserContext();
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
@@ -143,7 +144,7 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
                 setAlertMessages([response.data.message]);
                 setAlertStatus('success');
             }
-
+            setIsImport(true);
             setTimeout(function () { location.reload() }, 1000);
 
             const user = localStorage.getItem('currentUser');
@@ -151,8 +152,8 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
 
             const auditData = {
                 userId: parsedUser?.userId,
-                action: 'crud',
-                act: 'edit',
+                action: 'import',
+                act: 'inventory',
                 fileName: fileName,
             };
 
@@ -163,7 +164,8 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
                 .catch(error => {
                     console.error('Error audit logs:', error);
                 });
-
+            
+            onClose();
         } catch (error: any) {
             console.error('Error importing file:', error);
             setAlertMessages([error.response.data.message]);

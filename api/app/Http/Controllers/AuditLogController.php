@@ -38,6 +38,8 @@ class AuditLogController extends Controller
             $action = $request->input('action', 'general');
             $act = $request->input('act');
             $fileName = $request->input('fileName');
+            $material_code = $request->input('material_code');
+            $material_desc = $request->input('material_desc');
 
             $firstName = $user->first_name;
             $middleInitial = $user->middle_name ? substr($user->middle_name, 0, 1) . '.' : '';
@@ -90,7 +92,15 @@ class AuditLogController extends Controller
             }
             
             if($action == 'import'){
-                $description = "$firstName $middleInitial $lastName imported $fileName.";
+                switch($act){
+                    case "inventory":
+                        $description = "$firstName $middleInitial $lastName imported $fileName.xlsx.";
+                        break;
+                    default:
+                    $description = "$firstName $middleInitial $lastName imported $fileName.";
+                        break;
+                }
+                
             }
 
             if($action == 'export'){
@@ -100,6 +110,7 @@ class AuditLogController extends Controller
                         break;
                     case "file":
                         $description = "$firstName $middleInitial $lastName exported $fileName.xlsx.";
+                        break;
                     case "formulation_file":
                         $description = "$firstName $middleInitial $lastName exported $fileName.";
                         break;
@@ -108,6 +119,17 @@ class AuditLogController extends Controller
                         break;
                     default:
                         $description = "Unknown source or action.";
+                        break;
+                }
+            }
+
+            if($action == 'stock'){
+                switch($act){
+                    case "low stock":
+                        $description = "Item $material_code $material_desc is low in stock.";
+                        break;
+                    default:
+                        $description = "Unknown stock notification.";
                         break;
                 }
             }

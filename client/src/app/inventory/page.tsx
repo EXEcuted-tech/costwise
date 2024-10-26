@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import Header from '@/components/header/Header';
 import { useSidebarContext } from '@/contexts/SidebarContext';
 import { MdTrolley, MdCalendarToday } from "react-icons/md";
@@ -27,12 +27,16 @@ const Inventory = () => {
     const [isImportInventoryListModalOpen, setImportInventoryListModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
+    const [isImport, setIsImport] = useState(() => {
+        return localStorage.getItem('isImport') === 'true';
+    });
 
     const [monthOptions, setMonthOptions] = useState<{ display: string; value: string }[]>([]);
     const [selectedMonth, setSelectedMonth] = useState<string>('');
     const [inventoryList, setInventoryList] = useState<InventoryType[][]>([]);
     const currentMonthInventory = inventoryList.find(monthData => monthData[0]?.month_year === selectedMonth) || [];
     const { currentUser } = useUserContext();
+    const hasFetched = useRef(false);
 
     // Search & Filter
     const [searchTerm, setSearchTerm] = useState('');
@@ -95,14 +99,37 @@ const Inventory = () => {
         });
     }
 
+    const logLowStockAudit = (item: InventoryType) => {
+        const user = localStorage.getItem('currentUser');
+        const parsedUser = JSON.parse(user || '{}');
+        
+        const auditData = {
+            userId: parsedUser?.userId,
+            action: 'stock',
+            act: `low stock`,
+            material_code: item.material_code,
+            material_desc: item.material_desc
+        };
+
+        api.post('/auditlogs/logsaudit', auditData)
+            .then(response => {
+                console.log('Audit log created successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error logging audit:', error);
+            });
+    };
+
     // Retrieve inventory list
     useEffect(() => {
+        if (hasFetched.current) return;
+        hasFetched.current = true;
         const fetchInventoryLists = async () => {
             try {
                 const response = await api.get('/inventory/lists');
                 if (response.data.data) {
                     const inventoryData = response.data.data;
-
+                    console.log("Hello",inventoryData);
                     if (Array.isArray(inventoryData)) {
                         const processedInventoryList = inventoryData.map(monthData => {
                             const inventoryItems = monthData.inventory_info.map((item: any) => {
@@ -112,12 +139,23 @@ const Inventory = () => {
                                     material_code: material?.material_code || '',
                                     material_desc: material?.material_desc || '',
                                     unit: material?.unit || '',
-                                    month_year: monthData.month_year
+                                    month_year: monthData.month_year,
+                                    stock_status: item.stock_status
                                 };
                             });
                             return inventoryItems;
                         });
                         setInventoryList(processedInventoryList);
+
+                        if(isImport){
+                            processedInventoryList.flat().forEach(item => {
+                                if (item.stock_status === 'Low Stock') {
+                                    logLowStockAudit(item);
+                                }
+                            });
+                            setIsImport(false);
+                            localStorage.removeItem('isImport');
+                        }
 
                         //Set month options
                         const extractMonths = inventoryData.map((item: any) => item.month_year);
@@ -151,6 +189,14 @@ const Inventory = () => {
             setCurrentIndex(0);
         }
     }, [monthOptions]);
+
+    useEffect(() => {
+        if (isImport) {
+            localStorage.setItem('isImport', 'true');
+        } else {
+            localStorage.removeItem('isImport');
+        }
+    }, [isImport]);
 
     // Search & Filter
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -229,7 +275,7 @@ const Inventory = () => {
             }
 
             {isImportInventoryListModalOpen &&
-                <ImportInventoryList onClose={closeImportInventoryListModal} />
+                <ImportInventoryList onClose={closeImportInventoryListModal} setIsImport={setIsImport}/>
             }
 
             {isDeleteModalOpen && <ConfirmDeleteInventory inventoryList={currentMonthInventory} monthYear={selectedMonth} onClose={closeDeleteModal} />}
