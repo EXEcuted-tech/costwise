@@ -26,7 +26,6 @@ class FodlController extends ApiController
 
     public function retrieve(Request $request)
     {
-        // To be removed pa ang mga unnecessary fields
         $allowedColumns = [
             'fodl_id',
             'fg_code',
@@ -126,8 +125,6 @@ class FodlController extends ApiController
             $archivedFodlData = $fodl->toArray();
 
             Fodl::on('archive_mysql')->create($archivedFodlData);
-
-            // $files = File::whereJsonContains('settings->fodls', ['fodl_id' => $fodl_id])->get();
             $files = File::where('file_id', $file_id)->get();
 
             foreach ($files as $file) {
@@ -293,9 +290,6 @@ class FodlController extends ApiController
                 }
             }
 
-            // FinishedGood::whereNotIn('fg_code', $fgCodes)
-            //     ->update(['fodl_id' => null]);
-
             \DB::commit();
 
             $this->status = 200;
@@ -340,8 +334,6 @@ class FodlController extends ApiController
             foreach ($fodls as $fodl) {
                 $archivedFodlData = $fodl->toArray();
                 Fodl::on('archive_mysql')->create($archivedFodlData);
-
-                // $files = File::whereJsonContains('settings->fodls', ['fodl_id' => $fodl_id])->get();
                 $files = File::where('file_id', $file_id)->get();
 
                 foreach ($files as $file) {
@@ -365,10 +357,6 @@ class FodlController extends ApiController
                     }
                 }
             }
-
-            // \DB::table('finished_goods')
-            //     ->whereIn('fodl_id', $fodlIds)
-            //     ->update(['fodl_id' => null]);
 
             Fodl::whereIn('fodl_id', $fodlIds)->delete();
 
@@ -423,10 +411,6 @@ class FodlController extends ApiController
                     }
                 }
             }
-
-            // \DB::table('finished_goods')
-            //     ->whereIn('fodl_id', $fodlIds)
-            //     ->update(['fodl_id' => null]);
 
             if($finishedGoodsWithFodlId->isEmpty()){
                 Fodl::whereIn('fodl_id', $fodlIds)->delete();

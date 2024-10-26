@@ -16,9 +16,4 @@ class Formulation extends Model
         'emulsion',
         'material_qty_list',
     ];
-
-    // protected $casts = [
-    //     'emulsion' => 'array',
-    //     'material_qty_list' => 'array',
-    // ];
 }

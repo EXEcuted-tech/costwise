@@ -21,9 +21,4 @@ class Fodl extends Model
         'direct_labor',
         'monthYear',
     ];
-
-    // public function finishedGoods()
-    // {
-    //     return $this->hasMany(FinishedGood::class, 'fodl_id', 'fodl_id');
-    // }
 }

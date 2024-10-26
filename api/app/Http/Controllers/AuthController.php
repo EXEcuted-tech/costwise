@@ -44,9 +44,7 @@ class AuthController extends ApiController
             $validatedData['sys_role'] = $request->sys_role;
 
             $user = User::create($validatedData);
-            // $accessToken = $user->createToken('authToken')->plainTextToken;
 
-            //Profile picture upload
             if ($request->hasFile('display_picture')) {
                 try {
                     $path = $request->file('display_picture')->store('profile_pictures', 'public');
@@ -58,7 +56,6 @@ class AuthController extends ApiController
                 }
 
             $this->status = 200;
-            // $this->response['token'] = $accessToken;
             return $this->getResponse("User created successfully!");
         } catch (\Throwable $th) {
             Log::info($th->getMessage());

@@ -20,7 +20,6 @@ use Illuminate\Support\Facades\Log;
 class CostCalcController extends ApiController
 {
 
-    //Retrieve available monthYear options
     public function retrieveMonthYearOptions()
     {
         try {
@@ -47,7 +46,6 @@ class CostCalcController extends ApiController
         }
     }
 
-    //Retrieve FG options
     public function retrieveFGOptions(Request $request)
     {
         $monthYear = $request->query('monthYear');
@@ -74,11 +72,9 @@ class CostCalcController extends ApiController
         try {
             $fgRecord = FinishedGood::where('fg_id', $fg_id)->first();
 
-            //Retrieve formulation
             $formulation = Formulation::where('fg_id', $fgRecord->fg_id)->first();
             $materialQtyList = json_decode($formulation->material_qty_list);
 
-            //Store fg data
             $fgData = [
                 'formula_code' => $formulation->formula_code,
                 'code' => $fgRecord->fg_code,
@@ -90,7 +86,6 @@ class CostCalcController extends ApiController
                 'components' => []
             ];
 
-            //Retrieve emulsion data
             $emulsion = json_decode($formulation->emulsion);
             if (!empty(get_object_vars($emulsion))) {
                 $fgData['components'][] = [
@@ -99,10 +94,9 @@ class CostCalcController extends ApiController
                     'unit' => $emulsion->unit,
                 ];
             } else {
-                $fgData['components'][] = []; //empty
+                $fgData['components'][] = []; 
             }
 
-            //Retrieve list of materials
             foreach ($materialQtyList as $index => $materialItem) {
                 $materialId = key($materialItem);
                 $details = current($materialItem);
@@ -137,8 +131,6 @@ class CostCalcController extends ApiController
         }
     }
 
-
-    //Exporting
     public function export(Request $request)
     {
         $fileName = $request->input('file_name');
@@ -180,7 +172,6 @@ class CostCalcController extends ApiController
                     fputcsv($handle, ["Formula", "Level", "Item Code", "Description", "Batch Qty", "Unit", "Cost", "Total Cost"]);
 
                     foreach ($data as $fg) {
-                        // Write FG row
                         fputcsv($handle, [
                             $fg['formula_code'],
                             '',
@@ -192,7 +183,6 @@ class CostCalcController extends ApiController
                             $fg['total_cost']
                         ]);
 
-                        // Write component rows
                         foreach ($fg['components'] as $component) {
                             if (!empty($component)) {
                                 fputcsv($handle, [
@@ -284,7 +274,6 @@ class CostCalcController extends ApiController
 
         $row = 2;
 
-        //Add FG Row
         $sheet->setCellValue("A$row", $fg['formula_code']);
         $sheet->setCellValue("B$row", 1);
         $sheet->setCellValue("C$row", $fg['code']);
@@ -298,8 +287,6 @@ class CostCalcController extends ApiController
         $sheet->getStyle("A$row:H$row")->getFill()->getStartColor()->setRGB('FFEBEB');
         $sheet->getStyle("A$row:H$row")->getFont()->setSize(8)->setName('Open Sans');
         $row++;
-
-        // Add components
 
         foreach ($fg['components'] as $component) {
             if (!empty($component)) {
@@ -323,8 +310,6 @@ class CostCalcController extends ApiController
             }
         }
 
-
-        // Apply number formatting
         $sheet->getStyle('E2:E' . ($row - 1))->getNumberFormat()->setFormatCode('0.00');
         $sheet->getStyle('G2:H' . ($row - 1))->getNumberFormat()->setFormatCode('0.00');
     }
@@ -389,13 +374,11 @@ class CostCalcController extends ApiController
             $sheet->getStyle("A$row:B$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_LEFT);
             $sheet->getStyle("C$row:F$row")->getAlignment()->setHorizontal(Alignment::HORIZONTAL_RIGHT);
 
-            // Add borders for each row
             $sheet->getStyle("A$row:F$row")->getBorders()->getAllBorders()->setBorderStyle(Border::BORDER_THIN);
 
             $row++;
         }
 
-        // Auto-size columns A to F
         foreach (range('A', 'F') as $columnID) {
             $sheet->getColumnDimension($columnID)->setAutoSize(true);
         }
