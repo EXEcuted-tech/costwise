@@ -136,7 +136,7 @@ class InventoryController extends ApiController
                     Log::info("existingMaterial", ['existingMaterial' => $existingMaterial]);
                     if (!$existingMaterial) {
                         $materialRecords = $material->toArray();
-                        DB::connection('archive_mysql')->table('materials')->insert($materialRecords);
+                        DB::connection('archive_mysql')->table('materials')->create($materialRecords);
                     }
                 }
             }
@@ -150,7 +150,7 @@ class InventoryController extends ApiController
                     $inventoryRecords['created_at'] = $inventory->created_at->format('Y-m-d H:i:s');
                     $inventoryRecords['updated_at'] = $inventory->updated_at->format('Y-m-d H:i:s');
 
-                    DB::connection('archive_mysql')->table('inventory')->insert($inventoryRecords);
+                    DB::connection('archive_mysql')->table('inventory')->create($inventoryRecords);
                     $inventory->delete();
                 }
             }
@@ -165,7 +165,7 @@ class InventoryController extends ApiController
                     $inventoryFile['created_at'] = $fileData->created_at->format('Y-m-d H:i:s');
                     $inventoryFile['updated_at'] = $fileData->updated_at->format('Y-m-d H:i:s');
 
-                    DB::connection('archive_mysql')->table('files')->insert($inventoryFile);
+                    DB::connection('archive_mysql')->table('files')->create($inventoryFile);
                     $fileData->delete();
                 }
             }

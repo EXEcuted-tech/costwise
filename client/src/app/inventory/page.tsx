@@ -127,7 +127,6 @@ const Inventory = () => {
                 const response = await api.get('/inventory/lists');
                 if (response.data.data) {
                     const inventoryData = response.data.data;
-                    console.log("Hello",inventoryData);
                     if (Array.isArray(inventoryData)) {
                         const processedInventoryList = inventoryData.map(monthData => {
                             const inventoryItems = monthData.inventory_info.map((item: any) => {

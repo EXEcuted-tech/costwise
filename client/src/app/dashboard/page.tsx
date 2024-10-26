@@ -115,7 +115,6 @@ const DashboardPage = () => {
   const fetchAverageCost = async () => {
     setIsLoading(true);
     const response = await api.get("/finished_goods/average_cost");
-    console.log(response.data);
     setAverageCost(parseFloat(response.data.average_cost));
     setFgPercentageChange(response.data.percentage_change);
     setFgTrend(response.data.trend);
@@ -125,14 +124,12 @@ const DashboardPage = () => {
   const fetchTotalProductionCost = async () => {
     setIsLoading(true);
     const response = await api.get("/transactions/total_production_cost");
-    console.log(response.data);
     const formattedCost = Number(
       response.data.total_production_cost
     ).toLocaleString("en-US", {
       minimumFractionDigits: 2,
       maximumFractionDigits: 2,
     });
-    console.log(formattedCost);
     setTotalProductionCost(formattedCost);
     setProductCostPercentageChange(response.data.percentage_change);
     setProductCostTrend(response.data.trend);
@@ -142,7 +139,6 @@ const DashboardPage = () => {
   const fetchMaterialCostUtilization = async () => {
     setIsLoading(true);
     const response = await api.get("/materials/material_cost_utilization");
-    console.log(response.data);
     setMaterialCost(response.data.material_cost_utilization);
     setMaterialCostPercentageChange(response.data.percentage_change);
     setMaterialCostTrend(response.data.trend);

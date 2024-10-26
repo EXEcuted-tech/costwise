@@ -131,8 +131,6 @@ const AddFormulationPage = () => {
                 batchQty: item.batchQty,
             }));
 
-            console.log(transformedMaterialData);
-
             const payload = {
                 fg_id: fgResponse.data.fg_id,
                 formula_code: finishedGood.formula,
