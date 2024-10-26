@@ -166,7 +166,7 @@ const ProjectedCostPage = () => {
                 {yearList.map((date) => (
                   <li
                     key={date.year}
-                    className={`px-[2px] py-[2px] mx-[0.1em] cursor-pointer hover:shadow-lg text-[20px] text-black dark:text-white ${activeStart === date.year ? "shadow-lg bg-gray-50" : " "
+                    className={`px-[2px] py-[2px] mx-[0.1em] cursor-pointer hover:shadow-lg text-[20px] text-black dark:text-white ${activeStart === date.year ? "shadow-lg" : " "
                       }`}
                     onClick={() => {
                       setActiveStart(date.year);
@@ -202,7 +202,7 @@ const ProjectedCostPage = () => {
               {half.map((half, key) => (
                 <li
                   key={key}
-                  className={`px-[2px] py-[2px] mx-[0.1em] cursor-pointer hover:shadow-lg text-[20px] dark:text-white ${activeEnd === half.half ? "shadow-lg bg-gray-50" : " "
+                  className={`px-[2px] py-[2px] mx-[0.1em] cursor-pointer hover:shadow-lg text-[20px] dark:text-white ${activeEnd === half.half ? "shadow-lg" : " "
                     }`}
                   onClick={() => {
                     setActiveEnd(half.half);
@@ -217,7 +217,7 @@ const ProjectedCostPage = () => {
         </div>
         <div
           className={`${isOpen ? "flex flex-col 4xl:flex-row" : "flex flex-col 3xl:flex-row"
-            } w-[97%] h-full gap-[2%] rounded-xl mt-[10px] 2xl:mt-0 bg-white dark:bg-[#121212]`}
+            } w-[97%] h-full gap-[2%] rounded-xl mt-[10px] 2xl:mt-0 dark:bg-[#121212]`}
         >
           {/* Left Div */}
           <div
@@ -246,7 +246,7 @@ const ProjectedCostPage = () => {
           {/* Right Div */}
           <div
             className={`${isOpen ? "w-full 4xl:w-[45%]" : "w-full 3xl:w-[45%]"
-              } flex flex-col gap-[10px] h-full mt-[10px] 2xl:mt-0`}
+              } flex flex-col gap-[20px] h-full mt-[10px] 2xl:mt-0`}
           >
             <div
               className={`${isOpen

@@ -197,6 +197,25 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
         const file = event.target.files?.[0];
         if (file) {
             handleFileUpload(file);
+            const fullName = `${user.first_name} ${user.middle_name ? user.middle_name.charAt(0) + '. ' : ''} ${user.last_name}`;
+            const users = localStorage.getItem('currentUser');
+            const parsedUser = JSON.parse(users || '{}');
+
+            const auditData = {
+            userId: parsedUser?.userId,
+            action: 'general',
+            act: 'others_photo',
+            fileName: fullName,
+            };
+
+            api.post('/auditlogs/logsaudit', auditData)
+            .then(response => {
+                console.log('Audit log created successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error audit logs:', error);
+            });
+
         }
     };
 
@@ -319,7 +338,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
 
             setAlertMessages([response.data.message]);
             setAlertStatus('success');
-            const fullName = `${user.first_name} ${user.last_name}`;
+            const fullName = `${user.first_name} ${user.middle_name ? user.middle_name.charAt(0) + '. ' : ''} ${user.last_name}`;
 
             const userRetrieved = localStorage.getItem('currentUser');
             const parsedUser = JSON.parse(userRetrieved || '{}');
@@ -330,7 +349,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
                 act: 'edit_user',
                 fileName: fullName
             };
-
+            console.log(fullName);
             api.post('/auditlogs/logsaudit', auditData)
                 .then(response => {
                     console.log('Audit log created successfully:', response.data);

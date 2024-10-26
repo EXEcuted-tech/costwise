@@ -102,6 +102,23 @@ const ProfilePage = () => {
 
     const handleCameraClick = () => {
         fileInputRef.current?.click();
+
+        const user = localStorage.getItem('currentUser');
+        const parsedUser = JSON.parse(user || '{}');
+
+        const auditData = {
+          userId: parsedUser?.userId,
+          action: 'general',
+          act: 'photo',
+        };
+
+        api.post('/auditlogs/logsaudit', auditData)
+          .then(response => {
+            console.log('Audit log created successfully:', response.data);
+          })
+          .catch(error => {
+            console.error('Error audit logs:', error);
+          });
     };
 
     const handleLogout = async () => {
