@@ -136,8 +136,6 @@ class AuditLogController extends Controller
 
             $spreadsheet = new Spreadsheet();
             $monthIndex = 0;
-            // $sheet = $spreadsheet->getActiveSheet();
-            // $sheet->setTitle('Audit Logs');
 
             foreach ($logsByMonth as $month => $monthLogs) {
                 $sheet = $monthIndex === 0 ? $spreadsheet->getActiveSheet() : $spreadsheet->createSheet($monthIndex);
@@ -145,7 +143,6 @@ class AuditLogController extends Controller
                 $this->processSheet($sheet, $monthLogs);
                 $monthIndex++;
             }
-            // $this->processSheet($sheet, $logs);
 
             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
             $fileName = 'AuditLogs_' . now()->format('Y-m-d') . '.xlsx';

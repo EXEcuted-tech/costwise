@@ -41,7 +41,7 @@ class DateHelper
             return $date->format('F Y');
         }
 
-        return 'Invalid Date'; // Change this to getResponse soon
+        return 'Invalid Date';
     }
 
     public static function formatMonth($yyyymm)
@@ -57,15 +57,13 @@ class DateHelper
             return 'Invalid Date';
         }
     
-        // Create a DateTime object using the year and month
         $date = DateTime::createFromFormat('Y-m', "$year-$month");
     
         if ($date) {
-            // Return only the month name (e.g., "January")
             return $date->format('F');
         }
     
-        return 'Invalid Date'; // Change this to getResponse soon
+        return 'Invalid Date';
     }
 }
 

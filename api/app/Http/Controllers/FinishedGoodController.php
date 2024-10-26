@@ -27,7 +27,6 @@ class FinishedGoodController extends ApiController
 
     public function retrieve(Request $request)
     {
-        // To be removed pa ang mga unnecessary fields
         $allowedColumns = [
             'fg_id',
             'fodl_id',
@@ -70,7 +69,6 @@ class FinishedGoodController extends ApiController
 
     public function retrieveFirst(Request $request)
     {
-        // Allowed columns for filtering
         $allowedColumns = [
             'fg_id',
             'fodl_id',
@@ -88,7 +86,6 @@ class FinishedGoodController extends ApiController
         $col = $request->query('col');
         $value = $request->query('value');
 
-        // Validate column
         if (!in_array($col, $allowedColumns)) {
             $this->status = 400;
             return $this->getResponse("Invalid column specified.");
@@ -329,57 +326,42 @@ class FinishedGoodController extends ApiController
         $unit = $request->input('unit');
         $formulation_no = $request->input('formulation_no');
 
-        // try {
-        // $finishedGood = FinishedGood::where('fg_code', $fg_code)
-        //     ->where('fg_desc', $fg_desc)
-        //     ->where('total_batch_qty', $total_batch_qty)
-        //     ->where('unit', $unit)
-        //     ->where('formulation_no', $formulation_no)
-        //     ->first();
+        try {
+            // $finishedGood = FinishedGood::where('fg_code', $fg_code)
+            //     ->where('fg_desc', $fg_desc)
+            //     ->where('total_batch_qty', $total_batch_qty)
+            //     ->where('unit', $unit)
+            //     ->where('formulation_no', $formulation_no)
+            //     ->first();
 
-        // if ($finishedGood) {
-        //     $this->status = 400;
-        //     return $this->getResponse("Finished Good exists!");
-        // }
-        $finishedGood = new FinishedGood();
-        $finishedGood->fg_code = $fg_code;
-        $finishedGood->fg_desc = $fg_desc;
-        $finishedGood->total_batch_qty = $total_batch_qty;
-        $finishedGood->unit = $unit;
-        $finishedGood->formulation_no = $formulation_no;
-        $finishedGood->monthYear = date('Ym');
-        $matchingFodl = Fodl::where('fg_code', $fg_code)
-            ->where('monthYear', $finishedGood->monthYear)
-            ->first();
+            // if ($finishedGood) {
+            //     $this->status = 400;
+            //     return $this->getResponse("Finished Good exists!");
+            // }
+            $finishedGood = new FinishedGood();
+            $finishedGood->fg_code = $fg_code;
+            $finishedGood->fg_desc = $fg_desc;
+            $finishedGood->total_batch_qty = $total_batch_qty;
+            $finishedGood->unit = $unit;
+            $finishedGood->formulation_no = $formulation_no;
+            $finishedGood->monthYear = date('Ym');
+            $matchingFodl = Fodl::where('fg_code', $fg_code)
+                ->where('monthYear', $finishedGood->monthYear)
+                ->first();
 
-        $finishedGood->fodl_id = $matchingFodl?->fodl_id;
+            $finishedGood->fodl_id = $matchingFodl?->fodl_id;
 
-        $finishedGood->save();
+            $finishedGood->save();
 
-        $this->status = 201;
-        $this->response['fg_id'] = $finishedGood->fg_id;
-        return $this->getResponse("Finished Good created successfully.");
-        // } catch (\Exception $e) {
-        //     $this->status = 500;
-        //     $this->response['message'] = $e->getMessage();
-        //     return $this->getResponse("An error occurred while updating the Finished Good.");
-        // }
+            $this->status = 201;
+            $this->response['fg_id'] = $finishedGood->fg_id;
+            return $this->getResponse("Finished Good created successfully.");
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = $e->getMessage();
+            return $this->getResponse("An error occurred while updating the Finished Good.");
+        }
     }
-
-    // public function getAverageCost()
-    // {
-    //     try {
-    //         $overallAverage = FinishedGood::where('is_least_cost', 1)->avg('total_cost');
-
-    //         $this->status = 200;
-    //         $this->response['average_cost'] = $overallAverage;
-    //         return $this->getResponse("Average costs for least cost products retrieved successfully.");
-    //     } catch (\Exception $e) {
-    //         $this->status = 500;
-    //         $this->response['message'] = $e->getMessage();
-    //         return $this->getResponse("An error occurred while retrieving average costs.");
-    //     }
-    // }
 
     public function getAverageCost()
     {
@@ -419,7 +401,7 @@ class FinishedGoodController extends ApiController
     public function retrieveAllFGData(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'monthYear' => 'required', // Validate monthYear
+            'monthYear' => 'required',
         ]);
 
         if ($validator->fails()) {
@@ -427,47 +409,47 @@ class FinishedGoodController extends ApiController
             return $this->getResponse($validator->errors()->first());
         }
 
-        // try {
-        $monthYear = $request->input('monthYear');
+        try {
+            $monthYear = $request->input('monthYear');
 
-        $fgData = FinishedGood::where('is_least_cost', 1)
-            ->where('monthYear', $monthYear)
-            ->get();
+            $fgData = FinishedGood::where('is_least_cost', 1)
+                ->where('monthYear', $monthYear)
+                ->get();
 
-        if ($fgData->isEmpty()) {
-            $this->status = 404;
-            $this->response['message'] = 'No finished goods found for the specified criteria.';
+            if ($fgData->isEmpty()) {
+                $this->status = 404;
+                $this->response['message'] = 'No finished goods found for the specified criteria.';
+                return $this->getResponse();
+            }
+
+            $fodlIds = $fgData->pluck('fodl_id');
+
+            $fodlData = Fodl::whereIn('fodl_id', $fodlIds)->get();
+
+            $fullfgData = $fgData->map(function ($finishedGood) use ($fodlData) {
+
+                $fodl = $fodlData->firstWhere('fodl_id', $finishedGood->fodl_id);
+                return [
+                    'fg_id' => $finishedGood->fg_id,
+                    'fodl_id' => $finishedGood->fodl_id,
+                    'fg_code' => $finishedGood->fg_code,
+                    'fg_desc' => $finishedGood->fg_desc,
+                    'rm_cost' => $finishedGood->rm_cost,
+                    'formulation_no' => $finishedGood->formulation_no,
+                    'monthYear' => $finishedGood->monthYear,
+                    'factory_overhead' => $fodl->factory_overhead,
+                    'direct_labor' => $fodl->direct_labor,
+                    'total_cost' => $finishedGood->total_cost,
+                ];
+            });
+
+            $this->status = 200;
+            $this->response['data'] = $fullfgData;
+            return $this->getResponse();
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = $e->getMessage();
             return $this->getResponse();
         }
-
-        $fodlIds = $fgData->pluck('fodl_id');
-
-        $fodlData = Fodl::whereIn('fodl_id', $fodlIds)->get();
-
-        $fullfgData = $fgData->map(function ($finishedGood) use ($fodlData) {
-
-            $fodl = $fodlData->firstWhere('fodl_id', $finishedGood->fodl_id);
-            return [
-                'fg_id' => $finishedGood->fg_id,
-                'fodl_id' => $finishedGood->fodl_id,
-                'fg_code' => $finishedGood->fg_code,
-                'fg_desc' => $finishedGood->fg_desc,
-                'rm_cost' => $finishedGood->rm_cost,
-                'formulation_no' => $finishedGood->formulation_no,
-                'monthYear' => $finishedGood->monthYear,
-                'factory_overhead' => $fodl->factory_overhead,
-                'direct_labor' => $fodl->direct_labor,
-                'total_cost' => $finishedGood->total_cost,
-            ];
-        });
-
-        $this->status = 200;
-        $this->response['data'] = $fullfgData;
-        return $this->getResponse();
-        // } catch (\Exception $e) {
-        //     $this->status = 500;
-        //     $this->response['message'] = $e->getMessage();
-        //     return $this->getResponse();
-        // }
     }
 }

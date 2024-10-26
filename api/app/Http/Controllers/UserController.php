@@ -88,7 +88,6 @@ class UserController extends ApiController
             $user->display_picture = $path;
             $user->save();
 
-            // Return the full URL
             $fullUrl = asset('storage/' . $path);
 
             return response()->json([
@@ -142,7 +141,6 @@ class UserController extends ApiController
 
             $validatedData = $validator->validated();
 
-            // Handle sys_role
             if (isset($validatedData['sys_role'])) {
                 $newRoles = is_array($validatedData['sys_role'])
                     ? $validatedData['sys_role']
@@ -150,17 +148,14 @@ class UserController extends ApiController
 
                 sort($newRoles);
 
-                // Directly set the new roles instead of merging
                 $user->sys_role = json_encode(array_values($newRoles));
             }
 
-            // Handle display_picture upload
             if ($request->hasFile('display_picture')) {
                 $path = $request->file('display_picture')->store('profile_pictures', 'public');
                 $user->display_picture = $path;
             }
 
-            // Update user attributes
             foreach ($validatedData as $key => $value) {
                 if ($key !== 'sys_role' && $key !== 'display_picture') {
                     $user->$key = $value;
@@ -190,20 +185,14 @@ class UserController extends ApiController
 
             }
 
-            //Reset password to default
             $userData['password'] = Hash::make('archived_user_'. $user->id);
 
-            // Format datetime values
             $userData['created_at'] = $user->created_at->format('Y-m-d H:i:s');
             $userData['updated_at'] = $user->updated_at->format('Y-m-d H:i:s');
 
-            Log::info('User data: ' . json_encode($userData));
-
-            //Connect to archive database
             DB::beginTransaction();
             DB::connection('archive_mysql')->table('users')->insert($userData);
 
-            //Remove from current database
             $user->delete();
 
             DB::commit();
