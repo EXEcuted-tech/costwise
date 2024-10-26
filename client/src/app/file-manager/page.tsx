@@ -281,6 +281,7 @@ const FileManagerPage = () => {
   const handleDelete = async () => {
     if (fileToDelete) {
       try {
+        setIsLoading(true);
         await api.post(`/files/delete`, { col: 'file_id', value: fileToDelete });
 
         const settings = JSON.parse(fileSettings);
@@ -302,14 +303,15 @@ const FileManagerPage = () => {
           .catch(error => {
             console.error('Error audit logs:', error);
           });
-
+          setIsLoading(false);
       } catch (error) {
         console.error('Delete failed:', error);
       } finally {
+        setIsLoading(false);
         setDeleteModal(false);
         setFileToDelete(0);
         fetchData();
-        setInfoMsg('File deleted successfully!');
+        setInfoMsg('File archived successfully!');
       }
     }
   }
@@ -346,7 +348,7 @@ const FileManagerPage = () => {
           </p>
         </div>
       }
-      {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" onProceed={handleDelete} />}
+      {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" onProceed={handleDelete} isLoading={isLoading}/>}
       <Header icon={BsFolderFill} title={"File Manager"} />
       <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px] mt-[75px] 2xl:mt-[40px]' : 'px-[50px] mt-[36px]'} ml-[45px]`}>
         <div className='flex relative'>

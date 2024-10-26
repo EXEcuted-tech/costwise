@@ -473,7 +473,7 @@ const MasterFileContainer = (data: File) => {
               setAlertMessages(['Failed to bulk archive Material IDs.']);
             }
           } catch (deleteError) {
-            setAlertMessages(['An error occurred while deleting Material records.']);
+            setAlertMessages(['An error occurred while archiving Material records.']);
           }
 
           setRemovedMaterialIds([]);
@@ -688,7 +688,7 @@ const MasterFileContainer = (data: File) => {
                 setAlertMessages([`Failed to archive materials for formulation_id ${formulation_id}.`]);
               }
             } catch (deleteMaterialError) {
-              setAlertMessages([`An error occurred while deleting materials for formulation_id ${formulation_id}.`]);
+              setAlertMessages([`An error occurred while archiving materials for formulation_id ${formulation_id}.`]);
             }
           }
         }

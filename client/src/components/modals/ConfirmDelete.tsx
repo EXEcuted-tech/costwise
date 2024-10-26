@@ -1,14 +1,16 @@
 import React from 'react';
 import { IoIosClose } from 'react-icons/io';
 import { TiWarning } from "react-icons/ti";
+import Spinner from '../loaders/Spinner';
 
 interface ConfirmDeleteProps {
     onClose: () => void;
     onProceed: () => void;
     subject: string;
+    isLoading?: boolean;
 }
 
-const ConfirmDelete: React.FC<ConfirmDeleteProps> = ({ onClose, onProceed, subject }) => {
+const ConfirmDelete: React.FC<ConfirmDeleteProps> = ({ onClose, onProceed, subject, isLoading}) => {
     return (
         <div className='flex justify-center items-center z-[1500] w-full h-full fixed top-0 left-0 p-4 overflow-auto backdrop-brightness-50'>
             <div className="flex flex-col w-[28rem] min-h-[380px] mx-[50px] px-3 py-2 bg-white dark:bg-[#5e5e5e] rounded-[20px] animate-pop-out drop-shadow">
@@ -35,7 +37,8 @@ const ConfirmDelete: React.FC<ConfirmDeleteProps> = ({ onClose, onProceed, subje
                         <div className='my-[20px] px-[50px] grid grid-cols-2 gap-4'>
                             <div className="relative inline-flex bg-white border-1 border-primary overflow-hidden text-primary flex items-center justify-center rounded-[30px] cursor-pointer transition-all rounded group"
                                 onClick={onProceed}>
-                                <button className="text-[19px] font-black before:ease relative h-12 w-40 overflow-hidden bg-primary text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-primary hover:before:-translate-x-40">
+                                <button className="flex justify-center items-center text-[19px] font-black before:ease relative h-12 w-40 overflow-hidden bg-primary text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-primary hover:before:-translate-x-40">
+                                    {isLoading && <Spinner className='size-[10px] mr-[5px]'/>}
                                     <span className="relative z-10">Proceed</span>
                                 </button>
                             </div>

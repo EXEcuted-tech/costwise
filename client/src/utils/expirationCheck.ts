@@ -33,11 +33,24 @@ export const refreshToken = async (): Promise<boolean> => {
 
         return true;
     } catch (error) {
-        console.log("Log you out on Protected Route 4:");
-        localStorage.clear();
-        await removeTokens();
-        window.location.href = '/'; 
-        return false;
+        const refreshToken = localStorage.getItem('refreshToken');
+        const response = await axios.post(`${config.API}/api/refresh`, null, {
+            headers: {
+                Authorization: `Bearer ${refreshToken}`
+            }
+        });
+        if (response.data.status != 401) {
+            const { access_token, refresh_token, access_token_expiration } = response.data;
+            localStorage.setItem('accessToken', access_token);
+            localStorage.setItem('refreshToken', refresh_token);
+            localStorage.setItem('tokenExpiresAt', access_token_expiration);
+        } 
+        return true;
+        // console.log("Log you out on Protected Route 4:");
+        // localStorage.clear();
+        // await removeTokens();
+        // window.location.href = '/'; 
+        // return false;
     }
 };
 

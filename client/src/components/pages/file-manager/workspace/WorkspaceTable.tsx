@@ -43,12 +43,15 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
 
     const [initialData, setInitialData] = useState<Record<string, any>[]>([]);
 
-    useEffect(() => {
-        if (initialData.length === 0) {
-            setInitialData(data);
-            setTableData(data);
-        }
-    }, [data, initialData.length]);
+    // useEffect(() => {
+    //     if (initialData.length === 0) {
+    //         setInitialData(data);
+    //         setTableData(data);
+    //     }
+    // }, [data, initialData.length]);
+    useEffect(()=>{
+        setTableData(data);
+    },[data])
 
     const handleInputChange = (rowIndex: number, key: string, value: string) => {
         const updatedData = [...tableData];
