@@ -370,8 +370,8 @@ function TrainingModel() {
         <div className="mx-auto p-5 flex flex-col xl:flex-row gap-6 h-[90%]">
           {/* Left Section */}
           <div className="w-[500px] flex-1 bg-white shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
-            <h2 className="flex items-center 2xl:text-2xl text-4xl font-semibold text-primary mb-4 xl:mb-2">
-              <MdModelTraining className="2xl:text-4xl text-4xl font-semibold text-primary mr-2" />
+            <h2 className="flex items-center 3xl:text-[20px] text-2xl font-semibold text-primary mb-4 xl:mb-2">
+              <MdModelTraining className="3xl:text-4xl text-3xl font-semibold text-primary mr-2" />
               Training Duration
             </h2>
             <p className="text-5xl font-bold text-primary">
@@ -383,8 +383,8 @@ function TrainingModel() {
           </div>
 
           <div className="flex-1 bg-white shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
-            <h2 className="flex items-center 2xl:text-2xl text-4xl font-semibold text-primary mb-4 xl:mb-2">
-              <MdOutlineCalculate className="2xl:text-4xl text-4xl font-semibold text-primary mr-2" />
+            <h2 className="flex items-center 3xl:text-[20px] text-2xl font-semibold text-primary mb-4 xl:mb-2">
+              <MdOutlineCalculate className="3xl:text-4xl text-3xl font-semibold text-primary mr-2" />
               Average Loss
             </h2>
             <p className="text-5xl font-bold text-primary">
@@ -396,8 +396,8 @@ function TrainingModel() {
           </div>
 
           {/* Right Section */}
-          <div className="flex-1 bg-primary shadow-lg rounded-lg p-4 grid grid-cols-1 gap-4 items-center justify-center">
-            <h2 className="flex items-center text-2xl font-semibold text-white">
+          <div className="flex-1 bg-primary shadow-lg rounded-lg p-2 grid grid-cols-1 gap-4 items-center justify-center">
+            <h2 className="flex items-center text-xl font-semibold text-white">
               <MdOnlinePrediction className="text-4xl font-semibold text-white mr-2" />
               Total Cost Prediction
             </h2>

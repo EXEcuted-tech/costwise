@@ -13,7 +13,7 @@ import api from '@/utils/api';
 import Alert from "@/components/alerts/Alert";
 import { useRouter } from 'next/navigation';
 import ConfirmChanges from '@/components/modals/ConfirmChanges';
-import AddUserRoles from '@/components/pages/user-management/AddUserRoles';
+import AddUserRoles from '@/components/pages/user-management/addUserRoles';
 // import dotenv from "dotenv";
 import { useUserContext } from '@/contexts/UserContext';
 
