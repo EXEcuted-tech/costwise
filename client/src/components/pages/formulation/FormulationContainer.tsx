@@ -213,16 +213,17 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                         <div className={`${isOpen? '3xl:px-[20px]' : '3xl:px-[20px]'} w-full font-lato bg-white dark:bg-[#3C3C3C] mt-[20px] rounded-lg drop-shadow-lg mb-[20px]`}>
                             <table className='w-full'>
                                 <thead className='border-b border-b-[#c4c4c4]'>
-                                    <tr className='text-[#777777] font-bold xl:text-[14px] 2xl:text-[18px] dark:text-[#d1d1d1]'>
+                                    <tr className='text-[#777777] font-bold xl:text-[14px] 2xl:text-[16px] 3xl:text-[18px] dark:text-[#d1d1d1]'>
                                         <th className='py-[10px] px-[8px] 2xl:px-[15px] text-left'>FORMULA CODE</th>
-                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-left`}>ITEM CODE</th>
-                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-left`}>DESCRIPTION</th>
-                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-left`}>UNIT</th>
-                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-center`}>FORMULATION NO.</th>
-                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-left`}>MONTH-YEAR</th>
-                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-right`}>BATCH QTY.</th>
-                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' } text-right`}>COST</th>
-                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[8px]' }`}>MANAGE</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[5px]' } text-left`}>ITEM CODE</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[5px]' } text-left`}>DESCRIPTION</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[5px]' } text-left`}>UNIT</th>
+                                        <th className={`${isOpen? '2xl:px-[8px]' : 'px-[5px]' } hidden 2xl:flex text-center mt-2.5`}>FORMULATION NO.</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[5px]' } flex 2xl:hidden text-center mt-[8px]`}>NO.</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[5px]' } text-left`}>MONTH-YEAR</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[5px]' } text-right`}>BATCH QTY.</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[5px]' } text-right`}>COST</th>
+                                        <th className={`${isOpen? 'px-[5px] 2xl:px-[8px]' : 'px-[5px]' }`}>MANAGE</th>
                                     </tr>
                                 </thead>
                                 <tbody>
