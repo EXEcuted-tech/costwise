@@ -58,7 +58,7 @@ class AuditLogController extends Controller
                         $description = "$firstName $middleInitial $lastName archived user $fileName.";
                         break;
                     default:
-                        $description = "";
+                        $description = "Unknown source or action.";
                         break;
                 }
             }
@@ -84,7 +84,7 @@ class AuditLogController extends Controller
                         $description = "$firstName $middleInitial $lastName archived the entire inventory list.";
                         break;     
                     default:
-                        $description = "";
+                        $description = "Unknown source or action.";
                         break;
                 }
             }
@@ -103,8 +103,11 @@ class AuditLogController extends Controller
                     case "formulation_file":
                         $description = "$firstName $middleInitial $lastName exported $fileName.";
                         break;
+                    case "logs":
+                        $description = "$firstName $middleInitial $lastName exported all existing audit logs.";
+                        break;
                     default:
-                        $description = "";
+                        $description = "Unknown source or action.";
                         break;
                 }
             }
@@ -133,8 +136,6 @@ class AuditLogController extends Controller
 
             $spreadsheet = new Spreadsheet();
             $monthIndex = 0;
-            // $sheet = $spreadsheet->getActiveSheet();
-            // $sheet->setTitle('Audit Logs');
 
             foreach ($logsByMonth as $month => $monthLogs) {
                 $sheet = $monthIndex === 0 ? $spreadsheet->getActiveSheet() : $spreadsheet->createSheet($monthIndex);
@@ -142,7 +143,6 @@ class AuditLogController extends Controller
                 $this->processSheet($sheet, $monthLogs);
                 $monthIndex++;
             }
-            // $this->processSheet($sheet, $logs);
 
             $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
             $fileName = 'AuditLogs_' . now()->format('Y-m-d') . '.xlsx';

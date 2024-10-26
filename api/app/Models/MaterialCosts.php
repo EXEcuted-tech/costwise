@@ -8,9 +8,6 @@ use Illuminate\Database\Eloquent\Model;
 class MaterialCosts extends Model
 {
     use  HasFactory;
-    //=====================
-    //  Will Be Replaced
-    //=====================
 
     protected $table = 'models';
     protected $primaryKey = 'model_id';

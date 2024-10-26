@@ -87,7 +87,6 @@ class TransactionController extends ApiController
             $this->response['data'] = $result;
             return $this->getResponse();
         } catch (\Exception $e) {
-            // Handle exceptions and return error message
             $this->status = 500;
             $this->response['message'] = $e->getMessage();
             return $this->getResponse();
@@ -307,7 +306,6 @@ class TransactionController extends ApiController
         } else if ($transaction->material_id != null) {
             $material = Material::find($transaction->material_id);
             if ($material) {
-                // Check if this material is referenced by other transactions or in master files
                 $otherReferences = Transaction::where('material_id', $material->material_id)
                     ->where('transaction_id', '!=', $transactionId)
                     ->exists();

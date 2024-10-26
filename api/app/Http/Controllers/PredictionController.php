@@ -130,7 +130,6 @@ class PredictionController extends ApiController
             $prediction = Prediction::where('monthYear', $monthYear)->get();
 
             if ($prediction) {
-                // If a prediction is found, return it
                 $this->status = 200;
                 $this->response['data'] = $prediction;
                 $this->response['message'] = "Prediction retrieved successfully.";

@@ -49,7 +49,7 @@ const AuditLogPage = () => {
     const { drawerOpen, setDrawerOpen } = useDrawerContext();
     const { isOpen, setIsOpen } = useSidebarContext();
     const { currentUser, setCurrentUser, setError } = useUserContext();
-    const [isLoading, setIsLoading] = useState(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [exportLoading, setExportLoading] = useState(false);
 
     const [selectedData, setSelectedData] = useState<AuditTableProps | null>(null);
@@ -72,6 +72,7 @@ const AuditLogPage = () => {
     };
 
     const fetchData = async () => {
+        setIsLoading(true);
         try {
             const res = await api.get('/auditlogs');
             const logs = res.data.map((log: any) => ({
@@ -165,8 +166,8 @@ const AuditLogPage = () => {
 
         const auditData = {
             userId: parsedUser?.userId,
-            action: 'export',
-            act: 'all files',
+            action: "export",
+            act: "logs",
         };
 
         api.post('/auditlogs/logsaudit', auditData)
@@ -269,41 +270,42 @@ const AuditLogPage = () => {
                             </tr>
                         </thead>
                         <tbody className="">
-                            {currentListPage.length > 0 ? currentListPage.map((auditLogs, index) => (
-                                <tr key={index} className={`${isLoading ? 'hidden' : 'flex w-full h-[74px] items-center text-[14px] 4xl:text-[18px] pl-[15px] 4xl:pl-[20px] py-[7px] dark:bg-[#3C3C3C] dark:text-[#d1d1d1] 4xl:py-[10px] border-b border-x border-black dark:border-[#d1d1d1] border-opacity-[50%] bg-white'} ${index === currentListPage.length - 1 ? 'rounded-b-xl' : ''}`}>
-                                    <td className="w-[27.5%]">
-                                        {auditLogs.dateTimeAdded.toLocaleString()}
-                                    </td>
-                                    <td className="flex flex-col w-[23.5%]">
-                                        #{auditLogs.employeeNo}
-                                    </td>
-                                    <td className="flex w-[34.5%] 4xl:w-[37.5%] text-[14px] 4xl:text-[18px] items-center break-all">
-                                        <span className="font-bold uppercase">
-                                            {auditLogs.actionEvent}:<span className="ml-1 font-normal normal-case">{auditLogs.description}</span>
-                                        </span>
+                            {!isLoading ? (
+                                currentListPage.length > 0 ? currentListPage.map((auditLogs, index) => (
+                                    <tr key={index} className={`${isLoading ? 'hidden' : 'flex w-full h-[74px] items-center text-[14px] 4xl:text-[18px] pl-[15px] 4xl:pl-[20px] py-[7px] dark:bg-[#3C3C3C] dark:text-[#d1d1d1] 4xl:py-[10px] border-b border-x border-black dark:border-[#d1d1d1] border-opacity-[50%] bg-white'} ${index === currentListPage.length - 1 ? 'rounded-b-xl' : ''}`}>
+                                        <td className="w-[27.5%]">
+                                            {auditLogs.dateTimeAdded.toLocaleString()}
+                                        </td>
+                                        <td className="flex flex-col w-[23.5%]">
+                                            #{auditLogs.employeeNo}
+                                        </td>
+                                        <td className="flex w-[34.5%] 4xl:w-[37.5%] text-[14px] 4xl:text-[18px] items-center break-all">
+                                            <span className="font-bold uppercase">
+                                                {auditLogs.actionEvent}:<span className="ml-1 font-normal normal-case">{auditLogs.description}</span>
+                                            </span>
 
-                                    </td>
-                                    <td className="flex items-center">
-                                        <span onClick={() => handleShowMore(auditLogs)} className="cursor-pointer font-bold text-primary hover:text-[#851818] transition-colors duration-300 ease-in-out">
-                                            Show More
-                                        </span>
-                                    </td>
-                                </tr>
-                            )) :
-                                (
-                                    <tr className="py-[7px] 4xl:py-[100px]">
-                                        <td colSpan={4} className='h-[74px] border-b border-x rounded-b-xl border-black border-opacity-[50%] bg-white dark:bg-[#3C3C3C] dark:text-[#d1d1d1] flex justify-center items-center py-4'>
-                                            {isLoading ?
-                                                (
-                                                    <Spinner className="!size-[30px]" />
-                                                ) :
-                                                (
-                                                    <p>No logs available.</p>
-                                                )
-                                            }
+                                        </td>
+                                        <td className="flex items-center">
+                                            <span onClick={() => handleShowMore(auditLogs)} className="cursor-pointer font-bold text-primary hover:text-[#851818] transition-colors duration-300 ease-in-out">
+                                                Show More
+                                            </span>
                                         </td>
                                     </tr>
-                                )}
+                                )) :
+                                    (
+                                        <tr className="py-[7px] 4xl:py-[100px]">
+                                            <td colSpan={4} className='h-[74px] border-b border-x rounded-b-xl border-black border-opacity-[50%] bg-white dark:bg-[#3C3C3C] dark:text-[#d1d1d1] flex justify-center items-center py-4'>
+                                                <p>No logs available.</p>
+                                            </td>
+                                        </tr>
+                                    )
+                            ) : (
+                                <tr className="py-[7px] 4xl:py-[100px]">
+                                    <td colSpan={4} className='h-[74px] border-b border-x rounded-b-xl border-black border-opacity-[50%] bg-white dark:bg-[#3C3C3C] dark:text-[#d1d1d1] flex justify-center items-center py-4'>
+                                        <Spinner className="!size-[30px]" />
+                                    </td>
+                                </tr>
+                            )}
                         </tbody>
                     </table>
                     <div className={`${isLoading ? 'hidden' : 'relative py-[1%]'}`}>
