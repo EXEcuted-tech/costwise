@@ -165,7 +165,7 @@ function LoginPage() {
               </div>
               <div className="flex items-center justify-center h-[15%]">
                 <FaAt className="mr-[1%]" />
-                <p>example.virginia.com</p>
+                <p>customercare@virginiafood.com.ph</p>
               </div>
             </div>
           </div>

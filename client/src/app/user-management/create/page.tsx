@@ -518,6 +518,7 @@ const AccountCreation = () => {
                                                 <option value="cost accounting">Cost Accounting</option>
                                                 <option value="human resources">Human Resources</option>
                                                 <option value="research development">Research & Development</option>
+                                                <option value="research development">IT Department</option>
                                             </select>
                                         </div>
                                     </div>

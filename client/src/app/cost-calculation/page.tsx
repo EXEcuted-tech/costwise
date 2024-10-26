@@ -39,7 +39,9 @@ const CostCalculation = () => {
   const [allFGData, setAllFGData] = useState<AllFinishedGood[]>([]);
   const [fileName, setFileName] = useState<string>("sample");
   const [exportType, setExportType] = useState<string>("xlsx");
-  const [selectedGoods, setSelectedGoods] = useState<{ id: number; name: string }[]>([]);
+  const [selectedGoods, setSelectedGoods] = useState<
+    { id: number; name: string }[]
+  >([]);
   const [sheets, setSheets] = useState<
     { id: number; data: SpecificFinishedGood | null }[]
   >([{ id: 0, data: null }]);
@@ -100,11 +102,9 @@ const CostCalculation = () => {
   // Sheet functions
   const handleAddSheet = () => {
     setSheets((prevSheets) => {
-      if ((prevSheets.length >= FGOptions.length) && prevSheets.length != 0) {
+      if (prevSheets.length >= FGOptions.length && prevSheets.length != 0) {
         if (FGOptions.length == 0) {
-          setAlertMessages([
-            "Choose Month Year first!",
-          ]);
+          setAlertMessages(["Choose Month Year first!"]);
           setAlertStatus("critical");
         } else {
           setAlertMessages([
@@ -122,21 +122,20 @@ const CostCalculation = () => {
         const newId = Math.max(...prevSheets.map((sheet) => sheet.id), 0) + 1;
         return [...prevSheets, { id: newId, data: null }];
       }
-      setAlertMessages([
-        "Choose a Finished Good first!",
-      ]);
+      setAlertMessages(["Choose a Finished Good first!"]);
       setAlertStatus("critical");
       return prevSheets;
     });
   };
 
   const handleRemoveSheet = (id: number) => {
-
-    const sheetToRemove = sheets.find(sheet => sheet.id === id);
+    const sheetToRemove = sheets.find((sheet) => sheet.id === id);
     setSheets(sheets.filter((sheet) => sheet.id !== id));
     if (sheetToRemove) {
-      setSelectedGoods(prev => {
-        return prev.filter(goodId => goodId.name !== sheetToRemove.data?.desc);
+      setSelectedGoods((prev) => {
+        return prev.filter(
+          (goodId) => goodId.name !== sheetToRemove.data?.desc
+        );
       });
     }
   };
@@ -149,30 +148,32 @@ const CostCalculation = () => {
         (sheet) => sheet.data?.code === data.code
       );
 
-      const newSheets = existingIndex !== -1
-        ? prevSheets.map((sheet, index) =>
-          index === existingIndex ? { ...sheet, data } : sheet
-        )
-        : prevSheets.map((sheet) =>
-          sheet.id === id ? { ...sheet, data } : sheet
-        );
+      const newSheets =
+        existingIndex !== -1
+          ? prevSheets.map((sheet, index) =>
+              index === existingIndex ? { ...sheet, data } : sheet
+            )
+          : prevSheets.map((sheet) =>
+              sheet.id === id ? { ...sheet, data } : sheet
+            );
 
       previousSheets.forEach((previousSheet, index) => {
-        if ((previousSheet.data === null || newSheets[index].data === null)) {
+        if (previousSheet.data === null || newSheets[index].data === null) {
           return;
         }
 
         if (previousSheet.data !== null && newSheets[index].data !== null) {
-          if (previousSheet.data.desc != newSheets[index].data?.desc) {
-            setSelectedGoods(prev => {
-              return prev.filter(goodId => goodId.name !== previousSheet.data?.desc);
+          if (previousSheet.data.desc != newSheets[index].data.desc) {
+            setSelectedGoods((prev) => {
+              return prev.filter(
+                (goodId) => goodId.name !== previousSheet.data?.desc
+              );
             });
           }
         }
       });
       return newSheets;
     });
-
   };
 
   const handleMonthYear = (value: string, label: string) => {
@@ -219,7 +220,12 @@ const CostCalculation = () => {
 
     if (
       selectedFG === "All-FG" &&
-      !costData.some((entry) => entry.monthYear === currentMonthYear)
+      !costData.some((entry) => entry.monthYear === currentMonthYear) &&
+      costData[0].products.every((product) =>
+        allFGData.some(
+          (allFGProduct) => product.productName == allFGProduct.fg_desc
+        )
+      )
     ) {
       setPrompt(true);
     } else {
@@ -230,10 +236,16 @@ const CostCalculation = () => {
   const promptProceed = () => {
     setPrompt(false);
     setIsLoading(true);
-    const products: Product[] = allFGData.map((fg) => ({
-      productName: fg.fg_desc,
-      cost: parseFloat(fg.total_cost) || 0,
-    }));
+    const products: Product[] = allFGData
+      .filter((fg) =>
+        costData[0].products.some(
+          (product) => product.productName === fg.fg_desc
+        )
+      )
+      .map((fg) => ({
+        productName: fg.fg_desc,
+        cost: parseFloat(fg.total_cost) || 0,
+      }));
 
     let newData: CostDataEntry = {
       monthYear: currentMonthYear,
@@ -243,8 +255,7 @@ const CostCalculation = () => {
     const updatedCostData = [...costData, newData];
     setCostData(updatedCostData);
     updateTraininingData(updatedCostData);
-    exportFile(allFGData);
-  }
+  };
 
   const exportFile = async (sheetData: any) => {
     try {
@@ -272,25 +283,6 @@ const CostCalculation = () => {
         setExportLoading(false);
         setAlertMessages(["Report exported successfully."]);
         setAlertStatus("success");
-
-        const user = localStorage.getItem('currentUser');
-        const parsedUser = JSON.parse(user || '{}');
-
-        const auditData = {
-            userId: parsedUser?.userId,
-            action: 'crud',
-            act: 'files',
-            fileName: fileName,
-        };
-
-        api.post('/auditlogs/logsaudit', auditData)
-            .then(response => {
-                console.log('Audit log created successfully:', response.data);
-            })
-            .catch(error => {
-                console.error('Error audit logs:', error);
-            });
-
       } else {
         setExportLoading(false);
         setAlertMessages(["Error exporting workbook:", response.data.message]);
@@ -300,7 +292,7 @@ const CostCalculation = () => {
       setExportLoading(false);
       console.error("Error exporting workbook:", error);
     }
-  }
+  };
 
   const updateTraininingData = async (updatedData: any[]) => {
     setIsLoading(true);
@@ -409,20 +401,25 @@ const CostCalculation = () => {
 
   return (
     <>
-      {prompt && <ConfirmTraining setConfirmDialog={setPrompt} onProceed={promptProceed} />}
+      {prompt && (
+        <ConfirmTraining
+          setConfirmDialog={setPrompt}
+          onProceed={promptProceed}
+        />
+      )}
       {isLoading && <TrainingLoader />}
-      {(exportLoading) &&
-        <div className='fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-brightness-50 z-[1500]'>
+      {exportLoading && (
+        <div className="fixed top-0 left-0 w-full h-full flex flex-col justify-center items-center backdrop-brightness-50 z-[1500]">
           <div className="three-body">
             <div className="three-body__dot"></div>
             <div className="three-body__dot"></div>
             <div className="three-body__dot"></div>
           </div>
-          <p className='text-primary font-light text-[20px] mt-[10px] text-white'>
+          <p className="text-primary font-light text-[20px] mt-[10px] text-white">
             Exporting file(s)...
           </p>
         </div>
-      }
+      )}
       <div className="fixed top-4 right-4 z-50">
         <div className="flex flex-col items-end space-y-2">
           {alertMessages &&
@@ -431,146 +428,147 @@ const CostCalculation = () => {
                 className="!relative"
                 variant={
                   alertStatus as
-                  | "default"
-                  | "information"
-                  | "warning"
-                  | "critical"
-                  | "success"
-                  | undefined
+                    | "default"
+                    | "information"
+                    | "warning"
+                    | "critical"
+                    | "success"
+                    | undefined
                 }
                 key={index}
                 message={msg}
                 setClose={() => {
-                  setAlertMessages((prev) => prev.filter((_, i) => i !== index));
+                  setAlertMessages((prev) =>
+                    prev.filter((_, i) => i !== index)
+                  );
                 }}
               />
             ))}
         </div>
       </div>
-      <div className="w-full">
-        <div>
-          <Header icon={BiSolidReport} title="Cost Calculation" />
-        </div>
-        <div className="flex mt-[30px] ml-[80px] mr-[35px]">
-          <div className="w-[30rem] pb-8">
-            {/* Date Range */}
-            <div className="flex">
-              <div className="text-[19px] mr-5 pt-4 dark:text-white">
-                Month & Year{" "}
-                <span className="text-[#B22222] ml-1 font-bold">*</span>
-              </div>
+
+      <Header icon={BiSolidReport} title="Cost Calculation" />
+
+      <div className="flex mt-[30px] ml-[80px] mr-[35px]">
+        <div className="w-[30rem] pb-8">
+          {/* Date Range */}
+          <div className="flex">
+            <div className="text-[19px] mr-5 pt-4">
+              Month & Year{" "}
+              <span className="text-[#B22222] ml-1 font-bold">*</span>
             </div>
-            <div className="mt-2">
-              <BiCalendarEvent className="absolute text-[30px] dark:text-[#d1d1d1] text-[#6b6b6b82] mt-[6px] ml-2 z-[3]" />
-              <select
-                className="w-[220px] h-[45px] text-[21px] pl-[42px] pr-4 text-[#000000] dark:text-white bg-white dark:bg-[#3C3C3C] border-1 border-[#929090] rounded-md drop-shadow-md cursor-pointer"
-                name="Month & Year"
-                defaultValue=""
-                onChange={(e) =>
-                  handleMonthYear(
-                    e.target.value,
-                    e.target.options[e.target.selectedIndex].text
-                  )
-                }
-              >
-                <option value="" disabled>
-                  mm-yyyy
+          </div>
+          <div className="mt-2">
+            <BiCalendarEvent className="absolute text-[30px] text-[#6b6b6b82] mt-[6px] ml-2 z-[3]" />
+            <select
+              className="w-[220px] h-[45px] text-[21px] pl-[42px] pr-4 text-[#000000] bg-white border-1 border-[#929090] rounded-md drop-shadow-md cursor-pointer"
+              name="Month & Year"
+              defaultValue=""
+              onChange={(e) =>
+                handleMonthYear(
+                  e.target.value,
+                  e.target.options[e.target.selectedIndex].text
+                )
+              }
+            >
+              <option value="" disabled>
+                mm-yyyy
+              </option>
+              {monthYearOptions.map((option, index) => (
+                <option key={index} value={option.value}>
+                  {option.label}
                 </option>
-                {monthYearOptions.map((option, index) => (
-                  <option key={index} value={option.value} className="dark:text-white">
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {/* FG Selector */}
-            <div className="flex mt-4">
-              <div
-                onClick={() => handleFGClick("Specific-FG")}
-                className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-l-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                    ${selectedFG === "Specific-FG"
-                    ? "bg-[#B22222] text-white"
-                    : "bg-white hover:bg-[#ebebeb] dark:bg-[#3C3C3C] dark:text-white text-black transition-colors duration-200 ease-in-out"
-                  }`}
-              >
-                Specific-FG
-              </div>
-              <div
-                onClick={() => handleFGClick("All-FG")}
-                className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-r-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                    ${selectedFG === "All-FG"
-                    ? "bg-[#B22222] text-white"
-                    : "bg-white hover:bg-[#ebebeb] dark:bg-[#3C3C3C] dark:text-white text-black transition-colors duration-200 ease-in-out"
-                  }`}
-              >
-                All-FG
-              </div>
-            </div>
+              ))}
+            </select>
           </div>
-
-          <div className="flex flex-col ml-auto">
-            {/* Export Button */}
-            <div className="flex ml-auto">
-              <div className="text-[19px] mr-5 pt-4 dark:text-white">Export File</div>
+          {/* FG Selector */}
+          <div className="flex mt-4">
+            <div
+              onClick={() => handleFGClick("Specific-FG")}
+              className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-l-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
+                                    ${
+                                      selectedFG === "Specific-FG"
+                                        ? "bg-[#B22222] text-white"
+                                        : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
+                                    }`}
+            >
+              Specific-FG
             </div>
-            <div className="flex mt-2 ml-auto">
-              <select
-                className="w-[95px] h-[45px] text-[21px] pl-[10px] text-[#000000] bg-white dark:bg-[#3C3C3C] dark:text-white border-1 border-[#929090] rounded-l-md drop-shadow-md cursor-pointer"
-                name="fromDate"
-                value={exportType}
-                onChange={(e) => setExportType(e.target.value)}
-              >
-                <option value="xlsx">XLSX</option>
-                <option value="csv">CSV</option>
-              </select>
-
-              <button
-                className="w-[40px] h-[45px] bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out px-[5px] rounded-r-md cursor-pointer"
-                onClick={handleExport}
-              >
-                <MdDownloadForOffline className="text-white text-[30px] hover:animate-shake-tilt" />
-              </button>
-            </div>
-
-            {/* Add Sheet Button */}
-            <div className="h-[45px] mt-4">
-              {selectedFG === "Specific-FG" && (
-                <div
-                  onClick={handleAddSheet}
-                  className="flex items-center w-[170px] px-4 h-[45px] text-white bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out rounded-md cursor-pointer"
-                >
-                  <IoMdAdd className="text-[28px] mr-3" />{" "}
-                  <p className="text-[21px] font-bold">FG Sheet</p>
-                </div>
-              )}
+            <div
+              onClick={() => handleFGClick("All-FG")}
+              className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-r-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
+                                    ${
+                                      selectedFG === "All-FG"
+                                        ? "bg-[#B22222] text-white"
+                                        : "bg-white hover:bg-[#ebebeb] text-black transition-colors duration-200 ease-in-out"
+                                    }`}
+            >
+              All-FG
             </div>
           </div>
         </div>
 
-        <div className="bg-background dark:bg-[#1E1E1E] pb-[15px]">
-          {selectedFG === "All-FG" ? (
-            <AllFG
-              title={`Cost Summary Report: ${monthYear.label}`}
+        <div className="flex flex-col ml-auto">
+          {/* Export Button */}
+          <div className="flex ml-auto">
+            <div className="text-[19px] mr-5 pt-4">Export File</div>
+          </div>
+          <div className="flex mt-2 ml-auto">
+            <select
+              className="w-[95px] h-[45px] text-[21px] pl-[10px] text-[#000000] bg-white border-1 border-[#929090] rounded-l-md drop-shadow-md cursor-pointer"
+              name="fromDate"
+              value={exportType}
+              onChange={(e) => setExportType(e.target.value)}
+            >
+              <option value="xlsx">XLSX</option>
+              <option value="csv">CSV</option>
+            </select>
+
+            <button
+              className="w-[40px] h-[45px] bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out px-[5px] rounded-r-md cursor-pointer"
+              onClick={handleExport}
+            >
+              <MdDownloadForOffline className="text-white text-[30px] hover:animate-shake-tilt" />
+            </button>
+          </div>
+
+          {/* Add Sheet Button */}
+          <div className="h-[45px] mt-4">
+            {selectedFG === "Specific-FG" && (
+              <div
+                onClick={handleAddSheet}
+                className="flex items-center w-[170px] px-4 h-[45px] text-white bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out rounded-md cursor-pointer"
+              >
+                <IoMdAdd className="text-[28px] mr-3" />{" "}
+                <p className="text-[21px] font-bold">FG Sheet</p>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-background pb-[15px]">
+        {selectedFG === "All-FG" ? (
+          <AllFG
+            title={`Cost Summary Report: ${monthYear.label}`}
+            isOpen={isOpen}
+            sheetData={allFGData}
+          />
+        ) : (
+          sheets.map((sheet) => (
+            <SpecificFG
+              key={sheet.id}
+              id={sheet.id}
+              removeSheet={handleRemoveSheet}
+              updateSheetData={updateSheetData}
               isOpen={isOpen}
-              sheetData={allFGData}
+              monthYear={monthYear}
+              FGOptions={FGOptions}
+              setSelectedGoods={setSelectedGoods}
+              selectedGoods={selectedGoods}
             />
-          ) : (
-            sheets.map((sheet) => (
-              <SpecificFG
-                key={sheet.id}
-                id={sheet.id}
-                removeSheet={handleRemoveSheet}
-                updateSheetData={updateSheetData}
-                isOpen={isOpen}
-                monthYear={monthYear}
-                FGOptions={FGOptions}
-                setSelectedGoods={setSelectedGoods}
-                selectedGoods={selectedGoods}
-              />
-            ))
-          )
-          }
-        </div>
+          ))
+        )}
       </div>
     </>
   );
