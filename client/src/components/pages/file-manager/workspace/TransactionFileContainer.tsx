@@ -148,9 +148,7 @@ const TransactionFileContainer = (data: File) => {
 
   const onSaveTransactionsSheet = async (transactions: any[]) => {
     // try {
-    console.log(transactions);
     const hasEmptyEntry = transactions.some(item => {
-      //console.log(item);
       return (
         (item.date === "" ||
           item.amount === "" ||
@@ -172,7 +170,6 @@ const TransactionFileContainer = (data: File) => {
       );
     });
 
-    // console.log(hasEmptyEntry);
     if (hasEmptyEntry) {
       setAlertMessages(['One or more entries are empty. Please fill in all required fields.']);
       return;
@@ -205,7 +202,6 @@ const TransactionFileContainer = (data: File) => {
       transactions: transformedTransactions,
     };
 
-    console.log(payload);
     try {
       const saveResponse = await api.post('/transactions/update_batch', payload);
 

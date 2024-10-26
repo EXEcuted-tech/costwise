@@ -17,8 +17,6 @@ export interface UserProps {
   setCurrentUser: React.Dispatch<React.SetStateAction<User | null>>;
   setError: React.Dispatch<React.SetStateAction<string>>;
   error: string;
-  silentMode: boolean;
-  setSilentMode: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 export const useUserContext = () => {
@@ -32,7 +30,7 @@ export const useUserContext = () => {
 export const UserProvider = ({ children }: { children: ReactNode }) => {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [error, setError] = useState('');
-  const [silentMode, setSilentMode] = useState(false);
+
   useEffect(() => {
     const userString = localStorage.getItem('currentUser');
     if (userString) {
@@ -46,7 +44,7 @@ export const UserProvider = ({ children }: { children: ReactNode }) => {
   }, []);
 
   return (
-    <UserContext.Provider value={{ currentUser, setCurrentUser, setError, error, silentMode, setSilentMode }}>
+    <UserContext.Provider value={{ currentUser, setCurrentUser, setError, error }}>
       {children}
     </UserContext.Provider>
   );

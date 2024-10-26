@@ -40,7 +40,7 @@ const UserActivity: React.FC<UserActivityProps> = ({ url, name, activity, descri
             <div className='mr-[15px] flex justify-center'>
                 {url != null ? (
                     <div
-                        className='flex justify-center items-center size-[40px] rounded-full border border-white hover:brightness-90 cursor-pointer overflow-hidden'
+                        className='flex justify-center items-center size-[40px] rounded-full border border-white overflow-hidden'
                     >
                         <div
                             className="w-full h-full object-cover"
@@ -54,7 +54,7 @@ const UserActivity: React.FC<UserActivityProps> = ({ url, name, activity, descri
                     </div>
                 ) : (
                     <div
-                        className='flex justify-center items-center size-[40px] rounded-full border border-white hover:brightness-90 cursor-pointer bg-gray-200'
+                        className='flex justify-center items-center size-[40px] rounded-full border border-white bg-gray-200'
                     >
                         <FaUser className='text-gray-500 text-xl' />
                     </div>

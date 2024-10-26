@@ -192,7 +192,7 @@ class ReleaseNoteController extends ApiController
             $noteData['user_id'] = NULL;
 
             DB::beginTransaction();
-            DB::connection('archive_mysql')->table('release_notes')->insert($noteData);
+            DB::connection('archive_mysql')->table('release_notes')->create($noteData);
             $note->delete();
 
             DB::commit();

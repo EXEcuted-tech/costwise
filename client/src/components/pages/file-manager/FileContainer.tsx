@@ -32,27 +32,6 @@ const FileContainer: React.FC<FileContainerProps> = ({
 }) => {
     const [searchTerm, setSearchTerm] = useState('');
     const [selectedDate, setSelectedDate] = useState('');
-    // const dataToDisplay = tab === 'all' ? allData : tab === 'masterfile' ? masterFileData : allData;
-
-    // useEffect(()=>{
-    //     console.log(dataToDisplay);
-    // },[dataToDisplay])
-
-    // const filteredData = dataToDisplay.filter((file) =>
-    //     file.name.toLowerCase().includes(searchTerm.toLowerCase())
-    // );
-
-    // const filteredData = dataToDisplay.filter((file) => {
-    //     try {
-    //         const settings = JSON.parse(file.settings);
-    //         const fileName = settings.file_name || '';
-
-    //         return fileName.toLowerCase().includes(searchTerm.toLowerCase());
-    //     } catch (error) {
-    //         console.error('Error parsing settings JSON:', error);
-    //         return false;
-    //     }
-    // });
 
     const dataToDisplay = useMemo(() => {
         const data =

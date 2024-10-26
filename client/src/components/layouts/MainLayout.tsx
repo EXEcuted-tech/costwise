@@ -10,13 +10,15 @@ import { useNotificationContext } from '@/contexts/NotificationContext';
 import { useUserContext } from '@/contexts/UserContext';
 import Alert from '../alerts/Alert';
 import { useTokenRefresh } from '@/hooks/useTokenRefresh';
+import { useSilentModeContext } from '@/contexts/SilentModeContext';
 
 const MainLayout = () => {
   const { isOpen, setIsOpen } = useSidebarContext();
   const { setHasNewNotifications } = useNotificationContext();
   const [notificationSound, setNotificationSound] = useState<HTMLAudioElement | null>(null);
-  const { setError, error, silentMode } = useUserContext();
-
+  const { setError, error } = useUserContext();
+  const { silentMode, setSilentMode } = useSilentModeContext();
+  
   const notificationSoundSrc = '/notification-ring.mp3';
 
   useTokenRefresh(5);
@@ -36,8 +38,8 @@ const MainLayout = () => {
 
         if (response.data.data.length > 0) {
           setHasNewNotifications(true);
-          if(!silentMode){
-            notificationSound?.play()
+          if (!silentMode) {
+            notificationSound?.play();
           }
         } else {
           setHasNewNotifications(false);
@@ -49,7 +51,7 @@ const MainLayout = () => {
       }
     };
 
-    const intervalId = setInterval(checkForNewNotifications, 15000); // Check every 30 seconds
+    const intervalId = setInterval(checkForNewNotifications, 15000);
 
     return () => clearInterval(intervalId);
   }, [notificationSound, setHasNewNotifications]);

@@ -16,17 +16,13 @@ const ConfirmDeleteUser: React.FC<ConfirmDeleteProps> = ({ user, onClose }) => {
     const [alertStatus, setAlertStatus] = useState<string>('');
     const { currentUser } = useUserContext();
 
-    console.log("DELETING USERRRRRR", user);
-
     const handleDeleteUser = async(userId: number, fName: string, lName: string) => {
         //Reset errors
         setAlertStatus('');
         setAlertMessages([]);
         const fullName = `${fName} ${lName}`;
-        console.log(fullName);
         try {
             const response = await api.delete(`/user/archive/${userId}`);
-            console.log(response);
 
             setAlertStatus('success');
             setAlertMessages([response.data.message])

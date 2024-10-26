@@ -95,7 +95,6 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
     //Prefill form fields
     useEffect(() => {
         if (user && Object.keys(user).length > 0) {
-            // console.log('Initializing user info with:', user);
             retireveUserInfo(user);
             setIsInitialized(true);
         }
@@ -142,10 +141,6 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
                 position !== (user.position || '') ||
                 localProfileImage !== (`${config.API}/storage/${user.display_picture}`) ||
                 JSON.stringify(selectedRoleValues) !== JSON.stringify(user.sys_role || []);
-
-            // console.log('Form dirty state:', isDirty);
-            // console.log('Current values:', { first_name, middle_name, last_name, suffix, email_address, department, employee_number, phone_number, position, localProfileImage, selectedRoleValues });
-            // console.log('Original user values:', user);
 
             setIsFormDirty(isDirty);
         }
@@ -197,6 +192,25 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
         const file = event.target.files?.[0];
         if (file) {
             handleFileUpload(file);
+            const fullName = `${user.first_name} ${user.middle_name ? user.middle_name.charAt(0) + '. ' : ''} ${user.last_name}`;
+            const users = localStorage.getItem('currentUser');
+            const parsedUser = JSON.parse(users || '{}');
+
+            const auditData = {
+            userId: parsedUser?.userId,
+            action: 'general',
+            act: 'others_photo',
+            fileName: fullName,
+            };
+
+            api.post('/auditlogs/logsaudit', auditData)
+            .then(response => {
+                console.log('Audit log created successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error audit logs:', error);
+            });
+
         }
     };
 
@@ -319,7 +333,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
 
             setAlertMessages([response.data.message]);
             setAlertStatus('success');
-            const fullName = `${user.first_name} ${user.last_name}`;
+            const fullName = `${user.first_name} ${user.middle_name ? user.middle_name.charAt(0) + '. ' : ''} ${user.last_name}`;
 
             const userRetrieved = localStorage.getItem('currentUser');
             const parsedUser = JSON.parse(userRetrieved || '{}');
@@ -330,7 +344,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
                 act: 'edit_user',
                 fileName: fullName
             };
-
+            console.log(fullName);
             api.post('/auditlogs/logsaudit', auditData)
                 .then(response => {
                     console.log('Audit log created successfully:', response.data);

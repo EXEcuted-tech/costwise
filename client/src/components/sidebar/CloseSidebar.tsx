@@ -55,7 +55,6 @@ const CloseSidebar: React.FC = () => {
 
   useEffect(() => {
     if (currentUser) {
-      console.log(currentUser.displayPicture);
       setProfilePicture(currentUser.displayPicture);
       if (currentUser.userType === 'Admin') {
         setIsAdmin(true);

@@ -11,6 +11,7 @@ import { SetStateAction, useEffect, useState } from 'react';
 import { FaBell, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import Spinner from '@/components/loaders/Spinner'; // Added import for Spinner component
 import { useUserContext } from '@/contexts/UserContext';
+import { useSilentModeContext } from '@/contexts/SilentModeContext';
 
 const NotificationPage = () => {
     const [currentPage, setCurrentPage] = useState(1);
@@ -20,7 +21,7 @@ const NotificationPage = () => {
     const { hasNewNotifications, setHasNewNotifications } = useNotificationContext();
     const [isOnlyShowUnread, setIsOnlyShowUnread] = useState(false);
     const [isLoading, setIsLoading] = useState(false); // Added isLoading state
-    const { silentMode, setSilentMode } = useUserContext();
+    const { silentMode, setSilentMode } = useSilentModeContext();
 
     const getIconForAction = (action: string | number) => {
         const actionIcons = {
@@ -219,7 +220,9 @@ const NotificationPage = () => {
                 <div className='w-full flex justify-between items-center'>
                     <div className="flex items-center">
                         <button
-                            onClick={() => setSilentMode(!silentMode)}
+                            onClick={() => {
+                                setSilentMode(!silentMode)
+                            }}
                             className="text-2xl text-[#ABABAB] dark:text-gray-300 focus:outline-none"
                         >
                             {silentMode ? <FaVolumeMute /> : <FaVolumeUp />}

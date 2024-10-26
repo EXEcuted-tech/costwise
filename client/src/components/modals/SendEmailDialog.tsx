@@ -24,9 +24,7 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
     setModal(true);
     setIsLoading(true);
     try {
-      console.log("HERE");
       const response = await api.post('/password-reset/email', { email, employeeNum });
-      console.log(response);
       if(response.status==404){
         setAlertMessage(response.data.message);
       } else {
