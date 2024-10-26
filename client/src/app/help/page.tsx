@@ -87,7 +87,7 @@ const UserManualPage = () => {
               <div className="flex w-[20%] 2xl:w-[15%] items-start justify-center">
                 <FaCompass className="text-[30px] 2xl:text-[40px] 3xl:text-[50px]" />
               </div>
-              <div className="flex flex-col pl-[5%] w-[80%] text-tertiary">
+              <div className="flex flex-col pl-[5%] w-[80%] text-tertiary px">
                 <div className="text-[16px] xl:text-[18px] 2xl:text-[20px] 3xl:text-[24px] font-bold">
                   <p>Getting Started</p>
                 </div>
@@ -119,7 +119,7 @@ const UserManualPage = () => {
                         <li key={index}>{section.heading}</li>
                       )
                     )}
-                    {sectionsGS.length > 3 && (
+                    {sectionsGS.length > 2 && (
                       <li>More articles available...</li>
                     )}
                   </ul>
@@ -177,7 +177,7 @@ const UserManualPage = () => {
                         <li key={index}>{section.heading}</li>
                       )
                     )}
-                    {sectionsEssentials.length > 3 && (
+                    {sectionsEssentials.length > 2 && (
                       <li>More articles available...</li>
                     )}
                   </ul>
@@ -235,7 +235,7 @@ const UserManualPage = () => {
                         <li key={index}>{section.heading}</li>
                       )
                     )}
-                    {sectionsMG.length > 3 && (
+                    {sectionsMG.length > 2 && (
                       <li>More articles available...</li>
                     )}
                   </ul>

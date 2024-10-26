@@ -22,11 +22,16 @@ const ManageAccountPage = () => {
   };
 
   // Handle Input change
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement> | React.ChangeEvent<HTMLTextAreaElement>, index: number) => {
+  const handleChange = (
+    e:
+      | React.ChangeEvent<HTMLInputElement>
+      | React.ChangeEvent<HTMLTextAreaElement>,
+    index: number
+  ) => {
     const { name, value } = e.target;
-    const updatedSections:any = [...sections];
+    const updatedSections: any = [...sections];
     updatedSections[index] = {
-      ...updatedSections[index] as { [key: string]: string },
+      ...(updatedSections[index] as { [key: string]: string }),
       [name]: value,
     };
     setSections(updatedSections);
@@ -34,7 +39,7 @@ const ManageAccountPage = () => {
 
   // Add new heading section
   const addSection = () => {
-    setSections((prevSections:any) => [
+    setSections((prevSections: any) => [
       ...prevSections,
       { heading: "New Heading", content: "New content" },
     ]);
@@ -128,7 +133,7 @@ const ManageAccountPage = () => {
           {isLoading ? (
             <LoadingSpinner /> // Show loading spinner
           ) : (
-            <div id="scroll-style" className="overflow-y-scroll">
+            <div id="scroll-style" className="overflow-y-scroll px-32">
               {sections.map((section, index) => (
                 <div
                   key={index}
@@ -149,7 +154,7 @@ const ManageAccountPage = () => {
                       </button>
                     </div>
                   ) : (
-                    <h1>{section.heading}</h1>
+                    <h1 className="font-bold text-[40px]">{section.heading}</h1>
                   )}
                   <div className="flex flex-col text-[24px] pt-[10px] text-tertiary">
                     {isEditing ? (
