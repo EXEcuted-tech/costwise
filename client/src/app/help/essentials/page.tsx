@@ -12,8 +12,8 @@ import { useSidebarContext } from "@/contexts/SidebarContext";
 const EssentialsPage = () => {
     const [isEditing, setIsEditing] = useState(false);
     const [sections, setSections] = useState([{
-        heading: "Whot",
-        content: "Why"
+        heading: "Insert Heading",
+        content: "Insert Content"
     }]);
     const [isLoading, setIsLoading] = useState(true); // Loading state
     const { isAdmin } = useSidebarContext();
@@ -84,25 +84,28 @@ const EssentialsPage = () => {
     );
 
     return (
-        <div className="bg-cover bg-center items-center justify-center bg-[#FFFAF8] bg-opacity-20 h-[100vh] overflow-hidden">
+        <div className="bg-cover dark:bg-[#121212] bg-center items-center justify-center bg-[#FFFAF8] bg-opacity-20 h-[100vh] overflow-hidden">
             <Header icon={PiBookOpenText} title="User's Manual" />
             <div className="flex h-[90%] w-[98%] pl-[90px] pt-[15px] -z-50">
-                <div className="flex flex-col bg-white w-full rounded-xl p-10 drop-shadow-lg">
+                <div className="flex flex-col bg-white dark:bg-[#3C3C3C] w-full rounded-xl p-10 drop-shadow-lg">
                     <div className="flex flex-row w-full items-center justify-start border-b border-[#ACACAC] gap-[15px]">
                         <Link href="/help">
-                            <GoArrowLeft className="text-primary text-[1.5em] xl:text-[2em] hover:opacity-75 hover:animate-shrink-in transition ease-in-out duration-200" />
+                            <GoArrowLeft className="dark:text-white text-primary text-[1.5em] xl:text-[2em] hover:opacity-75 hover:animate-shrink-in transition ease-in-out duration-200" />
                         </Link>
-                        <p className="flex items-center justify-start text-primary text-[40px] font-bold">
+                        <p className="dark:text-white flex items-center justify-start text-primary text-[40px] font-bold">
                             Essential Features
                         </p>
                         {isAdmin && (
                             <div className="flex justify-center items-center h-[50%] cursor-pointer transition-colors duration-200 ease-in-out">
                                 {!isEditing ? (
-                                    <FaPencilAlt onClick={handleEditClick} className="w-[30px] h-auto text-primary" />
+                                    <FaPencilAlt 
+                                        onClick={handleEditClick} 
+                                        className="dark:text-white hover:animate-shake-tilt w-[30px] h-auto text-primary" 
+                                    />
                                 ) : (
-                                    <div className="flex items-center gap-2">
-                                        <FaCheck onClick={saveEdit} className="w-[30px] h-auto text-green-500 cursor-pointer" />
-                                        <FaTimes onClick={handleEditClick} className="w-[30px] h-auto text-red-500 cursor-pointer" />
+                                    <div className="animate-pop-out flex items-center gap-2">
+                                        <FaCheck onClick={saveEdit} className="hover:brightness-50 w-[30px] h-auto text-green-500 cursor-pointer" />
+                                        <FaTimes onClick={handleEditClick} className="hover:brightness-50 w-[30px] h-auto text-red-500 cursor-pointer" />
                                     </div>
                                 )}
                             </div>
@@ -111,9 +114,9 @@ const EssentialsPage = () => {
                     {isLoading ? (
                         <LoadingSpinner /> // Show loading spinner
                     ) : (
-                        <div id="scroll-style" className="overflow-y-scroll">
+                        <div id="scroll-style" className="px-28 overflow-y-scroll">
                             {sections.map((section, index) => (
-                                <div key={index} className="flex flex-col pt-[50px] text-[30px] text-tertiary">
+                                <div key={index} className="flex flex-col pt-[50px] text-[30px] text-tertiary dark:text-white">
                                     {isEditing ? (
                                         <div className="flex items-center gap-4">
                                             <input
@@ -121,27 +124,27 @@ const EssentialsPage = () => {
                                                 name="heading"
                                                 value={section.heading}
                                                 onChange={(e) => handleChange(e, index)}
-                                                className="border p-2 mb-2 w-full font-bold"
+                                                className="animate-pop-out dark:bg-[#3C3C3C] dark:border-[#C5C5C5] rounded-lg border p-2 mb-2 w-full font-bold"
                                                 placeholder="Section Heading"
                                             />
                                             <button onClick={() => removeSection(index)}>
-                                                <FaTrash className="text-primary cursor-pointer" />
+                                                <FaTrash className="hover:text-[#d13232] text-primary cursor-pointer dark:text-white dark:hover:brightness-50" />
                                             </button>
                                         </div>
                                     ) : (
-                                        <h1 className="font-bold">{section.heading}</h1>
+                                        <h1 className="font-bold text-[40px]">{section.heading}</h1>
                                     )}
-                                    <div className="flex flex-col text-[24px] pt-[10px] text-tertiary">
+                                    <div className="flex flex-col text-[24px] pt-[10px] text-tertiary border-black">
                                         {isEditing ? (
                                             <textarea
                                                 name="content"
                                                 value={section.content}
                                                 onChange={(e) => handleChange(e, index)}
-                                                className="border p-2 w-full h-[150px]"
+                                                className="animate-pop-out dark:bg-[#3C3C3C] dark:border-[#C5C5C5] dark:text-white rounded-lg border p-2 w-full h-[150px]"
                                                 placeholder="Section Content"
                                             />
                                         ) : (
-                                            <p>{section.content}</p>
+                                            <p className="dark:text-white">{section.content}</p>
                                         )}
                                     </div>
                                 </div>
@@ -150,9 +153,9 @@ const EssentialsPage = () => {
                                 <div className="flex items-center justify-center pt-[20px]">
                                     <button
                                         onClick={addSection}
-                                        className="flex items-center text-primary hover:opacity-75 transition-all"
+                                        className="flex items-center text-primary dark:text-white hover:opacity-75 transition-all"
                                     >
-                                        <FaPlus className="mr-2" /> Add New Section
+                                        <FaPlus className="mr-2 dark:text-white" /> Add New Section
                                     </button>
                                 </div>
                             )}

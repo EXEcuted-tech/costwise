@@ -59,7 +59,8 @@ const SystemMaintenance = () => {
                     setAlertStatus("critical");
                 }
             } catch (error) {
-                console.error('Error retrieving release notes:', error);
+                setAlertMessages(["Failed to retrieve release notes"]);
+                setAlertStatus("critical");
             }
         }
 
@@ -106,7 +107,7 @@ const SystemMaintenance = () => {
     };
 
     return (
-        <div className='w-full h-screen bg-background'>
+        <div className='w-full h-screen bg-background dark:bg-[#121212]'>
             <div className='absolute top-0 right-0'>
                 {alertMessages && alertMessages.map((msg, index) => (
                 <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
@@ -123,8 +124,8 @@ const SystemMaintenance = () => {
                 {/* Info Tiles */}
                 <div className='flex mx-16 mt-12 mb-9 gap-[5rem] justify-center'>
                     {/* Database Storage */}
-                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]'} flex flex-col p-4 h-[17rem] bg-white rounded-lg drop-shadow-lg hover:animate-shrink-in2`}>
-                        <div className='flex flex-col mb-8'>
+                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]'} flex flex-col p-4 h-[17rem] bg-white dark:bg-[#3C3C3C] rounded-lg drop-shadow-lg hover:animate-shrink-in2`}>
+                        <div className='flex flex-col mb-8 dark:text-white'>
                             <div className='flex'>
                                 {isLoading ? <Loader className='h-12 w-[2rem]'/>
                                             : <span className='text-[38px] mr-2'>{storage?.total.split(' ')[0]}</span> }
@@ -135,7 +136,7 @@ const SystemMaintenance = () => {
                             <span className='text-[23px] font-light'>Database Storage</span>
                         </div>
 
-                        <div className='flex flex-col'>
+                        <div className='flex flex-col dark:text-white'>
                             <div className='w-full h-[1.5rem] bg-gray-100 rounded-full'>
                                 <div className='h-[1.5rem] bg-[#DD8383] rounded-full' style={{ width: `${(parseFloat(storage?.used.split(' ')[0]) / parseFloat(storage?.total.split(' ')[0])) * 100}%` }}></div>
                             </div>
@@ -147,13 +148,13 @@ const SystemMaintenance = () => {
                     </div>
 
                     {/* Files */}
-                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]'} flex flex-col p-4 h-[17rem] bg-white rounded-lg drop-shadow-lg hover:animate-shrink-in2`}>
-                        <div className='flex flex-col mb-8'>
+                    <div className={`${isOpen ? 'w-[40%] 2xl:w-[32%]' : 'w-[32%]'} flex flex-col p-4 h-[17rem] bg-white dark:bg-[#3C3C3C] rounded-lg drop-shadow-lg hover:animate-shrink-in2`}>
+                        <div className='flex flex-col mb-8 dark:text-white'>
                             <div className='flex'>
                                 {isLoading ? <Loader className='h-12 w-[2rem]'/>
                                     : <span className='text-[38px] mr-2'>{totalFiles || '0'}</span>}
                                 {isLoading ? ''
-                                    : <span className='text-[30px] pt-2'>FILES</span>}
+                                    : <span className='text-[30px] pt-2'>{totalFiles == 1 ? 'FILE' : 'FILES'}</span>}
                                 <PiFilesFill className='text-[60px] ml-auto mr-3 text-gray-200' />
                             </div>
                             <span className='text-[23px] font-light'>Total No. of Files</span>
@@ -195,7 +196,7 @@ const SystemMaintenance = () => {
                                 })}
                             </div>
                             <div className='flex mt-[5px] p-3'>
-                                <div className='w-[50%]'>
+                                <div className='w-[50%] dark:text-white'>
                                     <div className='flex'>
                                         <div className='w-4 h-4 mt-1 mr-2 bg-[#DD8383] rounded-full'></div>
                                         <span className='text-[17px] font-light'>Master Files</span>
@@ -205,7 +206,7 @@ const SystemMaintenance = () => {
                                         <span className='text-[17px] font-light'>Transactions</span>
                                     </div>
                                 </div>
-                                <div className='w-[50%]'>
+                                <div className='w-[50%] dark:text-white'>
                                     <div className='flex'>
                                         <div className='w-4 h-4 mt-1 mr-2 bg-[#B6CDFF] rounded-full'></div>
                                         <span className='text-[17px] font-light'>Inventory</span>
@@ -221,19 +222,18 @@ const SystemMaintenance = () => {
                 </div>
 
                 {/* Release Notes */}
-                <div className={`${isOpen ? 'mx-9 2xl:mx-16' : 'mx-16'} flex flex-col h-[31rem] bg-white rounded-lg drop-shadow-md`}>
+                <div className={`${isOpen ? 'mx-9 2xl:mx-16' : 'mx-16'} flex flex-col h-[31rem] bg-white dark:bg-[#3C3C3C] rounded-lg drop-shadow-md`}>
                     {/* Header */}
-                    <div className='flex w-full h-[4rem] px-4 py-3 font-medium bg-white border border-[#9290906c] drop-shadow-md rounded-t-lg'>
-                        <IoGitNetworkOutline className='text-[32px] text-gray-500 mt-1 mr-3' />
-                        <span className='text-[28px] text-[#5B5353]'>Release Notes</span>
+                    <div className='flex w-full h-[4rem] px-4 py-3 font-medium bg-white dark:bg-[#3C3C3C] border border-[#9290906c] drop-shadow-md rounded-t-lg'>
+                        <IoGitNetworkOutline className='text-[32px] text-gray-500 mt-1 mr-3 dark:text-[#d1d1d1]' />
+                        <span className='text-[28px] text-[#5B5353] dark:text-white'>Release Notes</span>
                         <button className={`${isOpen ? 'ml-2 2xl:ml-5' : 'ml-5'} w-[2rem] h-[2rem] text-[25px] mt-1 px-[3px] text-gray-500 border border-[#9290905b] bg-white drop-shadow-md rounded-lg`} onClick={() => setCreateNotes(true)}><IoMdAdd /></button>
                         <div className="mt-[3px] ml-auto text-gray-600">
                             <div className='flex absolute text-[1.3em] text-gray-400 mt-[0.3rem] ml-3'>
                                 <IoIosSearch />
                             </div>
                             <input
-
-                                className={`${isOpen ? 'w-[20rem]' : 'w-[20rem]'} bg-white h-8 px-5 pl-9 text-[1.1em] border border-[#9290906c] rounded-lg focus:outline-none`}
+                                className={`${isOpen ? 'w-[20rem]' : 'w-[20rem]'} bg-white h-8 px-5 pl-9 text-[1.1em] border border-[#9290906c] dark:bg-[#3C3C3C] dark:border-[#5C5C5C] dark:text-white rounded-lg focus:outline-none`}
                                 type="search"
                                 name="search"
                                 placeholder="Search here..."
@@ -257,7 +257,7 @@ const SystemMaintenance = () => {
                                 />
                             ))}
                             {currentListPage.length === 0 && (
-                                <div className="text-center  items-center justify-items-center text-[#555555] mt-20">
+                                <div className="text-center  items-center justify-items-center text-[#555555] dark:text-white mt-20">
                                     <PiNewspaperLight className='text-[80px] mb-4' />
                                     <p className='text-[20px]'>No release notes found matching your search.</p>
                                 </div>

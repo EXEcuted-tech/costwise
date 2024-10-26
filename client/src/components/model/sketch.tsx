@@ -155,7 +155,9 @@ export async function initializeModel(
       validationSplit: 0.2,
       callbacks: {
         onEpochEnd: (epoch, logs) => {
-          currentLossHistory.push(logs.loss);
+          if(logs){
+            currentLossHistory.push(logs.loss);
+          }
           console.log("This is epoch number: ", epoch)
           console.log("This is the loss value", logs)
         },
@@ -246,7 +248,7 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
   const [trainingSpeed, setTrainingSpeed] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true); // Loading state
 
-  const [totalPrediction, setTotalPrediction] = useState<{ monthYear: string; cost: number }[]>([]);
+  const [totalPrediction, setTotalPrediction] = useState<any[]>([]);
 
   // Helper function for cost extraction
   const getProductCosts = (productName: string): number[] =>
@@ -367,12 +369,12 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
       ) : (
         <div className="mx-auto p-5 flex flex-col xl:flex-row gap-6 h-[90%]">
           {/* Left Section */}
-          <div className="w-[30%] flex-1 bg-white shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
-            <h2 className="flex items-center 3xl:text-[20px] text-2xl font-semibold text-primary mb-4 xl:mb-2">
-              <MdModelTraining className="3xl:text-4xl text-3xl font-semibold text-primary mr-2" />
+          <div className="w-[30%] flex-1 bg-white dark:bg-[#5c5c5c] shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
+            <h2 className="flex items-center 3xl:text-[20px] text-2xl font-semibold text-primary dark:text-white mb-4 xl:mb-2">
+              <MdModelTraining className="3xl:text-4xl text-3xl font-semibold text-primary mr-2 dark:text-white" />
               Training Duration
             </h2>
-            <p className="text-5xl font-bold text-primary">
+            <p className="text-5xl font-bold text-primary dark:text-white">
               {trainingSpeed.toFixed(2)}s
             </p>
             <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
@@ -380,12 +382,12 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
             </p>
           </div>
 
-          <div className="w-[30%] flex-1 bg-white shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
-            <h2 className="flex items-center 3xl:text-[20px] text-2xl font-semibold text-primary mb-4 xl:mb-2">
-              <MdOutlineCalculate className="3xl:text-4xl text-3xl font-semibold text-primary mr-2" />
+          <div className="w-[30%] flex-1 bg-white dark:bg-[#5c5c5c] shadow-lg rounded-lg p-8 xl:p-2 flex flex-col items-center">
+            <h2 className="flex items-center 3xl:text-[20px] text-2xl font-semibold text-primary dark:text-white mb-4 xl:mb-2">
+              <MdOutlineCalculate className="3xl:text-4xl text-3xl font-semibold text-primary mr-2 dark:text-white" />
               Average Loss
             </h2>
-            <p className="text-[40px] font-bold text-primary">
+            <p className="text-[40px] font-bold text-primary dark:text-white">
               {(lossHistory[lossHistory.length - 1] / 4).toFixed(6)}
             </p>
             <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">

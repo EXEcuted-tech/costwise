@@ -67,12 +67,12 @@ class ReleaseNoteController extends ApiController
         try {
             $notes = ReleaseNote::with('user:user_id,first_name,middle_name,last_name,suffix')->orderBy('created_at', 'desc')->get();
 
-            if ($notes->isEmpty()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'No release notes found.'
-                ], 404);
-            }
+            // if ($notes->isEmpty()) {
+            //     return response()->json([
+            //         'status' => 'error',
+            //         'message' => 'No release notes found.'
+            //     ], 404);
+            // }
 
             $formattedNotes = $notes->map(function ($note) {
                 return [

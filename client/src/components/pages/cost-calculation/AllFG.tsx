@@ -22,7 +22,7 @@ const AllFG: React.FC<AllFGrops> = ({ isOpen, title, sheetData }) => {
     <div
       className={`${
         isOpen ? "xl:ml-[4rem]" : ""
-      } relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white rounded-2xl border-1 border-[#656565] shadow-md animate-pull-down`}
+      } relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white dark:bg-[#3C3C3C] rounded-2xl border-1 border-[#656565] shadow-md animate-pull-down`}
     >
       {/* Header */}
       <div
@@ -47,7 +47,7 @@ const AllFG: React.FC<AllFGrops> = ({ isOpen, title, sheetData }) => {
                     isOpen
                       ? "xl:pl-[35px] 2xl:pl-[40px] 3xl:pl-6 4xl:pl-6 xl:text-[16px] 2xl:text-[18px] 3xl:text-[20px] 4xl:text-[20px]"
                       : "xl:text-[16px] 2xl:text-[20px] 3xl:text-[20px] text-[20px]"
-                  } text-center animate-zoomIn whitespace-nowrap font-bold text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}
+                  } text-center animate-zoomIn whitespace-nowrap font-bold dark:text-[#d1d1d1] text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}
                 >
                   {columnName}
                 </th>
@@ -58,7 +58,7 @@ const AllFG: React.FC<AllFGrops> = ({ isOpen, title, sheetData }) => {
             {sheetData.map((data, index) => (
               <tr
                 key={data.fg_id}
-                className={`text-[#6B6B6B] ${
+                className={`text-[#6B6B6B] dark:text-[#d1d1d1] ${
                   isOpen
                     ? "xl:text-[16px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[20px]"
                     : "xl:text-[16px] 2xl:text-[20px] 3xl:text-[20px] 4xl:text-[20px] text-[20px]"

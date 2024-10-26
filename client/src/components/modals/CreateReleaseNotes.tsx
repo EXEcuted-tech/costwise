@@ -168,21 +168,21 @@ const CreateReleaseNotes: React.FC<CreateReleaseNotesProps> = ({setCreateNotes})
                 }} />
                 ))}
             </div>
-            <div className="flex flex-col w-[70%] 2xl:w-[60%] 3xl:w-[50%] h-[750px] bg-white rounded-[20px] animate-pop-out drop-shadow">
+            <div className="flex flex-col w-[70%] 2xl:w-[60%] 3xl:w-[50%] h-[750px] bg-white dark:bg-[#3C3C3C] rounded-[20px] animate-pop-out drop-shadow">
 
                 {/* Header */}
-                <div className='flex items-center rounded-[20px] h-[10%] bg-[#F5F5F5] text-[27px] font-bold'>
+                <div className='flex items-center rounded-[20px] h-[10%] bg-[#F5F5F5] dark:bg-[#121212] text-[27px] font-bold'>
                     <div className='flex items-center w-full h-full ml-[20px] gap-[10px]'>
-                        <FaFilePen className='text-[#777777] text-[30px]' />
-                        <p>Create Release Note</p>
+                        <FaFilePen className='text-[#777777] dark:text-[#d1d1d1] text-[30px]' />
+                        <p className='dark:text-white'>Create Release Note</p>
                     </div>
                     <IoIosClose className='mt-[2px] text-[70px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out'
                         onClick={()=>setCreateNotes(false)}/>
                 </div>
 
-                <div className="h-full">
+                <div className="h-full ">
                     {/* Title Area */}
-                    <div className='flex flex-row mt-4 mb-4'>
+                    <div className='flex flex-row mt-4 mb-4 dark:text-white '>
                         <div className='flex h-[13%] items-center text-[25px] font-bold px-[30px] gap-[30px]'>
                             <p className='flex'>Title: <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                             <input 
@@ -240,7 +240,7 @@ const CreateReleaseNotes: React.FC<CreateReleaseNotesProps> = ({setCreateNotes})
                             })}
                         </div>
                     </div>
-                    <div className='h-[70%] px-[30px]'>
+                    <div className='h-[70%] px-[30px] dark:text-white'>
                         <textarea
                             name="content"
                             value={noteContent[currentNoteType]}
