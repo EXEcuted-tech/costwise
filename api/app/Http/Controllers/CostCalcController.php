@@ -72,16 +72,15 @@ class CostCalcController extends ApiController
         $fg_id = $request->query('fg_id');
 
         try {
-
             $fgRecord = FinishedGood::where('fg_id', $fg_id)->first();
 
             //Retrieve formulation
-            $formulation = Formulation::where('formulation_id', $fgRecord->formulation_no)->first();
+            $formulation = Formulation::where('fg_id', $fgRecord->fg_id)->first();
             $materialQtyList = json_decode($formulation->material_qty_list);
 
             //Store fg data
             $fgData = [
-                'formulation_no' => $fgRecord->formulation_no,
+                'formula_code' => $formulation->formula_code,
                 'code' => $fgRecord->fg_code,
                 'desc' => $fgRecord->fg_desc,
                 'batch_qty' => $fgRecord->total_batch_qty,
@@ -93,7 +92,7 @@ class CostCalcController extends ApiController
 
             //Retrieve emulsion data
             $emulsion = json_decode($formulation->emulsion);
-            if ($emulsion) {
+            if (!empty(get_object_vars($emulsion))) {
                 $fgData['components'][] = [
                     'level' => $emulsion->level,
                     'qty' => $emulsion->batch_qty,
@@ -183,8 +182,8 @@ class CostCalcController extends ApiController
                     foreach ($data as $fg) {
                         // Write FG row
                         fputcsv($handle, [
-                            $fg['formulation_no'],
-                            1,
+                            $fg['formula_code'],
+                            '',
                             $fg['code'],
                             $fg['desc'],
                             $fg['batch_qty'],
@@ -195,17 +194,30 @@ class CostCalcController extends ApiController
 
                         // Write component rows
                         foreach ($fg['components'] as $component) {
-                            fputcsv($handle, [
-                                '',
-                                $component['level'] ?? '',
-                                $component['item_code'] ?? '',
-                                $component['description'] ?? 'EMULSION',
-                                $component['batch_quantity'] ?? $component['qty'] ?? '',
-                                $component['unit'] ?? '',
-                                $component['cost'] ?? '',
-                                $component['total_cost'] ?? ''
-                            ]);
+                            if (!empty($component)) {
+                                fputcsv($handle, [
+                                    '',
+                                    $component['level'] ?? '',
+                                    $component['item_code'] ?? '',
+                                    $component['description'] ?? 'EMULSION',
+                                    $component['batch_quantity'] ?? $component['qty'] ?? '',
+                                    $component['unit'] ?? '',
+                                    $component['cost'] ?? '',
+                                    $component['total_cost'] ?? ''
+                                ]);
+                            }
                         }
+
+                        fputcsv($handle, [
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            '',
+                            ''
+                        ]);
                     }
                     fclose($handle);
                 };
@@ -273,7 +285,7 @@ class CostCalcController extends ApiController
         $row = 2;
 
         //Add FG Row
-        $sheet->setCellValue("A$row", $fg['formulation_no']);
+        $sheet->setCellValue("A$row", $fg['formula_code']);
         $sheet->setCellValue("B$row", 1);
         $sheet->setCellValue("C$row", $fg['code']);
         $sheet->setCellValue("D$row", $fg['desc']);
@@ -288,25 +300,29 @@ class CostCalcController extends ApiController
         $row++;
 
         // Add components
+
         foreach ($fg['components'] as $component) {
-            $sheet->setCellValue("A$row", "");
-            $sheet->setCellValue("B$row", $component['level']);
-            $sheet->setCellValue("C$row", $component['item_code'] ?? "");
+            if (!empty($component)) {
+                $sheet->setCellValue("A$row", "");
+                $sheet->setCellValue("B$row", $component['level'] ?? "");
+                $sheet->setCellValue("C$row", $component['item_code'] ?? "");
 
-            if (!isset($component['description']) && isset($component['qty'])) {
-                $sheet->setCellValue("D$row", "EMULSION");
-                $sheet->setCellValue("E$row", $component['qty']);
-            } else {
-                $sheet->setCellValue("D$row", $component['description'] ?? "");
-                $sheet->setCellValue("E$row", $component['batch_quantity'] ?? "");
+                if (!isset($component['description']) && isset($component['qty'])) {
+                    $sheet->setCellValue("D$row", "EMULSION");
+                    $sheet->setCellValue("E$row", $component['qty']);
+                } else {
+                    $sheet->setCellValue("D$row", $component['description'] ?? "");
+                    $sheet->setCellValue("E$row", $component['batch_quantity'] ?? "");
+                }
+
+                $sheet->setCellValue("F$row", $component['unit'] ?? "");
+                $sheet->setCellValue("G$row", $component['cost'] ?? "");
+                $sheet->setCellValue("H$row", $component['total_cost'] ?? "");
+                $sheet->getStyle("A$row:H$row")->getFont()->setSize(8)->setName('Open Sans');
+                $row++;
             }
-
-            $sheet->setCellValue("F$row", $component['unit']);
-            $sheet->setCellValue("G$row", $component['cost'] ?? "");
-            $sheet->setCellValue("H$row", $component['total_cost'] ?? "");
-            $sheet->getStyle("A$row:H$row")->getFont()->setSize(8)->setName('Open Sans');
-            $row++;
         }
+
 
         // Apply number formatting
         $sheet->getStyle('E2:E' . ($row - 1))->getNumberFormat()->setFormatCode('0.00');
@@ -334,7 +350,7 @@ class CostCalcController extends ApiController
         $sheet->getColumnDimension('D')->setWidth(19.29);
         $sheet->getColumnDimension('E')->setWidth(12.57);
         $sheet->getColumnDimension('F')->setWidth(11.43);
-        
+
         $sheet->mergeCells('A2:F2');
         $sheet->setCellValue('A2', 'for the month of ' . $monthYear);
         $sheet->getStyle('A2')->getFont()->setSize(10)->setName('Arial')->setBold(true)->setItalic(true);

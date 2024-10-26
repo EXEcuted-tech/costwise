@@ -221,7 +221,7 @@ const FormulationPage = () => {
             <Header icon={HiClipboardList} title={"Formulations"} />
             {compareFormula && <CompareFormulaDialog setCompareFormula={setCompareFormula} />}
             {bomList && <BillOfMaterialsList setBOM={setBomList} />}
-            <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px] transition-all duration-400 ease-in-out`}>
+            <div className={`${isOpen ? 'px-[10px] 3xl:px-[20px]' : 'px-[50px]'} mt-[25px] ml-[45px] transition-all duration-400 ease-in-out`}>
                 {(!view && !edit && !viewFormulas && !viewBOM) &&
                     <div className='flex'>
                         {/* Search Component */}

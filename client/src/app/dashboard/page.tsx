@@ -69,11 +69,10 @@ const DashboardPage = () => {
         (prediction: { monthYear: string }) => prediction.monthYear === targetMonthYear
       );
 
-      const totalCostForMonth = selectedMonthPredictions.reduce((acc, prediction) => {
+      const totalCostForMonth = selectedMonthPredictions.reduce((acc: number, prediction: { cost: string; }) => {
         const parsedCost = parseFloat(prediction.cost);
         return acc + parsedCost;
       }, 0);
-      t
       const formattedPredictions = [{
         monthYear: targetMonthYear,
         cost: totalCostForMonth.toFixed(2),
@@ -91,6 +90,7 @@ const DashboardPage = () => {
     const storedUser = localStorage.getItem('currentUser');
     if (storedUser) {
       const user = JSON.parse(storedUser);
+      fetchAuditLogs();
       setName(user.name);
       fetchAverageCost();
       fetchTotalProductionCost();
@@ -136,34 +136,37 @@ const DashboardPage = () => {
     setIsLoading(false);
   };
 
-  const fetchAuditLogs = async () => {
-    const interval = setInterval(() => {
-      setIsLoading(true);
-      const fetchData = async () => {
-        try {
-          const res = await api.get('/auditlogs');
-          const logs = res.data.map((log: any) => ({
-            employeeName: `${log.user.first_name} ${log.user.middle_name ? log.user.middle_name.charAt(0) + '. ' : ''}${log.user.last_name}`,
-            description: log.description,
-            actionEvent: log.action as ActionType,
-            profile: log.user.display_picture,
-            time: new Date(log.timestamp),  // Store the Date object for sorting
-            formattedTime: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })  // Separate field for display
-          }));
+  const fetchData = async () => {
+    try {
+      const res = await api.get('/auditlogs');
+      const logs = res.data.map((log: any) => ({
+        employeeName: `${log.user.first_name} ${log.user.middle_name ? log.user.middle_name.charAt(0) + '. ' : ''}${log.user.last_name}`,
+        description: log.description,
+        actionEvent: log.action as ActionType,
+        profile: log.user.display_picture,
+        time: new Date(log.timestamp),  // Store the Date object for sorting
+              formattedTime: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })  // Separate field for display
+      }));
           const sortedLogs = logs.sort((a: AuditLogs, b: AuditLogs) => b.time.getTime() - a.time.getTime());
-          setAuditLogs(sortedLogs);
-          setIsLoading(false);
-        } catch (error: any) {
-          console.error("Failed to fetch audit logs:", error);
-          setIsLoading(false);
-        } finally {
-          setIsLoading(false);
-        }
-      }
-      fetchData();
-      console.log("Total Prediction", totalPrediction)
-    }, 25000);
-    return () => clearInterval(interval);
+      setAuditLogs(sortedLogs);
+      setIsLoading(false);
+    } catch (error: any) {
+      console.error("Failed to fetch audit logs:", error);
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
+    }
+  }
+
+  const fetchAuditLogs = async () => {
+    const initialFetchTimeout = setTimeout(fetchData, 2000);
+
+    const fetchInterval = setInterval(fetchData, 30000);
+
+    return () => {
+        clearTimeout(initialFetchTimeout);
+        clearInterval(fetchInterval);
+    };
   };
 
   const [totalPrediction, setTotalPrediction] = useState<
@@ -180,8 +183,8 @@ const DashboardPage = () => {
         <div className="flex flex-col flex-wrap w-[72%] 4xl:w-[75%]">
           <h1
             className={`${isOpen
-              ? "text-[34px] 2xl:text-[42px] 3xl:text-[52px] 4xl:text-[58px]"
-              : "text-[40px] 2xl:text-[55px] 3xl:text-[68px]"
+                ? "text-[34px] 2xl:text-[42px] 3xl:text-[52px] 4xl:text-[58px]"
+                : "text-[40px] 2xl:text-[55px] 3xl:text-[68px]"
               } truncate text-ellipsis text-[#414141] font-bold animate-color-pulse dark:animate-color-pulse-dark`}
           >
             Good Evening,{" "}
@@ -189,8 +192,8 @@ const DashboardPage = () => {
           </h1>
           <p
             className={`${isOpen
-              ? "text-[16px] 2xl:text-[18px] 3xl:text-[22px]"
-              : "text-[18px] 2xl:text-[20px] 3xl:text-[28px]"
+                ? "text-[16px] 2xl:text-[18px] 3xl:text-[22px]"
+                : "text-[18px] 2xl:text-[20px] 3xl:text-[28px]"
               } font-medium text-[#868686] dark:text-[#C6C6C6]`}
           >
             Welcome to CostWise: Virginia’s Product Costing System!
@@ -199,16 +202,16 @@ const DashboardPage = () => {
         <div className="w-[27%] 4xl:w-[20%] flex flex-col justify-center mr-[5px]">
           <h2
             className={`${isOpen
-              ? "text-[18px] 2xl:text-[24px]"
-              : "text-[19px] 2xl:text-[25px] 3xl:text-[30px]"
+                ? "text-[18px] 2xl:text-[24px]"
+                : "text-[19px] 2xl:text-[25px] 3xl:text-[30px]"
               } text-[#414141] dark:text-white font-bold text-right`}
           >
             {new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
           </h2>
           <p
             className={`${isOpen
-              ? "text-[14px] 2xl:text-[16px]"
-              : "text-[16px] 3xl:text-[21px]"
+                ? "text-[14px] 2xl:text-[16px]"
+                : "text-[16px] 3xl:text-[21px]"
               } text-[#414141] italic dark:text-white text-right`}
           >
             {new Date().toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit', hour12: true })}
@@ -217,8 +220,8 @@ const DashboardPage = () => {
         <div>
           <div
             className={`${isOpen
-              ? "text-[1.2em] 2xl:text-[1.8em]"
-              : "text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]"
+                ? "text-[1.2em] 2xl:text-[1.8em]"
+                : "text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]"
               } text-primary p-3 drop-shadow-lg bg-white rounded-full cursor-pointer hover:text-white hover:bg-primary transition-colors duration-300 ease-in-out`}
 
             onClick={() => setColorMode(colorMode === "light" ? "dark" : "light")}>
@@ -250,7 +253,7 @@ const DashboardPage = () => {
                   </div>
                   <div className='flex flex-col items-center'>
                     <h1 className='text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white'>
-                      ₱{totalProductionCost}
+                      ₱{totalProductionCost ? totalProductionCost : '0.00'}
                     </h1>
                     <p className='italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]'>Total Production Cost</p>
                   </div>
@@ -306,7 +309,7 @@ const DashboardPage = () => {
                   </div>
                   <div className="flex flex-col items-center">
                     <h1 className="text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white">
-                      ₱{totalPrediction[0]?.cost}
+                      ₱{totalPrediction.length > 0 ? totalPrediction[0]?.cost : '0.00'}
                     </h1>
                     <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
                       Total Prediction Cost
@@ -370,7 +373,7 @@ const DashboardPage = () => {
                     </div>
                   ))
               }
-
+              
             </div>
           </div>
         )}
@@ -380,45 +383,3 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
-
-// const fakeData: UserActivityProps[] = [
-//   {
-//     url: "https://i.imgur.com/AZOtzD7.jpg",
-//     name: "Kathea Mari Mayol",
-//     activity: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-//     time: "2 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/SeymIUb.jpg",
-//     name: "John Doe",
-//     activity:
-//       "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-//     time: "5 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/dm51tBF.jpg",
-//     name: "Jane Smith",
-//     activity:
-//       "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-//     time: "10 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/AN69p1a.jpg",
-//     name: "Michael Johnson",
-//     activity:
-//       "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.",
-//     time: "15 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/zb1h8kj.jpg",
-//     name: "Emily Davis",
-//     activity: "Excepteur sint occaecat cupidatat non proident, sunt in culpa.",
-//     time: "20 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/nzcwr8x.jpg",
-//     name: "Chris Lee",
-//     activity: "Mollit anim id est laborum.",
-//     time: "25 minutes ago",
-//   },
-// ];

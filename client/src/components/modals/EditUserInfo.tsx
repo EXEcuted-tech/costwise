@@ -4,7 +4,7 @@ import React, { ChangeEvent, useEffect, useState } from 'react';
 import { BsPersonLock } from 'react-icons/bs';
 import { IoClose, IoCamera } from "react-icons/io5";
 import { RiFolderUserFill } from "react-icons/ri";
-import AddUserRoles, { CheckboxState } from '@/components/pages/user-management/AddUserRoles';
+import AddUserRoles, { CheckboxState } from '@/components/pages/user-management/addUserRoles';
 import Image from 'next/image';
 import config from '@/server/config';
 import api from '@/utils/api';
@@ -369,9 +369,9 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
     }
 
     return (
-        <div className='flex justify-center items-center z-[199999] w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)]'>
+        <div className='flex justify-center items-center z-[9999] w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)]'>
             
-            <div className='absolute top-0 right-0 z-[9999]'>
+            <div className='absolute top-0 right-0 z-[99999]'>
                 {alertMessages && alertMessages.map((msg, index) => (
                 <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
                     setAlertMessages(prev => prev.filter((_, i) => i !== index));

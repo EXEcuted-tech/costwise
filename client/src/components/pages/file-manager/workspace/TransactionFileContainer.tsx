@@ -266,7 +266,6 @@ const TransactionFileContainer = (data: File) => {
 
         if (deleteResponse.data.status === 200) {
           setSuccessMessage('Transaction/s archived successfully.');
-          setRemovedIds([]);
         } else {
           setAlertMessages(['Failed to bulk archive Transactions.']);
         }
@@ -285,6 +284,7 @@ const TransactionFileContainer = (data: File) => {
           setAlertMessages(['An error occurred while saving the transaction. Please try again.']);
         }
       }
+      setRemovedIds([]);
     }
 
 
