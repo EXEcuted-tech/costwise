@@ -211,9 +211,6 @@ class FormulationController extends ApiController
         $file = $request->file('file');
         $extension = $file->getClientOriginalExtension();
 
-        // $user = Auth::user();
-        // $userName = "{$user->first_name} {$user->last_name}";
-
         if ($extension == 'xlsx') {
             $this->processExcel($file->getRealPath());
 
@@ -244,7 +241,6 @@ class FormulationController extends ApiController
 
     private function processFormulationSheet($data)
     {
-        // Skip the header row
         array_shift($data);
 
         $formulaCode = null;
@@ -472,18 +468,6 @@ class FormulationController extends ApiController
                 $bomFormulations = json_decode($bom->formulations, true);
                 $bomFormulations = array_diff($bomFormulations, [$formulationId]);
                 $bom->formulations = json_encode(array_values($bomFormulations));
-                // if (empty($bomFormulations)) {
-                //     $removedBomId = $bom->bom_id;
-                //     $bom->delete();
-
-                //     $fileRecord = File::where('some_condition')->first();
-                //     if ($fileRecord) {
-                //         $settings = json_decode($fileRecord->settings, true);
-                //         $settings['bom_ids'] = array_diff($settings['bom_ids'], [$removedBomId]);
-                //         $fileRecord->settings = json_encode($settings);
-                //         $fileRecord->save();
-                //     }
-                // }
                 $bom->save();
             }
 
@@ -544,76 +528,76 @@ class FormulationController extends ApiController
         $fgIds = $request->input('fg_ids');
         $bomId = $request->input('bom_id');
 
-        // try {
-        $bom = Bom::find($bomId);
+        try {
+            $bom = Bom::find($bomId);
 
-        if (!$bom) {
-            $this->status = 400;
-            return $this->getResponse("BOM Not Found");
-        }
-
-        $formulationIds = Formulation::whereIn('fg_id', $fgIds)
-            ->pluck('formulation_id')
-            ->toArray();
-
-        $bomFormulations = json_decode($bom->formulations, true);
-        $bomFormulations = array_diff($bomFormulations, $formulationIds);
-        $bom->formulations = json_encode(array_values($bomFormulations));
-        $bom->save();
-
-        $formulationsToDelete = Formulation::whereIn('formulation_id', $formulationIds)->get();
-        $finishedGoodsToDelete = FinishedGood::whereIn('fg_id', $fgIds)->get();
-
-        $archivedFormulations = $formulationsToDelete->map(function ($item) {
-            return [
-                'formulation_id' => $item->formulation_id,
-                'fg_id' => $item->fg_id,
-                'formula_code' => $item->formula_code,
-                'emulsion' => $item->emulsion,
-                'material_qty_list' => $item->material_qty_list,
-                'created_at' => $item->created_at?->format('Y-m-d H:i:s'),
-                'updated_at' => $item->updated_at?->format('Y-m-d H:i:s'),
-            ];
-        })->toArray();
-
-        $archivedFinishedGoods = $finishedGoodsToDelete->map(function ($item) {
-            $fodlExists = Fodl::on('archive_mysql')->find($item->fodl_id);
-            return [
-                'fg_id' => $item->fg_id,
-                'fodl_id' => $fodlExists ? $item->fodl_id : null,
-                'fg_code' => $item->fg_code,
-                'fg_desc' => $item->fg_desc,
-                'total_cost' => $item->total_cost,
-                'total_batch_qty' => $item->total_batch_qty,
-                'rm_cost' => $item->rm_cost,
-                'unit' => $item->unit,
-                'formulation_no' => $item->formulation_no,
-                'is_least_cost' => $item->is_least_cost,
-                'monthYear' => $item->monthYear,
-            ];
-        })->toArray();
-
-        if ($finishedGoodsToDelete->isNotEmpty()) {
-            foreach ($archivedFinishedGoods as $finishedGood) {
-                FinishedGood::on('archive_mysql')->create($finishedGood);
+            if (!$bom) {
+                $this->status = 400;
+                return $this->getResponse("BOM Not Found");
             }
-        }
 
-        if ($formulationsToDelete->isNotEmpty()) {
-            foreach ($archivedFormulations as $formulation) {
-                Formulation::on('archive_mysql')->create($formulation);
+            $formulationIds = Formulation::whereIn('fg_id', $fgIds)
+                ->pluck('formulation_id')
+                ->toArray();
+
+            $bomFormulations = json_decode($bom->formulations, true);
+            $bomFormulations = array_diff($bomFormulations, $formulationIds);
+            $bom->formulations = json_encode(array_values($bomFormulations));
+            $bom->save();
+
+            $formulationsToDelete = Formulation::whereIn('formulation_id', $formulationIds)->get();
+            $finishedGoodsToDelete = FinishedGood::whereIn('fg_id', $fgIds)->get();
+
+            $archivedFormulations = $formulationsToDelete->map(function ($item) {
+                return [
+                    'formulation_id' => $item->formulation_id,
+                    'fg_id' => $item->fg_id,
+                    'formula_code' => $item->formula_code,
+                    'emulsion' => $item->emulsion,
+                    'material_qty_list' => $item->material_qty_list,
+                    'created_at' => $item->created_at?->format('Y-m-d H:i:s'),
+                    'updated_at' => $item->updated_at?->format('Y-m-d H:i:s'),
+                ];
+            })->toArray();
+
+            $archivedFinishedGoods = $finishedGoodsToDelete->map(function ($item) {
+                $fodlExists = Fodl::on('archive_mysql')->find($item->fodl_id);
+                return [
+                    'fg_id' => $item->fg_id,
+                    'fodl_id' => $fodlExists ? $item->fodl_id : null,
+                    'fg_code' => $item->fg_code,
+                    'fg_desc' => $item->fg_desc,
+                    'total_cost' => $item->total_cost,
+                    'total_batch_qty' => $item->total_batch_qty,
+                    'rm_cost' => $item->rm_cost,
+                    'unit' => $item->unit,
+                    'formulation_no' => $item->formulation_no,
+                    'is_least_cost' => $item->is_least_cost,
+                    'monthYear' => $item->monthYear,
+                ];
+            })->toArray();
+
+            if ($finishedGoodsToDelete->isNotEmpty()) {
+                foreach ($archivedFinishedGoods as $finishedGood) {
+                    FinishedGood::on('archive_mysql')->create($finishedGood);
+                }
             }
+
+            if ($formulationsToDelete->isNotEmpty()) {
+                foreach ($archivedFormulations as $formulation) {
+                    Formulation::on('archive_mysql')->create($formulation);
+                }
+            }
+
+            Formulation::whereIn('formulation_id', $formulationIds)->delete();
+            FinishedGood::whereIn('fg_id', $fgIds)->delete();
+
+            $this->status = 200;
+            return $this->getResponse('Deletion was done successfully!');
+        } catch (\Exception $e) {
+            $this->status = 500;
+            return $this->getResponse("Error! Try again.");
         }
-
-        Formulation::whereIn('formulation_id', $formulationIds)->delete();
-        FinishedGood::whereIn('fg_id', $fgIds)->delete();
-
-        $this->status = 200;
-        return $this->getResponse('Deletion was done successfully!');
-        // } catch (\Exception $e) {
-        //     $this->status = 500;
-        //     return $this->getResponse("Error! Try again.");
-        // }
     }
 
     public function deleteBulkWithMaterial(Request $request)
@@ -735,7 +719,7 @@ class FormulationController extends ApiController
             return [
                 'status' => 500,
                 'message' => 'Error! Try again.',
-                'error' => $e->getMessage() // Optionally include the error message
+                'error' => $e->getMessage()
             ];
         }
     }

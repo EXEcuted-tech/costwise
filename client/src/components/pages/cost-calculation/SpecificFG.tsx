@@ -67,6 +67,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
 
         if (response.status === 200) {
           const fgData = response.data.data;
+          console.log(fgData);
           setSelectedFGDetails([fgData]);
           setIsLoading(false);
           updateSheetData(id, fgData);
@@ -84,32 +85,33 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
 
   return (
     <>
-      <div className="absolute top-0 right-0">
-        {alertMessages &&
-          alertMessages.map((msg, index) => (
-            <Alert
-              className="!relative"
-              variant={
-                alertStatus as
-                | "default"
-                | "information"
-                | "warning"
-                | "critical"
-                | "success"
-                | undefined
-              }
-              key={index}
-              message={msg}
-              setClose={() => {
-                setAlertMessages((prev) => prev.filter((_, i) => i !== index));
-              }}
-            />
-          ))}
+      <div className="fixed top-4 right-4 z-50">
+        <div className="flex flex-col items-end space-y-2">
+          {alertMessages &&
+            alertMessages.map((msg, index) => (
+              <Alert
+                className="!relative"
+                variant={
+                  alertStatus as
+                  | "default"
+                  | "information"
+                  | "warning"
+                  | "critical"
+                  | "success"
+                  | undefined
+                }
+                key={index}
+                message={msg}
+                setClose={() => {
+                  setAlertMessages((prev) => prev.filter((_, i) => i !== index));
+                }}
+              />
+            ))}
+        </div>
       </div>
-
       <div
         className={`${isOpen ? "" : ""
-          } relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white rounded-2xl border-1 border-[#656565] shadow-md animate-pull-down`}
+          } relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white dark:bg-[#3C3C3C] rounded-2xl border-1 border-[#656565] shadow-md animate-pull-down`}
       >
         {/* Header */}
         <div className="flex h-14 rounded-t-2xl bg-[#B22222] text-white text-[26px] font-bold py-2 pl-7 drop-shadow-xl">
@@ -138,7 +140,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                 {columnNames.map((columnName, index) => (
                   <th
                     key={index}
-                    className={`text-center animate-zoomIn whitespace-nowrap font-bold text-[#6B6B6B] py-2 px-6 border-b border-[#ACACAC]`}
+                    className={`text-center animate-zoomIn whitespace-nowrap font-bold text-[#6B6B6B] dark:text-[#d1d1d1] py-2 px-6 border-b border-[#ACACAC]`}
                   >
                     {columnName}
                   </th>
@@ -150,7 +152,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                 <tr>
                   <td
                     colSpan={columnNames.length}
-                    className="text-center py-[14rem]"
+                    className="text-center py-[14rem] dark:text-white"
                   >
                     {/* <Spinner color="danger" size="lg" label="Loading..." /> */}
                     No finished good selected. <br /> Select a finished good to
@@ -161,9 +163,9 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                 <>
                   <tr className={`text-[#6B6B6B] bg-[#ffebeb] font-semibold`}>
                     <td className="text-center px-6 py-2">
-                      {selectedFGDetails[0].formulation_no}
+                      {selectedFGDetails[0].formula_code}
                     </td>
-                    <td className="text-center">1</td>
+                    <td className="text-center"></td>
                     <td>{selectedFGDetails[0].code}</td>
                     <td>{selectedFGDetails[0].desc}</td>
                     <td className="text-right pr-12">
@@ -182,7 +184,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                   {selectedFGDetails[0]?.components[0] &&
                     Object.keys(selectedFGDetails[0].components[0]).length >
                     0 && (
-                      <tr className={`text-[#6B6B6B]`}>
+                      <tr className={`text-[#6B6B6B] dark:text-[#d1d1d1]`}>
                         <td className="text-center px-6 py-3"></td>
                         <td className="text-center">
                           {selectedFGDetails[0].components[0].level}
@@ -201,7 +203,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                   {selectedFGDetails[0]?.components
                     ?.slice(1)
                     .map((component: { level: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; item_code: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; description: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; batch_quantity: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; unit: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; cost: string | number | bigint | boolean | React.ReactElement<any, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<React.AwaitedReactNode> | null | undefined; total_cost: string; }, index: React.Key | null | undefined) => (
-                      <tr key={index} className={`text-[#6B6B6B]`}>
+                      <tr key={index} className={`text-[#6B6B6B] dark:text-[#d1d1d1]`}>
                         <td className="text-center px-6 py-3"></td>
                         <td className="text-center">{component.level}</td>
                         <td>{component.item_code}</td>

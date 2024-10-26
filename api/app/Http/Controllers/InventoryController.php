@@ -125,10 +125,8 @@ class InventoryController extends ApiController
         $inventoryMonthYear = $request->input('inventory_monthYear');
 
         try {
-            //Connect to archive database
             DB::beginTransaction();
 
-            //Insert non-existing material records for linking later
             foreach ($materialIdList as $materialId) {
                 $material = Material::where('material_id', $materialId)->first();
                 Log::info("material", ['material' => $material]);
@@ -143,7 +141,6 @@ class InventoryController extends ApiController
                 }
             }
 
-            //Archive inventory records
             foreach ($inventoryIdList as $inventoryId) {
                 $inventory = Inventory::where('inventory_id', $inventoryId)->first();
 
@@ -158,19 +155,18 @@ class InventoryController extends ApiController
                 }
             }
 
-            //Archive inventory files w/ selected monthYear
-            foreach ($file as $file) {
-                $fileSettings = json_decode($file->settings);
+            foreach ($file as $fileData) {
+                $fileSettings = json_decode($fileData->settings);
                 $monthYear = $fileSettings->monthYear;
 
                 if ($monthYear === $inventoryMonthYear) {
-                    $inventoryFile = $file->toArray();
+                    $inventoryFile = $fileData->toArray();
 
-                    $inventoryFile['created_at'] = $file->created_at->format('Y-m-d H:i:s');
-                    $inventoryFile['updated_at'] = $file->updated_at->format('Y-m-d H:i:s');
+                    $inventoryFile['created_at'] = $fileData->created_at->format('Y-m-d H:i:s');
+                    $inventoryFile['updated_at'] = $fileData->updated_at->format('Y-m-d H:i:s');
 
                     DB::connection('archive_mysql')->table('files')->insert($inventoryFile);
-                    $file->delete();
+                    $fileData->delete();
                 }
             }
 
@@ -183,7 +179,6 @@ class InventoryController extends ApiController
         }
     }
 
-    //Retrieve all month/year from Files table
     private function retrieveAllMonthYear()
     {
         try {
@@ -227,7 +222,6 @@ class InventoryController extends ApiController
 
                 $existingIndex = array_search($month_year, array_column($inventoryList, 'month_year'));
 
-                //If monthYear alrdy exists, merge inventory ids
                 if ($existingIndex !== false) {
                     $inventoryList[$existingIndex]['inventory_ids'] = array_merge(
                         $inventoryList[$existingIndex]['inventory_ids'],
@@ -256,10 +250,11 @@ class InventoryController extends ApiController
 
             if (!empty($inventoryList)) {
                 $this->status = 200;
-                $this->response['data'] = $inventoryList; //array
+                $this->response['data'] = $inventoryList;
                 return $this->getResponse();
             } else {
-                return $this->getResponse(['message' => "No inventory data found."], 404);
+                $this->status = 404;
+                return $this->getResponse(['message' => "No inventory data found."]);
             }
         } catch (\Exception $e) {
             return response()->json(['error' => $e->getMessage()], 500);
@@ -284,7 +279,6 @@ class InventoryController extends ApiController
         $file = $request->file('file');
         $this->monthYear = $request->input('month_year');
 
-        // Check if monthYear is valid
         $currentMonth = Carbon::now()->format('Y-m');
         $uploadMonth = Carbon::createFromFormat('Y-m', $this->monthYear);
 
@@ -297,20 +291,18 @@ class InventoryController extends ApiController
         $fileNameWithExt = $request->input('file_name_with_extension');
         $extension = $file->getClientOriginalExtension();
 
-        //Check if valid file
         if (strpos($fileName, "Inventory") === false) {
             $this->status = 400;
             return $this->getResponse("Invalid file. Please upload a valid inventory file.");
         }
 
-        //Check if valid inventory file alrdy exists for the monthYear
         $fileCategories = [
-            'MM', //Meat Material
-            'MA', //Meat Alternate
-            'CA', //Casing
-            'FI', //Food Ingredient
-            'PK', //Packaging
-            'TC', //Tin Can
+            'MM',
+            'MA',
+            'CA',
+            'FI',
+            'PK',
+            'TC',
         ];
 
         try {
@@ -349,13 +341,12 @@ class InventoryController extends ApiController
                 'settings' => json_encode($settings),
             ];
 
-            //Process Excel file
             try {
                 $this->processExcel($file->getRealPath(), $this->monthYear);
             } catch (\Exception $e) {
                 $this->status = 400;
                 $this->response['message'] = $e->getMessage();
-                return $this->getResponse($this->response['message'], $this->status);
+                return $this->getResponse($this->response['message']);
             }
 
             $settings['inventory_ids'] = $this->inventoryIds;
@@ -376,7 +367,6 @@ class InventoryController extends ApiController
             $requiredSheets = ['Purchases', 'Inventory', 'Usages'];
             $missingSheets = [];
 
-            //Check for missing required sheets
             foreach ($requiredSheets as $sheet) {
                 if ($spreadsheet->getSheetByName($sheet) === null) {
                     $missingSheets[] = $sheet;
@@ -387,7 +377,6 @@ class InventoryController extends ApiController
                 throw new \Exception("Missing required sheets: " . implode(', ', $missingSheets));
             }
 
-            //Process each sheet
             $worksheets = [
                 'Purchases' => $spreadsheet->getSheetByName('Purchases'),
                 'Inventory' => $spreadsheet->getSheetByName('Inventory'),
@@ -398,7 +387,6 @@ class InventoryController extends ApiController
             $inventoryData = $this->processInventorySheet($worksheets['Inventory']);
             $usagesData = $this->processUsagesSheet($worksheets['Usages']);
 
-            //Create inventory record
             $this->createInventoryRecords($purchasesData, $inventoryData, $usagesData);
 
         } catch (\Exception $e) {
@@ -445,7 +433,6 @@ class InventoryController extends ApiController
             'RM-NM-CA-VI-RE' => 'strd',
         ];
 
-        //Check if monthYear is present in date column
         foreach ($data as $row) {
            if(!empty($row[0])) {
             $carbonDate = Carbon::createFromFormat('m/d/Y', $row[0]);
@@ -468,7 +455,6 @@ class InventoryController extends ApiController
             throw new \Exception("The selected Month/Year date is not present in the Inventory file.");
         }
 
-        // If present, process the data
         foreach ($data as $row) {
             $rowData = array_combine($headers, $row);
             $itemCode = $rowData['Item Code'];
@@ -482,7 +468,6 @@ class InventoryController extends ApiController
                 continue;
             }
 
-            //clean up date column
             $cleanDate = str_replace('\\', '', $date);
             try {
                 $carbonDate = Carbon::createFromFormat('n/d/Y', $cleanDate);
@@ -497,7 +482,6 @@ class InventoryController extends ApiController
 
             $formattedDate = $carbonDate->format('Y-m-d');
 
-            //assign default units if not provided
             if (!$unit || $unit == 'N/A') {
                 foreach ($defaultUnits as $prefix => $defaultUnit) {
                     if (strpos($itemCode, $prefix) === 0) {
@@ -516,7 +500,7 @@ class InventoryController extends ApiController
                     'unit' => $unit,
                 ]
             );
-            //only include purchases for the specified monthYear in purchasesData
+
             if ($carbonDate->format('Y-m') === $monthYear) {
                 $purchasesData[$material->material_id] = [
                     'purchased_qty' => $this->cleanNumericValue($purchasedQty),
@@ -538,7 +522,6 @@ class InventoryController extends ApiController
             $itemCode = $rowData['Item Code'];
             $inventoryQty = $rowData['Quantity'];
 
-            //update existing material
             $material = Material::where('material_code', $itemCode)->first();
 
             if ($material) {
@@ -599,7 +582,6 @@ class InventoryController extends ApiController
                 continue;
             }
 
-            // Determine the category based on the item code
             $category = 'other';
             foreach ($categories as $prefix => $categoryName) {
                 if (strpos($material->material_code, $prefix) === 0) {
@@ -612,7 +594,6 @@ class InventoryController extends ApiController
             $inventoryQty = $inventoryData[$materialId]['inventory_qty'] ?? 0;
             $usageQty = $usagesData[$materialId]['usage_qty'] ?? 0;
 
-            //Determine stock status
             $stockStatus = $inventoryQty < $usageQty ? 'Low Stock' : 'In Stock';
 
             $inventoryRecord = Inventory::create([

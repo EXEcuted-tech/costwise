@@ -160,7 +160,7 @@ const CreateReleaseNotes: React.FC<CreateReleaseNotesProps> = ({setCreateNotes})
     }
 
     return (
-        <div className='flex justify-center items-center z-[1000] w-full h-full fixed p-4 overflow-auto top-0 left-0 bg-[rgba(0,0,0,0.5)]'>
+        <div className='flex justify-center items-center z-[1000] w-full h-full fixed overflow-auto top-0 left-0 bg-[rgba(0,0,0,0.5)]'>
             <div className='absolute top-0 right-0'>
                 {alertMessages && alertMessages.map((msg, index) => (
                 <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
@@ -168,32 +168,32 @@ const CreateReleaseNotes: React.FC<CreateReleaseNotesProps> = ({setCreateNotes})
                 }} />
                 ))}
             </div>
-            <div className="flex flex-col w-[50%] h-[750px] bg-white rounded-[20px] animate-pop-out drop-shadow">
+            <div className="flex flex-col w-[70%] 2xl:w-[60%] 3xl:w-[50%] h-[750px] bg-white dark:bg-[#3C3C3C] rounded-[20px] animate-pop-out drop-shadow">
 
                 {/* Header */}
-                <div className='flex items-center rounded-t-[10px] h-[10%] bg-[#F5F5F5] text-[27px] font-bold'>
+                <div className='flex items-center rounded-[20px] h-[10%] bg-[#F5F5F5] dark:bg-[#121212] text-[27px] font-bold'>
                     <div className='flex items-center w-full h-full ml-[20px] gap-[10px]'>
-                        <FaFilePen className='text-[#777777] text-[30px]' />
-                        <p>Create Release Note</p>
+                        <FaFilePen className='text-[#777777] dark:text-[#d1d1d1] text-[30px]' />
+                        <p className='dark:text-white'>Create Release Note</p>
                     </div>
                     <IoIosClose className='mt-[2px] text-[70px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out'
                         onClick={()=>setCreateNotes(false)}/>
                 </div>
 
-                <div className="h-full">
+                <div className="h-full ">
                     {/* Title Area */}
-                    <div className='flex-row mt-4 mb-4'>
-                        <div className='flex h-[13%] items-center text-[25px] font-bold px-[30px] gap-[20px]'>
-                            <p>Title: <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                    <div className='flex flex-row mt-4 mb-4 dark:text-white '>
+                        <div className='flex h-[13%] items-center text-[25px] font-bold px-[30px] gap-[30px]'>
+                            <p className='flex'>Title: <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                             <input 
-                                className={` ${titleError ? 'border-red-500 border-2' : 'border-[###777777] focus:border-[#777777]'} w-[30rem] h-[60%] py-1 px-[20px] rounded-xl border drop-shadow-lg`}
+                                className={` ${titleError ? 'border-red-500 border-2' : 'border-[###777777] focus:border-[#777777]'} w-[80%] h-[60%] py-1 px-[20px] rounded-xl border drop-shadow-lg`}
                                 placeholder='Release Note Title'
                                 onChange={(e) => handleTitleChange(e.target.value)}
                             ></input>
-                            <div className='flex ml-[20px] h-[13%] items-center text-[25px] font-bold gap-[20px]'>
-                                <p>Version: <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                            <div className='flex items-center text-[25px] font-bold gap-[20px]'>
+                                <p className='flex'>Version: <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                                 <input 
-                                    className={` ${versionError ? 'border-red-500 border-2' : 'border-[###777777] focus:border-[#777777]'} w-[6rem] h-[60%] py-1 px-4 rounded-xl border drop-shadow-lg`}
+                                    className={` ${versionError ? 'border-red-500 border-2' : 'border-[###777777] focus:border-[#777777]'} w-[30%] h-[60%] py-1 px-[10px] rounded-xl border drop-shadow-lg`}
                                     placeholder='1.0'
                                     step='0.1'
                                     type='number'
@@ -240,7 +240,7 @@ const CreateReleaseNotes: React.FC<CreateReleaseNotesProps> = ({setCreateNotes})
                             })}
                         </div>
                     </div>
-                    <div className='h-[70%] px-[30px]'>
+                    <div className='h-[70%] px-[30px] dark:text-white'>
                         <textarea
                             name="content"
                             value={noteContent[currentNoteType]}
@@ -249,7 +249,7 @@ const CreateReleaseNotes: React.FC<CreateReleaseNotesProps> = ({setCreateNotes})
                             placeholder="Section Content"
                         />
                     </div>
-                    <div className='flex mt-7 mr-7 items-center justify-end'>
+                    <div className='flex mt-6 mr-7 items-center justify-end'>
                         <button 
                             className='flex items-center justify-center w-[8rem] font-semibold bg-primary text-white text-[20px] border-r-[2px] rounded-[10px] px-3 py-1 cursor-pointer'
                             onClick={handleSubmit}

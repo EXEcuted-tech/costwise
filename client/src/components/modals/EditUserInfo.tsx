@@ -1,16 +1,17 @@
 import { User } from '@/types/data';
-import defaultProfile from '@/assets/default-profile-picture.png';
+// import defaultProfile from '@/assets/default-profile-picture.png';
 import React, { ChangeEvent, useEffect, useState } from 'react';
 import { BsPersonLock } from 'react-icons/bs';
 import { IoClose, IoCamera } from "react-icons/io5";
 import { RiFolderUserFill } from "react-icons/ri";
-import AddUserRoles, { CheckboxState } from '@/components/pages/user-management/AddUserRoles';
+import AddUserRoles, { CheckboxState } from '@/components/pages/user-management/AddUserRole';
 import Image from 'next/image';
 import config from '@/server/config';
 import api from '@/utils/api';
 import ConfirmChanges from './ConfirmChanges';
 import Alert from '../alerts/Alert';
 import { useUserContext } from '@/contexts/UserContext';
+import { FaUser } from 'react-icons/fa6';
 
 interface EditUserInfoProps {
     user: User;
@@ -42,8 +43,8 @@ const getRoleName = (roleId: number): string => {
 };
 
 
-const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
-    const { currentUser } = useUserContext(); 
+const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
+    const { currentUser } = useUserContext();
 
     const [isInitialized, setIsInitialized] = useState(false);
     const [showRolesSelectModal, setShowRolesSelectModal] = useState(false);
@@ -51,8 +52,8 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
     const [selectedRoleValues, setSelectedRoleValues] = useState<number[]>(Array.isArray(user.sys_role) ? user.sys_role : []);
     const [isFormDirty, setIsFormDirty] = useState(false);
     const [showConfirmChanges, setShowConfirmChanges] = useState(false);
-    
-    const [localProfileImage, setLocalProfileImage] = useState<string>(user.display_picture ? `${config.API}/storage/${user.display_picture}` : defaultProfile.src);
+
+    const [localProfileImage, setLocalProfileImage] = useState<string>(`${config.API}/storage/${user.display_picture}`);
     const [profileImage, setProfileImage] = useState<File | null>(null);
     const [first_name, setFirst_name] = useState<string>('');
     const [email_address, setEmail] = useState<string>('');
@@ -76,11 +77,11 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
     const [positionError, setPositionError] = useState(false);
     const [profilePictureError, setProfilePictureError] = useState(false);
     const [roleError, setRoleError] = useState(false);
-    
+
     useEffect(() => {
         if (user && user.sys_role) {
-            const roles = Array.isArray(user.sys_role) 
-                ? user.sys_role 
+            const roles = Array.isArray(user.sys_role)
+                ? user.sys_role
                 : JSON.parse(user.sys_role);
             setSelectedRoleValues(roles);
         }
@@ -92,26 +93,26 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
     }
 
     //Prefill form fields
-    useEffect (() => {  
+    useEffect(() => {
         if (user && Object.keys(user).length > 0) {
             // console.log('Initializing user info with:', user);
             retireveUserInfo(user);
             setIsInitialized(true);
         }
-      }, [user]);
+    }, [user]);
 
-    const retireveUserInfo = async(user: User) => {
+    const retireveUserInfo = async (user: User) => {
         setFirst_name(user.first_name || '');
         setMiddle_name(user.middle_name || '');
         setLast_name(user.last_name || '');
-        setSuffix(user.employee_suffix ||  '');
+        setSuffix(user.employee_suffix || '');
         setEmail(user.email_address || '');
         setDepartment(user.department || '');
         setEmployee_number(user.employee_number || '');
         setPhone_number(user.phone_number || '');
         setPosition(user.position || '');
-        setLocalProfileImage(user.display_picture ? `${config.API}/storage/${user.display_picture}` : defaultProfile.src);
-        
+        setLocalProfileImage(`${config.API}/storage/${user.display_picture}`);
+
         let sysRoles: number[] = [];
         if (typeof user.sys_role === 'string') {
             try {
@@ -120,7 +121,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
             }
         } else if (Array.isArray(user.sys_role)) {
             sysRoles = user.sys_role;
-            
+
         }
         const newSelectedRoles = sysRoles.map((roleId: number) => getRoleName(roleId));
         setSelectedRoles(newSelectedRoles);
@@ -129,7 +130,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
     //Confirm changes
     useEffect(() => {
         if (isInitialized && user && Object.keys(user).length > 0) {
-            const isDirty = 
+            const isDirty =
                 first_name !== (user.first_name || '') ||
                 middle_name !== (user.middle_name || '') ||
                 last_name !== (user.last_name || '') ||
@@ -139,16 +140,16 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                 employee_number !== (user.employee_number || '') ||
                 phone_number !== (user.phone_number || '') ||
                 position !== (user.position || '') ||
-                localProfileImage !== (user.display_picture ? `${config.API}/storage/${user.display_picture}` : defaultProfile.src) ||
+                localProfileImage !== (`${config.API}/storage/${user.display_picture}`) ||
                 JSON.stringify(selectedRoleValues) !== JSON.stringify(user.sys_role || []);
-            
+
             // console.log('Form dirty state:', isDirty);
             // console.log('Current values:', { first_name, middle_name, last_name, suffix, email_address, department, employee_number, phone_number, position, localProfileImage, selectedRoleValues });
             // console.log('Original user values:', user);
 
-        setIsFormDirty(isDirty);
+            setIsFormDirty(isDirty);
         }
-    }, [first_name, middle_name, last_name, suffix, email_address, department, 
+    }, [first_name, middle_name, last_name, suffix, email_address, department,
         employee_number, phone_number, position, localProfileImage, selectedRoleValues, user, isInitialized]);
 
     const handleNavigation = () => {
@@ -182,7 +183,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
         }
 
         setProfileImage(file);
-        
+
         const reader = new FileReader();
         reader.onload = () => {
             setLocalProfileImage(reader.result as string);
@@ -208,7 +209,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
     }
 
     //Update user info
-     const handleSubmit = async () => {
+    const handleSubmit = async () => {
         const newAlertMessages: string[] = [];
         setAlertStatus('critical');
 
@@ -226,7 +227,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
         setPositionError(false);
         setProfilePictureError(false);
         setRoleError(false);
-        
+
         // Check required fields
         if (!first_name && !last_name && !email_address && !department && !employee_number && !phone_number && !position && !profileImage && selectedRoles.length === 0) {
             newAlertMessages.push('Fill in all required fields!');
@@ -289,7 +290,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
             return;
         }
 
-        try { 
+        try {
             const accessToken = localStorage.getItem('accessToken');
             const formData = new FormData();
 
@@ -319,34 +320,34 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
             setAlertMessages([response.data.message]);
             setAlertStatus('success');
             const fullName = `${user.first_name} ${user.last_name}`;
-            
+
             const userRetrieved = localStorage.getItem('currentUser');
             const parsedUser = JSON.parse(userRetrieved || '{}');
 
             const auditData = {
-                userId: parsedUser?.userId, 
+                userId: parsedUser?.userId,
                 action: 'general',
                 act: 'edit_user',
                 fileName: fullName
             };
 
             api.post('/auditlogs/logsaudit', auditData)
-            .then(response => {
-                console.log('Audit log created successfully:', response.data);
-            })
-            .catch(error => {
-                console.error('Error audit logs:', error);
-            });
+                .then(response => {
+                    console.log('Audit log created successfully:', response.data);
+                })
+                .catch(error => {
+                    console.error('Error audit logs:', error);
+                });
 
             window.location.reload();
 
         } catch (error: any) {
             console.log(error)
             let errorMessages: string[] = []
-            
+
             if (error.response && error.response.data) {
                 const responseData = error.response.data;
-                
+
                 if (responseData.errors && typeof responseData.errors === 'object') {
                     Object.values(responseData.errors).forEach((errorArray: any) => {
                         if (Array.isArray(errorArray)) {
@@ -357,11 +358,11 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                     errorMessages.push(responseData.message);
                 }
             }
-            
+
             if (errorMessages.length === 0) {
                 errorMessages.push('Unexpected error occurred. Please try again.');
             }
-            
+
             setAlertMessages(errorMessages);
             setAlertStatus('critical');
         }
@@ -369,18 +370,18 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
     }
 
     return (
-        <div className='flex justify-center items-center z-[199999] w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)]'>
-            
-            <div className='absolute top-0 right-0 z-[9999]'>
+        <div className='flex justify-center items-center z-[9999] w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)]'>
+
+            <div className='absolute top-0 right-0 z-[99999]'>
                 {alertMessages && alertMessages.map((msg, index) => (
-                <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
-                    setAlertMessages(prev => prev.filter((_, i) => i !== index));
-                }} />
+                    <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
+                        setAlertMessages(prev => prev.filter((_, i) => i !== index));
+                    }} />
                 ))}
             </div>
             {showConfirmChanges && (
-                <ConfirmChanges 
-                    setConfirmChanges={setShowConfirmChanges} 
+                <ConfirmChanges
+                    setConfirmChanges={setShowConfirmChanges}
                     onConfirm={() => {
                         setShowConfirmChanges(false);
                         onClose();
@@ -388,41 +389,41 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                 />
             )}
 
-             {showRolesSelectModal && (
-                <AddUserRoles 
-                    onClose={() => setShowRolesSelectModal(false)} 
+            {showRolesSelectModal && (
+                <AddUserRoles
+                    onClose={() => setShowRolesSelectModal(false)}
                     onConfirm={handleConfirmRoles}
                     initialSelectedRoles={selectedRoles}
                     initialSelectedRoleValues={selectedRoleValues}
                 />
             )}
-            
-            <div className="flex flex-col w-auto h-auto mx-[50px] p-6 bg-white shadow-md shadow-gray-800 rounded-lg animate-pop-out max-4xl:scale-90 max-3xl:scale-85 max-2xl:scale-80 max-xl:scale-75 max-xl:left-[15%] max-2xl:left-[20%] max-3xl:left-[25%]"> 
-                
-                {/* Title */} 
+
+            <div className="flex flex-col w-auto h-auto mx-[50px] p-6 bg-white dark:bg-[#3C3C3C] shadow-md shadow-gray-800 rounded-lg animate-pop-out max-4xl:scale-90 max-3xl:scale-85 max-2xl:scale-80 max-xl:scale-75 max-xl:left-[15%] max-2xl:left-[20%] max-3xl:left-[25%]">
+
+                {/* Title */}
                 <div className='flex justify-center mt-1 mb-1 border-b-2 border-[#A0A0A0]'>
-                    <div className="flex text-[1.6em] font-semibold ml-6 mb-2">
-                        <RiFolderUserFill className='mr-2 text-gray-600 text-[1.6em]' /> User Information
+                    <div className="flex text-[1.6em] font-semibold ml-6 mb-2 dark:text-white">
+                        <RiFolderUserFill className='mr-2 text-gray-600 text-[1.6em] dark:text-[#d1d1d1]' /> User Information
                     </div>
 
                     {/* Assign Roles */}
                     <div className='flex ml-auto mr-2 mb-2'>
-                        <button 
+                        <button
                             className='flex items-center bg-gray-100 rounded-lg p-2 px-3 border border-gray-300 hover:bg-gray-200 cursor-pointer transition-colors duration-300 ease-in-out'
                             onClick={handleShowRolesSelectModal}
                         >
                             <BsPersonLock className='text-[1.7em] text-[#5B5353]' />
                             <span className=' text-[1.1em] text-gray-600 ml-2 mt-1'>User Roles</span>
                             {selectedRoles.length > 0 && !roleError && (
-                                    <span className="ml-2 mt-1 text-sm text-gray-600">
-                                        {selectedRoles.length} role{selectedRoles.length !== 1 ? 's' : ''} selected
-                                    </span>
-                                )}
-                        </button>  
+                                <span className="ml-2 mt-1 text-sm text-gray-600">
+                                    {selectedRoles.length} role{selectedRoles.length !== 1 ? 's' : ''} selected
+                                </span>
+                            )}
+                        </button>
                     </div>
 
                     <div className="h-[2rem] text-[2em] text-[#CECECE]">
-                        <button 
+                        <button
                             onClick={() => handleNavigation()}
                         >
                             <IoClose />
@@ -447,37 +448,42 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                                 accept="image/jpeg,image/png"
                             />
                             <div className='w-24 h-24 bg-gray-300 border-4 border-[#A60000] rounded-full transition-all duration-300 ease-in-out'>
-                                <Image
-                                    src={localProfileImage}
-                                    alt="Profile preview"
-                                    height={100}
-                                    width={100}
-                                    style={{ objectFit: 'fill', borderRadius: '100%', transition: 'border-color 0.3s ease-in-out' }}
-                                    onError={(e) => {
-                                        e.currentTarget.src = defaultProfile.src;
-                                    }}
-                                />
+                                {localProfileImage != `${config.API}/storage/null` ?
+                                    <Image
+                                        src={localProfileImage}
+                                        alt="Profile preview"
+                                        height={100}
+                                        width={100}
+                                        style={{ objectFit: 'fill', borderRadius: '100%', transition: 'border-color 0.3s ease-in-out' }}
+                                    />
+                                    :
+                                    <div
+                                        className='flex justify-center items-center w-full h-full rounded-full bg-gray-200'
+                                    >
+                                        <FaUser className='text-gray-500 text-[3rem] w-3/4 h-3/4' />
+                                    </div>
+                                }
                             </div>
                         </div>
-                        <div className="">
+                        <div className="dark:text-white">
                             <div className='text-[1.4em] font-semibold capitalize'> {user.first_name} {user.last_name} </div>
                             <div className='text-[1.1em] capitalize'> {user.position} </div>
                         </div>
                     </div>
 
-                    
+
                 </div>
 
                 {/* Form */}
-                <div className='flex justify-center'>
+                <div className='flex justify-center dark:text-white'>
                     {/* 1st Col */}
                     <div className='flex flex-col ml-3 mr-8'>
                         <div className='flex flex-col justify-start text-[1.2em] mb-4'>
-                        <p className={`${firstNameError ? 'text-[#B22222]' : ''} flex `}>First Name <span className='text-[#B22222] ml-1 font-bold'>*</span></p> 
-                        <div className="flex flex-col w-full">
+                            <p className={`${firstNameError ? 'text-[#B22222]' : ''} flex `}>First Name <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                            <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
+                                        className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
                                         type="fname"
                                         name="fname"
                                         value={first_name}
@@ -488,11 +494,11 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                         </div>
 
                         <div className='flex flex-col justify-start text-[1.2em] mb-4'>
-                        <p className={`${emailError ? 'text-[#B22222]' : ''} flex `}>Email Address <span className='text-[#B22222] ml-1 font-bold'>*</span></p> 
+                            <p className={`${emailError ? 'text-[#B22222]' : ''} flex `}>Email Address <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
                                         type="email"
                                         name="email"
                                         value={email_address}
@@ -507,7 +513,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <select
-                                        className={` ${departmentError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        className={` ${departmentError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
                                         name="dept"
                                         onChange={(e) => updateSelect(setDepartment)(e)}
                                     >
@@ -528,7 +534,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className='bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base border-[#B3B3B3]  focus:outline'
+                                        className='bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base border-[#B3B3B3]  focus:outline'
                                         type="mname"
                                         name="mname"
                                         value={middle_name}
@@ -543,7 +549,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${employeeNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        className={` ${employeeNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
                                         type="enum"
                                         name="enum"
                                         value={employee_number}
@@ -558,7 +564,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
                                         type="contactnum"
                                         name="contactnum"
                                         value={phone_number}
@@ -569,14 +575,14 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                         </div>
                     </div>
 
-                     {/* 3rd Col */}
-                     <div className='flex flex-col mr-6'>
+                    {/* 3rd Col */}
+                    <div className='flex flex-col mr-6'>
                         <div className='flex flex-col justify-start text-[1.2em] mb-4'>
-                        <p className={`${lastNameError ? 'text-[#B22222]' : ''} flex `}>Last Name<span className='text-[#B22222] ml-1 font-bold'>*</span></p> 
+                            <p className={`${lastNameError ? 'text-[#B22222]' : ''} flex `}>Last Name<span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
+                                        className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
                                         type="lname"
                                         name="lname"
                                         value={last_name}
@@ -587,11 +593,11 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                         </div>
 
                         <div className='flex flex-col justify-start text-[1.2em] mb-4'>
-                        <p className={`${suffixError ? 'text-[#B22222]' : ''} flex `}>Suffix</p>
-                        <div className="flex flex-col w-full">
+                            <p className={`${suffixError ? 'text-[#B22222]' : ''} flex `}>Suffix</p>
+                            <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${suffixError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
+                                        className={` ${suffixError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
                                         type="suffix"
                                         name="suffix"
                                         value={suffix}
@@ -602,11 +608,11 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                         </div>
 
                         <div className='flex flex-col justify-start text-[1.2em] mb-4'>
-                        <p className={`${positionError ? 'text-[#B22222]' : ''} flex `}>Position <span className='text-[#B22222] ml-1 font-bold'>*</span></p> 
+                            <p className={`${positionError ? 'text-[#B22222]' : ''} flex `}>Position <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${positionError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
+                                        className={` ${positionError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
                                         type="position"
                                         name="position"
                                         value={position}
@@ -618,16 +624,16 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user}) => {
                     </div>
                 </div>
 
-                 {/* Buttons */}
-                 <div className='flex w-full mt-7 justify-center'>
-                    <button 
+                {/* Buttons */}
+                <div className='flex w-full mt-7 justify-center'>
+                    <button
                         className='w-[7rem] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] text-white mr-4 shadow-lg rounded-xl hover:bg-[#006900] transition-colors duration-300 ease-in-out'
                         onClick={handleSubmit}
-                    > 
-                        Save 
+                    >
+                        Save
                     </button>
                 </div>
-            </div>  
+            </div>
         </div>
     )
 }

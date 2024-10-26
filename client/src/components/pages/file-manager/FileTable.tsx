@@ -156,13 +156,13 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
                             return (
                                 <tr key={index} className='border-b-[0.3px] border-[#d9d9d9]'>
                                     <td className={`${isOpen ? 'pl-[20px] 2xl:pl-[46px]' : 'pl-[46px]'} py-2`}>
-                                        <p className={`${isOpen ? 'text-[16px] 2xl:text-[18px]' : 'text-[18px]'} text-primary dark:text-[#ff5252] cursor-pointer hover:underline`}
+                                        <p className={`text-[16px] 2xl:text-[18px] text-primary dark:text-[#ff5252] cursor-pointer hover:underline`}
                                             onClick={() => handleView(data)}>{fileLabel}</p>
-                                        <p className={`${isOpen && 'text-[14px] 2xl:text-[16px]'} italic text-[#868686] dark:text-[#d1d1d1]`}>{fileName}</p>
+                                        <p className={`text-[14px] 2xl:text-[16px] italic text-[#868686] dark:text-[#d1d1d1]`}>{fileName}</p>
                                     </td>
-                                    <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'} dark:text-white`}>{fileType}</td>
-                                    <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'} dark:text-white`}>{dateAdded}</td>
-                                    <td className={`${isOpen && 'text-[14px] 2xl:text-[16px]'} dark:text-white`}>{addedBy}</td>
+                                    <td className={` text-[14px] 2xl:text-[16px] dark:text-white`}>{fileType}</td>
+                                    <td className={` text-[14px] 2xl:text-[16px] dark:text-white`}>{dateAdded}</td>
+                                    <td className={` text-[14px] 2xl:text-[16px] dark:text-white`}>{addedBy}</td>
                                     <td className={`${isOpen ? 'w-[20%] 3xl:w-[15%] pr-[20px] 2xl:pr-[46px]' : 'w-[20%] 2xl:w-[15%] pr-[46px]'}`}>
                                         <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
                                             <div className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:text-white dark:hover:bg-[#4C4C4C]

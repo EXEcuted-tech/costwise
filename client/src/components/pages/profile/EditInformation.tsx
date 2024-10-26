@@ -87,6 +87,17 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
         };
         try {
             await api.put('/user/update', payload);
+
+            const user = localStorage.getItem('currentUser');
+            const parsedUser = JSON.parse(user || '{}');
+
+            const auditData = {
+                userId: parsedUser?.userId,
+                action: 'general',
+                act: 'edit',
+            };
+
+            api.post('/auditlogs/logsaudit', auditData);
             setSuccessModal(true);
         } catch (error: any) {
             console.log("Error updating user info", error);

@@ -28,7 +28,7 @@ function ProjectedCostingContent({ children }: { children: React.ReactNode }) {
           : isOpen
             ? "w-[calc(100%-280px)] 2xl:w-full ml-[280px] 2xl:ml-[360px]"
             : "w-full ml-[120px]"
-          } min-h-screen font-lato bg-background transition-all duration-400 ease-in-out`}
+          } min-h-screen font-lato bg-background dark:bg-[#121212] transition-all duration-400 ease-in-out`}
       >
         {children}
       </main>

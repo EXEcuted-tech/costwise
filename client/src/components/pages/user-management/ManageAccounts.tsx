@@ -15,9 +15,20 @@ interface ManageAccountsPageProps {
     fileData: User[];
     isOpen?: boolean;
     isLoading: boolean;
+    selectedUser: User;
+    setSelectedUser: React.Dispatch<React.SetStateAction<User>>;
+    setIsEditModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
+    setIsDeleteModalOpen: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, isLoading }) => {
+const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ 
+    fileData, 
+    isOpen, 
+    isLoading, 
+    selectedUser, 
+    setSelectedUser, 
+    setIsEditModalOpen,
+    setIsDeleteModalOpen }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
@@ -27,10 +38,6 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
     const indexOfFirstItem = indexOfLastItem - 8;
     const currentListPage = fileData.slice(indexOfFirstItem, indexOfLastItem);
 
-    const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-
-    const [selectedUser, setSelectedUser] = useState<User>({} as User);
     const [errorMsg, setErrorMsg] = useState<string>('');
     const { currentUser } = useUserContext();
     const sysRoles = currentUser?.roles;
@@ -44,9 +51,6 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
         setIsEditModalOpen(true);
     };
 
-    const closeEditModal = () => {
-        setIsEditModalOpen(false);
-    };
 
     const openDeleteModal = (user: User) => {
         if (!sysRoles?.includes(3)) {
@@ -57,31 +61,25 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
         setIsDeleteModalOpen(true);
     };
 
-    const closeDeleteModal = () => {
-        setIsDeleteModalOpen(false);
-    };
-
     return (
         <>
             {errorMsg && <Alert setClose={() => setErrorMsg('')} variant='critical' message={errorMsg} />}
             {/* Modals */}
-            {isEditModalOpen && <EditUserInfo user={selectedUser} onClose={closeEditModal} />}
-            {isDeleteModalOpen && <ConfirmDeleteUser user={selectedUser} onClose={closeDeleteModal} />}
-            <div className="flex flex-col w-auto h-[44rem] rounded-lg shadow-md shadow-gray-300">
+            <div className="flex flex-col w-auto h-[44rem] rounded-lg shadow-md shadow-gray-300 dark:shadow-gray-800 dark:bg-[#3C3C3C] ">
                 {/* Main Content */}
-                <div className="animate-fade-in3 flex flex-col w-auto h-[38rem] xl:h-[40rem] 2xl:h-[38rem] 3xl:h-[38rem] 4xl:h-[38rem]">
-                    <table className="w-full h-[5rem] text-left">
-                        <thead className="bg-[#F3F3F3] border-b border-[#868686]">
-                            <tr className={`${isOpen ? 'text-[1.1em] 3xl:text-[1em] 2xl:text-[1em] xl:text-[0.9em]' : 'text-[1.3em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[1em]'} text-[#6B6B6B]`}>
+                <div className="animate-fade-in3 flex flex-col w-auto rounded-t-xl dark:bg-[#3C3C3C] dark:text-[#d1d1d1] h-[38rem] xl:h-[40rem] 2xl:h-[38rem] 3xl:h-[38rem] 4xl:h-[38rem]">
+                    <table className="w-full h-[5rem] rounded-t-xl text-left">
+                        <thead className="bg-[#F3F3F3] dark:bg-[#5C5C5C] border-b rounded-t-xl border-[#868686]">
+                            <tr className={`${isOpen ? 'text-[16px] 3xl:text-[1.2em] 2xl:text-[1.1em]' : 'text-[16px] 3xl:text-[1.2em] 2xl:text-[1.1em]'} text-[#6B6B6B] dark:text-[#d1d1d1]`}>
                                 <th className={`${isOpen ? 'pl-[2rem] 4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[14rem] xl:w-[8rem]' : 'pl-8 w-[20rem] 4xl:w-[20rem] 3xl:w-[15rem] 2xl:w-[14rem] xl:pl-6'} py-4`}
                                 >Name</th>
                                 <th className={`${isOpen ? 'w-[10rem] 4xl:w-[10rem] 3xl:w-[7rem] 2xl:w-[8rem] xl:w-[6rem]' : 'w-[15rem] 4xl:w-[10rem] 3xl:w-[10rem] 2xl:w-[8rem] xl:w-[7rem]'} py-4 `}
                                 >Position</th>
                                 <th className={`${isOpen ? '4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[12rem] xl:w-[12rem]' : '4xl:w-[15rem] xl:w-[15rem]'} py-4`}>
                                     Email</th>
-                                <th className={`${isOpen ? '4xl:w-[13rem] 3xl:w-[10rem] 2xl:w-[12rem] xl:w-[10rem]' : '4xl:w-[13rem] 2xl:w-[10rem] xl:w-[13rem]'} py-4`}>
+                                <th className={`${isOpen ? '4xl:w-[13rem] 3xl:w-[12rem] 2xl:w-[14rem] xl:w-[12rem]' : '4xl:w-[13rem] 2xl:w-[10rem] xl:w-[13rem]'} py-4`}>
                                     Contact Number</th>
-                                <th className={`${isOpen ? '4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[9rem] xl:w-[5rem]' : ' 4xl:w-[15rem] 3xl:w-[15rem] 2xl:w-[13rem] xl:w-[5rem]'} w-[15rem] py-4`}>
+                                <th className={`${isOpen ? '4xl:w-[15rem] 3xl:w-[13rem] 2xl:w-[9rem] xl:w-[10rem]' : ' 4xl:w-[15rem] 3xl:w-[15rem] 2xl:w-[13rem] xl:w-[8rem]'} w-[15rem] py-4`}>
                                     Department</th>
                                 <th className={`${isOpen ? 'w-[10rem] 4xl:w-[10rem] 3xl:w-[7rem] 2xl:w-[8rem] xl:w-[6rem]' : 'w-[15rem] 4xl:w-[10rem] 3xl:w-[10rem] 2xl:w-[8rem] xl:w-[7rem]'} w-[15rem] py-4`}>
                                     Role</th>
@@ -89,7 +87,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                                 >Manage</th>
                             </tr>
                         </thead>
-                        <tbody>
+                        <tbody className='dark:bg-[#3C3C3C]'>
                             {isLoading ? (
                                 <tr>
                                     <td colSpan={7} className="text-center pt-[15rem]">
@@ -100,7 +98,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                                 </tr>
                             ) : fileData.length > 0 ? (
                                 currentListPage.map((data, index) => (
-                                    <tr key={index} className={`${isOpen ? 'text-[1.1em] 4xl:text-[1.1em] 3xl:text-[0.9em] 2xl:text-[0.8em] xl:text-[0.7em]' : 'text-[1.2em] 4xl:text-[1.2em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[1em]'} border-b border-[#868686] hover:bg-gray-50`}>
+                                    <tr key={index} className={`${isOpen ? 'text-[1.1em] 4xl:text-[1.1em] 3xl:text-[0.9em] 2xl:text-[0.8em] xl:text-[0.7em]' : 'text-[1.2em] 4xl:text-[1.2em] 3xl:text-[1.2em] 2xl:text-[1.1em] xl:text-[1em]'} border-b border-[#868686] dark:bg-[#3C3C3C] hover:bg-gray-50`}>
                                         <td className={`${isOpen ? 'pl-[2rem]' : 'pl-8 xl:pl-6'} break-words capitalize`}>{data.first_name} {data.middle_name} {data.last_name}</td>
                                         <td className="py-5 break-words capitalize">{data.position}</td>
                                         <td className="py-4 break-words">{data.email_address}</td>
@@ -125,7 +123,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                                 ))
                             ) : (
                                 <tr>
-                                    <td colSpan={7} className="text-center items-center justify-items-center font-semibold pt-[13rem] text-[#555555]">
+                                    <td colSpan={7} className="text-center items-center justify-items-center dark:bg-[#3C3C3C] font-semibold pt-[13rem] text-[#555555]">
                                         <FaUserLargeSlash className='text-[85px] mb-4' />
                                         <p className='text-[20px]'>No users to display.</p>
                                     </td>
@@ -136,7 +134,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({ fileData, isOpen, i
                 </div>
 
                 {/* Footer */}
-                <div className="flex w-full justify-center h-[5rem] mt-4 rounded-b-xl bg-white border-[#868686]">
+                <div className="flex w-full justify-center h-[5rem] mt-4 rounded-b-xl bg-white dark:bg-[#3C3C3C] border-[#868686]">
                     <PrimaryPagination
                         data={fileData}
                         itemsPerPage={8}

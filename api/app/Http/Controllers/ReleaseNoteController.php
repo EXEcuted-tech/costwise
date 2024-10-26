@@ -67,13 +67,6 @@ class ReleaseNoteController extends ApiController
         try {
             $notes = ReleaseNote::with('user:user_id,first_name,middle_name,last_name,suffix')->orderBy('created_at', 'desc')->get();
 
-            if ($notes->isEmpty()) {
-                return response()->json([
-                    'status' => 'error',
-                    'message' => 'No release notes found.'
-                ], 404);
-            }
-
             $formattedNotes = $notes->map(function ($note) {
                 return [
                     'note_id' => $note->note_id,
@@ -192,14 +185,12 @@ class ReleaseNoteController extends ApiController
                 ], 404);
             }
 
-            // Format datetime values
             $noteData = $note->toArray();
             $noteData['created_at'] = $note->created_at->format('Y-m-d H:i:s');
             $noteData['updated_at'] = $note->updated_at->format('Y-m-d H:i:s');
             $noteData['content'] = json_encode($noteData['content']);
             $noteData['user_id'] = NULL;
 
-            //Archive release note
             DB::beginTransaction();
             DB::connection('archive_mysql')->table('release_notes')->insert($noteData);
             $note->delete();

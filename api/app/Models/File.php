@@ -23,8 +23,4 @@ class File extends Model
         'file_type',
         'settings',
     ];
-
-    // protected $casts = [
-    //     'settings' => 'array', // Ensure 'settings' is cast to an array
-    // ];
 }
