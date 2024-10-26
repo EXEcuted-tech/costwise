@@ -109,7 +109,7 @@ const AuditLogPage = () => {
             }
         }
 
-        const initialFetchTimeout = setTimeout(fetchData, 5000);
+        const initialFetchTimeout = setTimeout(fetchData, 500);
 
         const fetchInterval = setInterval(fetchData, 30000);
 

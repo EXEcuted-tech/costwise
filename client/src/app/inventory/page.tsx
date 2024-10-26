@@ -27,9 +27,7 @@ const Inventory = () => {
     const [isImportInventoryListModalOpen, setImportInventoryListModalOpen] = useState(false);
     const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
     const [isLoading, setIsLoading] = useState(true);
-    const [isImport, setIsImport] = useState(() => {
-        return localStorage.getItem('isImport') === 'true';
-    });
+    // const [isImport, setIsImport] = useState(false);
 
     const [monthOptions, setMonthOptions] = useState<{ display: string; value: string }[]>([]);
     const [selectedMonth, setSelectedMonth] = useState<string>('');
@@ -147,13 +145,13 @@ const Inventory = () => {
                         });
                         setInventoryList(processedInventoryList);
 
-                        if(isImport){
+                        const checkImport = localStorage.getItem('isImport') == 'true';
+                        if(checkImport){
                             processedInventoryList.flat().forEach(item => {
                                 if (item.stock_status === 'Low Stock') {
                                     logLowStockAudit(item);
                                 }
                             });
-                            setIsImport(false);
                             localStorage.removeItem('isImport');
                         }
 
@@ -190,13 +188,13 @@ const Inventory = () => {
         }
     }, [monthOptions]);
 
-    useEffect(() => {
-        if (isImport) {
-            localStorage.setItem('isImport', 'true');
-        } else {
-            localStorage.removeItem('isImport');
-        }
-    }, [isImport]);
+    // useEffect(() => {
+    //     if (isImport) {
+    //         localStorage.setItem('isImport', 'true');
+    //     } else {
+    //         localStorage.removeItem('isImport');
+    //     }
+    // }, [isImport]);
 
     // Search & Filter
     const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -275,7 +273,7 @@ const Inventory = () => {
             }
 
             {isImportInventoryListModalOpen &&
-                <ImportInventoryList onClose={closeImportInventoryListModal} setIsImport={setIsImport}/>
+                <ImportInventoryList onClose={closeImportInventoryListModal}/>
             }
 
             {isDeleteModalOpen && <ConfirmDeleteInventory inventoryList={currentMonthInventory} monthYear={selectedMonth} onClose={closeDeleteModal} />}

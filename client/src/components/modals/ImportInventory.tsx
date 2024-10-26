@@ -6,13 +6,13 @@ import { FaFileCircleCheck, FaFileCircleXmark, FaRegFile } from "react-icons/fa6
 import Alert from '../alerts/Alert';
 import api from '@/utils/api';
 import { useUserContext } from '@/contexts/UserContext';
+import Spinner from '../loaders/Spinner';
 
 interface ImportInventoryListProps {
     onClose: () => void;
-    setIsImport: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
-const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, setIsImport }) => {
+const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) => {
     const { currentUser } = useUserContext();
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
@@ -22,6 +22,7 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, setI
     const [fileNameWithExt, setFileNameWithExt] = useState<string>('');
     const [fileSize, setFileSize] = useState<number>(0);
     const [monthYear, setMonthYear] = useState<string>('');
+    const [isLoading, setIsLoading] = useState(false);
 
     //File Upload 
     const handleDragOver = (event: React.DragEvent<HTMLLabelElement>) => {
@@ -123,6 +124,7 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, setI
 
         // Import file
         try {
+            setIsLoading(true);
             const accessToken = localStorage.getItem('access_token');
             const formData = new FormData();
 
@@ -143,8 +145,10 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, setI
             if (response.data.message) {
                 setAlertMessages([response.data.message]);
                 setAlertStatus('success');
+                setIsLoading(false);
             }
-            setIsImport(true);
+
+            localStorage.setItem('isImport', 'true');
             setTimeout(function () { location.reload() }, 1000);
 
             const user = localStorage.getItem('currentUser');
@@ -164,12 +168,13 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, setI
                 .catch(error => {
                     console.error('Error audit logs:', error);
                 });
-            
+
             onClose();
         } catch (error: any) {
             console.error('Error importing file:', error);
             setAlertMessages([error.response.data.message]);
             setAlertStatus('critical');
+            setIsLoading(false);
         }
 
 
@@ -298,7 +303,14 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose, setI
                             className="text-[19px] font-black before:ease relative h-12 w-full overflow-hidden bg-primary text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-primary hover:before:-translate-x-[400px]"
                             onClick={handleConfirm}
                         >
-                            <span className="relative z-10">Confirm</span>
+                            {isLoading ? (
+                                <div className='flex justify-center items-center'>
+                                    <Spinner className='mr-4'/>
+                                    <span className="relative z-10">Confirm</span>
+                                </div>
+                            ) : (
+                                <span className="relative z-10">Confirm</span>
+                            )}
                         </button>
                     </div>
                 </div>
