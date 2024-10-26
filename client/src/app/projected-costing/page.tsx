@@ -216,36 +216,36 @@ const ProjectedCostPage = () => {
           </div>
         </div>
         <div
-          className={`${isOpen ? "flex flex-col 4xl:flex-row" : "flex flex-col 2xl:flex-row"
-            } w-[97%] h-full gap-[2%] rounded-xl mt-[10px] 2xl:mt-0`}
+          className={`${isOpen ? "flex flex-col 4xl:flex-row" : "flex flex-col 3xl:flex-row"
+            } w-[97%] h-full gap-[2%] rounded-xl mt-[10px] 2xl:mt-0 bg-white`}
         >
           {/* Left Div */}
           <div
-            className={`${isOpen ? "w-full 4xl:w-[65%]" : "w-full 2xl:w-[65%]"
+            className={`${isOpen ? "w-full 4xl:w-[55%]" : "w-full 3xl:w-[55%]"
               } flex flex-col h-full rounded-lg shadow-lg`}
           >
             <div className="flex text-[30px] font-bold h-[10%] bg-white rounded-t-[20px] items-center justify-start border-b-2 pl-10">
               <p className="w-[95%] text-[#585858]">Graph</p>
             </div>
-            <div className="flex items-center justify-center h-[500px] lg:h-[50%] w-[100%] bg-white p-2">
+            <div className="flex items-center justify-center h-[500px] lg:h-full w-full bg-white p-2">
               <ProductCost
                 selectedYear={activeStart}
                 selectedHalf={activeEnd}
               />
             </div>
-            <div className="flex text-[30px] text-[#585858] font-bold h-[10%] bg-white items-center justify-start border-y-2 pl-10">
+            <div className="flex text-[30px] text-[#585858] font-bold bg-white items-center justify-start border-y-2 pl-10">
               <p className="w-[95%]">Estimated Summary</p>
               <Tooltip content="Key metrics overview from the model's performance" placement="right">
-                <span><IoIosInformationCircle className="text-[35px] text-[#625F5F] hover:brightness-50" /></span>
+                <span><IoIosInformationCircle className="text-[35px] text-[#625F5F] hover:brightness-50 mr-[10px]" /></span>
               </Tooltip>
             </div>
-            <div className="flex items-center justify-center h-[30%] bg-white p-10 2xl:p-0 rounded-b-[20px] shadow-b-lg">
-              <TrainingModel />
+            <div className="flex items-center justify-center bg-white p-2 2xl:p-2 rounded-b-[20px] shadow-b-lg">
+              <TrainingModel isOpen={isOpen}/>
             </div>
           </div>
           {/* Right Div */}
           <div
-            className={`${isOpen ? "w-full 4xl:w-[45%]" : "w-full 2xl:w-[45%]"
+            className={`${isOpen ? "w-full 4xl:w-[45%]" : "w-full 3xl:w-[45%]"
               } flex flex-col gap-[10px] h-full mt-[10px] 2xl:mt-0`}
           >
             <div
@@ -257,7 +257,7 @@ const ProjectedCostPage = () => {
               {/* Predictions Section */}
               <div
                 className={`${isOpen ? "h-full " : ""
-                  } flex flex-col bg-white p-[10px] m-1 w-full border-l-[15px] border-blue-500 rounded-e-lg shadow-lg`}
+                  } flex flex-col bg-white p-[10px] mr-1 w-full border-l-[15px] border-blue-500 rounded-e-lg shadow-lg`}
               >
                 <div className="border-b-1 border-[#D9D9D9] flex flex-row">
                   <p className="text-[24px] font-bold w-[95%]">
@@ -285,7 +285,7 @@ const ProjectedCostPage = () => {
               </div>
             </div>
             {/* Projected Product Cost Case Section */}
-            <div className="flex flex-col bg-white p-[10px] m-1 h-full rounded-lg shadow-lg">
+            <div className="flex flex-col bg-white p-[10px] h-full w-full rounded-lg shadow-lg">
               <div className="flex flex-row p-[5px]">
                 <p className="text-[24px] font-bold w-[95%]">
                   Projected Finished Goods Cost
