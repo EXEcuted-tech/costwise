@@ -59,6 +59,12 @@ class AuditLogController extends Controller
                     case "archive":
                         $description = "$firstName $middleInitial $lastName archived user $fileName.";
                         break;
+                    case "photo":
+                        $description = "$firstName $middleInitial $lastName uploaded their profile picture.";
+                        break;
+                    case "others_photo":
+                        $description = "$firstName $middleInitial $lastName uploaded $fileName's profile picture.";
+                        break;
                     default:
                         $description = "Unknown source or action.";
                         break;
