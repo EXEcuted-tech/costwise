@@ -23,7 +23,20 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
     e.preventDefault();
     setModal(true);
     setIsLoading(true);
+    const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
     try {
+
+      if(!email){
+        setAlertMessage("Email address is required.");
+      }else if (!emailRegex.test(email)){
+        setAlertMessage("Invalid email address.");
+      }
+      if(!employeeNum){
+        setAlertMessage("Employee number is required.");
+      } else if (employeeNum.length !== 10){
+        setAlertMessage("Employee number must be 10 digits.");
+      }
+
       const response = await api.post('/password-reset/email', { email, employeeNum });
       if(response.status==404){
         setAlertMessage(response.data.message);
@@ -31,7 +44,6 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
         setAccess(true);
       }
     } catch (error) {
-      setAlertMessage("Incorrect input details!");
       console.error('Error sending reset email:', error);
     } finally {
       setIsLoading(false);

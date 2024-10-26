@@ -25,9 +25,9 @@ class PasswordResetController extends Controller
 
         $token = $user->createToken('passwordResetToken', ['*'], now()->addMinutes(60));
         $plainTextToken = explode('|', $token->plainTextToken)[1];
-        \Log::info('Received Toasdfasdfasdfsdaen: ' . $plainTextToken);
+        \Log::info('Received Token: ' . $plainTextToken);
 
-        $resetUrl = config('app.url') . '/pass-reset/' . $plainTextToken . '?email=' . urlencode($request->email);
+        $resetUrl = config('app.forgot_password_url') . '/pass-reset/' . $plainTextToken . '?email=' . urlencode($request->email);
         Mail::to($user->email_address)->send(new PasswordResetMail($resetUrl));
 
         return response()->json(['message' => 'Password reset link sent!']);
