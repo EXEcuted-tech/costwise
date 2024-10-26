@@ -126,6 +126,30 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
 
     const handleAddEvent = (event: Event) => {
         setEvents([...events, event]);
+        const user = localStorage.getItem('currentUser');
+        const parsedUser = JSON.parse(user || '{}');
+        
+        const formattedDate = event.date.toLocaleDateString('en-US', {
+            month: 'long',
+            day: '2-digit',
+            year: 'numeric'
+        });
+
+        const auditData = {
+            userId: parsedUser?.userId,
+            action: 'general',
+            act: 'events',
+            event: event.title,
+            date: formattedDate
+        };
+
+        api.post('/auditlogs/logsaudit', auditData)
+            .then(response => {
+                console.log('Audit log created successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error logging audit:', error);
+            });
         setIsModalOpen(false);
     };
 
