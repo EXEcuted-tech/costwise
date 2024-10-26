@@ -447,14 +447,16 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
                                 onChange={handleUpload}
                                 accept="image/jpeg,image/png"
                             />
-                            <div className='w-24 h-24 bg-gray-300 border-4 border-[#A60000] rounded-full transition-all duration-300 ease-in-out'>
+                            <div className='w-24 h-24 bg-gray-300 border-4 border-[#A60000] rounded-full overflow-hidden transition-all duration-300 ease-in-out'>
                                 {localProfileImage != `${config.API}/storage/null` ?
-                                    <Image
-                                        src={localProfileImage}
-                                        alt="Profile preview"
-                                        height={100}
-                                        width={100}
-                                        style={{ objectFit: 'fill', borderRadius: '100%', transition: 'border-color 0.3s ease-in-out' }}
+                                    <div
+                                        className="w-full h-full object-cover"
+                                        style={{
+                                            backgroundImage: `url(${localProfileImage})`,
+                                            backgroundPosition: 'center',
+                                            backgroundRepeat: 'no-repeat',
+                                            backgroundSize: 'cover'
+                                        }}
                                     />
                                     :
                                     <div
