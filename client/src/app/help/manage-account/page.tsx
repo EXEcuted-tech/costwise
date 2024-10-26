@@ -59,7 +59,6 @@ const ManageAccountPage = () => {
   // Saving Changes to Database
   const saveEdit = async () => {
     const content = JSON.stringify(sections);
-    console.log("Displaying Changed Content", content);
     if (content.length === 0) {
       setError("Cannot save empty sections.");
       return;

@@ -95,7 +95,6 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
     //Prefill form fields
     useEffect(() => {
         if (user && Object.keys(user).length > 0) {
-            // console.log('Initializing user info with:', user);
             retireveUserInfo(user);
             setIsInitialized(true);
         }
@@ -142,10 +141,6 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
                 position !== (user.position || '') ||
                 localProfileImage !== (`${config.API}/storage/${user.display_picture}`) ||
                 JSON.stringify(selectedRoleValues) !== JSON.stringify(user.sys_role || []);
-
-            // console.log('Form dirty state:', isDirty);
-            // console.log('Current values:', { first_name, middle_name, last_name, suffix, email_address, department, employee_number, phone_number, position, localProfileImage, selectedRoleValues });
-            // console.log('Original user values:', user);
 
             setIsFormDirty(isDirty);
         }

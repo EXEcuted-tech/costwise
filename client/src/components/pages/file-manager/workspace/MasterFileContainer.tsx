@@ -423,7 +423,6 @@ const MasterFileContainer = (data: File) => {
 
   const onSaveMaterialSheet = async (materials: any[]) => {
     try {
-      // console.log(materials);
       const hasEmptyEntry = materials.some(item => {
         return (
           typeof item === 'object' &&
@@ -549,16 +548,12 @@ const MasterFileContainer = (data: File) => {
       const formulaArray = JSON.parse(bomResponse.data.data[0].formulations);
       if (bomResponse.data.status == 200) {
         const formulations = splitFormulations(updatedData, formulaArray);
-        //debug here add a console.log for formulations
         const firstRowData = updatedData[0];
         const firstRowItemCode = firstRowData?.itemCode;
         const firstRowDescription = firstRowData?.description;
 
-        console.log("Outside", formulations);
         formulations.forEach(async ({ id, formulations }, index) => {
-          console.log("Inside", formulations);
           const formulationData = formulations;
-          console.log(formulationData);
           const finishedGood = formulationData[0];
 
           let hasError = false;
@@ -576,9 +571,7 @@ const MasterFileContainer = (data: File) => {
             return;
           }
 
-          // console.log("hasError", !hasError);
           if (!hasError) {
-            console.log("No error here!");
             let fgRow = {
               fg_id: finishedGood.id,
               fg_code: finishedGood.itemCode,
@@ -628,7 +621,6 @@ const MasterFileContainer = (data: File) => {
                   batchQty: item.batchQty,
                 }));
 
-                console.log(fgResponse.data.data);
                 const payload = {
                   bom: bomId,
                   emulsion: transformedEmulsionData,
@@ -804,7 +796,6 @@ const MasterFileContainer = (data: File) => {
 
     data.forEach((item) => {
       if (item.rowType === 'endIdentifier') {
-        console.log("Here", item);
         if (currentFormulation.length > 0) {
           formulations.push([...currentFormulation, item]);
           currentFormulation = [];

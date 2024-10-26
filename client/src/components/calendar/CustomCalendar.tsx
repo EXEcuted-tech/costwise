@@ -59,9 +59,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
             try {
                 const response = await api.get('/events/retrieve_all');
                 if (response.data.status === 200) {
-                    console.log(response.data.data);
                     setEvents(response.data.data.map((event: any) => {
-                        console.log('event_id:', event.event_id);
                         return {
                             id: event.event_id,
                             date: new Date(event.event_date),
@@ -95,7 +93,6 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
         if (day !== null) {
             const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
             setSelectedDate(clickedDate);
-            console.log("CLICK: Events", events);
             const existingEvent = events.find(event => {
                 console.log('Comparing event:', event);
                 console.log('Event date:', event.date.getDate(), event.date.getMonth(), event.date.getFullYear());
@@ -175,9 +172,10 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
                     {calendarDays.map((day, index) => (
                         <span
                             key={index}
-                            className={`text-[12px] 2xl:text-[16px] py-2 hover:bg-gray-200 dark:text-white font-medium rounded-full transition-colors cursor-pointer
+                            className={`text-[12px] 2xl:text-[16px] py-2 dark:text-white font-medium rounded-full transition-colors cursor-pointer
                             ${day === null ? 'invisible' : ''}
-                            ${isEventDay(day) ? 'bg-primary text-white hover:bg-red-600' : ''}`}
+                            ${isEventDay(day) ? 'bg-primary text-white hover:bg-red-600' : ''}
+                            ${day === new Date().getDate() && new Date().getMonth() === currentDate.getMonth() && new Date().getFullYear() === currentDate.getFullYear() ? 'bg-secondary text-black hover:brightness-90' : 'hover:bg-gray-200'}`}
                             onClick={() => handleDayClick(day)}
                         >
                             {day}

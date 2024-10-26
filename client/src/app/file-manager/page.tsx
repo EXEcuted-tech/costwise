@@ -227,7 +227,6 @@ const FileManagerPage = () => {
   }, [uploadType, shouldOpenDropzone, open]);
 
   const handleExportAll = async () => {
-    console.log("Went in here");
     const sysRoles = currentUser?.roles;
     if (!sysRoles?.includes(17)) {
         setError('You are not authorized to export records or files.');

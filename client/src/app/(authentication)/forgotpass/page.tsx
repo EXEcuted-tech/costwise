@@ -108,7 +108,6 @@ function ForgotPassPage() {
               <p className="w-full">(032) 239-8800</p>
             </div>
             <div className="flex items-center justify-center h-[15%]">
-              <FaAt className="mr-[1%]" />
               <p>customercare@virginiafood.com.ph</p>
             </div>
           </div>
