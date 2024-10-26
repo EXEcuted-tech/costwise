@@ -154,7 +154,7 @@ const SystemMaintenance = () => {
                                 {isLoading ? <Loader className='h-12 w-[2rem]'/>
                                     : <span className='text-[38px] mr-2'>{totalFiles || '0'}</span>}
                                 {isLoading ? ''
-                                    : <span className='text-[30px] pt-2'>FILES</span>}
+                                    : <span className='text-[30px] pt-2'>{totalFiles == 1 ? 'FILE' : 'FILES'}</span>}
                                 <PiFilesFill className='text-[60px] ml-auto mr-3 text-gray-200' />
                             </div>
                             <span className='text-[23px] font-light'>Total No. of Files</span>

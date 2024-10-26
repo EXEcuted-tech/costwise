@@ -100,7 +100,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
 
   return (
     <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]'>
-      <div className='animate-pop-out flex flex-col bg-white w-[950px] h-auto rounded-[20px] px-[10px] overflow-y-auto'>
+      <div className='animate-pop-out flex flex-col bg-white dark:bg-[#3C3C3C] w-[950px] h-auto rounded-[20px] px-[10px] overflow-y-auto'>
         <div className='flex justify-end'>
           <IoIosClose className='text-[60px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out'
             onClick={handleCloseModal} />
@@ -109,8 +109,8 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
           <BsPersonLock className='text-[55px] text-[#5B5353]' />
         </div>
         <div className='flex flex-col justify-center items-center pb-[20px]'>
-          <h1 className='font-black text-[28px]'>Assign User Roles</h1>
-          <p className='text-center text-[#9D9D9D] text-[17px] px-[30px]'>
+          <h1 className='font-black text-[28px] dark:text-white'>Assign User Roles</h1>
+          <p className='text-center text-[#9D9D9D] dark:text-[#d1d1d1] text-[17px] px-[30px]'>
             Select the roles (access rights) you want to assign to the user.
           </p>
         </div>
@@ -118,7 +118,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
         {/* Role Select */}
         <div className='flex flex-row justify-between px-[30px] mt-2'>
           <div className='w-[48%]'>
-            <h2 className='font-bold text-[22px] mb-3'>Select Roles</h2>
+            <h2 className='font-bold text-[22px] mb-3 dark:text-white'>Select Roles</h2>
             <CustomRoleSelect 
               selectedRoles={selectedRoles}
               setSelectedRoles={setSelectedRoles}
@@ -127,7 +127,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
             />
             {/* CheckBoxes */}
             <div className='flex mt-4 ml-1 gap-[6rem]'>
-              <div className='grid grid-cols-2 gap-5'>
+              <div className='grid grid-cols-2 gap-5 dark:text-white'>
                 <div className='flex items-center'>
                     <input 
                       type="checkbox"
@@ -201,7 +201,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
                       disabled={isAllChecked}
                       checked={checkboxStates.export}
                     />
-                    <label className='text-[17px]'>Export Files/Records</label>
+                    <label className='text-[17px]'>Export File/Record</label>
                 </div>
               </div>
             </div>
@@ -210,7 +210,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
           {/* Selected Roles */}
           <div className='w-[48%]'>
             <div className='flex justify-between mb-3'>
-              <h2 className='font-bold text-[22px]'>Selected Roles</h2>
+              <h2 className='font-bold text-[22px] dark:text-white'>Selected Roles</h2>
                 <button 
                   className='text-[17px] bg-gray-200 text-[#5B5353] px-4 py-1 rounded-lg border border-gray-300 hover:bg-gray-300 cursor-pointer transition-colors duration-300 ease-in-out'
                   onClick={handleClearAll}
@@ -219,7 +219,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
             <div className='border border-[#B6B6B6] px-4 rounded-lg h-[250px] overflow-y-auto'>
               <div className='grid grid-cols-2 gap-x-4 gap-y-2 p-3'>
                 {selectedRoles.map((role, index) => (
-                  <div key={index} className='flex items-center animate-fade-in3'>
+                  <div key={index} className='flex items-center animate-fade-in3 dark:text-[#d1d1d1]'>
                     <CiSquareCheck className='text-primary text-[19px] mr-2 flex-shrink-0' />
                     <p className=' text-[19px] truncate'>{role}</p>
                   </div>
@@ -241,7 +241,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
           <div className="relative bg-white border-1 border-primary overflow-hidden text-primary flex items-center justify-center cursor-pointer transition-all rounded-lg group"
             >
             <button 
-              className="text-[19px] font-black before:ease relative h-12 w-full overflow-hidden bg-primary text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-primary hover:before:-translate-x-40"
+              className="text-[19px] font-black before:ease relative h-12 w-full overflow-hidden bg-primary text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-primary hover:before:-translate-x-[450px]"
               onClick={handleConfirm}
             >
               <span className="relative z-10">Confirm</span>
