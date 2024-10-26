@@ -83,7 +83,7 @@ const UserManagement = () => {
             {errorMsg && <Alert setClose={() => setErrorMsg('')} variant='critical' message={errorMsg} />}
             {isEditModalOpen && <EditUserInfo user={selectedUser} onClose={closeEditModal} />}
             {isDeleteModalOpen && <ConfirmDeleteUser user={selectedUser} onClose={closeDeleteModal} />}
-            <div className="w-full animate-fade-in">
+            <div className="w-full animate-fade-in3">
                 <div>
                     <Header icon={RiShieldUserFill} title="User Management"></Header>
                 </div>
@@ -95,7 +95,7 @@ const UserManagement = () => {
                             <IoIosSearch />
                         </div>
                         <input
-                            className={` ${isOpen ? 'w-[19rem]' : 'w-[26rem]'} bg-white h-8  px-5 pl-9 text-[1.1em] border border-gray-400 rounded-lg focus:outline-none`}
+                            className={` ${isOpen ? 'w-[19rem]' : 'w-[26rem]'} bg-white h-8  px-5 pl-9 text-[1.1em] dark:bg-[#121212] dark:text-white border border-gray-400 rounded-lg focus:outline-none`}
                             type="search"
                             name="search"
                             placeholder="Search by name, role, or department..."

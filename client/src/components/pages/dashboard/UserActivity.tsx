@@ -56,7 +56,7 @@ const UserActivity: React.FC<UserActivityProps> = ({ url, name, activity, descri
                     <div
                         className='flex justify-center items-center size-[40px] rounded-full border border-white hover:brightness-90 cursor-pointer bg-gray-200'
                     >
-                        <FaUser className='text-gray-500 text-3xl' />
+                        <FaUser className='text-gray-500 text-xl' />
                     </div>
                 )}
             </div>

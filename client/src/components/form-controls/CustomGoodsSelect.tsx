@@ -70,7 +70,7 @@ const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placehol
           <option 
             key={option.value} 
             value={option.value} 
-            className={`${numberDisabledOptions.includes(option.value) && 'font-medium bg-secondary text-gray-700'} text-[#ACACAC] truncate`}
+            className={`${numberDisabledOptions.includes(option.value) ? 'font-medium bg-secondary dark:bg-secondary dark:text-black text-gray-700' : 'dark:bg-[#3C3C3C] dark:text-white text-[#ACACAC]'} truncate`}
             disabled={numberDisabledOptions.includes(option.value)}>
             {numberDisabledOptions.includes(option.value) && '📋'}{option.label}
           </option>

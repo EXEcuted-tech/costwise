@@ -13,7 +13,7 @@ import api from '@/utils/api';
 import Alert from "@/components/alerts/Alert";
 import { useRouter } from 'next/navigation';
 import ConfirmChanges from '@/components/modals/ConfirmChanges';
-import AddUserRoles from '@/components/pages/user-management/AddUserRoles';
+import AddUserRoles from '@/components/pages/user-management/AddUserRole';
 // import dotenv from "dotenv";
 import { useUserContext } from '@/contexts/UserContext';
 
@@ -335,7 +335,7 @@ const AccountCreation = () => {
                     }}
                 />
             )}
-            <div className="w-full h-full flex flex-row font-lato animate-fade-in">
+            <div className="w-full h-full flex flex-row font-lato animate-fade-in3">
                 <div className='absolute top-0 right-0'>
                     {alertMessages && alertMessages.map((msg, index) => (
                         <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
@@ -347,7 +347,7 @@ const AccountCreation = () => {
                 <div className='hidden 2xl:flex h-full bg-cover bg-center 2xl:w-[30%]' style={{ backgroundImage: `url(${background.src})` }} />
                 {/* Wait lang butngan panig margin */}
                 <div className={` ${isOpen ? 'w-full' : 'w-full'} 
-                    h-full bg-white shadow-2xl`}>
+                    h-full bg-white dark:bg-[#3C3C3C] shadow-2xl`}>
                     {/* Title */}
                     <div className={` flex flex-col w-full h-[7.3rem] justify-center items-center`}>
                         <div className='flex w-full items-center'>
@@ -357,20 +357,20 @@ const AccountCreation = () => {
                                     onClick={() => handleNavigation('/user-management')}
                                 />
                             </div>
-                            <p className='font-black text-[1.9em] 3xl:text-[2.2em] flex-grow text-center mr-[1.7em]'>
+                            <p className='font-black text-[1.9em] 3xl:text-[2.2em] flex-grow text-center dark:text-white mr-[1.7em]'>
                                 Account Creation</p>
                         </div>
-                        <div className='mb-2 text-[1.1em] 3xl:text-[1.4em]'> Create an employee account </div>
+                        <div className='mb-2 text-[1.1em] 3xl:text-[1.4em] dark:text-white'> Create an employee account </div>
                         <div className='w-full h-[15px] bg-[#B22222]'></div>
                     </div>
 
                     {/* Upload Picture */}
-                    <div className='flex items-center justify-center w-full h-[18rem] border-[#929090] border-b-3 bg-white'>
+                    <div className='flex items-center justify-center w-full h-[18rem] dark:bg-[#3C3C3C] border-[#929090] border-b-3 bg-white'>
                         {previewUrl ? (
                             <div className="flex flex-col items-center justify-center w-full animate-fade-in2">
                                 <label
                                     htmlFor="dropzone-file"
-                                    className="flex flex-col items-center justify-center w-[93%] h-[6rem] border-2 border-dashed border-[#929090] rounded-xl cursor-pointer bg-white hover:bg-[#FFD3D3] hover:border-primary group transition-all duration-300 ease-in-out"
+                                    className="flex flex-col dark:bg-[#3C3C3C] items-center justify-center w-[93%] h-[6rem] border-2 border-dashed border-[#929090] rounded-xl cursor-pointer bg-white hover:bg-[#FFD3D3] hover:border-primary group transition-all duration-300 ease-in-out"
                                     onDragOver={handleDragOver}
                                     onDrop={handleDrop}
                                 >
@@ -388,7 +388,7 @@ const AccountCreation = () => {
                                 </label>
 
                                 {/* Image Preview */}
-                                <div className="relative mt-5 w-[93%] h-[6rem] p-6 flex items-center justify-start animate-fade-in2 border-2 border-[#B3B3B3] rounded-xl group hover:border-[#B22222] hover:bg-gray-100 transition-all duration-300 ease-in-out">
+                                <div className="relative mt-5 w-[93%] h-[6rem] p-6 flex items-center justify-start animate-fade-in2 border-2 border-[#B3B3B3] rounded-xl group hover:border-[#B22222] hover:bg-gray-100 dark:hover:bg-[#3C3C3C] transition-all duration-300 ease-in-out">
                                     <div className='flex mr-5 group-hover:scale-95 transition-all duration-300 ease-in-out'>
                                         <Image
                                             src={previewUrl}
@@ -422,11 +422,11 @@ const AccountCreation = () => {
                         ) : (
                             <label
                                 htmlFor="dropzone-file"
-                                className="flex flex-col items-center justify-center w-[93%] h-[13rem] border-2 border-dashed border-[#929090] rounded-xl cursor-pointer bg-white hover:bg-[#FFD3D3] hover:border-primary group transition-all duration-300 ease-in-out"
+                                className="flex flex-col items-center dark:bg-[#3C3C3C] justify-center w-[93%] h-[13rem] border-2 border-dashed border-[#929090] rounded-xl cursor-pointer bg-white hover:bg-[#FFD3D3] hover:border-primary group transition-all duration-300 ease-in-out"
                                 onDragOver={handleDragOver}
                                 onDrop={handleDrop}
                             >
-                                <div className='flex flex-col items-center justify-center pt-5 pb-6 group-hover:scale-90 transition-all duration-300 ease-in-out'>
+                                <div className='flex flex-col items-center dark:bg-[#3C3C3C] justify-center pt-5 pb-6 group-hover:scale-90 transition-all duration-300 ease-in-out'>
                                     <FcImageFile className="w-16 h-16 mb-4 text-[5em] text-gray-500" />
                                     <p className="mb-2 text-lg text-gray-500"><span className="text-[#B22222] font-semibold underline">Click to upload</span> or drag and drop profile picture</p>
                                     <p className="text-base text-gray-500">Support: JPG, JPEG, PNG (max: 2MB)</p>
@@ -474,11 +474,11 @@ const AccountCreation = () => {
                             {/* 1st Col */}
                             <div className={` ${isOpen ? '' : ''} flex flex-col flex-1 mr-5 2xl:mr-9 gap-10`}>
                                 <div className='flex flex-col justify-start'>
-                                    <p className={`${firstNameError ? 'text-[#B22222]' : ''} flex `}>First Name <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                                    <p className={`${firstNameError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>First Name <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
+                                                className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
                                                 type="fname"
                                                 name="fname"
                                                 value={first_name}
@@ -489,11 +489,11 @@ const AccountCreation = () => {
                                 </div>
 
                                 <div className='flex flex-col justify-start'>
-                                    <p className={`${emailError ? 'text-[#B22222]' : ''} flex `}>Email Address <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                                    <p className={`${emailError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Email Address <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
+                                                className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                                 type="email"
                                                 name="email"
                                                 placeholder=""
@@ -505,11 +505,11 @@ const AccountCreation = () => {
                                 </div>
 
                                 <div className='flex flex-col justify-start'>
-                                    <p className={`${departmentError ? 'text-[#B22222]' : ''} flex `}>Department<span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                                    <p className={`${departmentError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Department<span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <select
-                                                className={` ${departmentError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
+                                                className={` ${departmentError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                                 defaultValue=""
                                                 value={department}
                                                 onChange={(e) => updateField(setDepartment)(e)}
@@ -527,11 +527,11 @@ const AccountCreation = () => {
                             {/* 2nd Col */}
                             <div className='flex flex-col flex-1 mr-5 2xl:mr-9 gap-10'>
                                 <div className='flex flex-col justify-start'>
-                                    <p>Middle Name</p>
+                                    <p className='dark:text-[#d1d1d1]'>Middle Name</p>
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${isOpen ? '' : ''} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline capitalize `}
+                                                className={` ${isOpen ? '' : ''} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline capitalize `}
                                                 type="mname"
                                                 name="mname"
                                                 placeholder=""
@@ -543,11 +543,11 @@ const AccountCreation = () => {
                                 </div>
 
                                 <div className='flex flex-col justify-start'>
-                                    <p className={`${employeeNumberError ? 'text-[#B22222]' : ''} flex `}>Employee Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                                    <p className={`${employeeNumberError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Employee Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${employeeNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
+                                                className={` ${employeeNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                                 type="enum"
                                                 name="enum"
                                                 placeholder="0123456789"
@@ -559,11 +559,11 @@ const AccountCreation = () => {
                                 </div>
 
                                 <div className='flex flex-col justify-start'>
-                                    <p className={`${phoneNumberError ? 'text-[#B22222]' : ''} flex `}>Phone Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                                    <p className={`${phoneNumberError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Phone Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
+                                                className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                                 type="contactnum"
                                                 name="contactnum"
                                                 placeholder="+63 9123456789"
@@ -578,11 +578,11 @@ const AccountCreation = () => {
                             {/* 3rd Col */}
                             <div className='flex flex-col flex-1 gap-10'>
                                 <div className='flex flex-col justify-start'>
-                                    <p className={`${lastNameError ? 'text-[#B22222]' : ''} flex `}>Last Name<span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                                    <p className={`${lastNameError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Last Name<span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
+                                                className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
                                                 type="lname"
                                                 name="lname"
                                                 placeholder=""
@@ -594,11 +594,11 @@ const AccountCreation = () => {
                                 </div>
 
                                 <div className='flex flex-col justify-start'>
-                                    <p className={`${suffixError ? 'text-[#B22222]' : ''} flex `}>Suffix</p>
+                                    <p className={`${suffixError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Suffix</p>
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${suffixError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
+                                                className={` ${suffixError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
                                                 type="suffix"
                                                 name="suffix"
                                                 placeholder=""
@@ -610,11 +610,11 @@ const AccountCreation = () => {
                                 </div>
 
                                 <div className='flex flex-col justify-start'>
-                                    <p className={`${positionError ? 'text-[#B22222]' : ''} flex `}>Position <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                                    <p className={`${positionError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Position <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${positionError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
+                                                className={` ${positionError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
                                                 type="position"
                                                 name="position"
                                                 placeholder=""

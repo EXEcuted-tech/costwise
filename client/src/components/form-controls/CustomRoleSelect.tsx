@@ -37,7 +37,7 @@ const CustomRoleSelect: React.FC<CustomRoleSelectProps> = ({
     { role: 'Create Event', description: 'User can create events.', value: 14 },
     { role: 'Edit Event', description: 'User can edit events.', value: 15 },
     { role: 'Archive Event', description: 'User can archive events.', value: 16 },
-    { role: 'Export Files/Records', description: 'User can export files/records.', value: 17 },
+    { role: 'Export File/Record', description: 'User can export files/records.', value: 17 },
   ];
 
   const handleOptionClick = (option: { role: string, value: number; description: string }) => {
@@ -47,12 +47,7 @@ const CustomRoleSelect: React.FC<CustomRoleSelectProps> = ({
       if (prevOptions.includes(optionText)) {
         return prevOptions.filter(item => item !== optionText);
       } else {
-        if (prevOptions.length < 17) {
-          return [...prevOptions, optionText];
-        } else {
-          alert('You can only select up to 17 options.');
-          return prevOptions;
-        }
+        return [...prevOptions, optionText];
       }
     });
 
@@ -60,12 +55,7 @@ const CustomRoleSelect: React.FC<CustomRoleSelectProps> = ({
       if (prevValues.includes(option.value)) {
         return prevValues.filter(value => value !== option.value);
       } else {
-        if (prevValues.length < 17) {
-          return [...prevValues, option.value];
-        } else {
-          alert('You can only select up to 17 options.');
-          return prevValues;
-        }
+        return [...prevValues, option.value];
       }
     });
     setInputValue('');
@@ -85,7 +75,7 @@ const CustomRoleSelect: React.FC<CustomRoleSelectProps> = ({
   return (
     <div ref={ref} className="relative w-full font-lato z-[1000]">
       <div
-        className="w-full rounded-lg border border-[#B6B6B6] bg-white text-[#5C5C5C] cursor-pointer p-2"
+        className="w-full rounded-lg border border-[#B6B6B6] bg-white dark:bg-[#3C3C3C] text-[#5C5C5C] cursor-pointer p-2"
         onClick={() => {
           setIsDropdownOpen(!isDropdownOpen);
         }}
@@ -99,7 +89,7 @@ const CustomRoleSelect: React.FC<CustomRoleSelectProps> = ({
           ))} */}
           <input
             type="text"
-            className={`min-w-[150px] outline-none focus:ring-0 border-none pr-4`}
+            className={`min-w-[150px] outline-none focus:ring-0 border-none pr-4 dark:bg-[#3C3C3C] dark:text-white`}
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder={inputValue === '' ? '➯ Select or type role...' : '➯'}
             value={inputValue}
@@ -111,12 +101,12 @@ const CustomRoleSelect: React.FC<CustomRoleSelectProps> = ({
         </div>
       </div>
       {isDropdownOpen && (
-        <div id="scroll-style" className="animate-pull-down absolute w-full bg-white z-10 mt-1 border border-[#B6B6B6] drop-shadow-lg rounded-l-[10px] rounded-r-[5px] max-h-[180px] overflow-y-auto">
+        <div id="scroll-style" className="animate-pull-down absolute w-full bg-white dark:bg-[#3C3C3C] dark:text-white z-10 mt-1 border border-[#B6B6B6] drop-shadow-lg rounded-l-[10px] rounded-r-[5px] max-h-[180px] overflow-y-auto">
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option, index) => (
               <div
                 key={index}
-                className="flex items-center p-2 hover:bg-gray-100"
+                className="flex items-center p-2 hover:bg-gray-100 hover:dark:bg-[#3C3C3C]"
               >
                 <label className="relative flex items-center p-3 rounded-full cursor-pointer"
 

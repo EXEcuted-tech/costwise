@@ -31,11 +31,11 @@ const MonthSelector:React.FC<ModalProps> = ({months, onClose, onMonthSelect}) =>
     };
     return (
         <div className={`flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]`}>
-            <div className={`${isOpen ? '4xl:w-[860px] 3xl:w-[820px] 2xl:w-[800px] xl:w-[550px]' : '4xl:w-[860px] 3xl:w-[820px] 2xl:w-[800px] xl:w-[550px]'} px-[35px] mx-[50px] 2xl:mx-0 animate-pop-out bg-white w-[860px] min-h-[210px] mt-[-50px] rounded-[10px]`}>
+            <div className={`${isOpen ? '4xl:w-[860px] 3xl:w-[820px] 2xl:w-[800px] xl:w-[550px]' : '4xl:w-[860px] 3xl:w-[820px] 2xl:w-[800px] xl:w-[550px]'} px-[35px] mx-[50px] 2xl:mx-0 animate-pop-out bg-white dark:bg-[#3c3c3c] w-[860px] min-h-[210px] mt-[-50px] rounded-[10px]`}>
                 <div className='flex justify-between pt-[10px] mb-2'>
                     <div className='flex items-center'>
-                        <MdCalendarMonth className='mr-[7px] text-[35px]' />
-                        <h1 className='text-[30px] font-black'>Select Month</h1>
+                        <MdCalendarMonth className='mr-[7px] text-[35px] dark:text-white' />
+                        <h1 className='text-[30px] font-black dark:text-white'>Select Month</h1>
                     </div>
                     <IoClose 
                         onClick={onClose}
