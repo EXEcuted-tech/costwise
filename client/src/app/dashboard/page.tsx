@@ -74,7 +74,7 @@ const DashboardPage = () => {
       );
 
       const totalCostForMonth = selectedMonthPredictions.reduce(
-        (acc, prediction) => {
+        (acc: number, prediction: { cost: string; }) => {
           const parsedCost = parseFloat(prediction.cost);
           return acc + parsedCost;
         },
