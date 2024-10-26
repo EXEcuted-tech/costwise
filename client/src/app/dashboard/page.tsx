@@ -13,9 +13,7 @@ import {
 } from "react-icons/fa6";
 import { PiPackageFill } from "react-icons/pi";
 import ProductCostChart from "@/components/pages/dashboard/LineChart";
-import UserActivity, {
-  UserActivityProps,
-} from "@/components/pages/dashboard/UserActivity";
+import UserActivity from "@/components/pages/dashboard/UserActivity";
 import api from "@/utils/api";
 import { formatDistanceToNow } from "date-fns";
 import Spinner from "@/components/loaders/Spinner";

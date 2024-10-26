@@ -10,7 +10,7 @@ interface EmailSentProps {
 const EmailSent: React.FC<EmailSentProps> = ({ onClose, email }) => {
 
   return (
-    <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]'>
+    <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[99999]'>
       <div className='animate-pop-out bg-white w-[460px] h-auto rounded-[20px] px-[10px] py-[20px]'>
         <div className='flex justify-center'>
           <RiFileWarningFill className='text-[95px] text-[#FFCC00]' />
