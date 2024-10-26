@@ -132,7 +132,7 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
   }
 
   return (
-    <div className="h-full w-full">
+    <div className="h-full w-full max-w-[700px]">
       <Line
         data={chartData}
         options={{
