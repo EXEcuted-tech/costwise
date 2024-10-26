@@ -8,6 +8,20 @@ const theme = createTheme({
       main: '#B22222',
     },
   },
+  components: {
+    MuiPagination: {
+      styleOverrides: {
+        root: {
+          '.dark & .Mui-selected': {
+            color: '#ffffff !important',
+          },
+          '.dark & .MuiPaginationItem-root': {
+            color: '#ffffff !important',
+          },
+        },
+      },
+    },
+  },
 });
 
 interface PrimaryPaginationProps {
@@ -27,7 +41,7 @@ const PrimaryPagination:React.FC<PrimaryPaginationProps> = ({ data = [], itemsPe
           showFirstButton
           showLastButton
           color="primary"
-          className=""
+          className="dark:!text-white"
           onChange={handlePageChange}
           page={currentPage}
         />

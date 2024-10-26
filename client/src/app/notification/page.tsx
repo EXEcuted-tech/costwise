@@ -27,7 +27,8 @@ const NotificationPage = () => {
             general: 'general',
             crud: 'crud',
             import: 'import',
-            export: 'export'
+            export: 'export',
+            stock: 'stock'
         } as Record<string, string>;
         return actionIcons[action as keyof typeof actionIcons] || 'bell';
     };
@@ -37,7 +38,8 @@ const NotificationPage = () => {
             general: 'General |',
             crud: 'CRUD |',
             import: 'Import |',
-            export: 'Export |'
+            export: 'Export |',
+            stock: 'Stock |'
         } as Record<string, string>;
         return actionTexts[action as keyof typeof actionTexts] || 'Notification';
     };

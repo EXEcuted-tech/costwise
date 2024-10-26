@@ -389,13 +389,15 @@ const AccountCreation = () => {
 
                                 {/* Image Preview */}
                                 <div className="relative mt-5 w-[93%] h-[6rem] p-6 flex items-center justify-start animate-fade-in2 border-2 border-[#B3B3B3] rounded-xl group hover:border-[#B22222] hover:bg-gray-100 dark:hover:bg-[#3C3C3C] transition-all duration-300 ease-in-out">
-                                    <div className='flex mr-5 group-hover:scale-95 transition-all duration-300 ease-in-out'>
-                                        <Image
-                                            src={previewUrl}
-                                            alt="Profile preview"
-                                            height={70}
-                                            width={70}
-                                            style={{ objectFit: 'contain', borderRadius: '50%', border: '2px solid ##929090', transition: 'border-color 0.3s ease-in-out' }}
+                                    <div className='flex mr-5 group-hover:scale-95 transition-all duration-300 ease-in-out w-16 h-16 border-2 border-[#A60000] rounded-full overflow-hidden'>
+                                        <div
+                                            className="w-full h-full object-cover"
+                                            style={{
+                                                backgroundImage: `url(${previewUrl})`,
+                                                backgroundPosition: 'center',
+                                                backgroundRepeat: 'no-repeat',
+                                                backgroundSize: 'cover'
+                                            }}
                                         />
 
                                     </div>
