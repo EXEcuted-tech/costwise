@@ -131,7 +131,7 @@ class UserController extends ApiController
                 'department' => 'nullable',
                 'phone_number' => 'nullable|regex:/^(\+?[0-9]{1,4})?\s?-?[0-9]{10}$/',
                 'position' => 'nullable',
-                'sys_role' => 'nullable|json',
+                'sys_role' => 'nullable',
                 'display_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
             ]);
 
@@ -162,6 +162,7 @@ class UserController extends ApiController
                 }
             }
 
+            $user->sys_role = json_decode($user->sys_role);
             $user->save();
 
             Log::info('User updated successfully!', ['user' => $user]);
