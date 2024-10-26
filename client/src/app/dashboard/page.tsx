@@ -164,11 +164,11 @@ const DashboardPage = () => {
             time: new Date(log.timestamp), // Store the Date object for sorting
             formattedTime: formatDistanceToNow(new Date(log.timestamp), {
               addSuffix: true,
-            }), // Separate field for display
+            }),
           }));
           const sortedLogs = logs.sort(
             (a: AuditLogs, b: AuditLogs) => b.time.getTime() - a.time.getTime()
-          );
+          ).slice(0, 15);
           setAuditLogs(sortedLogs);
           setIsLoading(false);
         } catch (error: any) {
