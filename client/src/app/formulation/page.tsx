@@ -162,7 +162,11 @@ const FormulationPage = () => {
                 setInfoMsg(results.join(', '));
             } catch (errors) {
                 if (Array.isArray(errors)) {
-                    setErrorMsg("Incorrect file uploaded!");
+                    if(errors[0] == "Material not found on the current month."){
+                        setErrorMsg("Material not found on the current month.")
+                    } else {
+                        setErrorMsg("Incorrect file uploaded!");
+                    }
                 } else {
                     setErrorMsg('An error occurred during file upload');
                 }
