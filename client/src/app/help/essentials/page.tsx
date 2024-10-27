@@ -80,7 +80,7 @@ const EssentialsPage = () => {
       fetchArticle();
     } catch (error) {
       console.error("Error updating article:", error);
-      setAlertMessages("Failed to save changes. Please try again.");
+      setAlertMessages(["Failed to save changes. Please try again."]);
     }
     setIsEditing(false);
   };

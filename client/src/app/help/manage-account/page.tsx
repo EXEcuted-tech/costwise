@@ -79,7 +79,7 @@ const ManageAccountPage = () => {
       fetchArticle();
     } catch (error) {
       console.error("Error updating article:", error);
-      setAlertMessages("Failed to save changes. Please try again.");
+      setAlertMessages(["Failed to save changes. Please try again."]);
     }
     setIsEditing(false);
   };
@@ -92,7 +92,7 @@ const ManageAccountPage = () => {
       setSections(parsedSections);
     } catch (error) {
       console.error("Error fetching article:", error);
-      setAlertMessages("Failed to load article. Please refresh.");
+      setAlertMessages(["Failed to load article. Please refresh."]);
     } finally {
       setIsLoading(false);
     }

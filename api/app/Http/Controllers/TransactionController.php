@@ -358,13 +358,13 @@ class TransactionController extends ApiController
 
         if ($deletedCount == count($transaction_ids)) {
             $this->status = 200;
-            $this->response['message'] = "All transactions deleted successfully.";
+            $this->response['message'] = "All transactions archived successfully.";
         } elseif ($deletedCount > 0) {
             $this->status = 206;
-            $this->response['message'] = "$deletedCount out of " . count($transaction_ids) . " transactions deleted successfully.";
+            $this->response['message'] = "$deletedCount out of " . count($transaction_ids) . " transactions archived successfully.";
         } else {
             $this->status = 404;
-            $this->response['message'] = "No transactions were deleted.";
+            $this->response['message'] = "No transactions were archived.";
         }
 
         return $this->getResponse();

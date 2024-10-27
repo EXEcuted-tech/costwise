@@ -199,7 +199,7 @@ class ReleaseNoteController extends ApiController
 
             return response()->json([
                 'status' => 'success',
-                'message' => 'Release Note successfully deleted.'
+                'message' => 'Release Note successfully archived.'
             ], 200);
         } catch (\Throwable $th) {
             Log::error($th->getMessage());

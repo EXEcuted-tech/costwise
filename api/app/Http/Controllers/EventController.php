@@ -82,6 +82,6 @@ class EventController extends ApiController
         $event->delete();
 
         $this->status = 204;
-        return $this->getResponse("Event deleted successfully.");
+        return $this->getResponse("Event archived successfully.");
     }
 }
