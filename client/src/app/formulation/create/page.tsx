@@ -104,7 +104,9 @@ const AddFormulationPage = () => {
             if (emulsionIndex !== -1) {
                 let totalBatchQty = 0;
                 for (let i = 0; i < updated.length; i++) {
-                    if (i !== emulsionIndex && !updated[i].description?.toUpperCase().startsWith('PACKAGING')) {
+                    if (i !== emulsionIndex 
+                        && !updated[i].description?.toUpperCase().includes('EMULSION')
+                        && !updated[i].description?.toUpperCase().includes('PACKAGING')) {
                         totalBatchQty += Number(updated[i].batchQty) || 0;
                     }
                 }
