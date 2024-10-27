@@ -12,6 +12,7 @@ import Header from '@/components/header/Header';
 import api from '@/utils/api';
 import Alert from '@/components/alerts/Alert';
 import ButtonSpinner from '@/components/loaders/ButtonSpinner';
+import WkspConfirmDialog from '@/components/modals/WkspConfirmDialog';
 
 const AddFormulationPage = () => {
     const [formulaData, setFormulaData] = useState<FormulationRecord[]>([
@@ -60,10 +61,34 @@ const AddFormulationPage = () => {
         setFormulaData([...formulaData, newRow]);
     };
 
+    const [confirmDialog, setConfirmDialog] = useState(false);
+    const [rowToRemove, setRowToRemove] = useState<{ index: number } | null>(null);
+
     const removeRow = (index: number) => {
-        if (index === 0) return; // Prevent removing the first row
-        const updatedData = formulaData.filter((_, i) => i !== index);
-        setFormulaData(updatedData);
+        setRowToRemove({ index });
+        setConfirmDialog(true);
+    };
+
+    // const removeRow = (index: number) => {
+    //     if (index === 0) return; // Prevent removing the first row
+    //     const updatedData = formulaData.filter((_, i) => i !== index);
+    //     setFormulaData(updatedData);
+    // };
+    const confirmRemoveRow = () => {
+        if (rowToRemove === null) return;
+
+        const { index } = rowToRemove;
+        const rowToRemoveData = formulaData[index];
+
+        if (index === 0) return;
+        // Remove the row from formulaData
+        setFormulaData(prevData => prevData.filter((_, i) => i !== index));
+
+        // Add the removed row to removedRows
+        setRemovedRows(prevRows => [...prevRows, rowToRemoveData]);
+
+        setConfirmDialog(false);
+        setRowToRemove(null);
     };
 
     const handleInputChange = (index: number, key: keyof FormulationRecord, value: string | number) => {
@@ -116,10 +141,10 @@ const AddFormulationPage = () => {
                 }
                 : {};
 
-            const materials = formulaData.filter(item => 
-                item.description?.toLowerCase() !== 'emulsion' && 
-                item.level !== null && 
-                item.level !== '' && 
+            const materials = formulaData.filter(item =>
+                item.description?.toLowerCase() !== 'emulsion' &&
+                item.level !== null &&
+                item.level !== '' &&
                 !item.formulation
             );
 
@@ -180,6 +205,14 @@ const AddFormulationPage = () => {
                 ))}
                 {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
             </div>
+            {confirmDialog && (
+                <div className="absolute z-[1000]">
+                    <WkspConfirmDialog
+                        setConfirmDialog={setConfirmDialog}
+                        onConfirm={confirmRemoveRow}
+                    />
+                </div>
+            )}
             <Header icon={HiClipboardList} title={"Formulations"} />
             <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
                 <div className='bg-white dark:bg-[#3c3c3c] rounded-[10px] drop-shadow px-[30px] min-h-[820px] pb-[30px] mb-[25px]'>
@@ -206,7 +239,7 @@ const AddFormulationPage = () => {
                                         onClick={onSave}>
                                         <div className="flex items-center transition-opacity duration-300 ease-in-out">
                                             {isLoading ? (
-                                                <ButtonSpinner className='!size-[20px] mr-[2px] opacity-100'/>
+                                                <ButtonSpinner className='!size-[20px] mr-[2px] opacity-100' />
                                             ) : (
                                                 <IoIosSave className='mr-[5px] opacity-100' />
                                             )}
@@ -317,7 +350,7 @@ const AddFormulationPage = () => {
                                                     {add ? (
                                                         <IoTrash className="text-[#717171] text-[25px] cursor-pointer hover:text-red-700 transition-colors duration-300 ease-in-out dark:text-[#d1d1d1] dark:hover:text-red-500"
                                                             onClick={() => removeRow(index + 1)} />
-                                                    ):(<td></td>)}
+                                                    ) : (<td></td>)}
                                                 </td>
                                                 <td className='text-center px-6 py-[10px]'>
                                                     {add ? (
