@@ -92,12 +92,28 @@ const AddFormulationPage = () => {
     };
 
     const handleInputChange = (index: number, key: keyof FormulationRecord, value: string | number) => {
-        const updatedData = [...formulaData];
-        updatedData[index] = {
-            ...updatedData[index],
-            [key]: value
-        };
-        setFormulaData(updatedData);
+        setFormulaData((prevData) => {
+            const updated = [...prevData];
+            updated[index] = {
+                ...updated[index],
+                [key]: value
+            };
+
+            // Calculate emulsion batch quantity
+            const emulsionIndex = updated.findIndex(row => row.description === 'EMULSION');
+            if (emulsionIndex !== -1) {
+                let emulsionBatchQty = 0;
+                for (let i = 1; i < emulsionIndex; i++) {
+                    if (!updated[i].description?.toUpperCase().startsWith('PACKAGING')) {
+                        console.log(updated[i].description);
+                        emulsionBatchQty += Number(updated[i].batchQty) || 0;
+                    }
+                }
+                updated[emulsionIndex].batchQty = emulsionBatchQty;
+            }
+
+            return updated;
+        });
     };
 
     const onSave = async () => {
