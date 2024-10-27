@@ -187,7 +187,7 @@ class FormulationController extends ApiController
                     $materialQtyList[] = [
                         $matchingMaterial->material_id => [
                             'level' => $material['level'],
-                            'batchQty' => $material['batchQty'],
+                            'qty' => $material['batchQty'],
                             'total_cost' => $matchingMaterial->material_cost * $material['batchQty']
                         ]
                     ];
