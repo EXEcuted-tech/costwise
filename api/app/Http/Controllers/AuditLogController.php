@@ -40,6 +40,8 @@ class AuditLogController extends Controller
             $fileName = $request->input('fileName');
             $material_code = $request->input('material_code');
             $material_desc = $request->input('material_desc');
+            $event = $request->input('event');
+            $date = $request->input('date');
 
             $firstName = $user->first_name;
             $middleInitial = $user->middle_name ? substr($user->middle_name, 0, 1) . '.' : '';
@@ -64,6 +66,9 @@ class AuditLogController extends Controller
                         break;
                     case "others_photo":
                         $description = "$firstName $middleInitial $lastName uploaded $fileName's profile picture.";
+                        break;
+                    case "events":
+                        $description = "$firstName $middleInitial $lastName set an event $event on $date.";
                         break;
                     default:
                         $description = "Unknown source or action.";
