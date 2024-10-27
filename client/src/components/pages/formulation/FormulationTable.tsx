@@ -196,7 +196,9 @@ const FormulationTable: React.FC<{
             setFormulaData(prevData => prevData.filter((_, i) => i !== index));
 
             // Add the removed row to removedRows
-            setRemovedRows(prevRows => [...prevRows, rowToRemoveData]);
+            if(rowToRemoveData.id != 0 && rowToRemoveData.track_id != 0 && rowToRemoveData.itemCode != '' && rowToRemoveData.description != ''){
+                setRemovedRows(prevRows => [...prevRows, rowToRemoveData]);
+            }
 
             setConfirmDialog(false);
             setRowToRemove(null);
