@@ -102,14 +102,13 @@ const AddFormulationPage = () => {
             // Calculate emulsion batch quantity
             const emulsionIndex = updated.findIndex(row => row.description === 'EMULSION');
             if (emulsionIndex !== -1) {
-                let emulsionBatchQty = 0;
-                for (let i = 1; i < emulsionIndex; i++) {
-                    if (!updated[i].description?.toUpperCase().startsWith('PACKAGING')) {
-                        console.log(updated[i].description);
-                        emulsionBatchQty += Number(updated[i].batchQty) || 0;
+                let totalBatchQty = 0;
+                for (let i = 0; i < updated.length; i++) {
+                    if (i !== emulsionIndex && !updated[i].description?.toUpperCase().startsWith('PACKAGING')) {
+                        totalBatchQty += Number(updated[i].batchQty) || 0;
                     }
                 }
-                updated[emulsionIndex].batchQty = emulsionBatchQty;
+                updated[emulsionIndex].batchQty = totalBatchQty;
             }
 
             return updated;
