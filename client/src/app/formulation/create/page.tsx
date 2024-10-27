@@ -107,7 +107,7 @@ const AddFormulationPage = () => {
                     if (i !== emulsionIndex 
                         && !updated[i].description?.toUpperCase().includes('EMULSION')
                         && !updated[i].description?.toUpperCase().includes('PACKAGING')
-                        && updated[i].formulation === null) {
+                        && updated[i].formulation === "") {
                         totalBatchQty += Number(updated[i].batchQty) || 0;
                     }
                 }
