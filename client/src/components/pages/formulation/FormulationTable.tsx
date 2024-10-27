@@ -233,7 +233,8 @@ const FormulationTable: React.FC<{
                     for (let i = 0; i < updated.length; i++) {
                         if (i !== emulsionIndex 
                             && !updated[i].description?.toUpperCase().includes('EMULSION')
-                            && !updated[i].description?.toUpperCase().includes('PACKAGING')) {
+                            && !updated[i].description?.toUpperCase().includes('PACKAGING')
+                            && updated[i].formulation === null) {
                             totalBatchQty += Number(updated[i].batchQty) || 0;
                         }
                     }
