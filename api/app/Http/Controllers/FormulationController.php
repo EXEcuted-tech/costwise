@@ -184,9 +184,12 @@ class FormulationController extends ApiController
                     ->first();
 
                 if ($matchingMaterial) {
-                    $materialQtyList[$matchingMaterial->material_id] = [
-                        'level' => $material['level'],
-                        'batchQty' => $material['batchQty'],
+                    $materialQtyList[] = [
+                        $matchingMaterial->material_id => [
+                            'level' => $material['level'],
+                            'batchQty' => $material['batchQty'],
+                            'total_cost' => $matchingMaterial->material_cost * $material['batchQty']
+                        ]
                     ];
                 }
             }
@@ -195,7 +198,7 @@ class FormulationController extends ApiController
             $formulation->fg_id = $request->input('fg_id');
             $formulation->formula_code = $request->input('formula_code');
             $formulation->emulsion = json_encode($request->input('emulsion'));
-            $formulation->material_qty_list = json_encode([$materialQtyList]);
+            $formulation->material_qty_list = json_encode($materialQtyList);
             $formulation->save();
 
             $this->status = 200;
