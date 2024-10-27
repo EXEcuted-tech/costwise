@@ -462,7 +462,7 @@ class FormulationController extends ApiController
                 return $this->getResponse("Finished Good or Formulation not found!");
             }
 
-            $bom = Bom::whereRaw('JSON_CONTAINS(formulations, ?)', [$formulationId])->first();
+            $bom = Bom::whereRaw('JSON_CONTAINS(formulations, ?)', [json_encode($formulationId)])->first();
 
             if ($bom) {
                 $bomFormulations = json_decode($bom->formulations, true);
