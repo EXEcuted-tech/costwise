@@ -49,7 +49,8 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
         if (response && response.data.status === 200) {
           setFileData(response.data.data);
         }
-      } catch (error) {
+      } catch (error:any) {
+        setFileData([]);
         console.error('Error fetching data:', error);
       } finally {
         setIsLoading(false);

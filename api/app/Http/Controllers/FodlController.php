@@ -149,7 +149,7 @@ class FodlController extends ApiController
 
             return response()->json([
                 'status' => 200,
-                'message' => 'FODL record deleted and archived successfully.'
+                'message' => 'FODL record archived successfully.'
             ], 200);
         } catch (\Exception $e) {
             \DB::rollBack();
@@ -363,7 +363,7 @@ class FodlController extends ApiController
             \DB::commit();
 
             $this->status = 200;
-            return $this->getResponse('FODL records deleted and archived successfully.');
+            return $this->getResponse('FODL records archived successfully.');
         } catch (\Exception $e) {
             \DB::rollBack();
             $this->status = 500;
@@ -420,7 +420,7 @@ class FodlController extends ApiController
 
             return [
                 'status' => 200,
-                'message' => 'FODL records deleted and archived successfully.'
+                'message' => 'FODL records archived successfully.'
             ];
         } catch (\Exception $e) {
             \DB::rollBack();

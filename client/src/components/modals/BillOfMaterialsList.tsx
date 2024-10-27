@@ -34,11 +34,11 @@ const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateActio
                 setBomData((prevData) => prevData.filter((_, i) => i !== bomToDelete.index));
                 setMiniMenu(null);
             } catch (error) {
-                setAlertMessages(prev => [...prev, 'Failed to delete BOM']);
+                setAlertMessages(prev => [...prev, 'Failed to archive BOM']);
             } finally {
                 setDeleteModal(false);
                 setBomToDelete(null);
-                setSuccessMessage('BOM deleted successfully');
+                setSuccessMessage('BOM archived successfully');
             }
         }
     };

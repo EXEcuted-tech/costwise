@@ -8,6 +8,7 @@ import { PiBookOpenText } from "react-icons/pi";
 import getArticle from "@/utils/article/getArticle";
 import updateArticle from "@/utils/article/updateArticle";
 import { useSidebarContext } from "@/contexts/SidebarContext";
+import Alert from "@/components/alerts/Alert";
 
 const ManageAccountPage = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -19,8 +20,8 @@ const ManageAccountPage = () => {
   ]);
   const [isLoading, setIsLoading] = useState(true);
   const { isAdmin } = useSidebarContext();
-  const [error, setError] = useState(" ");
-
+  const [alertMessages, setAlertMessages] = useState<string[]>([]);
+  const [alertStatus, setAlertStatus] = useState<string>("");
   // Toggle edit mode
   const handleEditClick = () => {
     setIsEditing((prev) => !prev);
@@ -59,8 +60,17 @@ const ManageAccountPage = () => {
   // Saving Changes to Database
   const saveEdit = async () => {
     const content = JSON.stringify(sections);
-    if (content.length === 0) {
-      setError("Cannot save empty sections.");
+
+    const hasEmptySection = sections.some(
+      (section) => !section.heading.trim() || !section.content.trim()
+    );
+
+    if (hasEmptySection) {
+      setAlertMessages([
+        ...alertMessages,
+        "All sections must have both a heading and content..",
+      ]);
+      setAlertStatus("critical");
       return;
     }
 
@@ -69,7 +79,7 @@ const ManageAccountPage = () => {
       fetchArticle();
     } catch (error) {
       console.error("Error updating article:", error);
-      setError("Failed to save changes. Please try again.");
+      setAlertMessages(["Failed to save changes. Please try again."]);
     }
     setIsEditing(false);
   };
@@ -82,7 +92,7 @@ const ManageAccountPage = () => {
       setSections(parsedSections);
     } catch (error) {
       console.error("Error fetching article:", error);
-      setError("Failed to load article. Please refresh.");
+      setAlertMessages(["Failed to load article. Please refresh."]);
     } finally {
       setIsLoading(false);
     }
@@ -105,6 +115,33 @@ const ManageAccountPage = () => {
       <Header icon={PiBookOpenText} title="User's Manual" />
       <div className="flex h-[90%] w-[98%] pl-[90px] pt-[15px] -z-50">
         <div className="flex flex-col bg-white dark:bg-[#3C3C3C] w-full rounded-xl p-10 drop-shadow-lg">
+          {/* Error Alert */}
+          <div className="fixed top-4 right-4 z-50">
+            <div className="flex flex-col items-end space-y-2">
+              {alertMessages &&
+                alertMessages.map((msg, index) => (
+                  <Alert
+                    className="!relative"
+                    variant={
+                      alertStatus as
+                        | "default"
+                        | "information"
+                        | "warning"
+                        | "critical"
+                        | "success"
+                        | undefined
+                    }
+                    key={index}
+                    message={msg}
+                    setClose={() => {
+                      setAlertMessages((prev) =>
+                        prev.filter((_, i) => i !== index)
+                      );
+                    }}
+                  />
+                ))}
+            </div>
+          </div>
           <div className="flex flex-row w-full items-center justify-start border-b border-[#ACACAC] gap-[15px]">
             <Link href="/help">
               <GoArrowLeft className="dark:text-white text-primary text-[1.5em] xl:text-[2em] hover:opacity-75 hover:animate-shrink-in transition ease-in-out duration-200" />

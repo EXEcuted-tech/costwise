@@ -192,7 +192,7 @@ class UserController extends ApiController
             $userData['updated_at'] = $user->updated_at->format('Y-m-d H:i:s');
 
             DB::beginTransaction();
-            DB::connection('archive_mysql')->table('users')->insert($userData);
+            User::on('archive_mysql')->create($userData);
 
             $user->delete();
 

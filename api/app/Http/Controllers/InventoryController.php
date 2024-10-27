@@ -136,7 +136,7 @@ class InventoryController extends ApiController
                     Log::info("existingMaterial", ['existingMaterial' => $existingMaterial]);
                     if (!$existingMaterial) {
                         $materialRecords = $material->toArray();
-                        DB::connection('archive_mysql')->table('materials')->create($materialRecords);
+                        Material::on('archive_mysql')->create($materialRecords);
                     }
                 }
             }
@@ -150,7 +150,7 @@ class InventoryController extends ApiController
                     $inventoryRecords['created_at'] = $inventory->created_at->format('Y-m-d H:i:s');
                     $inventoryRecords['updated_at'] = $inventory->updated_at->format('Y-m-d H:i:s');
 
-                    DB::connection('archive_mysql')->table('inventory')->create($inventoryRecords);
+                    Inventory::on('archive_mysql')->create($inventoryRecords);
                     $inventory->delete();
                 }
             }
@@ -165,14 +165,14 @@ class InventoryController extends ApiController
                     $inventoryFile['created_at'] = $fileData->created_at->format('Y-m-d H:i:s');
                     $inventoryFile['updated_at'] = $fileData->updated_at->format('Y-m-d H:i:s');
 
-                    DB::connection('archive_mysql')->table('files')->create($inventoryFile);
+                    File::on('archive_mysql')->create($inventoryFile);
                     $fileData->delete();
                 }
             }
 
             DB::commit();
 
-            return response()->json(['message' => 'Inventory list deleted successfully']);
+            return response()->json(['message' => 'Inventory list archived successfully']);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);

@@ -8,6 +8,7 @@ import { PiBookOpenText } from "react-icons/pi";
 import getArticle from "@/utils/article/getArticle";
 import updateArticle from "@/utils/article/updateArticle";
 import { useSidebarContext } from "@/contexts/SidebarContext";
+import Alert from "@/components/alerts/Alert";
 
 const GettingStartedPage = () => {
   const [isEditing, setIsEditing] = useState(false);
@@ -19,6 +20,8 @@ const GettingStartedPage = () => {
   ]);
   const [isLoading, setIsLoading] = useState(true); // Loading state
   const { isAdmin } = useSidebarContext();
+  const [alertMessages, setAlertMessages] = useState<string[]>([]);
+  const [alertStatus, setAlertStatus] = useState<string>("");
 
   // Toggle edit mode
   const handleEditClick = () => {
@@ -59,13 +62,27 @@ const GettingStartedPage = () => {
   const saveEdit = async () => {
     const content = JSON.stringify(sections);
 
+    const hasEmptySection = sections.some(
+      (section) => !section.heading.trim() || !section.content.trim()
+    );
+
+    if (hasEmptySection) {
+      setAlertMessages([
+        ...alertMessages,
+        "All sections must have both a heading and content..",
+      ]);
+      setAlertStatus("critical");
+      return;
+    }
+
     try {
-      await updateArticle("Getting Started", content);
+      await updateArticle("Manage Account", content);
+      fetchArticle();
     } catch (error) {
       console.error("Error updating article:", error);
+      setAlertMessages(["Failed to save changes. Please try again."]);
     }
     setIsEditing(false);
-    fetchArticle();
   };
 
   const fetchArticle = async () => {
@@ -96,6 +113,33 @@ const GettingStartedPage = () => {
       <Header icon={PiBookOpenText} title="User's Manual" />
       <div className="flex h-[90%] w-[98%] pl-[90px] pt-[15px] -z-50">
         <div className="flex flex-col bg-white dark:bg-[#3C3C3C] w-full rounded-xl p-10 drop-shadow-lg">
+          {/* Error Alert */}
+          <div className="fixed top-4 right-4 z-50">
+            <div className="flex flex-col items-end space-y-2">
+              {alertMessages &&
+                alertMessages.map((msg, index) => (
+                  <Alert
+                    className="!relative"
+                    variant={
+                      alertStatus as
+                        | "default"
+                        | "information"
+                        | "warning"
+                        | "critical"
+                        | "success"
+                        | undefined
+                    }
+                    key={index}
+                    message={msg}
+                    setClose={() => {
+                      setAlertMessages((prev) =>
+                        prev.filter((_, i) => i !== index)
+                      );
+                    }}
+                  />
+                ))}
+            </div>
+          </div>
           <div className="flex flex-row w-full items-center justify-start border-b border-[#ACACAC] gap-[15px]">
             <Link href="/help">
               <GoArrowLeft className="dark:text-white text-primary text-[1.5em] xl:text-[2em] hover:opacity-75 hover:animate-shrink-in transition ease-in-out duration-200" />

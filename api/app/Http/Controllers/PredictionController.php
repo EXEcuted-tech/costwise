@@ -41,7 +41,7 @@ class PredictionController extends ApiController
                     ->delete();
 
                 $this->status = 200;
-                $this->response['message'] = "Current month's prediction deleted successfully.";
+                $this->response['message'] = "Current month's prediction archived successfully.";
                 return $this->getResponse();
             }
 

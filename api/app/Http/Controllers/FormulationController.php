@@ -504,7 +504,7 @@ class FormulationController extends ApiController
             }
 
             $this->status = 200;
-            return $this->getResponse("Finished Good and Formulation deleted successfully!");
+            return $this->getResponse("Finished Good and Formulation archived successfully!");
         } catch (\Exception $e) {
             $this->status = 500;
             return $this->getResponse("Error! Try again. " . $e->getMessage());

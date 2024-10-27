@@ -336,7 +336,7 @@ const CompareFormulaContainer = () => {
                                                 <td className='text-left px-6'>{info.itemCode}</td>
                                                 <td className='text-left px-6'>{info.description}</td>
                                                 <td className='text-center px-6'>{info.formulation}</td>
-                                                <td className='text-right px-6'>{info.batchQty}</td>
+                                                <td className='text-right px-6'>{info.batchQty?.toFixed(2)}</td>
                                                 <td className='text-left px-6'>{info.unit}</td>
                                                 <td className='text-right px-6'>{info.rowType !== 'finishedGood' ? info.cost : ''}</td>
                                                 <td className='text-right px-6'>{info.rowType === 'finishedGood' ? info.cost : ''}</td>

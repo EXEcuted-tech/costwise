@@ -148,7 +148,7 @@ class FileController extends ApiController
             $records->each->delete();
 
             $this->status = 200;
-            return $this->getResponse("Records successfully deleted.");
+            return $this->getResponse("Records successfully archived.");
         } catch (\Exception $e) {
             $this->status = 500;
             return $this->getResponse($e->getMessage());
@@ -173,7 +173,7 @@ class FileController extends ApiController
             \DB::commit();
 
             $this->status = 200;
-            return $this->getResponse('BOM and associated data deleted successfully');
+            return $this->getResponse('BOM and associated data archived successfully');
         } catch (\Exception $e) {
             \DB::rollBack();
             $this->status = 500;

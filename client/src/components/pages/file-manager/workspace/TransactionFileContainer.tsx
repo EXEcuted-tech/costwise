@@ -48,7 +48,7 @@ const TransactionFileContainer = (data: File) => {
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowScrollMessage(false);
-    }, 3000);
+    }, 15000);
     return () => clearTimeout(timer);
   }, []);
 
