@@ -195,7 +195,8 @@ class FormulationController extends ApiController
             $formulation->fg_id = $request->input('fg_id');
             $formulation->formula_code = $request->input('formula_code');
             $formulation->emulsion = json_encode($request->input('emulsion'));
-            $formulation->material_qty_list = json_encode($materialQtyList);
+            $materialQtyToArray = json_encode($materialQtyList);
+            $formulation->material_qty_list = [$materialQtyToArray];
             $formulation->save();
 
             $this->status = 200;
