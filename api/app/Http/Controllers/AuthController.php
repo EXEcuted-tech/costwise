@@ -53,8 +53,8 @@ class AuthController extends ApiController
                     $user->save();
                 } catch (\Throwable $th) {
                     throw $th;
-                    }
                 }
+            }
 
             $this->status = 200;
             return $this->getResponse("User created successfully!");
@@ -90,7 +90,7 @@ class AuthController extends ApiController
 
             $user = User::where('email_address', $request->email_address)->first();
 
-            $accessToken = $user->createToken('accessToken', ['*'], now()->addMinutes(60));
+            $accessToken = $user->createToken('accessToken', ['*'], now()->addWeeks(2));
             $refreshToken = $user->createToken('refreshToken', ['*'], now()->addDays(30));
 
             $this->status = 200;
@@ -125,10 +125,10 @@ class AuthController extends ApiController
 
         $accessToken = $user->tokens()->where('name', 'accessToken')->first();
         if (!$accessToken) {
-            $accessToken = $user->createToken('accessToken', ['*'], now()->addMinutes(15));
+            $accessToken = $user->createToken('accessToken', ['*'], now()->addWeeks(2));
         } else {
             $accessToken->token = hash('sha256', $plainTextAccessToken = Str::random(48));
-            $accessToken->expires_at = now()->addMinutes(15);
+            $accessToken->expires_at = now()->addWeeks(2);
             $accessToken->save();
         }
 

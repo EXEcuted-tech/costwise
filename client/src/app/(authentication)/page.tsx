@@ -57,6 +57,7 @@ function LoginPage() {
     setAlertMessages([]);
 
     try {
+      localStorage.clear();
       const response = await api.post('/login', {
         "email_address": email,
         password
