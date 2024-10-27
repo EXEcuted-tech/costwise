@@ -69,7 +69,7 @@ const GettingStartedPage = () => {
     if (hasEmptySection) {
       setAlertMessages([
         ...alertMessages,
-        "All sections must have both a heading and content..",
+        "All sections must have both a heading and content.",
       ]);
       setAlertStatus("critical");
       return;
