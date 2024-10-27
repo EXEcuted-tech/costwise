@@ -44,6 +44,7 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
         setAccess(true);
       }
     } catch (error) {
+      setAlertMessage("User not found.");
       console.error('Error sending reset email:', error);
     } finally {
       setIsLoading(false);
