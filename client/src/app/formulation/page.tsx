@@ -161,9 +161,8 @@ const FormulationPage = () => {
                 const results = await Promise.all(uploadPromises);
                 setInfoMsg(results.join(', '));
             } catch (errors) {
-                console.log("Errors", errors);
                 if (Array.isArray(errors)) {
-                    setErrorMsg(errors.join(', '));
+                    setErrorMsg("Incorrect file uploaded!");
                 } else {
                     setErrorMsg('An error occurred during file upload');
                 }
