@@ -7,7 +7,7 @@ import { useUserContext } from '@/contexts/UserContext';
 import { HiArchiveBoxXMark } from 'react-icons/hi2';
 
 type ViewEditEventModalProps = {
-    event: { id: number };
+    event: { id: number, title: string };
     onClose: () => void;
 };
 
@@ -48,7 +48,7 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
 
     const formatTime = (isoString: string) => {
         const date = new Date(isoString);
-        return date.toTimeString().slice(0, 5); // Returns time in HH:MM format
+        return `${String(date.getUTCHours()).padStart(2, '0')}:${String(date.getUTCMinutes()).padStart(2, '0')}`; // Returns time in HH:MM format
     };
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -60,6 +60,24 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
             const adjustedDate = new Date(date.getTime() - date.getTimezoneOffset() * 60000);
             const updatedEventWithAdjustedDate = { ...updatedEvent, date: adjustedDate };
             const response = await api.post(`/events/update`, updatedEventWithAdjustedDate);
+
+            const user = localStorage.getItem('currentUser');
+            const parsedUser = JSON.parse(user || '{}');
+
+            const auditData = {
+                userId: parsedUser?.userId,
+                action: 'general',
+                act: 'events_edit',
+                event: event.title,
+            };
+
+            api.post('/auditlogs/logsaudit', auditData)
+                .then(response => {
+                    console.log('Audit log created successfully:', response.data);
+                })
+                .catch(error => {
+                    console.error('Error logging audit:', error);
+                });
             if (response.data.status !== 401) {
                 setIsLoading(false);
                 setIsEditing(false);
@@ -74,6 +92,24 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
         }
         setIsLoading(true);
         console.log(event);
+        const user = localStorage.getItem('currentUser');
+        const parsedUser = JSON.parse(user || '{}');
+
+        const auditData = {
+            userId: parsedUser?.userId,
+            action: 'general',
+            act: 'events_archive',
+            event: event.title,
+        };
+
+        api.post('/auditlogs/logsaudit', auditData)
+            .then(response => {
+                console.log('Audit log created successfully:', response.data);
+            })
+            .catch(error => {
+                console.error('Error logging audit:', error);
+            });
+            
         const response = await api.post(`/events/delete`, { event_id: id });
         if (response.data.status !== 401) {
             setIsLoading(false);

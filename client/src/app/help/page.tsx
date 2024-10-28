@@ -95,7 +95,7 @@ const UserManualPage = () => {
                   <p>Learn how to use Product Costing System.</p>
                 </div>
                 <div className="flex flex-col h-10% pl-[15%] 2xl:pl-[20px] pt-[10%] 3xl:pt-[10px] ">
-                  <ul className="list-disc xl:text-[14px] 2xl:text-[16px] 3xl:text-[20px]">
+                  <ul className="list-disc xl:text-[14px] 2xl:text-[16px] 3xl:text-[20px] dark:text-[#d1d1d1]">
                     {sectionsGS.slice(0, 2).map(
                       (
                         section: {
@@ -153,7 +153,7 @@ const UserManualPage = () => {
                   <p>Functionalities and processes in this system.</p>
                 </div>
                 <div className="flex flex-col h-10% pl-[15%] 2xl:pl-[20px] pt-[10%] 3xl:pt-[10px] ">
-                  <ul className="list-disc xl:text-[14px] 2xl:text-[16px] 3xl:text-[20px]">
+                  <ul className="list-disc xl:text-[14px] 2xl:text-[16px] 3xl:text-[20px] dark:text-[#d1d1d1]">
                     {sectionsEssentials.slice(0, 2).map(
                       (
                         section: {
@@ -211,7 +211,7 @@ const UserManualPage = () => {
                   <p>Account management and essentials.</p>
                 </div>
                 <div className="flex flex-col h-10% pl-[15%] 2xl:pl-[20px] pt-[10%] 3xl:pt-[10px] ">
-                  <ul className="list-disc xl:text-[14px] 2xl:text-[16px] 3xl:text-[20px]">
+                  <ul className="list-disc xl:text-[14px] 2xl:text-[16px] 3xl:text-[20px] dark:text-[#d1d1d1]">
                     {sectionsMG.slice(0, 2).map(
                       (
                         section: {
