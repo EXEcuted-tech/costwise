@@ -476,26 +476,9 @@ class BomController extends ApiController
             $monthYear = null;
 
             foreach ($formulationIds as $formulationId) {
-                $existingBom = Bom::whereJsonContains('formulations', $formulationId)->first();
-
-                if ($existingBom) {
-                    $existingFormulation = Formulation::findOrFail($formulationId);
-
-                    $existingFg = FinishedGood::findOrFail($existingFormulation->fg_id);
-                    $newFg = $existingFg->replicate();
-                    $newFg->save();
-
-                    $newFormulation = $existingFormulation->replicate();
-                    $newFormulation->fg_id = $newFg->fg_id;
-                    $newFormulation->save();
-
-                    $newFormulationIds[] = $newFormulation->formulation_id;
-                    $fgIds[] = $newFg->fg_id;
-                } else {
-                    $formulation = Formulation::findOrFail($formulationId);
-                    $newFormulationIds[] = $formulationId;
-                    $fgIds[] = $formulation->fg_id;
-                }
+                $formulation = Formulation::findOrFail($formulationId);
+                $newFormulationIds[] = $formulationId;
+                $fgIds[] = $formulation->fg_id;
 
                 $fg = FinishedGood::findOrFail(end($fgIds));
 

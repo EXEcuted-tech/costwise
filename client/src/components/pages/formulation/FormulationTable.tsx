@@ -651,7 +651,8 @@ const FormulationTable: React.FC<{
                                                                             }
                                                                         }}
                                                                         value={item.batchQty !== undefined && item.batchQty !== null ? Number(item.batchQty).toFixed(2) : ''}
-                                                                        className="w-full text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
+                                                                        className={`${item.description?.toLowerCase() == 'emulsion' ? 'brightness-90' : ''} w-full text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
+                                                                        disabled={item.description?.toLowerCase() == 'emulsion'}
                                                                     />
                                                                 </td>
                                                                 <td className='px-6 text-left'>

@@ -178,7 +178,7 @@ const OpenSidebar: React.FC = () => {
                               : 'my-[14px] 2xl:my-[11px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
                               }`}
                           >
-                            <IconComponent className={`${className} ${iconName === 'MdNotificationsActive' && 'animate-shake-infinte'} justify-center`} />
+                            <IconComponent className={`${className} ${iconName === 'MdNotificationsActive' && 'animate-shake-infinite'} justify-center`} />
                             <p className='font-lato ml-[8px] text-[20px] 2xl:text-[25px]'>{menuName}</p>
                           </li>
                         </Link>
@@ -216,7 +216,7 @@ const OpenSidebar: React.FC = () => {
                               : 'my-[14px] 2xl:my-[11px] hover:text-[#FFD3D3] px-[25px] 2xl:px-[40px]'
                               }`}
                           >
-                            <IconComponent className={`${className} ${iconName === 'MdNotificationsActive' && 'animate-shake-infinte'} ml-[5px] 2xl:ml-0 justify-center`} />
+                            <IconComponent className={`${className} ${iconName === 'MdNotificationsActive' && 'animate-shake-infinite'} ml-[5px] 2xl:ml-0 justify-center`} />
                             <p className='font-lato ml-[8px] text-[20px] 2xl:text-[25px]'>{menuName}</p>
                           </li>
                         </Link>

@@ -191,7 +191,7 @@ const CloseSidebar: React.FC = () => {
                           <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
                             'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
                             'my-[13px] hover:text-[#FFD3D3]'}`}>
-                            <IconComponent className={`${iconName === 'MdNotificationsActive' && hasNewNotifications && 'animate-shake-infinte'} ${className}`} />
+                            <IconComponent className={`${iconName === 'MdNotificationsActive' && hasNewNotifications && 'animate-shake-infinite'} ${className}`} />
                           </li>
                         </Link>
                       }
@@ -232,7 +232,7 @@ const CloseSidebar: React.FC = () => {
                           <li key={index} className={`hover:animate-shrink-in cursor-pointer ${path === route ?
                             'bg-[#FFD3D3] text-primary px-[20px] py-[5px] my-[8px] rounded-[20px]' :
                             'my-[13px] hover:text-[#FFD3D3]'}`}>
-                            <IconComponent className={`${iconName === 'MdNotificationsActive' && hasNewNotifications && 'animate-shake-infinte'} ${className}`} />
+                            <IconComponent className={`${iconName === 'MdNotificationsActive' && hasNewNotifications && 'animate-shake-infinite'} ${className}`} />
                           </li>
                         </Link>
                       }

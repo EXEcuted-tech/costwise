@@ -20,6 +20,7 @@ interface WorkspaceTableProps {
     removedBomIds?: RemovedId[];
     setRemovedBomIds?: React.Dispatch<React.SetStateAction<RemovedId[]>>;
     transactionCount?: number;
+    containerRef?: React.RefObject<HTMLDivElement>;
 }
 
 const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
@@ -35,9 +36,9 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
     removedBomIds,
     setRemovedBomIds,
     transactionCount,
+    containerRef
 }) => {
     const [tableData, setTableData] = useState(data);
-    const containerRef = useRef<HTMLDivElement | null>(null);
     const [confirmDialog, setConfirmDialog] = useState(false);
     const [rowToRemove, setRowToRemove] = useState<{ index: number, rowType?: string } | null>(null);
 
@@ -56,16 +57,15 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
     const handleInputChange = (rowIndex: number, key: string, value: string) => {
         const updatedData = [...tableData];
 
-        if (key == 'level' || key == 'formulation' || key == 'year' || key == 'month' || key == 'date') {
+        if (key == 'level' || key == 'formulation' || key == 'year' || key == 'month' || key == 'date' || key == 'glAccount') {
             const formattedValue = String(value);
             updatedData[rowIndex][key] = formattedValue;
-        } else if (!isNaN(Number(value)) && value !== '') {
-            const formattedValue = Number(value).toFixed(2);
-            updatedData[rowIndex][key] = formattedValue;
+        } else if (!isNaN(Number(value)) || value === '' || value === '.') {
+            // Allow empty string and decimal point during typing
+            updatedData[rowIndex][key] = value;
         } else {
             updatedData[rowIndex][key] = value;
         }
-
         setTableData(updatedData);
     };
 
@@ -222,26 +222,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
         setRowToRemove(null);
     };
 
-    const handleMouseMove = (e: React.MouseEvent) => {
-        const container = containerRef.current;
 
-        if (!container) return;
-
-        const { clientX } = e;
-        const { left, right } = container.getBoundingClientRect();
-
-        const distanceToRight = right - clientX;
-        const distanceToLeft = clientX - left;
-
-        const threshold = 100;
-        const scrollStep = 50;
-
-        if (distanceToRight < threshold) {
-            container.scrollLeft += scrollStep;
-        } else if (distanceToLeft < threshold) {
-            container.scrollLeft -= scrollStep;
-        }
-    };
 
     return (
         <>
@@ -253,7 +234,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                     />
                 </div>
             )}
-            <div ref={containerRef} onMouseMove={handleMouseMove} className="overflow-x-auto">
+            <div ref={containerRef} className="overflow-hidden">
                 {isEdit &&
                     <div className={`h-[40px] animate-zoomIn fixed flex items-center ${isTransaction ? 'left-[20px]' : 'left-[40px]'}`}>
                         <div className='flex justify-end my-[10px] mr-[10px]'>

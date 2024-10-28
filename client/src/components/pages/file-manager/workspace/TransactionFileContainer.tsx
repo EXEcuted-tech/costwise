@@ -1,7 +1,6 @@
 import React, { useEffect, useRef, useState } from 'react'
 import FileLabel from './FileLabel'
-import WorkspaceTable from './WorkspaceTable'
-import { FaPencilAlt } from 'react-icons/fa'
+import { FaArrowDown, FaArrowLeft, FaArrowRight, FaArrowUp, FaPencilAlt } from 'react-icons/fa'
 import { TbProgress } from 'react-icons/tb'
 import { File, TransactionRecord } from '@/types/data';
 import api from '@/utils/api'
@@ -9,6 +8,7 @@ import Alert from '@/components/alerts/Alert'
 import PrimaryPagination from '@/components/pagination/PrimaryPagination'
 import { useFileManagerContext } from '@/contexts/FileManagerContext'
 import { useUserContext } from '@/contexts/UserContext'
+import WorkspaceTable from './WorkspaceTable';
 
 const TransactionFileContainer = (data: File) => {
   const [isEdit, setIsEdit] = useState(false);
@@ -22,22 +22,6 @@ const TransactionFileContainer = (data: File) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [removedIds, setRemovedIds] = useState<number[]>([]);
 
-  const [currentPage, setCurrentPage] = useState<number>(1);
-  const [addedRowsCount, setAddedRowsCount] = useState<number>(0);
-
-  const [itemsPerPage, setItemsPerPage] = useState(100);
-
-  const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
-    setCurrentPage(page);
-  };
-
-  useEffect(() => {
-    setItemsPerPage(100 + addedRowsCount);
-  }, [addedRowsCount]);
-
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentListPage = transactionData.slice(indexOfFirstItem, indexOfLastItem);
 
   const { currentUser } = useUserContext();
 
@@ -280,6 +264,7 @@ const TransactionFileContainer = (data: File) => {
           setAlertMessages(['An error occurred while saving the transaction. Please try again.']);
         }
       }
+
       setRemovedIds([]);
     }
 
@@ -293,6 +278,55 @@ const TransactionFileContainer = (data: File) => {
     // window.location.reload();
   };
 
+  const containerRef = useRef<HTMLDivElement | null>(null);
+
+  const scrollHorizontalOnce = (direction: 'left' | 'right') => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const scrollAmount = 700; // Adjust this value to control scroll distance
+    const targetScroll = container.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount);
+
+    container.scrollTo({
+      left: targetScroll,
+      behavior: 'smooth'
+    });
+  };
+
+  const scrollHorizontalDown = (direction: 'left' | 'right') => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    const scrollAmount = 10000; // Adjust this value to control scroll distance
+    const targetScroll = container.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount);
+
+    container.scrollTo({
+      left: targetScroll,
+      behavior: 'smooth'
+    });
+  };
+
+  const scrollVerticalOnce = (direction: 'up' | 'down') => {
+    const scrollAmount = 700; // Adjust this value to control scroll distance
+    const targetScroll = window.scrollY + (direction === 'up' ? -scrollAmount : scrollAmount);
+
+    window.scrollTo({
+      top: targetScroll,
+      behavior: 'smooth'
+    });
+  };
+
+  const scrollVerticalDown = (direction: 'up' | 'down') => {
+    const scrollAmount = 10000; // Adjust this value to control scroll distance
+    const targetScroll = window.scrollY + (direction === 'up' ? -scrollAmount : scrollAmount);
+
+    window.scrollTo({
+      top: targetScroll,
+      behavior: 'smooth'
+    });
+  };
+
+
   return (
     <>
       <div className="fixed top-4 right-4 z-50">
@@ -305,11 +339,46 @@ const TransactionFileContainer = (data: File) => {
           {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
         </div>
       </div>
-      <div className='bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow mb-[35px] overflow-hidden'>
+      <div className="opacity-50 hover:opacity-100 fixed bottom-8 right-8 z-50 transition-opacity duration-300">
+        <div className="grid grid-cols-3 gap-2 bg-transparent p-2 rounded-lg">
+          <div></div>
+          <button
+            onClick={() => scrollVerticalOnce('up')}
+            onMouseDown={() => { scrollVerticalDown('up') }}
+            className="p-2 bg-primary rounded-[20px] hover:brightness-125 text-white">
+            <FaArrowUp />
+          </button>
+          <div></div>
+          <button
+            onClick={() => scrollHorizontalOnce('left')}
+            onMouseDown={() => { scrollHorizontalDown('left') }}
+            className="p-2 bg-primary rounded-[20px] hover:brightness-125 text-white">
+            <FaArrowLeft />
+          </button>
+          <div className="p-2 bg-primary rounded-[30px] animate-pulse flex justify-center items-center">
+            <div className="size-[10px] animate-shake-infinite bg-white rounded-full"></div>
+          </div>
+          <button
+            onClick={() => scrollHorizontalOnce('right')}
+            onMouseDown={() => { scrollHorizontalDown('right') }}
+            className="p-2 bg-primary rounded-[20px] hover:brightness-125 text-white">
+            <FaArrowRight />
+          </button>
+          <div></div>
+          <button
+            onClick={() => scrollVerticalOnce('down')}
+            onMouseDown={() => { scrollVerticalDown('down') }}
+            className="p-2 bg-primary rounded-[20px] hover:brightness-125 text-white">
+            <FaArrowDown />
+          </button>
+          <div></div>
+        </div>
+      </div>
+      <div className='bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow mb-[35px] overflow-hidden h-auto'>
         <FileLabel {...data} />
         {!isLoading ?
           <>
-            <div className=''>
+            <div id='scroll-style' className=''>
               {/* Production Transactions */}
               <div className='flex items-center border-y-1 border-[#868686] bg-[#F3F3F3] dark:bg-[#bababa] dark:border-[#5C5C5C] py-[15px] px-[20px]'>
                 <h1 className='font-bold text-[20px] text-[#5C5C5C] mr-[10px]'>PRODUCTION TRANSACTIONS</h1>
@@ -329,13 +398,13 @@ const TransactionFileContainer = (data: File) => {
               </div>
               {showScrollMessage && (
                 <div className="scroll-message">
-                  Move mouse to right or left direction to scroll horizontally
+                  Use the joystick controls to navigate through the workspace
                 </div>
               )}
 
-              <div className='p-[20px] overflow-x-auto'>
+              <div className='p-[20px]'>
                 <WorkspaceTable
-                  data={currentListPage}
+                  data={transactionData}
                   isEdit={isEdit}
                   setIsEdit={setIsEdit}
                   isTransaction={true}
@@ -343,19 +412,10 @@ const TransactionFileContainer = (data: File) => {
                   removedIds={removedIds}
                   setRemovedIds={setRemovedIds}
                   transactionCount={transactionsCount}
+                  containerRef={containerRef}
                 />
               </div>
             </div>
-            {currentListPage.length > 0 &&
-              <div className='relative py-[1%]'>
-                <PrimaryPagination
-                  data={transactionData}
-                  itemsPerPage={itemsPerPage}
-                  handlePageChange={handlePageChange}
-                  currentPage={currentPage}
-                />
-              </div>
-            }
           </>
           :
           <div className='flex justify-center items-center overflow-auto min-h-[552px]'>
