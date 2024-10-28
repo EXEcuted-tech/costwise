@@ -76,7 +76,7 @@ const GettingStartedPage = () => {
     }
 
     try {
-      await updateArticle("Manage Account", content);
+      await updateArticle("Getting Started", content);
       fetchArticle();
     } catch (error) {
       console.error("Error updating article:", error);

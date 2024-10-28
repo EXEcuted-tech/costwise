@@ -76,7 +76,7 @@ const EssentialsPage = () => {
     }
 
     try {
-      await updateArticle("Manage Account", content);
+      await updateArticle("Essentials", content);
       fetchArticle();
     } catch (error) {
       console.error("Error updating article:", error);
