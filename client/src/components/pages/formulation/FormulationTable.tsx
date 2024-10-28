@@ -196,7 +196,9 @@ const FormulationTable: React.FC<{
             setFormulaData(prevData => prevData.filter((_, i) => i !== index));
 
             // Add the removed row to removedRows
-            setRemovedRows(prevRows => [...prevRows, rowToRemoveData]);
+            if(rowToRemoveData.id != 0 && rowToRemoveData.track_id != 0 && rowToRemoveData.itemCode != '' && rowToRemoveData.description != ''){
+                setRemovedRows(prevRows => [...prevRows, rowToRemoveData]);
+            }
 
             setConfirmDialog(false);
             setRowToRemove(null);
@@ -229,14 +231,16 @@ const FormulationTable: React.FC<{
                 // Calculate emulsion batch quantity
                 const emulsionIndex = updated.findIndex(row => row.description === 'EMULSION');
                 if (emulsionIndex !== -1) {
-                    let emulsionBatchQty = 0;
-                    for (let i = 1; i < emulsionIndex; i++) {
-                        if (!updated[i].description?.toUpperCase().startsWith('PACKAGING')) {
-                            console.log(updated[i].description);
-                            emulsionBatchQty += Number(updated[i].batchQty) || 0;
+                    let totalBatchQty = 0;
+                    for (let i = 0; i < updated.length; i++) {
+                        if (i !== emulsionIndex 
+                            && !updated[i].description?.toUpperCase().includes('EMULSION')
+                            && !updated[i].description?.toUpperCase().includes('PACKAGING')
+                            && updated[i].formulation === null) {
+                            totalBatchQty += Number(updated[i].batchQty) || 0;
                         }
                     }
-                    updated[emulsionIndex].batchQty = emulsionBatchQty;
+                    updated[emulsionIndex].batchQty = totalBatchQty;
                 }
 
                 return updated;

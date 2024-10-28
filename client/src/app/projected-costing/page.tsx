@@ -14,6 +14,8 @@ import TrainingModel, {
 import { ProductEntry, CostDataEntry } from "@/types/data";
 import useOutsideClick from '@/hooks/useOutsideClick';
 import { Tooltip } from "@nextui-org/react";
+import useColorMode from "@/hooks/useColorMode";
+import HeaderProjected from "@/components/header/HeaderProjected";
 
 const ProjectedCostPage = () => {
   const { isOpen } = useSidebarContext();
@@ -133,11 +135,12 @@ const ProjectedCostPage = () => {
 
   const ref = useOutsideClick(() => setIsActiveStart(false));
   const ref2 = useOutsideClick(() => setIsActiveEnd(false));
+  const [colorMode, setColorMode] = useColorMode();
 
   return (
-    <div className="overflow-auto overflow-x-hidden bg-cover bg-center items-center justify-center bg-[#FFFAF8] dark:bg-[#121212] bg-opacity-20">
+    <div className="overflow-auto overflow-x-hidden bg-cover bg-center items-center justify-center bg-[#FFFAF8] dark:bg-[#1E1E1E] bg-opacity-20">
       <div>
-        <Header icon={MdOutlineAnalytics} title={"Projected Costing"} />
+        <HeaderProjected icon={MdOutlineAnalytics} title={"Projected Costing"} setColorMode={setColorMode} colorMode={colorMode}/>
       </div>
       <div className="w-full ml-[60px] pr-[45px] h-full 2xl:h-[90vh] flex flex-col items-start justify-start pt-[15px] py-[15px]">
         <p className="text-[30px] text-tertiary dark:text-white">Projected Product Costs</p>
@@ -150,7 +153,7 @@ const ProjectedCostPage = () => {
                 setIsActiveStart(!isActiveStart);
               }}
             >
-              <p className="absolute ml-4 bottom-7 px-2 bg-[#FFFAF8] dark:bg-[#121212] dark:text-white">
+              <p className="absolute ml-4 bottom-7 px-2 bg-[#FFFAF8] dark:bg-[#1E1E1E] dark:text-white">
                 Cost Year
               </p>
               <span className="selected flex flex-row text-[16px]">
@@ -187,7 +190,7 @@ const ProjectedCostPage = () => {
                 setIsActiveEnd(!isActiveEnd);
               }}
             >
-              <p className="absolute ml-4 bottom-7 px-2 bg-[#FFFAF8] dark:bg-[#121212] dark:text-white">
+              <p className="absolute ml-4 bottom-7 px-2 bg-[#FFFAF8] dark:bg-[#1E1E1E] dark:text-white">
                 Year Half
               </p>
               <span className="selected flex flex-row text-[16px]">
@@ -217,7 +220,7 @@ const ProjectedCostPage = () => {
         </div>
         <div
           className={`${isOpen ? "flex flex-col 4xl:flex-row" : "flex flex-col 3xl:flex-row"
-            } w-[97%] h-full gap-[2%] rounded-xl mt-[10px] 2xl:mt-0 dark:bg-[#121212]`}
+            } w-[97%] h-full gap-[2%] rounded-xl mt-[10px] 2xl:mt-0 dark:bg-[#1E1E1E]`}
         >
           {/* Left Div */}
           <div
@@ -231,6 +234,7 @@ const ProjectedCostPage = () => {
               <ProductCost
                 selectedYear={activeStart}
                 selectedHalf={activeEnd}
+                colorMode={colorMode}
               />
             </div>
             <div className="flex text-[30px] text-[#585858] font-bold bg-white dark:bg-[#3c3c3c] items-center justify-start border-y-2 pl-10">

@@ -12,10 +12,15 @@ const useColorMode = () => {
     colorMode === "dark"
       ? bodyClass.add(className)
       : bodyClass.remove(className);
+
+    if (colorMode === 'dark') {
+      localStorage.setItem('color', 'dark');
+    } else {
+      localStorage.setItem('color','light');
+    }
   }, [colorMode]);
 
   return [colorMode, setColorMode];
 };
-
 
 export default useColorMode;
