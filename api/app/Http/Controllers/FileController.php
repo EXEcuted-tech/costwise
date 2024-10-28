@@ -218,6 +218,7 @@ class FileController extends ApiController
             if ($uploadType == 'master') {
                 $this->calculateLeastCost($this->fileModel);
             }
+            $this->fileModel['created_at'] = now()->setTimezone('Asia/Manila');
             File::create($this->fileModel);
 
             $this->status = 200;

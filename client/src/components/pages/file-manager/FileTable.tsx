@@ -150,7 +150,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
                                     year: 'numeric',
                                     month: '2-digit',
                                     day: '2-digit',
-                                    timeZone: 'UTC',
+                                    timeZone: 'Asia/Manila',
                                 });
                             const addedBy = settings.user;
                             return (
