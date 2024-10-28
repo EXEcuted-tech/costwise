@@ -194,7 +194,7 @@ const DashboardPage = () => {
                 : "text-[40px] 2xl:text-[55px] 3xl:text-[68px]"
               } truncate text-ellipsis text-[#414141] font-bold animate-color-pulse dark:animate-color-pulse-dark`}
           >
-            Good Evening,{" "}
+            {new Date().getHours() < 12 ? "Good Morning" : new Date().getHours() < 17 ? "Good Afternoon" : "Good Evening"},
             <span className="animate-color-pulse2 dark:animate-color-pulse-dark2">
               {name}!
             </span>
