@@ -184,9 +184,12 @@ class FormulationController extends ApiController
                     ->first();
 
                 if ($matchingMaterial) {
-                    $materialQtyList[$matchingMaterial->material_id] = [
-                        'level' => $material['level'],
-                        'batchQty' => $material['batchQty'],
+                    $materialQtyList[] = [
+                        $matchingMaterial->material_id => [
+                            'level' => $material['level'],
+                            'qty' => $material['batchQty'],
+                            'total_cost' => $matchingMaterial->material_cost * $material['batchQty']
+                        ]
                     ];
                 }
             }
@@ -462,7 +465,7 @@ class FormulationController extends ApiController
                 return $this->getResponse("Finished Good or Formulation not found!");
             }
 
-            $bom = Bom::whereRaw('JSON_CONTAINS(formulations, ?)', [$formulationId])->first();
+            $bom = Bom::whereRaw('JSON_CONTAINS(formulations, ?)', [json_encode($formulationId)])->first();
 
             if ($bom) {
                 $bomFormulations = json_decode($bom->formulations, true);
@@ -504,7 +507,7 @@ class FormulationController extends ApiController
             }
 
             $this->status = 200;
-            return $this->getResponse("Finished Good and Formulation deleted successfully!");
+            return $this->getResponse("Finished Good and Formulation archived successfully!");
         } catch (\Exception $e) {
             $this->status = 500;
             return $this->getResponse("Error! Try again. " . $e->getMessage());

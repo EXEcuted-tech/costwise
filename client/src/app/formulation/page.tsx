@@ -161,9 +161,12 @@ const FormulationPage = () => {
                 const results = await Promise.all(uploadPromises);
                 setInfoMsg(results.join(', '));
             } catch (errors) {
-                console.log("Errors", errors);
                 if (Array.isArray(errors)) {
-                    setErrorMsg(errors.join(', '));
+                    if(errors[0] == "Material not found on the current month."){
+                        setErrorMsg("Material not found on the current month.")
+                    } else {
+                        setErrorMsg("Incorrect file uploaded!");
+                    }
                 } else {
                     setErrorMsg('An error occurred during file upload');
                 }

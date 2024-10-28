@@ -172,7 +172,7 @@ class InventoryController extends ApiController
 
             DB::commit();
 
-            return response()->json(['message' => 'Inventory list deleted successfully']);
+            return response()->json(['message' => 'Inventory list archived successfully']);
         } catch (\Exception $e) {
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);

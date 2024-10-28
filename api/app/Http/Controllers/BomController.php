@@ -440,7 +440,7 @@ class BomController extends ApiController
             \DB::commit();
 
             $this->status = 200;
-            $this->response['message'] = "BOM deleted and archived successfully.";
+            $this->response['message'] = "BOM archived successfully.";
             return $this->getResponse();
         } catch (\Exception $e) {
             \DB::rollBack();

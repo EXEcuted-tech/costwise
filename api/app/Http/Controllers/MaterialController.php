@@ -271,7 +271,7 @@ class MaterialController extends ApiController
             \DB::commit();
 
             $this->status = 200;
-            return $this->getResponse('Materials have been successfully deleted and archived.');
+            return $this->getResponse('Materials have been successfully archived.');
         } catch (\Exception $e) {
             \DB::rollBack();
             $this->status = 500;
@@ -327,7 +327,7 @@ class MaterialController extends ApiController
 
             return [
                 'status' => 200,
-                'message' => 'Materials have been successfully deleted and archived.'
+                'message' => 'Materials have been successfully archived.'
             ];
         } catch (\Exception $e) {
             \DB::rollBack();
