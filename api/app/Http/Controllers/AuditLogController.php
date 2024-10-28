@@ -67,8 +67,14 @@ class AuditLogController extends Controller
                     case "others_photo":
                         $description = "$firstName $middleInitial $lastName uploaded $fileName's profile picture.";
                         break;
-                    case "events":
+                    case "events_create":
                         $description = "$firstName $middleInitial $lastName set an event $event on $date.";
+                        break;
+                    case "events_edit":
+                        $description = "$firstName $middleInitial $lastName updated the event $event.";
+                        break;
+                    case "events_archive":
+                        $description = "$firstName $middleInitial $lastName archived the event $event.";
                         break;
                     default:
                         $description = "Unknown source or action.";

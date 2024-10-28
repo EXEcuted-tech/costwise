@@ -138,7 +138,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
         const auditData = {
             userId: parsedUser?.userId,
             action: 'general',
-            act: 'events',
+            act: 'events_create',
             event: event.title,
             date: formattedDate
         };
@@ -212,6 +212,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
                     <ViewEditEventModal
                         event={{
                             id: selectedEvent.id,
+                            title: selectedEvent.title
                         }}
                         onClose={() => setIsModalOpen(false)}
                     />
