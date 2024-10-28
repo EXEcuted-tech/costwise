@@ -56,7 +56,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
     const handleInputChange = (rowIndex: number, key: string, value: string) => {
         const updatedData = [...tableData];
 
-        if (key == 'level' || key == 'formulation' || key == 'year' || key == 'month') {
+        if (key == 'level' || key == 'formulation' || key == 'year' || key == 'month' || key == 'date') {
             const formattedValue = String(value);
             updatedData[rowIndex][key] = formattedValue;
         } else if (!isNaN(Number(value)) && value !== '') {

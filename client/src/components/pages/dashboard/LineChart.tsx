@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Line } from "react-chartjs-2";
 import {
   Chart as ChartJS,
@@ -37,15 +37,18 @@ interface ProductCostChartProps {
   selectedYear: string;
   selectedHalf: string;
   className?: string;
+  colorMode?: string;
 }
 
 const ProductCostChart: React.FC<ProductCostChartProps> = ({
   selectedYear,
   selectedHalf,
   className,
+  colorMode
 }) => {
   const [chartData, setChartData] = useState<any>(null);
   const [priceData, setPriceData] = useState<ChartDataEntry[]>([]);
+
 
   useEffect(() => {
     const fetchFile = async () => {
@@ -125,13 +128,24 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
 
     prepareChartData();
   }, [priceData, selectedYear, selectedHalf]);
+
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    if (colorMode === 'dark') {
+      setIsDarkMode(true);
+    } else {
+      setIsDarkMode(false);
+    }
+  }, [colorMode]);
+
   if (!chartData) {
     return (
       <div className="flex flex-col items-center justify-center animate-fadeIn">
-        <h2 className="text-4xl font-semibold text-gray-700 transition-transform transform hover:scale-105">
+        <h2 className="text-4xl font-semibold text-gray-700 transition-transform dark:text-white transform hover:scale-105">
           No Data Available
         </h2>
-        <p className="mt-2 text-gray-500 text-2xl transition-transform transform hover:scale-105">
+        <p className="mt-2 text-gray-500 text-2xl transition-transform transform dark:text-[#d1d1d1] hover:scale-105">
           Please select a year half to view the data.
         </p>
       </div>
@@ -148,10 +162,14 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
           plugins: {
             legend: {
               position: "top",
+              labels:{
+                color: isDarkMode ? "#ffffff" : "#666666",
+              },
             },
             title: {
               display: true,
               text: `Cost per Month/Year (${selectedYear} - ${selectedHalf})`,
+              color: isDarkMode ? "#ffffff" : "#666666",
             },
           },
           scales: {
@@ -164,7 +182,10 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
                   weight: "bold",
                   family: "Arial",
                 },
-                color: "#B22222",
+                color: isDarkMode ? "#e31b1b" : "#B22222",
+              },
+              ticks: {
+                color: isDarkMode ? "#ffffff" : "#666666",
               },
             },
             y: {
@@ -176,7 +197,10 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
                   weight: "bold",
                   family: "Arial",
                 },
-                color: "#B22222",
+                color: isDarkMode ? "#e31b1b" : "#B22222",
+              },
+              ticks: {
+                color: isDarkMode ? "#ffffff" : "#666666",
               },
               beginAtZero: true,
             },

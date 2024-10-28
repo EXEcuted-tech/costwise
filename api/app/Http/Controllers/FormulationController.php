@@ -184,9 +184,12 @@ class FormulationController extends ApiController
                     ->first();
 
                 if ($matchingMaterial) {
-                    $materialQtyList[$matchingMaterial->material_id] = [
-                        'level' => $material['level'],
-                        'batchQty' => $material['batchQty'],
+                    $materialQtyList[] = [
+                        $matchingMaterial->material_id => [
+                            'level' => $material['level'],
+                            'qty' => $material['batchQty'],
+                            'total_cost' => $matchingMaterial->material_cost * $material['batchQty']
+                        ]
                     ];
                 }
             }

@@ -36,11 +36,13 @@ interface ChartDataEntry {
 interface ProductCostChartProps {
   selectedYear: string;
   selectedHalf: string;
+  colorMode: string;
 }
 
 const ProductCostChart: React.FC<ProductCostChartProps> = ({
   selectedYear,
   selectedHalf,
+  colorMode
 }) => {
   const [chartData, setChartData] = useState<any>(null);
   const [priceData, setPriceData] = useState<ChartDataEntry[]>([]);
@@ -118,6 +120,17 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
 
     prepareChartData();
   }, [priceData, selectedYear, selectedHalf]);
+
+  const [isDarkMode, setIsDarkMode] = useState(false);
+
+  useEffect(() => {
+    if (colorMode === 'dark') {
+      setIsDarkMode(true);
+    } else {
+      setIsDarkMode(false);
+    }
+  }, [colorMode]);
+
   if (!chartData) {
     return (
       <div className="flex flex-col items-center justify-center animate-fadeIn">
@@ -141,10 +154,14 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
           plugins: {
             legend: {
               position: "top",
+              labels:{
+                color: isDarkMode ? "#ffffff" : "#666666",
+              },
             },
             title: {
               display: true,
               text: `Cost per Month/Year (${selectedYear} - ${selectedHalf})`,
+              color: isDarkMode ? "#ffffff" : "#666666",
             },
           },
           scales: {
@@ -157,7 +174,10 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
                   weight: "bold",
                   family: "Arial",
                 },
-                color: "#B22222",
+                color: isDarkMode ? "#e31b1b" : "#B22222",
+              },
+              ticks: {
+                color: isDarkMode ? "#ffffff" : "#666666",
               },
             },
             y: {
@@ -169,7 +189,10 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
                   weight: "bold",
                   family: "Arial",
                 },
-                color: "#B22222",
+                color: isDarkMode ? "#e31b1b" : "#B22222",
+              },
+              ticks: {
+                color: isDarkMode ? "#ffffff" : "#666666",
               },
               beginAtZero: true,
             },
