@@ -196,10 +196,10 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
                     {calendarDays.map((day, index) => (
                         <span
                             key={index}
-                            className={`text-[12px] 2xl:text-[16px] py-2 dark:text-white font-medium rounded-full transition-colors cursor-pointer
+                            className={`text-[12px] 2xl:text-[16px] py-2 font-medium rounded-full transition-colors cursor-pointer
                             ${day === null ? 'invisible' : ''}
                             ${isEventDay(day) ? 'bg-primary text-white hover:bg-red-600' : ''}
-                            ${day === new Date().getDate() && new Date().getMonth() === currentDate.getMonth() && new Date().getFullYear() === currentDate.getFullYear() ? 'bg-secondary text-black hover:brightness-90' : 'hover:bg-gray-200'}`}
+                            ${day === new Date().getDate() && new Date().getMonth() === currentDate.getMonth() && new Date().getFullYear() === currentDate.getFullYear() ? 'bg-secondary dark:bg-brightness-50 text-black hover:brightness-90' : 'dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600'}`}
                             onClick={() => handleDayClick(day)}
                         >
                             {day}

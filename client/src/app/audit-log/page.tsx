@@ -217,7 +217,7 @@ const AuditLogPage = () => {
                     </p>
                 </div>
             }
-            <div className={`w-full h-screen font-lato bg-background dark:bg-[#121212]`}>
+            <div className={`w-full h-screen font-lato bg-background dark:bg-[#1E1E1E]`}>
                 <AuditDrawer data={selectedData} />
                 <Header icon={GoHistory} title={"Audit Log"} />
                 <div className="ml-[95px] mr-[50px]">
@@ -227,7 +227,7 @@ const AuditLogPage = () => {
                                 <BiSearchAlt className="absolute left-3 top-[20px] 4xl:top-[24px] text-[20px] 4xl:text-[23px] transform -translate-y-1/2 text-gray-600" />
                                 <input
                                     onChange={(e) => setSearchTerm(e.target.value)}
-                                    className={`${isOpen ? 'w-[300px] 3xl:w-[400px]' : 'w-[400px]'} p-[6px] 4xl:p-[7px] dark:text-white text-[16px] 4xl:text-[20px] pl-[35px] 4xl:pl-[40px] border border-[#868686] rounded-full`}
+                                    className={`${isOpen ? 'w-[300px] 3xl:w-[400px]' : 'w-[400px]'} p-[6px] 4xl:p-[7px] dark:text-white dark:bg-[#3C3C3C] text-[16px] 4xl:text-[20px] pl-[35px] 4xl:pl-[40px] border border-[#868686] rounded-full`}
                                     placeholder="Search here..." />
                             </div>
                             <button onClick={sortAuditLogs} className="flex justify-center items-center bg-white dark:bg-[#3C3C3C] hover:bg-[#ebebeb] dark:hover:bg-[#787878] transition-colors duration-300 ease-in-out 4xl:p-[6px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]">

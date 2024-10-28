@@ -424,6 +424,7 @@ const DashboardPage = () => {
               selectedHalf="Second"
               selectedYear="2024"
               className={`${isOpen ? "w-full 3xl:w-[60%]" : "w-full"}`}
+              colorMode={colorMode}
             />
             {/* <div className='flex justify-center mt-[30px] pr-[20px] w-full'>
                 <CostTable className='h-[280px] w-full'/>
