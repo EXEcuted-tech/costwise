@@ -174,16 +174,16 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('update', [ReleaseNoteController::class, 'updateNote']);
         Route::post('delete', [ReleaseNoteController::class, 'deleteNote']);
     });
-});
 
-Route::prefix('/training')->group(function () {
-    Route::post('upload', [FileController::class, 'uploadTrainingData']);
-    Route::get('data', [FileController::class, 'getData']);
-    Route::post('update', [FileController::class, 'updateTrainingData']);
-});
+    Route::prefix('/training')->group(function () {
+        Route::post('upload', [FileController::class, 'uploadTrainingData']);
+        Route::get('data', [FileController::class, 'getData']);
+        Route::post('update', [FileController::class, 'updateTrainingData']);
+    });
 
-Route::prefix('/prediction')->group(function () {
-    Route::post('/upload', [PredictionController::class, 'uploadPrediction']);
-    Route::post('/data', [PredictionController::class, 'getPrediction']);
-    Route::post('/current_data', [PredictionController::class, 'getCurrentPrediction']);
+    Route::prefix('/prediction')->group(function () {
+        Route::post('/upload', [PredictionController::class, 'uploadPrediction']);
+        Route::post('/data', [PredictionController::class, 'getPrediction']);
+        Route::post('/current_data', [PredictionController::class, 'getCurrentPrediction']);
+    });
 });

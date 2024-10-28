@@ -76,11 +76,11 @@ const GettingStartedPage = () => {
     }
 
     try {
-      await updateArticle("Manage Account", content);
+      await updateArticle("Getting Started", content);
       fetchArticle();
     } catch (error) {
       console.error("Error updating article:", error);
-      setAlertMessages(["Failed to save changes. Please try again."]);
+      setAlertMessages("Failed to save changes. Please try again.");
     }
     setIsEditing(false);
   };
