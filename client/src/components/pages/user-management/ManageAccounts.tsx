@@ -34,8 +34,8 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({
         setCurrentPage(page);
     };
 
-    const indexOfLastItem = currentPage * 8;
-    const indexOfFirstItem = indexOfLastItem - 8;
+    const indexOfLastItem = currentPage * 6;
+    const indexOfFirstItem = indexOfLastItem - 6;
     const currentListPage = fileData.slice(indexOfFirstItem, indexOfLastItem);
 
     const [errorMsg, setErrorMsg] = useState<string>('');
@@ -137,7 +137,7 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({
                 <div className="flex w-full justify-center h-[5rem] mt-4 rounded-b-xl bg-white dark:bg-[#3C3C3C] border-[#868686]">
                     <PrimaryPagination
                         data={fileData}
-                        itemsPerPage={8}
+                        itemsPerPage={6}
                         handlePageChange={handlePageChange}
                         currentPage={currentPage}
                     />
