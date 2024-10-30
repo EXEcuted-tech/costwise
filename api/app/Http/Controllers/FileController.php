@@ -165,7 +165,7 @@ class FileController extends ApiController
             $formulationIds = json_decode($bom->formulations, true) ?? [];
             $fgIds = Formulation::whereIn('formulation_id', $formulationIds)->pluck('fg_id')->toArray();
 
-            FormulationController::deleteBulkWithFGInFile($fgIds, $bomId);
+            FormulationController::deleteBulkWithFGInFile($fgIds, $bomId, $formulationIds);
 
             Bom::on('archive_mysql')->create($bom->toArray());
             $bom->delete();
@@ -566,7 +566,9 @@ class FileController extends ApiController
 
             if (!is_null($this->formulationCode) && !is_null($code) && !is_null($description) && !is_null($row[4])) {
                 $this->fgCode = $code;
-                $fodl = Fodl::where('fg_code', $this->fgCode)->first();
+                $fodl = Fodl::where('fg_code', $this->fgCode)
+                    ->where('monthYear', $this->monthYear)
+                    ->first();
                 $finishedGood = FinishedGood::Create(
                     [
                         'fodl_id' => $fodl->fodl_id ?? null,
@@ -590,7 +592,15 @@ class FileController extends ApiController
                 $materialLevel = intval($level);
                 $materialQty = $batchQty;
 
-                $material = Material::where('material_code', $materialCode)->first();
+                $year = intval(substr($this->monthYear,0,4));
+                $month = intval(substr($this->monthYear,4,2));
+                
+                $material = Material::where('material_code', $materialCode)
+                ->whereYear('date', $year)
+                ->whereMonth('date', $month)
+                ->orderBy('date', 'desc')
+                ->first();
+
                 if ($material) {
                     $currentFormulation[] = [
                         $material->material_id => [
@@ -694,7 +704,7 @@ class FileController extends ApiController
 
     public function export(Request $request)
     {
-        try {
+        // try {
             $fileId = $request->input('file_id');
             $file = File::findOrFail($fileId);
 
@@ -715,11 +725,11 @@ class FileController extends ApiController
             return response()->download($tempFile, $fileName, [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ])->deleteFileAfterSend(true);
-        } catch (\Exception $e) {
-            $this->status = 500;
-            $this->response['message'] = "Export failed: " . $e->getMessage();
-            return $this->getResponse();
-        }
+        // } catch (\Exception $e) {
+        //     $this->status = 500;
+        //     $this->response['message'] = "Export failed: " . $e->getMessage();
+        //     return $this->getResponse();
+        // }
     }
 
     public function exportAll(Request $request)
@@ -756,8 +766,12 @@ class FileController extends ApiController
 
                 $settings = json_decode($file->settings, true);
                 $fileName = $settings['file_name_with_extension'];
-                $fileDate = new DateTime($file->created_at);
-                $folderName = $fileDate->format('Y_m');
+                
+                // Use monthYear from settings instead of created_at
+                $monthYear = $settings['monthYear'];
+                $year = substr($monthYear, 0, 4);
+                $month = substr($monthYear, 4, 2);
+                $folderName = $year . '_' . $month;
 
                 $writer = new \PhpOffice\PhpSpreadsheet\Writer\Xlsx($spreadsheet);
                 $tempFile = tempnam(sys_get_temp_dir(), 'excel_');

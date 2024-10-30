@@ -14,7 +14,16 @@ class DateHelper
         if (preg_match($pattern, $monthYearStr, $matches)) {
             $monthName = $matches[1];
             $year = $matches[2];
-            $monthNum = date('m', strtotime($monthName));
+            $monthMapping = [
+                'January' => '01', 'February' => '02', 'March' => '03',
+                'April' => '04', 'May' => '05', 'June' => '06',
+                'July' => '07', 'August' => '08', 'September' => '09',
+                'October' => '10', 'November' => '11', 'December' => '12'
+            ];
+            $monthNum = $monthMapping[$monthName] ?? null;
+            if ($monthNum === null) {
+                throw new InvalidArgumentException("Invalid month name: $monthName");
+            }
             $result = $year . $monthNum;
             return (int) $result;
         } else {
@@ -35,13 +44,19 @@ class DateHelper
             return 'Invalid Date';
         }
 
-        $date = DateTime::createFromFormat('Y-m', "$year-$month");
+        $monthMapping = [
+            1 => 'January', 2 => 'February', 3 => 'March',
+            4 => 'April', 5 => 'May', 6 => 'June',
+            7 => 'July', 8 => 'August', 9 => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December'
+        ];
 
-        if ($date) {
-            return $date->format('F Y');
+        $monthName = $monthMapping[$month] ?? null;
+        if ($monthName === null) {
+            return 'Invalid Date';
         }
 
-        return 'Invalid Date';
+        return $monthName . ' ' . $year;
     }
 
     public static function formatMonth($yyyymm)
@@ -50,20 +65,20 @@ class DateHelper
             return 'Invalid Date';
         }
     
-        $year = floor($yyyymm / 100);
         $month = $yyyymm % 100;
     
         if ($month < 1 || $month > 12) {
             return 'Invalid Date';
         }
     
-        $date = DateTime::createFromFormat('Y-m', "$year-$month");
-    
-        if ($date) {
-            return $date->format('F');
-        }
-    
-        return 'Invalid Date';
+        $monthMapping = [
+            1 => 'January', 2 => 'February', 3 => 'March',
+            4 => 'April', 5 => 'May', 6 => 'June',
+            7 => 'July', 8 => 'August', 9 => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December'
+        ];
+
+        return $monthMapping[$month] ?? 'Invalid Date';
     }
 }
 
