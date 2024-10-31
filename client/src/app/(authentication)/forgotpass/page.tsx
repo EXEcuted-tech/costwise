@@ -33,20 +33,20 @@ function ForgotPassPage() {
     let errors: string[] = [];
 
     if (!email) {
-        errors.push("Email address is required.");
+      errors.push("Email address is required.");
     } else if (!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email)) {
-        errors.push("Please enter a valid email address.");
+      errors.push("Please enter a valid email address.");
     }
     if (!employeeNum) {
-        errors.push("Employee number is required.");
+      errors.push("Employee number is required.");
     } else if (!/^\d{10}$/.test(employeeNum)) {
-        errors.push("Employee number should be 10 digits.");
+      errors.push("Employee number should be 10 digits.");
     }
 
     if (errors.length > 0) {
-        setAlertMessages(errors);
-        setIsLoading(false);
-        return;
+      setAlertMessages(errors);
+      setIsLoading(false);
+      return;
     }
     try {
       const response = await api.post('/password-reset/email', { email, employeeNum });
@@ -69,15 +69,15 @@ function ForgotPassPage() {
         setErrors(true);
         setAlertMessages([error.response.data.message]);
       }
-    }finally{
+    } finally {
       setIsLoading(false);
     }
-    
+
   };
   return (
     <>
-      {access && 
-        <EmailSent onClose={setAccess} email={email}/>
+      {access &&
+        <EmailSent onClose={setAccess} email={email} />
       }
       <div className="absolute top-0 right-0">
         {alertMessages && alertMessages.map((msg, index) => (
@@ -123,39 +123,45 @@ function ForgotPassPage() {
                 <p className="text-[39px] font-semibold">Forgot Password?</p>
                 <p className="text-[18px]">No worries! Enter your email, and an administrator will reach on you.</p>
               </div>
-              
+
               <div className="w-full">
                 <div className="flex items-center">
-                  <MdEmail className="mx-[1%] mr-[1.2%] lg:text-[1.6em] text-[1.3em]"/>
+                  <MdEmail className="mx-[1%] mr-[1.2%] lg:text-[1.6em] text-[1.3em]" />
                   <p className="text-[1.2em] text-[#828282]"
                   >Email Address</p>
                 </div>
                 <input className="text-[1.2em] font-semibold w-full rounded-xl bg-[#f3f3f3] border-2 border-[#d9d9d9] pr-[5%] text-tertiary px-[5%] h-[56px] mt-[5px]"
-                type='email'
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                  type='email'
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
                 <div className="flex items-center mt-[15px]">
-                  <FaAddressCard className="mx-[1%] mr-[1.2%] lg:text-[1.6em] text-[1.3em]"/>
+                  <FaAddressCard className="mx-[1%] mr-[1.2%] lg:text-[1.6em] text-[1.3em]" />
                   <p className="text-[1.2em] text-[#828282]">Employee Number</p>
                 </div>
                 <input className="text-[1.2em] font-semibold w-full rounded-xl bg-[#f3f3f3] border-2 border-[#d9d9d9] pr-[5%] text-tertiary px-[5%] h-[56px] mt-[5px]"
-                value={employeeNum}
-                onChange={(e) => setemployeeNum(e.target.value)}
+                  value={employeeNum}
+                  onChange={(e) => setemployeeNum(e.target.value)}
                 />
               </div>
               <div className="h-[15%] xl:h-[10%] items-end flex justify-center w-[100%]">
-                  <div className="relative inline-flex bg-primary overflow-hidden text-primary w-[50%] flex items-center justify-center rounded-[30px] h-[70%] xl:h-[70%] xl:w-[50%] cursor-pointer transition-all rounded hover:border-1 hover:border-primary group"
-                    >
-                    <button className="flex items-center text-[1em] xl:text-[1.2em] 2xl:text-[1.5em] font-black" type='submit'>
-                      <span className="w-full h-48 rounded bg-white absolute bottom-0 left-0 translate-x-full ease-out duration-500 transition-all translate-y-full mb-9 ml-9 group-hover:ml-0 group-hover:mb-32 group-hover:translate-x-0"></span>
-                      
-                      <span className="relative w-full text-left text-white transition-colors duration-300 ease-in-out group-hover:text-primary">
-                        {isLoading? <Spinner /> : 'Reset Password'}
-                      </span>
-                    </button>
-                  </div>
+                <div className="relative inline-flex bg-primary overflow-hidden text-primary w-[50%] flex items-center justify-center rounded-[30px] h-[70%] xl:h-[70%] xl:w-[50%] cursor-pointer transition-all rounded hover:border-1 hover:border-primary group"
+                >
+                  <button className="flex items-center text-[1em] xl:text-[1.2em] 2xl:text-[1.5em] font-black" type='submit'>
+                    <span className="w-full h-48 rounded bg-white absolute bottom-0 left-0 translate-x-full ease-out duration-500 transition-all translate-y-full mb-9 ml-9 group-hover:ml-0 group-hover:mb-32 group-hover:translate-x-0"></span>
+
+                    <span className="relative flex justify-center items-center w-full text-left text-white transition-colors duration-300 ease-in-out group-hover:text-primary">
+                      {isLoading ?
+                        <>
+                          <Spinner />
+                          <p className='ml-2'>Reset Password</p>
+                        </>
+                        :
+                        'Reset Password'}
+                    </span>
+                  </button>
                 </div>
+              </div>
             </div>
           </form>
         </div>
