@@ -159,7 +159,11 @@ const FormulationPage = () => {
 
             try {
                 const results = await Promise.all(uploadPromises);
-                setInfoMsg(results.join(', '));
+                if(results.length > 0){
+                    setInfoMsg(results.join(', '));
+                } else {
+                    setErrorMsg('Incorrect file type uploaded!');
+                }
             } catch (errors) {
                 if (Array.isArray(errors)) {
                     if(errors[0] == "Material not found on the current month."){

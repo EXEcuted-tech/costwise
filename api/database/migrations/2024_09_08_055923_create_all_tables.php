@@ -149,7 +149,7 @@ return new class extends Migration {
         // Inventory Table
         Schema::create('inventory', function (Blueprint $table) {
             $table->increments('inventory_id');
-            $table->unsignedInteger('material_id');
+            $table->unsignedInteger('material_id')->nullable();
             $table->enum('material_category', ['meat_material', 'meat_alternate', 'packaging', 'food_ingredient', 'casing', 'tin_can', 'other']);
             $table->enum('stock_status', ['In Stock', 'Low Stock']);
             $table->decimal('purchased_qty', 10, 2);
