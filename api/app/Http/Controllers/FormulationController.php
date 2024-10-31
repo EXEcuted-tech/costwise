@@ -646,7 +646,7 @@ class FormulationController extends ApiController
         return $this->getResponse("Formulation updated successfully!");
     }
 
-    public static function deleteBulkWithFGInFile($fgIds, $bomId)
+    public static function deleteBulkWithFGInFile($fgIds, $bomId, $formIds)
     {
         try {
             $bom = Bom::find($bomId);
@@ -658,34 +658,28 @@ class FormulationController extends ApiController
                 ];
             }
 
-            $formulationIds = Formulation::whereIn('fg_id', $fgIds)
-                ->pluck('formulation_id')
-                ->toArray();
-
             $bomFormulations = json_decode($bom->formulations, true) ?? [];
-            $bomFormulations = array_diff($bomFormulations, $formulationIds);
+            $bomFormulations = array_diff($bomFormulations, $formIds);
             $bom->formulations = json_encode(array_values($bomFormulations));
             $bom->save();
 
-            $formulationsToDelete = Formulation::whereIn('formulation_id', $formulationIds)->get();
+            $formulationsToDelete = Formulation::whereIn('formulation_id', $formIds)->get();
             $finishedGoodsToDelete = FinishedGood::whereIn('fg_id', $fgIds)->get();
 
             $archivedFormulations = $formulationsToDelete->map(function ($item) {
                 return [
-                    'formulation_id' => $item->formulation_id,
                     'fg_id' => $item->fg_id,
                     'formula_code' => $item->formula_code,
                     'emulsion' => $item->emulsion,
                     'material_qty_list' => $item->material_qty_list,
-                    'created_at' => optional($item->created_at)->format('Y-m-d H:i:s'),
-                    'updated_at' => optional($item->updated_at)->format('Y-m-d H:i:s'),
+                    'created_at' => $item->created_at->toDateTimeString(),
+                    'updated_at' => $item->updated_at->toDateTimeString(),
                 ];
             })->toArray();
 
             $archivedFinishedGoods = $finishedGoodsToDelete->map(function ($item) {
                 $fodlExists = Fodl::on('archive_mysql')->find($item->fodl_id);
                 return [
-                    'fg_id' => $item->fg_id,
                     'fodl_id' => $fodlExists ? $item->fodl_id : null,
                     'fg_code' => $item->fg_code,
                     'fg_desc' => $item->fg_desc,
@@ -699,19 +693,22 @@ class FormulationController extends ApiController
                 ];
             })->toArray();
 
+            $archivedFgIds = [];
             if ($finishedGoodsToDelete->isNotEmpty()) {
                 foreach ($archivedFinishedGoods as $finishedGood) {
-                    FinishedGood::on('archive_mysql')->create($finishedGood);
+                    $archivedFg = FinishedGood::on('archive_mysql')->create($finishedGood);
+                    $archivedFgIds[] = $archivedFg->fg_id;
                 }
             }
 
             if ($formulationsToDelete->isNotEmpty()) {
-                foreach ($archivedFormulations as $formulation) {
+                foreach ($archivedFormulations as $index => $formulation) {
+                    $formulation['fg_id'] = $archivedFgIds[$index];
                     Formulation::on('archive_mysql')->create($formulation);
                 }
             }
 
-            Formulation::whereIn('formulation_id', $formulationIds)->delete();
+            Formulation::whereIn('formulation_id', $formIds)->delete();
             FinishedGood::whereIn('fg_id', $fgIds)->delete();
 
             return [

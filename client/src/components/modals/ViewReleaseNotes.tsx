@@ -269,9 +269,9 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                         )}
                         {isEditing ? 
                             <div className='flex justify-center items-center h-full gap-1 animate-pop-out'>
-                                <FaCheck className='text-[28px] mt-3 ml-4 text-[#007100] cursor-pointer hover:animate-shake-infinte'
+                                <FaCheck className='text-[28px] mt-3 ml-4 text-[#007100] cursor-pointer hover:animate-shake-infinite'
                                     onClick={handleSaveEdit}/>
-                                <IoIosClose className='text-[45px] mt-3 text-[#921B1BFF] cursor-pointer hover:animate-shake-infinte'
+                                <IoIosClose className='text-[45px] mt-3 text-[#921B1BFF] cursor-pointer hover:animate-shake-infinite'
                                     onClick={handleCancelEdit}/>
                             </div>
                             : 

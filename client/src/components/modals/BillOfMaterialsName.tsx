@@ -15,7 +15,7 @@ const BillOfMaterialsName = ({ setSaveBomName, handleSaveToBOMList, isLoading }:
 
     return (
         <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000] z-[1000]'>
-            <div className='animate-pop-out bg-white w-[460px] h-[380px] rounded-[20px] px-[10px]'>
+            <div className='animate-pop-out bg-white dark:bg-[#3c3c3c] w-[460px] h-[380px] rounded-[20px] px-[10px]'>
                 <div className='flex justify-end'>
                     <IoIosClose className='mt-[2px] text-[70px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out'
                         onClick={() => { setSaveBomName(false) }} />
@@ -24,7 +24,7 @@ const BillOfMaterialsName = ({ setSaveBomName, handleSaveToBOMList, isLoading }:
                     <FaFileSignature className='text-[75px] text-[#FFCC00]' />
                 </div>
                 <div className='flex flex-col justify-center items-center pb-[10px]'>
-                    <h1 className='font-black text-[30px]'>Name Your BOM</h1>
+                    <h1 className='font-black text-[30px] dark:text-white'>Name Your BOM</h1>
                     <p className='text-center text-[#9D9D9D] text-[19px] px-[30px]'>
                         Before saving, please provide a name for this Bill of Materials!
                     </p>
@@ -33,7 +33,7 @@ const BillOfMaterialsName = ({ setSaveBomName, handleSaveToBOMList, isLoading }:
                     <input
                         type="text"
                         placeholder="Enter BOM name"
-                        className='w-full px-[15px] py-[10px] border border-gray-300 rounded-[10px] text-[16px]'
+                        className='w-full px-[15px] py-[10px] border border-gray-300 rounded-[10px] text-[16px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]'
                         onChange={(e) => setBomName(e.target.value)}
                     />
                 </div>

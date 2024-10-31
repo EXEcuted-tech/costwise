@@ -60,12 +60,11 @@ return new class extends Migration {
 
         // FODL Table
         Schema::create('fodl', function (Blueprint $table) {
-            $table->increments('fodl_id');
+            $table->unsignedInteger('fodl_id')->autoIncrement();
             $table->string('fg_code', 255);
             $table->decimal('factory_overhead', 10, 2);
             $table->decimal('direct_labor', 10, 2);
             $table->unsignedInteger('monthYear');
-            $table->index(['fodl_id']);
         });
 
         // Finished Goods Table

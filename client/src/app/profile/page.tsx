@@ -147,7 +147,7 @@ const ProfilePage = () => {
             <div className="relative w-full h-[170px]">
                 <div className="absolute w-full h-[50%] bg-[#FF0000] border-[5px] border-[#A60000] rounded-b-[100px]"></div>
                 <div className="absolute flex justify-center items-center w-[20%] 2xl:w-[16%] 4xl:w-[13%] h-[70%] top-[20px] left-1/2 -translate-x-1/2 bg-[#FF0000] border-[10px] border-[#A60000] rounded-[50%]">
-                    <Image src={virginialogo} alt={'Hotdog Logo'} className='flex w-[120px] cursor-pointer' />
+                    <Image src={virginialogo} alt={'Hotdog Logo'} className='flex w-[120px]' />
                 </div>
             </div>
 

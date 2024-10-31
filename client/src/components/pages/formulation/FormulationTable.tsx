@@ -593,7 +593,7 @@ const FormulationTable: React.FC<{
                                                                 <input
                                                                     type="text"
                                                                     onChange={(e) => handleInputChange(0, 'batchQty', e.target.value)}
-                                                                    value={Number(formulaData[0]?.batchQty).toFixed(2) ?? ''}
+                                                                    value={formulaData[0]?.batchQty !== undefined && !isNaN(formulaData[0]?.batchQty || 0) ? Number(formulaData[0]?.batchQty).toFixed(2) : '0.00'}
                                                                     className={`text-right animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] px-[5px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
                                                                 />
                                                             </td>
@@ -650,8 +650,9 @@ const FormulationTable: React.FC<{
                                                                                 handleInputChange(index + 1, 'batchQty', value);
                                                                             }
                                                                         }}
-                                                                        value={item.batchQty !== undefined && item.batchQty !== null ? Number(item.batchQty).toFixed(2) : ''}
-                                                                        className="w-full text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]"
+                                                                        value={item.batchQty !== undefined && item.batchQty !== null && !isNaN(item.batchQty || 0) ? Number(item.batchQty).toFixed(2) : '0.00'}
+                                                                        className={`${item.description?.toLowerCase() == 'emulsion' ? 'brightness-90' : ''} w-full text-right px-2 animate-zoomIn transition-all duration-400 ease-in-out border border-[#D9D9D9] bg-[#F9F9F9] text-[20px] text-[#090909] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
+                                                                        disabled={item.description?.toLowerCase() == 'emulsion'}
                                                                     />
                                                                 </td>
                                                                 <td className='px-6 text-left'>

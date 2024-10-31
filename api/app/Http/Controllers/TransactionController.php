@@ -108,6 +108,8 @@ class TransactionController extends ApiController
             'transactions.*.date' => 'required|date',
             'transactions.*.month' => 'required',
             'transactions.*.year' => 'required',
+            'transactions.*.amount' => 'required|numeric',
+            'transactions.*.qty' => 'required|numeric',
         ]);
 
 

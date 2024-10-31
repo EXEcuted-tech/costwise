@@ -255,6 +255,7 @@ const CostCalculation = () => {
     const updatedCostData = [...costData, newData];
     setCostData(updatedCostData);
     updateTraininingData(updatedCostData);
+    exportFile(allFGData);
   };
 
   const exportFile = async (sheetData: any) => {
