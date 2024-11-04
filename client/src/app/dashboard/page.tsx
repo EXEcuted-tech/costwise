@@ -86,8 +86,6 @@ const DashboardPage = () => {
         },
       ];
 
-      console.log("Formatted Predictions Data", formattedPredictions);
-
       setTotalPrediction(formattedPredictions);
     } catch (error) {
       console.error("Failed to load models:", error);
