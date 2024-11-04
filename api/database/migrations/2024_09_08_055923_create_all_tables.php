@@ -138,7 +138,7 @@ return new class extends Migration {
 
         // Predictions Table
         Schema::create('predictions', function (Blueprint $table) {
-            $table->integer('prediction_id', 10)->primary();
+            $table->increments('prediction_id');
             $table->unsignedInteger('product_num');
             $table->string('product_name', 255);
             $table->decimal('cost', 17, 7);
