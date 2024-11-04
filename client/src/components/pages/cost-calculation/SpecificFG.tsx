@@ -171,7 +171,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                     <td className="text-right pr-12">
                       {selectedFGDetails[0].batch_qty}
                     </td>
-                    <td>{selectedFGDetails[0].unit}</td>
+                    <td className="text-center">{selectedFGDetails[0].unit}</td>
                     <td className="text-right pr-4">
                       {selectedFGDetails[0].rm_cost}
                     </td>
@@ -194,7 +194,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                         <td className="text-right pr-12">
                           {selectedFGDetails[0].components[0].qty}
                         </td>
-                        <td>{selectedFGDetails[0].components[0].unit}</td>
+                        <td className="text-center">{selectedFGDetails[0].components[0].unit}</td>
                         <td className="text-right pr-4"></td>
                         <td className="text-right pr-7"></td>
                       </tr>
@@ -211,7 +211,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                         <td className="text-right pr-12">
                           {component.batch_quantity}
                         </td>
-                        <td>{component.unit}</td>
+                        <td className="text-center">{component.unit}</td>
                         <td className="text-right pr-4">{component.cost}</td>
                         <td className="text-right pr-7">
                           {parseFloat(component.total_cost).toFixed(2)}

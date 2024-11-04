@@ -181,7 +181,11 @@ const FileManagerPage = () => {
       Promise.all(acceptedFiles.map(processFile))
         .then((results) => {
           const successCount = results.filter(Boolean).length;
-          setInfoMsg(`Successfully uploaded ${successCount} file(s)!`);
+          if (successCount > 0) {
+            setInfoMsg(`Successfully uploaded ${successCount} file(s)!`);
+          } else {
+            setErrorMsg('Incorrect file type uploaded!');
+          }
           fetchData();
         })
         .catch((error) => {

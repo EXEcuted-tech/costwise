@@ -5,6 +5,7 @@ import { InventoryType } from '@/types/data';
 import Alert from '../alerts/Alert';
 import api from '@/utils/api';
 import { useUserContext } from '@/contexts/UserContext';
+import Spinner from '../loaders/Spinner';
 
 interface ConfirmDeleteProps {
     onClose: () => void;
@@ -16,8 +17,10 @@ const ConfirmDeleteInventory: React.FC<ConfirmDeleteProps> = ({ onClose, invento
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
     const { currentUser } = useUserContext();
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleDelete = async () => {
+        setIsLoading(true);
         try {
             const inventoryIds = inventoryList.map(inventory => inventory.inventory_id);
             const materialIds = inventoryList.map(inventory => inventory.material_id);
@@ -55,6 +58,8 @@ const ConfirmDeleteInventory: React.FC<ConfirmDeleteProps> = ({ onClose, invento
             console.log(error);
             setAlertMessages([error.response.data.message]);
             setAlertStatus('error');
+        } finally {
+            setIsLoading(false);
         }
     }
 
@@ -95,8 +100,15 @@ const ConfirmDeleteInventory: React.FC<ConfirmDeleteProps> = ({ onClose, invento
                         <div className='my-[20px] px-[50px] grid grid-cols-2 gap-4'>
                             <div className="relative bg-white border-1 border-primary overflow-hidden text-primary flex items-center justify-center rounded-[30px] cursor-pointer transition-all group"
                                 onClick={handleDelete}>
-                                <button className="text-[19px] font-black before:ease relative h-12 w-40 overflow-hidden bg-primary text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-primary hover:before:-translate-x-40">
-                                    <span className="relative z-10">Proceed</span>
+                                <button className="text-[19px] flex justify-center items-center font-black before:ease relative h-12 w-40 overflow-hidden bg-primary text-white shadow-2xl transition-all before:absolute before:right-0 before:top-0 before:h-12 before:w-6 before:translate-x-12 before:rotate-6 before:bg-white before:opacity-10 before:duration-700 hover:shadow-primary hover:before:-translate-x-40">
+                                    {isLoading ?
+                                        <>
+                                            <Spinner />
+                                            <span className="relative z-10 ml-2">Proceed</span>
+                                        </>
+                                        :
+                                        <span className="relative z-10">Proceed</span>
+                                    }
                                 </button>
                             </div>
                             <div className="relative bg-white border-1 border-primary overflow-hidden text-primary flex items-center justify-center rounded-[30px] cursor-pointer transition-all group"

@@ -103,10 +103,16 @@ const PasswordReset = () => {
           </label>
 
           <div className='flex w-full justify-center'>
-              <button className='w-[50%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] bg-primary text-white rounded-xl hover:bg-[#9c1c1c]'
+              <button className='flex justify-center items-center w-[50%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] bg-primary text-white rounded-xl hover:bg-[#9c1c1c]'
               type='submit'
               >
-              {isLoading? <Spinner /> : 'Reset Password'}    
+              {isLoading? 
+                <>
+                  <Spinner /> 
+                  <p className='ml-2'>Reset Password</p>
+                </>
+                : 
+                'Reset Password'}    
               </button>
           </div>
       </form>

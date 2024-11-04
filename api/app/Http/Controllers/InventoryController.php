@@ -147,6 +147,7 @@ class InventoryController extends ApiController
                 if ($inventory) {
                     $inventoryRecords = $inventory->toArray();
 
+                    $inventoryRecords['material_id'] = null;
                     $inventoryRecords['created_at'] = $inventory->created_at->format('Y-m-d H:i:s');
                     $inventoryRecords['updated_at'] = $inventory->updated_at->format('Y-m-d H:i:s');
 

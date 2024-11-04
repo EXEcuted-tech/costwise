@@ -138,8 +138,8 @@ return new class extends Migration {
 
         // Predictions Table
         Schema::create('predictions', function (Blueprint $table) {
-            $table->integer('prediction_id', 11)->primary();
-            $table->integer('product_num');
+            $table->integer('prediction_id', 10)->primary();
+            $table->unsignedInteger('product_num');
             $table->string('product_name', 255);
             $table->decimal('cost', 17, 7);
             $table->string('monthYear', 50);
@@ -149,7 +149,7 @@ return new class extends Migration {
         // Inventory Table
         Schema::create('inventory', function (Blueprint $table) {
             $table->increments('inventory_id');
-            $table->unsignedInteger('material_id');
+            $table->unsignedInteger('material_id')->nullable();
             $table->enum('material_category', ['meat_material', 'meat_alternate', 'packaging', 'food_ingredient', 'casing', 'tin_can', 'other']);
             $table->enum('stock_status', ['In Stock', 'Low Stock']);
             $table->decimal('purchased_qty', 10, 2);
