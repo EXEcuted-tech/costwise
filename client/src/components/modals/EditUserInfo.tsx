@@ -205,10 +205,8 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
 
             api.post('/auditlogs/logsaudit', auditData)
             .then(response => {
-                console.log('Audit log created successfully:', response.data);
             })
             .catch(error => {
-                console.error('Error audit logs:', error);
             });
 
         }
@@ -344,19 +342,15 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
                 act: 'edit_user',
                 fileName: fullName
             };
-            console.log(fullName);
             api.post('/auditlogs/logsaudit', auditData)
                 .then(response => {
-                    console.log('Audit log created successfully:', response.data);
                 })
                 .catch(error => {
-                    console.error('Error audit logs:', error);
                 });
 
             window.location.reload();
 
         } catch (error: any) {
-            console.log(error)
             let errorMessages: string[] = []
 
             if (error.response && error.response.data) {

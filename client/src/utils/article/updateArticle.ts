@@ -6,10 +6,8 @@ const updateArticle = async (category: string, content: string) => {
             category: category,
             content: content
         });
-        console.log("This is the Category Data: ", response.data.data[0]);
         return response.data.data[0];
     } catch (error) {
-        console.error("Error fetching data:", error);
         throw error;
     }
 };

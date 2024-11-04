@@ -91,10 +91,8 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
 
             api.post('/auditlogs/logsaudit', auditData)
                 .then(response => {
-                    console.log('Audit log created successfully:', response.data);
                 })
                 .catch(error => {
-                    console.error('Error audit logs:', error);
                 });
         } catch (error) {
             console.error('Export failed:', error);

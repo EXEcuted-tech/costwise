@@ -7,7 +7,6 @@ import { removeTokens } from './removeTokens';
 export const isTokenExpired = (): boolean => {
     const expiresAt = localStorage.getItem('tokenExpiresAt');
     if (!expiresAt) return false;
-    // console.log("Went Here", expiresAt, isAfter(new Date(), parseISO(expiresAt)));
     return isAfter(new Date(), parseISO(expiresAt));
 };
 
@@ -25,7 +24,6 @@ export const refreshToken = async (): Promise<boolean> => {
             localStorage.setItem('refreshToken', refresh_token);
             localStorage.setItem('tokenExpiresAt', access_token_expiration);
         } else {
-            console.log("Log you out on Protected Route 3:");
             localStorage.clear();
             await removeTokens();
             window.location.href = '/'; 
@@ -46,21 +44,14 @@ export const refreshToken = async (): Promise<boolean> => {
             localStorage.setItem('tokenExpiresAt', access_token_expiration);
         } 
         return true;
-        // console.log("Log you out on Protected Route 4:");
-        // localStorage.clear();
-        // await removeTokens();
-        // window.location.href = '/'; 
-        // return false;
     }
 };
 
 export const setupPeriodicTokenRefresh = (intervalMinutes: number = 5) => {
     const checkAndRefreshToken = async () => {
       if (isTokenExpired()) {
-        console.log("Periodic token refresh triggered");
         const refreshed = await refreshToken();
         if (!refreshed) {
-          console.log("Periodic refresh failed, logging out");
           localStorage.clear();
           await removeTokens();
           window.location.href = '/';

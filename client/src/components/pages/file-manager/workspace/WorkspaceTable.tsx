@@ -147,7 +147,6 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
         const rowToRemoveData = tableData[index];
         const id = rowToRemoveData['id'];
 
-        console.log(index, id);
         setTableData(prevData => prevData.filter((_, i) => i !== index));
 
         if (removedIds && setRemovedIds) {
@@ -305,7 +304,6 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                                     <td className="text-center border-t border-b border-gray-300 dark:bg-[#3C3C3C] dark:border-[#5C5C5C]">
                                         <IoTrash className="ml-[5px] text-[#717171] dark:text-[#d1d1d1] text-[25px] cursor-pointer hover:text-red-700 dark:hover:text-red-500 transition-colors duration-250 ease-in-out"
                                             onClick={() => {
-                                                console.log(row);
                                                 if (removedIds) {
                                                     removeRow(rowIndex)
                                                 } else if (removedBomIds) {

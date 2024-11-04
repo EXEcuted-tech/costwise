@@ -86,7 +86,6 @@ const CostCalculation = () => {
       if (costData.length === 0) {
         setCostData(parsedData);
       }
-      console.log("Pared Data", parsedData);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -180,7 +179,6 @@ const CostCalculation = () => {
     const numericValue = parseInt(value, 10);
     if (!isNaN(numericValue)) {
       setMonthYear({ value: numericValue, label: label });
-      // retrieveFGOptions(numericValue);
     }
   };
 
@@ -298,17 +296,10 @@ const CostCalculation = () => {
   const updateTraininingData = async (updatedData: any[]) => {
     setIsLoading(true);
     try {
-      console.log("Cost Data", updatedData);
       const response = await api.post("/training/update", {
         settings: JSON.stringify(updatedData),
       });
-
-      console.log(
-        "Successfully updated training Data: ",
-        response.data.data.settings
-      );
     } catch (err) {
-      console.log("Error updating training data was unsuccessful.", err);
     } finally {
       initializeModel(
         costData,
@@ -318,15 +309,12 @@ const CostCalculation = () => {
         setTrainingSpeed,
         setLossHistory
       );
-      console.log("After initialized model here are the data: ", trained);
-      console.log("Model Data", model);
     }
   };
 
   useEffect(() => {
     makePrediction(trained, model, costData);
     setIsLoading(false);
-    console.log("Cost Data After Training:", costData);
   }, [trained]);
 
   //Retrieve month and year options
@@ -339,7 +327,6 @@ const CostCalculation = () => {
         setMonthYearOptions(response.data.data);
       }
     } catch (error) {
-      console.log(error);
       setAlertMessages(["Error retrieving month and year options."]);
       setAlertStatus("critical");
     }

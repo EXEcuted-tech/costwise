@@ -53,7 +53,6 @@ const ViewUserRoles: React.FC<AddUserRolesProps> = ({ onClose, user_id }) => {
         })
         setRoles(response.data.map(getRoleName));
     } catch (error) {
-        console.log(error);
     }
   }
 

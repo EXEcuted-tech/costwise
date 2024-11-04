@@ -138,14 +138,11 @@ const FormulationContainer: React.FC<FormulationProps> = ({
 
             api.post('/auditlogs/logsaudit', auditData)
                 .then(response => {
-                    console.log('Audit log created successfully:', response.data);
                 })
                 .catch(error => {
-                    console.error('Error audit logs:', error);
                 });
 
         } catch (error) {
-            console.error('Export failed:', error);
         }
     }
 
@@ -180,10 +177,8 @@ const FormulationContainer: React.FC<FormulationProps> = ({
 
                 api.post('/auditlogs/logsaudit', auditData)
                     .then(response => {
-                        console.log('Audit log created successfully:', response.data);
                     })
                     .catch(error => {
-                        console.error('Error audit logs:', error);
                     });
             } catch (error) {
                 setAlertMessages(prev => [...prev, 'Failed to archive formulation']);

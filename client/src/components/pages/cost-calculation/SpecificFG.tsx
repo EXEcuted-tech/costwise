@@ -67,7 +67,6 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
 
         if (response.status === 200) {
           const fgData = response.data.data;
-          console.log(fgData);
           setSelectedFGDetails([fgData]);
           setIsLoading(false);
           updateSheetData(id, fgData);

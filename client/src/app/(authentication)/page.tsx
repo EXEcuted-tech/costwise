@@ -27,22 +27,9 @@ function LoginPage() {
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     const tokenExpiresAt = localStorage.getItem('tokenExpiresAt');
-
-    // if (tokenExpiresAt && isTokenExpired()) {
-    //   try {
-    //     const refreshed = refreshToken();
-    //     if (!refreshed) {
-    //       removeTokens();
-    //       router.push('/');
-    //     }
-    //   } catch (error) {
-    //     console.error('Failed to refresh token:', error);
-    //   }
-    // }
     
     if (accessToken && tokenExpiresAt) {
       const expiresAt = new Date(tokenExpiresAt);
-      // console.log(expiresAt, new Date(), expiresAt > new Date());
       if (expiresAt > new Date()) {
         router.push('/dashboard');
       }
@@ -73,7 +60,7 @@ function LoginPage() {
         const currentUs = {
           userId: user.data.user_id,
           empNum: user.data.employee_number,
-          name: user.data.first_name, // Can be full name if needed najud
+          name: user.data.first_name,
           email: user.data.email_address,
           userType: user.data.user_type,
           displayPicture: user.data.display_picture,

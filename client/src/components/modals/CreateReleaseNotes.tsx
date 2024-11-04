@@ -85,7 +85,6 @@ const CreateReleaseNotes: React.FC<CreateReleaseNotesProps> = ({setCreateNotes})
                     .join(' ');
                 setUser(fullName);
                 setUserId(userData.user_id);
-                console.log(response.data);
             } 
         } catch (error) {
             setAlertMessages(["Failed to get current user"]);

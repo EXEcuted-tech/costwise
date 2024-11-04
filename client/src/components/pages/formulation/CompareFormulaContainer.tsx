@@ -47,7 +47,6 @@ const CompareFormulaContainer = () => {
 
     const fetchData = useCallback(async () => {
         setIsLoading(true);
-        console.log("SELECTED CHOICES: ", selectedChoices);
         try {
             const allFormulationIds = selectedChoices;
 
@@ -171,12 +170,8 @@ const CompareFormulaContainer = () => {
                     }
                 }
             });
-
-            console.log(currentFormulations);
             setData(currentFormulations);
-
         } catch (error) {
-            console.error("Error fetching formulation data:", error);
         } finally {
             setIsLoading(false);
         }

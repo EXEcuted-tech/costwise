@@ -39,16 +39,13 @@ const ConfirmDeleteUser: React.FC<ConfirmDeleteProps> = ({ user, onClose }) => {
 
             api.post('/auditlogs/logsaudit', auditData)
             .then(response => {
-                console.log('Audit log created successfully:', response.data);
             })
             .catch(error => {
-                console.error('Error audit logs:', error);
             });
             setTimeout(() => {
                 window.location.reload();
               }, 1000);
         } catch (error: any) {
-            console.log(error);
             setAlertStatus('error');
             setAlertMessages([error.response.data.message]);
         }
