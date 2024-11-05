@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\FinishedGood;
 use App\Models\Fodl;
+use App\Models\Formulation;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
 use App\Helpers\DateHelper;
@@ -403,7 +405,12 @@ class FinishedGoodController extends ApiController
 
             $fgData = FinishedGood::where('is_least_cost', 1)
                 ->where('monthYear', $monthYear)
-                ->get();
+                ->get()
+                ->groupBy('fg_desc') // Group by fg_desc
+                ->map(function ($group) {
+                    return $group->sortBy('total_cost')->first();
+                })
+                ->values();
 
             if ($fgData->isEmpty()) {
                 $this->status = 404;
@@ -416,7 +423,6 @@ class FinishedGoodController extends ApiController
             $fodlData = Fodl::whereIn('fodl_id', $fodlIds)->get();
 
             $fullfgData = $fgData->map(function ($finishedGood) use ($fodlData) {
-
                 $fodl = $fodlData->firstWhere('fodl_id', $finishedGood->fodl_id);
                 return [
                     'fg_id' => $finishedGood->fg_id,
@@ -426,8 +432,8 @@ class FinishedGoodController extends ApiController
                     'rm_cost' => $finishedGood->rm_cost,
                     'formulation_no' => $finishedGood->formulation_no,
                     'monthYear' => $finishedGood->monthYear,
-                    'factory_overhead' => $fodl->factory_overhead,
-                    'direct_labor' => $fodl->direct_labor,
+                    'factory_overhead' => $fodl->factory_overhead ?? null,
+                    'direct_labor' => $fodl->direct_labor ?? null,
                     'total_cost' => $finishedGood->total_cost,
                 ];
             });
