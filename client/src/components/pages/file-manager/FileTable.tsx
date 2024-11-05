@@ -163,23 +163,23 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
                                     <td className={` text-[14px] 2xl:text-[16px] dark:text-white`}>{addedBy}</td>
                                     <td className={`${isOpen ? 'w-[20%] 3xl:w-[15%] pr-[20px] 2xl:pr-[46px]' : 'w-[20%] 2xl:w-[15%] pr-[46px]'}`}>
                                         <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
-                                            <div className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:text-white dark:hover:bg-[#4C4C4C]
+                                            <div title='View' className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:text-white dark:hover:bg-[#4C4C4C]
                                                 cursor-pointer hover:bg-[#f7f7f7] rounded-l-[5px] transition-colors duration-200 ease-in-out'
                                                 onClick={() => handleView(data)}>
                                                 <FaEye />
                                             </div>
-                                            <div className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:text-white
-                                        cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out dark:hover:bg-[#4C4C4C]'
+                                            <div title='Edit' className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:text-white
+                                                cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out dark:hover:bg-[#4C4C4C]'
                                                 onClick={() => handleEdit(data)}>
                                                 <FaPencilAlt />
                                             </div>
-                                            <div className='flex text-[20px] justify-center items-center border-r-1 border-[#868686] h-full dark:text-white
-                                        cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out dark:hover:bg-[#4C4C4C]'
+                                            <div title='Export' className='flex text-[20px] justify-center items-center border-r-1 border-[#868686] h-full dark:text-white
+                                                cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out dark:hover:bg-[#4C4C4C]'
                                                 onClick={() => handleExport(data)}>
                                                 <TiExport />
                                             </div>
-                                            <div className='flex text-[18px] justify-center items-center h-full transition-colors duration-200 ease-in-out
-                                        cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px] dark:text-white'
+                                            <div title='Archive' className='flex text-[18px] justify-center items-center h-full transition-colors duration-200 ease-in-out
+                                                cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px] dark:text-white'
                                                 onClick={() => handleDelete(data)}>
                                                 <HiArchiveBoxXMark />
                                             </div>

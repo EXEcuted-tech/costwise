@@ -231,7 +231,7 @@ const CostCalculation = () => {
     }
   };
 
-  const promptProceed = () => {
+  const promptProceed = async () => {
     setPrompt(false);
     setIsLoading(true);
     const products: Product[] = allFGData
@@ -252,8 +252,11 @@ const CostCalculation = () => {
 
     const updatedCostData = [...costData, newData];
     setCostData(updatedCostData);
-    updateTraininingData(updatedCostData);
-    exportFile(allFGData);
+    try {
+      await updateTraininingData(updatedCostData);
+      await exportFile(allFGData);
+    } catch (error) {
+    }
   };
 
   const exportFile = async (sheetData: any) => {
@@ -309,6 +312,7 @@ const CostCalculation = () => {
         setTrainingSpeed,
         setLossHistory
       );
+      setIsLoading(false);
     }
   };
 
