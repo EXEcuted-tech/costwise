@@ -153,7 +153,7 @@ const DashboardPage = () => {
               formattedTime: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })  // Separate field for display
       }));
           const sortedLogs = logs.sort((a: AuditLogs, b: AuditLogs) => b.time.getTime() - a.time.getTime());
-      setAuditLogs(sortedLogs);
+      setAuditLogs(sortedLogs.slice(0, 15));
       setIsAuditLoading(false);
     } catch (error: any) {
       console.error("Failed to fetch audit logs:", error);
@@ -317,7 +317,7 @@ const DashboardPage = () => {
                         } font-semibold`}
                     >
                       {fgPercentageChange
-                        ? `${fgTrend === "decreased" ? "-" : "+"
+                        ? `${fgTrend === "decreased" ? "" : "+"
                         }${fgPercentageChange}%`
                         : "‎"}
                     </p>
@@ -355,7 +355,7 @@ const DashboardPage = () => {
                         } font-semibold`}
                     >
                       {materialCostPercentageChange
-                        ? `${materialCostTrend === "decreased" ? "-" : "+"
+                        ? `${materialCostTrend === "decreased" ? "" : "+"
                         }${materialCostPercentageChange}%`
                         : "‎"}
                     </p>
