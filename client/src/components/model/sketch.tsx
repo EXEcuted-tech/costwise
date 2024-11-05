@@ -55,10 +55,6 @@ const uploadPredictions = async (
       cost,
       monthYear,
     });
-    console.log(
-      `Uploaded predictions for ${monthYear}, product ${product_name}:`,
-      response.data.data
-    );
   } catch (error: any) {
     console.error("Error uploading predictions:", error);
   }
@@ -110,8 +106,6 @@ export async function initializeModel(
   setTrainingSpeed: React.Dispatch<React.SetStateAction<number>>,
   setLossHistory: React.Dispatch<React.SetStateAction<number[]>>
 ) {
-  console.log("Currently training model, please wait for results...");
-
   const monthYears = costData.map((d) => monthYearToNumber(d.monthYear));
   let currentLossHistory: number[] = [];
 
@@ -147,8 +141,6 @@ export async function initializeModel(
 
   const startTime = performance.now();
 
-  console.log(`Number of active tensors: ${tf.memory().numTensors}`);
-
   try {
     await newModel.fit(inputTensor, labelTensor.transpose(), {
       epochs: 1000,
@@ -158,8 +150,6 @@ export async function initializeModel(
           if(logs){
             currentLossHistory.push(logs.loss);
           }
-          console.log("This is epoch number: ", epoch)
-          console.log("This is the loss value", logs)
         },
         ...[earlyStopping],
       },
@@ -167,10 +157,6 @@ export async function initializeModel(
 
     const endTime = performance.now();
     const duration = (endTime - startTime) / 1000;
-
-    console.log("Training complete");
-    console.log(`Model training complete in ${duration.toFixed(2)} seconds`);
-    console.log(currentLossHistory);
 
     setTrained(true);
     setModel(newModel);
@@ -182,9 +168,6 @@ export async function initializeModel(
     inputTensor.dispose();
     labelTensor.dispose();
     // newModel.dispose();
-    console.log(
-      `Number of active tensors after disposal: ${tf.memory().numTensors}`
-    );
   }
 }
 
@@ -226,17 +209,10 @@ export const makePrediction = async (
           monthYear,
           productName
         );
-
-        console.log(
-          `Prediction for ${productName}, ${monthYear}:`,
-          productPrediction
-        );
       }
     }
     model.dispose();
-    console.log("Predictions complete.");
   } else {
-    console.log("Model is not yet trained.");
   }
 };
 
@@ -279,10 +255,7 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
   }, []);
 
   const fetchPredictions = async () => {
-    console.log("Test Data", costData);
     const numProd = costData[costData.length - 1].products.length;
-
-    console.log("Number of data", numProd);
 
     try {
       const response = await api.post("/prediction/data", {
@@ -314,8 +287,6 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
         })
       );
 
-      console.log("Formatted Predictions Data", formattedPredictions);
-
       setTotalPrediction(formattedPredictions);
     } catch (error) {
       console.error("Failed to load models:", error);
@@ -335,7 +306,6 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
           setLossHistory
         );
       } catch (error) {
-        console.log("Error Creating model: ", error);
       } finally {
         model?.dispose();
         fetchPredictions();

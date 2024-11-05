@@ -6,28 +6,10 @@ const api = axios.create({
   baseURL: `${config.API}/api`,
 });
 
-// const isTokenExpired = (): boolean => {
-//   const expiresAt = localStorage.getItem('tokenExpiresAt');
-//   if (!expiresAt) return true;
-//   return isAfter(new Date(), parseISO(expiresAt));
-// };
-
-// api.interceptors.request.use((config:any) => {
-//   const token = localStorage.getItem('token');
-//   if (token) {
-//     config.headers.Authorization = `Bearer ${token}`;
-//   }
-//   return config;
-// }, (error: any) => {
-//   return Promise.reject(error);
-// });
-
 api.interceptors.request.use(
   async (config: any) => {
     const token = localStorage.getItem('accessToken');
     
-    // console.log("In api.ts");
-    // console.log(token && isTokenExpired());
     if (token && isTokenExpired()) {
       const refreshed = await refreshToken();
       if (!refreshed) {

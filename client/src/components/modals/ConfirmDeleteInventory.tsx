@@ -32,7 +32,6 @@ const ConfirmDeleteInventory: React.FC<ConfirmDeleteProps> = ({ onClose, invento
                     inventory_monthYear: monthYear
                 }
             });
-            console.log("response", response);
             setAlertMessages([response.data.message]);
             setAlertStatus('success');
 
@@ -47,15 +46,12 @@ const ConfirmDeleteInventory: React.FC<ConfirmDeleteProps> = ({ onClose, invento
 
             api.post('/auditlogs/logsaudit', auditData)
                 .then(response => {
-                    console.log('Audit log created successfully:', response.data);
                 })
                 .catch(error => {
-                    console.error('Error audit logs:', error);
                 });
             setTimeout(function () { location.reload() }, 1000);
 
         } catch (error: any) {
-            console.log(error);
             setAlertMessages([error.response.data.message]);
             setAlertStatus('error');
         } finally {

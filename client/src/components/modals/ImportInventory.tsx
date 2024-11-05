@@ -163,10 +163,8 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
 
             api.post('/auditlogs/logsaudit', auditData)
                 .then(response => {
-                    console.log('Audit log created successfully:', response.data);
                 })
                 .catch(error => {
-                    console.error('Error audit logs:', error);
                 });
 
             onClose();

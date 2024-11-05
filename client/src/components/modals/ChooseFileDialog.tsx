@@ -96,7 +96,6 @@ const ChooseFileDialog: React.FC<ChooseFileProps> = ({ dialogType, setDialog }) 
   };
 
   const handleChooseFile = () => {
-    console.log(chosenFileId, chosenFileType);
     router.push(`/file-manager/workspace?id=${chosenFileId}&type=${chosenFileType}`);
   };
 

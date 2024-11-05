@@ -253,11 +253,6 @@ const FormulationTable: React.FC<{
                 (row.batchQty === null || row.batchQty <= 0) ||
                 !row.unit
             );
-            // const hasEmptyRow = formulaData.some(row => {
-            //     const isEmpty = !row.itemCode || !row.description || (row.batchQty === null || row.batchQty <= 0) || !row.unit;
-            //     console.log(`Row: ${JSON.stringify(row)}, IsEmpty: ${isEmpty}`);
-            //     return isEmpty;
-            // });
 
             if (hasEmptyRow) {
                 setAlertMessages(prev => [...prev, 'Please fill in all fields and also ensure batch quantity is greater than 0.00']);
@@ -373,10 +368,8 @@ const FormulationTable: React.FC<{
 
                 api.post('/auditlogs/logsaudit', auditData)
                     .then(response => {
-                        console.log('Audit log created successfully:', response.data);
                     })
                     .catch(error => {
-                        console.error('Error audit logs:', error);
                     });
                 setTimeout(() => {
                     setIsLoading(false);

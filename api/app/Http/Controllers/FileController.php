@@ -704,7 +704,7 @@ class FileController extends ApiController
 
     public function export(Request $request)
     {
-        // try {
+        try {
             $fileId = $request->input('file_id');
             $file = File::findOrFail($fileId);
 
@@ -725,11 +725,11 @@ class FileController extends ApiController
             return response()->download($tempFile, $fileName, [
                 'Content-Type' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
             ])->deleteFileAfterSend(true);
-        // } catch (\Exception $e) {
-        //     $this->status = 500;
-        //     $this->response['message'] = "Export failed: " . $e->getMessage();
-        //     return $this->getResponse();
-        // }
+        } catch (\Exception $e) {
+            $this->status = 500;
+            $this->response['message'] = "Export failed: " . $e->getMessage();
+            return $this->getResponse();
+        }
     }
 
     public function exportAll(Request $request)
@@ -767,7 +767,6 @@ class FileController extends ApiController
                 $settings = json_decode($file->settings, true);
                 $fileName = $settings['file_name_with_extension'];
                 
-                // Use monthYear from settings instead of created_at
                 $monthYear = $settings['monthYear'];
                 $year = substr($monthYear, 0, 4);
                 $month = substr($monthYear, 4, 2);

@@ -148,10 +148,8 @@ const FileManagerPage = () => {
 
                     api.post('/auditlogs/logsaudit', auditData)
                       .then(response => {
-                        console.log('Audit log created successfully:', response.data);
                       })
                       .catch(error => {
-                        console.error('Error audit logs:', error);
                       });
 
                     resolve(true);
@@ -268,10 +266,8 @@ const FileManagerPage = () => {
 
       api.post('/auditlogs/logsaudit', auditData)
         .then(response => {
-          console.log('Audit log created successfully:', response.data);
         })
         .catch(error => {
-          console.error('Error audit logs:', error);
         });
 
     } catch (error) {
@@ -302,10 +298,8 @@ const FileManagerPage = () => {
 
         api.post('/auditlogs/logsaudit', auditData)
           .then(response => {
-            console.log('Audit log created successfully:', response.data);
           })
           .catch(error => {
-            console.error('Error audit logs:', error);
           });
           setIsLoading(false);
       } catch (error) {

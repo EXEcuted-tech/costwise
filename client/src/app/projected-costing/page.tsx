@@ -84,7 +84,6 @@ const ProjectedCostPage = () => {
       setpItemCost(formattedData);
 
     } catch (error) {
-      console.log("Error Retrieving Data: ", error);
     }
   };
   const recentTotalCost = () => {

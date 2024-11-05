@@ -117,7 +117,7 @@ return new class extends Migration {
 
         // Transaction Table
         Schema::create('transactions', function (Blueprint $table) {
-            $table->id('transaction_id');
+            $table->increments('transaction_id');
             $table->unsignedInteger('material_id')->nullable();
             $table->unsignedInteger('fg_id')->nullable();
             $table->string('journal', 255);
@@ -128,8 +128,8 @@ return new class extends Migration {
             $table->string('gl_desc', 255);
             $table->string('warehouse', 20);
             $table->timestamp('date');
-            $table->integer('month');
-            $table->integer('year');
+            $table->unsignedInteger('month');
+            $table->unsignedInteger('year');
             $table->longText('settings');
             $table->foreign('material_id')->references('material_id')->on('materials')->onDelete('cascade');
             $table->foreign('fg_id')->references('fg_id')->on('finished_goods')->onDelete('cascade');
@@ -138,7 +138,7 @@ return new class extends Migration {
 
         // Predictions Table
         Schema::create('predictions', function (Blueprint $table) {
-            $table->integer('prediction_id', 10)->primary();
+            $table->increments('prediction_id');
             $table->unsignedInteger('product_num');
             $table->string('product_name', 255);
             $table->decimal('cost', 17, 7);

@@ -86,8 +86,6 @@ const DashboardPage = () => {
         },
       ];
 
-      console.log("Formatted Predictions Data", formattedPredictions);
-
       setTotalPrediction(formattedPredictions);
     } catch (error) {
       console.error("Failed to load models:", error);
@@ -468,45 +466,3 @@ const DashboardPage = () => {
 };
 
 export default DashboardPage;
-
-// const fakeData: UserActivityProps[] = [
-//   {
-//     url: "https://i.imgur.com/AZOtzD7.jpg",
-//     name: "Kathea Mari Mayol",
-//     activity: "Lorem ipsum dolor sit amet, consectetur adipiscing elit.",
-//     time: "2 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/SeymIUb.jpg",
-//     name: "John Doe",
-//     activity:
-//       "Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-//     time: "5 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/dm51tBF.jpg",
-//     name: "Jane Smith",
-//     activity:
-//       "Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris.",
-//     time: "10 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/AN69p1a.jpg",
-//     name: "Michael Johnson",
-//     activity:
-//       "Duis aute irure dolor in reprehenderit in voluptate velit esse cillum.",
-//     time: "15 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/zb1h8kj.jpg",
-//     name: "Emily Davis",
-//     activity: "Excepteur sint occaecat cupidatat non proident, sunt in culpa.",
-//     time: "20 minutes ago",
-//   },
-//   {
-//     url: "https://i.imgur.com/nzcwr8x.jpg",
-//     name: "Chris Lee",
-//     activity: "Mollit anim id est laborum.",
-//     time: "25 minutes ago",
-//   },
-// ];

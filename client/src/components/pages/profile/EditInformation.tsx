@@ -100,7 +100,6 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
             api.post('/auditlogs/logsaudit', auditData);
             setSuccessModal(true);
         } catch (error: any) {
-            console.log("Error updating user info", error);
         } finally {
             setIsLoading(false);
         }

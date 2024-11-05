@@ -266,10 +266,8 @@ const AccountCreation = () => {
 
             api.post('/auditlogs/logsaudit', auditData)
                 .then(response => {
-                    console.log('Audit log created successfully:', response.data);
                 })
                 .catch(error => {
-                    console.error('Error audit logs:', error);
                 });
 
             // Reset form fields
@@ -287,7 +285,6 @@ const AccountCreation = () => {
             setSelectedRoleValues([]);
             setSelectedRoles([]);
         } catch (error: any) {
-            console.log(error)
             let errorMessages: string[] = []
 
             if (error.response && error.response.data) {

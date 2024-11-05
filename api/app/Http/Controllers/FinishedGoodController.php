@@ -327,17 +327,6 @@ class FinishedGoodController extends ApiController
         $formulation_no = $request->input('formulation_no');
 
         try {
-            // $finishedGood = FinishedGood::where('fg_code', $fg_code)
-            //     ->where('fg_desc', $fg_desc)
-            //     ->where('total_batch_qty', $total_batch_qty)
-            //     ->where('unit', $unit)
-            //     ->where('formulation_no', $formulation_no)
-            //     ->first();
-
-            // if ($finishedGood) {
-            //     $this->status = 400;
-            //     return $this->getResponse("Finished Good exists!");
-            // }
             $finishedGood = new FinishedGood();
             $finishedGood->fg_code = $fg_code;
             $finishedGood->fg_desc = $fg_desc;

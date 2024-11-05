@@ -27,7 +27,6 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
     useEffect(() => {
         const fetchEventDetails = async () => {
             try {
-                console.log(event);
                 const response = await api.get(`/events/retrieve`, { params: { col: 'event_id', val: event.id } });
                 if (response.data.status === 200) {
                     const eventData = response.data.data;
@@ -73,10 +72,8 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
 
             api.post('/auditlogs/logsaudit', auditData)
                 .then(response => {
-                    console.log('Audit log created successfully:', response.data);
                 })
                 .catch(error => {
-                    console.error('Error logging audit:', error);
                 });
             if (response.data.status !== 401) {
                 setIsLoading(false);
@@ -91,7 +88,6 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
             return;
         }
         setIsLoading(true);
-        console.log(event);
         const user = localStorage.getItem('currentUser');
         const parsedUser = JSON.parse(user || '{}');
 
@@ -104,10 +100,8 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
 
         api.post('/auditlogs/logsaudit', auditData)
             .then(response => {
-                console.log('Audit log created successfully:', response.data);
             })
             .catch(error => {
-                console.error('Error logging audit:', error);
             });
             
         const response = await api.post(`/events/delete`, { event_id: id });

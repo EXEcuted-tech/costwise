@@ -54,7 +54,6 @@ const AuditLogPage = () => {
 
     const [selectedData, setSelectedData] = useState<AuditTableProps | null>(null);
     const toggleDrawer = () => setDrawerOpen(!drawerOpen);
-    // const [data, setData] = useState<AuditTableProps[]>(fakeAuditAllData);
     const [auditLogs, setAuditLogs] = useState<AuditTableProps[]>([]);
     const [sortAscending, setSortAscending] = useState<boolean>(true);
     const [currentPage, setCurrentPage] = useState<number>(1);
@@ -76,10 +75,6 @@ const AuditLogPage = () => {
         try {
             const res = await api.get('/auditlogs');
             const logs = res.data.map((log: any) => ({
-                // log_id: log.log_id,
-                // user_id: log.user_id,
-                // action: log.action as ActionType,
-                // timestamp: new Date(log.timestamp),
                 dateTimeAdded: new Date(log.timestamp),
                 employeeName: `${log.user.first_name} ${log.user.middle_name ? log.user.middle_name.charAt(0) + '. ' : ''}${log.user.last_name}`,
                 employeeNo: log.user.employee_number,
@@ -154,7 +149,6 @@ const AuditLogPage = () => {
 
             setExportLoading(false);
         } catch (error) {
-            console.log('Error exporting audit logs:', error);
             setError('Failed to export audit logs. Please try again.');
             setExportLoading(false);
         }
@@ -172,7 +166,7 @@ const AuditLogPage = () => {
 
         api.post('/auditlogs/logsaudit', auditData)
             .then(response => {
-                console.log('Audit log created successfully:', response.data);
+                
             })
             .catch(error => {
                 console.error('Error audit logs:', error);
