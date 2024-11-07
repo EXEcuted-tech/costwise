@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RiFileWarningFill } from "react-icons/ri";
 import { IoIosClose } from "react-icons/io";
 import api from '@/utils/api';
@@ -8,6 +8,7 @@ import { useUserContext } from '@/contexts/UserContext';
 import PasswordChangeComplete from '@/components/modals/PasswordChangeComplete';
 import Alert from '@/components/alerts/Alert';
 import Spinner from '@/components/loaders/Spinner';
+import ErrorToken from '@/components/modals/ErrorToken';
 
 
 const PasswordReset = () => {
@@ -16,6 +17,7 @@ const PasswordReset = () => {
     const [passwordConfirmation, setPasswordConfirmation] = useState('');
     const [isLoading, setIsLoading] = useState(false);
     const [access, setAccess] = useState(false);
+    const [unavail, setUnavail] = useState(false);
     const [modal, setModal] = useState(false);
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     
@@ -63,9 +65,28 @@ const PasswordReset = () => {
     setIsLoading(false);
   }
 
+  useEffect(() => {
+    const fetchData = async () => {
+      
+      try {
+          console.log("hi bitch")
+          const tokens = await api.get(`/password-reset/${token}`, { params: { email } });
+          if (tokens.data.message === 'Invalid or expired token') {
+            setUnavail(true);
+          }
+      } catch (error: any) {
+          setUnavail(true);
+          console.error('Error fetching token:', error);
+      }
+  }
+  fetchData();
+}, []);
+
   return (
     <>
       {access && <PasswordChangeComplete />}
+      {unavail && < ErrorToken/>}
+
       <div className="absolute top-0 right-0">
         {alertMessages && alertMessages.map((msg, index) => (
           <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
