@@ -39,7 +39,8 @@ const AccountCreation = () => {
     const [position, setPosition] = useState<string>('');
     const [selectedRoles, setSelectedRoles] = useState<string[]>([]);
     const [selectedRoleValues, setSelectedRoleValues] = useState<number[]>([]);
-    const user_type = 'Regular'; //default user type
+    const [selectedUserType, setSelectedUserType] = useState<string>('Regular');
+    const user_type = selectedUserType;
     const defaultPassword = process.env.NEXT_PUBLIC_DEFAULT_PASSWORD; //default password
 
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
@@ -83,9 +84,10 @@ const AccountCreation = () => {
     };
 
     //Role options
-    const handleConfirmRoles = (roles: number[], roleNames: string[]) => {
+    const handleConfirmRoles = (roles: number[], roleNames: string[], userType: string) => {
         setSelectedRoleValues(roles);
         setSelectedRoles(roleNames);
+        setSelectedUserType(userType);
         setShowRolesSelectModal(false);
     }
 
@@ -145,7 +147,8 @@ const AccountCreation = () => {
         const newAlertMessages: string[] = [];
         setAlertStatus('critical');
 
-        const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        // Updated email regex to validate specific domains
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com|virginiafood\.com\.ph)$/i;
         const phoneRegex = /^\+63\s?9\d{9}$/;
 
         // Reset errors
@@ -182,7 +185,7 @@ const AccountCreation = () => {
             newAlertMessages.push('Email address is required.');
             setEmailError(true);
         } else if (!emailRegex.test(email_address)) {
-            newAlertMessages.push('Invalid email address.');
+            newAlertMessages.push('Invalid email address DNS.');
             setEmailError(true);
         }
         if (!department) {
@@ -193,6 +196,9 @@ const AccountCreation = () => {
             newAlertMessages.push('Employee number is required.');
             setEmployeeNumberError(true);
         } else if (employee_number.length < 10) {
+            newAlertMessages.push('Employee number must be 10 digits.');
+            setEmployeeNumberError(true);
+        } else if (employee_number.length > 10) {
             newAlertMessages.push('Employee number must be 10 digits.');
             setEmployeeNumberError(true);
         }
@@ -550,7 +556,7 @@ const AccountCreation = () => {
                                                 className={` ${employeeNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                                 type="enum"
                                                 name="enum"
-                                                placeholder="0123456789"
+                                                placeholder="10 digits"
                                                 value={employee_number}
                                                 onChange={(e) => updateField(setEmployee_number)(e)}
                                             />
@@ -628,7 +634,7 @@ const AccountCreation = () => {
                         </div>
                     </div>
                     {/* Buttons */}
-                    <div className='flex flex-col w-full text-[1.1em] 2xl:text-[1.2em] items-center gap-[10px]'>
+                    <div className='flex flex-col mt-5 w-full text-[1.1em] 2xl:text-[1.2em] items-center gap-[10px]'>
                         <div className="relative bg-primary overflow-hidden text-white w-[240px] h-[2.5em] 4xl:h-[3rem] flex items-center justify-center rounded-[10px] cursor-pointer transition-all hover:border-1 hover:border-primary group">
                             <button
                                 className="font-black"
