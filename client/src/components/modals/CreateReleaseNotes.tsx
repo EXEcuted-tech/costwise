@@ -158,6 +158,18 @@ const CreateReleaseNotes: React.FC<CreateReleaseNotesProps> = ({setCreateNotes})
 
     }
 
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setCreateNotes(false);
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [setCreateNotes]);
+
     return (
         <div className='flex justify-center items-center z-[1000] w-full h-full fixed overflow-auto top-0 left-0 bg-[rgba(0,0,0,0.5)]'>
             <div className='absolute top-0 right-0'>

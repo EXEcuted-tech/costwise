@@ -212,8 +212,8 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
                             title={day !== null ? "Click to view or create an event." : ""}
                             className={`text-[12px] 2xl:text-[16px] py-2 font-medium rounded-full transition-colors cursor-pointer
                             ${day === null ? 'invisible' : ''}
-                            ${isEventDay(day) ? 'bg-[#fffbb6] border-secondary border-2 text-black hover:bg-secondary dark:bg-[#3C3C3C] dark:hover:bg-secondary dark:hover:text-black' : ''}
-                            ${day === new Date().getDate() && new Date().getMonth() === currentDate.getMonth() && new Date().getFullYear() === currentDate.getFullYear() ? 'bg-[#fcbdbd] border-primary border-2 dark:bg-brightness-50 dark:text-white text-black hover:bg-primary hover:text-white' : 'dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                            ${isEventDay(day) ? 'bg-[#fffbb6] border-secondary border-2 text-black hover:bg-secondary dark:bg-[#fffbb6] dark:text-[#000000] dark:hover:bg-secondary dark:hover:text-black' : ''}
+                            ${day === new Date().getDate() && new Date().getMonth() === currentDate.getMonth() && new Date().getFullYear() === currentDate.getFullYear() ? 'bg-[#fcbdbd] border-primary border-2 dark:bg-brightness-50 dark:text-black text-black hover:bg-primary hover:text-white' : 'dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600'}`}
                             onClick={() => handleDayClick(day)}
                         >
                             {day}

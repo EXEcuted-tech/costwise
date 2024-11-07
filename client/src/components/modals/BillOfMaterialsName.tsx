@@ -1,5 +1,5 @@
 import { useFormulationContext } from '@/contexts/FormulationContext';
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FaFileSignature } from "react-icons/fa";
 import { IoIosClose } from "react-icons/io";
 import Spinner from '../loaders/Spinner';
@@ -12,6 +12,18 @@ const BillOfMaterialsName = ({ setSaveBomName, handleSaveToBOMList, isLoading }:
     }) => {
 
     const { setBomName } = useFormulationContext();
+
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setSaveBomName(false);
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [setSaveBomName]);
 
     return (
         <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000] z-[1000]'>

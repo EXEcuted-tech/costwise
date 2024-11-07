@@ -97,7 +97,18 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
     setIsAllChecked(false);
   };
 
-
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+            onClose();
+        }
+    };
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => {
+        document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [onClose]);
+  
   return (
     <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]'>
       <div className='animate-pop-out flex flex-col bg-white dark:bg-[#3C3C3C] w-[950px] h-auto rounded-[20px] px-[10px] overflow-y-auto'>

@@ -1,5 +1,5 @@
 import api from '@/utils/api';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FaCalendarPlus } from "react-icons/fa";
 import Spinner from '../loaders/Spinner';
 import { useUserContext } from '@/contexts/UserContext';
@@ -59,6 +59,18 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ date, onClose, onAddEvent
             }
         }
     };
+
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [onClose]);
 
     return (
         <>

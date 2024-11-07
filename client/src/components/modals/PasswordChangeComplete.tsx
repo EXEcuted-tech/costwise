@@ -6,8 +6,8 @@ const PasswordChangeComplete: React.FC = () => {
 
     const handleContinue = () => {
         window.close();
-      };
-
+    };
+    
     return (
     <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]'>
         <div className='animate-pop-out bg-white w-[460px] h-auto rounded-[20px] px-[10px] py-[20px]'>

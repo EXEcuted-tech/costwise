@@ -60,9 +60,20 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
 
         fetchEventDetails();
 
-        
-        
     }, [event.id]);
+
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [onClose]);
+
 
     const formatTime = (isoString: string) => {
         const date = new Date(isoString);

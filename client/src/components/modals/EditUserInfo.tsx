@@ -377,6 +377,19 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
 
     }
 
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [onClose]);
+
+
     return (
         <div className='flex justify-center items-center z-[9999] w-full h-full fixed top-0 left-0 bg-[rgba(0,0,0,0.5)]'>
 
