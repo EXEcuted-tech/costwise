@@ -92,31 +92,35 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
     const handleDayClick = (day: number | null) => {
         if (day !== null) {
             const clickedDate = new Date(currentDate.getFullYear(), currentDate.getMonth(), day);
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+
             setSelectedDate(clickedDate);
             const existingEvent = events.find(event => {
                 return event.date.getDate() === day &&
                        event.date.getMonth() === currentDate.getMonth() &&
                        event.date.getFullYear() === currentDate.getFullYear();
             });
+
             if (existingEvent) {
                 if (!sysRoles?.includes(13)) {
                     setError('You are not authorized to view this event.');
                     return;
                 }
-
-                if (!sysRoles?.includes(15)) {
-                    setError('You are not authorized to edit this event.');
+                setSelectedEvent(existingEvent);
+                setIsModalOpen(true);
+            } else {
+                if (clickedDate < today) {
+                    setError('Cannot create events for past dates');
                     return;
                 }
-                setSelectedEvent(existingEvent);
-            } else {
                 if (!sysRoles?.includes(14)) {
                     setError('You are not authorized to create an event.');
                     return;
                 }
                 setSelectedEvent(null);
+                setIsModalOpen(true);
             }
-            setIsModalOpen(true);
         }
     };
 

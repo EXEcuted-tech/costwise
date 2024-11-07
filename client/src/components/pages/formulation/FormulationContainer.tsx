@@ -245,22 +245,22 @@ const FormulationContainer: React.FC<FormulationProps> = ({
                                                 <td className='px-[15px] xl:px-[8px] text-right'>{data.finishedGood.rm_cost ?? 'N/A'}</td>
                                                 <td className='px-[15px] xl:px-[8px]'>
                                                     <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
-                                                        <div className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c]
+                                                        <div title='View' className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c]
                                                                 cursor-pointer hover:bg-[#f7f7f7] rounded-l-[5px] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleView(data.formulation_id)}>
                                                             <FaEye className='!size-[11px] 2xl:!size-[16px]'/>
                                                         </div>
-                                                        <div className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c]
+                                                        <div title='Edit' className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c]
                                                                 cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleEdit(data.formulation_id, data.formula_code)}>
                                                             <FaPencilAlt className='!size-[10px] 2xl:!size-[16px]' />
                                                         </div>
-                                                        <div className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c]
+                                                        <div title='Export' className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:border-[#5C5C5C] dark:hover:bg-[#4c4c4c]
                                                                 cursor-pointer hover:bg-[#f7f7f7] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleExport(data.formulation_id)}>
                                                             <TiExport className='!size-[11px] 2xl:!size-[16px]' />
                                                         </div>
-                                                        <div className='flex justify-center items-center h-full dark:border-[#5C5C5C]
+                                                        <div title='Archive' className='flex justify-center items-center h-full dark:border-[#5C5C5C]
                                                                 cursor-pointer hover:bg-primary hover:text-white hover:rounded-r-[4px] transition-colors duration-200 ease-in-out'
                                                             onClick={() => handleDeleteClick(data.formulation_id, data.formula_code)}>
                                                             <HiArchiveBoxXMark />

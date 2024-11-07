@@ -193,7 +193,7 @@ const AuditLogPage = () => {
 
     const indexOfLastItem = currentPage * 8;
     const indexOfFirstItem = indexOfLastItem - 8;
-    const currentListPage = filteredDataWithOption ? filteredDataWithOption.slice(indexOfFirstItem, indexOfLastItem) : [];
+    const currentListPage = filteredDataWithOption.slice(indexOfFirstItem, indexOfLastItem);
 
     const ref = useOutsideClick(() => setShowFilter(false));
 
@@ -302,7 +302,7 @@ const AuditLogPage = () => {
                     </table>
                     <div className={`${isLoading ? 'hidden' : 'relative py-[1%]'}`}>
                         <PrimaryPagination
-                            data={auditLogs}
+                            data={filteredDataWithOption}
                             itemsPerPage={8}
                             handlePageChange={handlePageChange}
                             currentPage={currentPage}
