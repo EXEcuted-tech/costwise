@@ -6,7 +6,8 @@ import * as XLSX from "xlsx";
 import { SpecificFinishedGood, Component } from "@/types/data";
 import api from "@/utils/api";
 import Alert from "@/components/alerts/Alert";
-import { Spinner } from "@nextui-org/react";
+import Spinner from "@/components/loaders/Spinner";
+import { RiFileCloseFill } from "react-icons/ri";
 
 type SpecificFGProps = {
   id: number;
@@ -41,7 +42,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
   ];
   const [alertMessages, setAlertMessages] = useState<string[]>([]);
   const [alertStatus, setAlertStatus] = useState<string>("");
-  const [isLoading, setIsLoading] = useState(true);
+  const [isLoading, setIsLoading] = useState(false);
 
   const [selectedFG, setSelectedFG] = useState<{ name: string; id: number }>({
     name: "",
@@ -55,6 +56,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
   const handleChange = async (selectedValue: { name: string; id: number }) => {
     try {
       if (selectedValue.id) {
+        setIsLoading(true);
         setSelectedFG(selectedValue);
         const combinedArray = [...selectedGoods];
         combinedArray.push(selectedValue)
@@ -79,6 +81,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
       console.error("Error retrieving FG info:", error);
       setAlertMessages([...alertMessages, "Error retrieving FG info."]);
       setAlertStatus("critical");
+      setIsLoading(false);
     }
   };
 
@@ -113,19 +116,24 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
           } relative w-auto h-[40rem] ml-[5rem] mr-[35px] mb-10 bg-white dark:bg-[#3C3C3C] rounded-2xl border-1 border-[#656565] shadow-md animate-pull-down`}
       >
         {/* Header */}
-        <div className="flex h-14 rounded-t-2xl bg-[#B22222] text-white text-[26px] font-bold py-2 pl-7 drop-shadow-xl">
+        <div className="flex h-14 rounded-t-2xl bg-[#B22222] text-white text-[24px] font-semibold py-2 pl-4 drop-shadow-xl">
           <CustomGoodsSelect
             options={FGOptions.map((fg) => ({ value: fg.id, label: fg.name }))}
-            placeholder="Choose Finished Good"
-            isOpen={isOpen}
+            placeholder=" Select or Search Finished Good"
             onChange={handleChange}
             disabledOptions={selectedGoods}
           />
 
           {/* Delete Button */}
           <button
+            title="Remove Sheet"
             onClick={() => removeSheet(id)}
-            className="text-[30px] ml-auto mr-4 cursor-pointer opacity-100 hover:opacity-75 transition-opacity duration-300 ease-in-out"
+            disabled={!selectedFG.id && selectedGoods.length === 0}
+            className={`text-[30px] ml-auto mr-4 cursor-pointer transition-opacity duration-300 ease-in-out ${
+              !selectedFG.id && selectedGoods.length === 0 
+                ? 'opacity-25 cursor-not-allowed' 
+                : 'opacity-100 hover:opacity-75'
+            }`}
           >
             <CgRemoveR />
           </button>
@@ -153,12 +161,12 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                     colSpan={columnNames.length}
                     className="text-center py-[14rem] dark:text-white"
                   >
-                    {/* <Spinner color="danger" size="lg" label="Loading..." /> */}
-                    No finished good selected. <br /> Select a finished good to
-                    create the cost calculation breakdown sheet.
+                    <div className='flex justify-center items-center'>
+                      <Spinner />
+                    </div>
                   </td>
                 </tr>
-              ) : selectedFGDetails ? (
+              ) : selectedFGDetails && selectedFGDetails.length > 0 ? (
                 <>
                   <tr className={`text-[#6B6B6B] bg-[#ffebeb] font-semibold`}>
                     <td className="text-center px-6 py-2">
@@ -220,9 +228,10 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
                 </>
               ) : (
                 <tr>
-                  <td colSpan={columnNames.length} className="text-center py-6">
-                    No finished good selected. Select a finished good to create
-                    the cost calculation breakdown sheet.
+                  <td colSpan={columnNames.length} className="items-center justify-items-center text-center font-semibold pt-[13rem] text-[#555555] dark:text-white">
+                    <RiFileCloseFill className='text-[85px] mb-4' />
+                    No finished good selected. <br /> Select a finished good to
+                    create the cost calculation breakdown sheet.
                   </td>
                 </tr>
               )}
