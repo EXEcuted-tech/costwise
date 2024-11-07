@@ -18,7 +18,7 @@ const BOMListContainer = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [monthYear, setMonthYear] = useState<number>(202401);
 
-  // const maxProductCost = Math.max(...data?.map(info => info.productCost) ?? []);
+  const minProductCost = Math.min(...(data?.formulations.filter(info => info.rowType === 'finishedGood').map(info => Number(info.cost)) ?? []));
 
   const fetchData = useCallback(async () => {
     setIsLoading(true);
@@ -150,6 +150,7 @@ const BOMListContainer = () => {
                   batchQty: materialInfo.qty,
                   unit: materialDetails.unit,
                   cost: materialDetails.material_cost,
+                  status: materialInfo.status,
                 });
               }
             });
@@ -281,33 +282,49 @@ const BOMListContainer = () => {
                 return acc;
               }, []).map((group, groupIndex) => (
                 <React.Fragment key={groupIndex}>
-                  {group.map((info, index) => (
-                    <tr key={index} className={`${info.rowType === 'finishedGood' ? (info.isLeastCost === 1 ? 'bg-[#fff873] text-black dark:text-black' : 'text-black dark:text-white') : (index % 2 === 1 ? 'bg-[#FCF7F7] dark:bg-[#4C4C4C]' : '')} animate-zoomIn text-center ${info.rowType === 'finishedGood' ? 'font-bold' : 'font-medium'} ${info.rowType === 'finishedGood' ? '' : 'text-[#6B6B6B] dark:text-[#d1d1d1]'} text-[18px] ${info.rowType === 'finishedGood' ? 'border-y border-[#ACACAC]' : ''}`}>
-                      <td className={`py-[10px] ${info.rowType === 'finishedGood' ? 'relative text-left px-6' : ''}`}>
-                        {info.rowType === 'finishedGood' && (
-                          <>
-                            {info.isLeastCost === 1 && (
-                              <>
-                                <div className="absolute bottom-[-5px] left-[30%] transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[10px] border-b-[#D9D9D9]"></div>
-                                <div className="absolute font-light text-black top-[50px] left-0 right-0 mx-auto w-max bg-[#D9D9D9] rounded-full px-4 py-2 shadow-lg z-10">
-                                  Least-Cost Formula
-                                </div>
-                              </>
-                            )}
-                            {info.formula}
-                          </>
-                        )}
-                      </td>
-                      <td className={`${info.rowType !== 'finishedGood' ? 'py-[10px]' : ''}`}>{info.rowType !== 'finishedGood' ? info.level : ''}</td>
-                      <td className='text-left px-6'>{info.itemCode}</td>
-                      <td className='text-left px-6'>{info.description}</td>
-                      <td className='text-center px-6'>{info.formulation}</td>
-                      <td className='text-right px-6'>{info.batchQty?.toFixed(2)}</td>
-                      <td className='text-left px-6'>{info.unit}</td>
-                      <td className='text-right px-6'>{info.rowType !== 'finishedGood' ? info.cost : ''}</td>
-                      <td className='text-right px-6'>{info.rowType === 'finishedGood' ? info.cost : ''}</td>
-                    </tr>
-                  ))}
+                  {group.map((info, index) => {
+                    const isOutOfStock = info.rowType === 'material' && info.status === 0;
+                    return (
+                      <tr key={index} className={`
+                          ${info.rowType === 'finishedGood' ? (info.isLeastCost === 1 ? 'bg-[#fff873] text-black dark:text-black' : 'text-black dark:text-white')
+                        : (index % 2 === 1 ? 'bg-[#FCF7F7] dark:bg-[#4C4C4C]' : '')} 
+                          ${isOutOfStock ? 'bg-[#FFE5E5] dark:bg-[#FF9999] text-primary' : ''}
+                          animate-zoomIn text-center ${info.rowType === 'finishedGood' ? 'font-bold' : 'font-medium'} 
+                          ${info.rowType === 'finishedGood' ? '' : 'text-[#6B6B6B] dark:text-[#d1d1d1]'} text-[18px] ${info.rowType === 'finishedGood' ? 'border-y border-[#ACACAC]' : ''}`}>
+                        <td className={`py-[10px] ${info.rowType === 'finishedGood' ? 'relative text-left px-6' : ''}`}>
+                          {info.rowType === 'finishedGood' && (
+                            <>
+                              {info.isLeastCost === 1 && (
+                                <>
+                                  <div className="absolute bottom-[-5px] left-[30%] transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[10px] border-b-[#D9D9D9]"></div>
+                                  <div className="absolute font-light text-black top-[50px] left-0 right-0 mx-auto w-max bg-[#D9D9D9] rounded-full px-4 py-2 shadow-lg z-10">
+                                    Least-Cost Formula
+                                  </div>
+                                </>
+                              )}
+                              {Number(info.cost) === minProductCost && info.isLeastCost === 0 && (
+                                <>
+                                  <div className="absolute bottom-[-5px] left-[30%] transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[10px] border-b-[#D9D9D9]"></div>
+                                  <div className="absolute font-light text-black top-[50px] left-0 right-0 mx-auto w-max bg-[#D9D9D9] rounded-full px-4 py-2 shadow-lg z-10">
+                                    Not Ideal Due to Material Shortage
+                                  </div>
+                                </>
+                              )}
+                              {info.formula}
+                            </>
+                          )}
+                        </td>
+                        <td className={`${info.rowType !== 'finishedGood' ? 'py-[10px]' : ''}`}>{info.rowType !== 'finishedGood' ? info.level : ''}</td>
+                        <td className='text-left px-6'>{info.itemCode}</td>
+                        <td className='text-left px-6'>{info.description}</td>
+                        <td className='text-center px-6'>{info.formulation}</td>
+                        <td className='text-right px-6'>{info.batchQty?.toFixed(2)}</td>
+                        <td className='text-left px-6'>{info.unit}</td>
+                        <td className='text-right px-6'>{info.rowType !== 'finishedGood' ? info.cost : ''}</td>
+                        <td className='text-right px-6'>{info.rowType === 'finishedGood' ? info.cost : ''}</td>
+                      </tr>
+                    );
+                  })}
                 </React.Fragment>
               ))
             )}

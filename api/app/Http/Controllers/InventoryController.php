@@ -2,6 +2,11 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bom;
+use App\Models\FinishedGood;
+use App\Models\Fodl;
+use App\Models\Formulation;
+use App\Models\Transaction;
 use Illuminate\Http\Request;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use League\Csv\Reader;
@@ -19,7 +24,7 @@ class InventoryController extends ApiController
     protected $monthYear;
     protected $inventoryIds = [];
 
-    public function retrieveAll ()
+    public function retrieveAll()
     {
         try {
             $inventory = Inventory::all();
@@ -171,6 +176,8 @@ class InventoryController extends ApiController
                 }
             }
 
+            $boms = Bom::where('created_at', '>=', "$inventoryMonthYear-01")->get();
+            $this->calculateLeastCost($boms);
             DB::commit();
 
             return response()->json(['message' => 'Inventory list archived successfully']);
@@ -178,6 +185,75 @@ class InventoryController extends ApiController
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);
         }
+    }
+
+    private function calculateLeastCost($boms)
+    {
+        foreach ($boms as $bom) {
+            $formulations = json_decode($bom->formulations, true);
+            $leastCost = PHP_FLOAT_MAX;
+            $leastCostFormulationId = null;
+
+            foreach ($formulations as $formulationId) {
+                $formulation = Formulation::findOrFail($formulationId);
+
+                $materialQtyList = json_decode($formulation->material_qty_list, true);
+                foreach ($materialQtyList as &$item) {
+                    foreach ($item as &$data) {
+                        if (isset($data['status'])) {
+                            unset($data['status']);
+                        }
+                    }
+                }
+                $formulation->material_qty_list = json_encode($materialQtyList);
+                $formulation->save();
+
+                $finishedGood = FinishedGood::firstOrCreate(
+                    ['fg_id' => $formulation->fg_id],
+                );
+
+                $totalMaterialCost = $this->calculateFormulationCost($formulation) / $finishedGood->total_batch_qty;
+                $finishedGood->update(['rm_cost' => $totalMaterialCost]);
+
+                $fodl = Fodl::where('fodl_id', $finishedGood->fodl_id)->first();
+                $totalCost = $totalMaterialCost + ($fodl->factory_overhead ?? 0) + ($fodl->direct_labor ?? 0);
+                $finishedGood->update(['total_cost' => $totalCost]);
+                $finishedGood->update(['is_least_cost' => false]);
+                if ($totalMaterialCost < $leastCost) {
+                    $leastCost = $totalMaterialCost;
+                    $leastCostFormulationId = $formulationId;
+                }
+            }
+
+            if ($leastCostFormulationId) {
+                $leastCostFormulation = Formulation::findOrFail($leastCostFormulationId);
+                $leastCostFinishedGood = FinishedGood::where('fg_id', $leastCostFormulation->fg_id)->first();
+
+                if ($leastCostFinishedGood) {
+                    $leastCostFinishedGood->update(['is_least_cost' => true]);
+                }
+            }
+        }
+    }
+
+    private function calculateFormulationCost($formulation)
+    {
+        $materialQtyList = json_decode($formulation->material_qty_list, true);
+
+        $totalCost = 0;
+
+        foreach ($materialQtyList as $item) {
+            foreach ($item as $materialId => $data) {
+                $material = Material::findOrFail($materialId);
+                $quantity = $data['qty'];
+                $materialCost = $material->material_cost;
+                $productCost = $materialCost * $quantity;
+
+                $totalCost += $productCost;
+            }
+        }
+
+        return $totalCost;
     }
 
     private function retrieveAllMonthYear()
@@ -193,9 +269,9 @@ class InventoryController extends ApiController
                 if (!in_array($monthYear, $monthYearList)) {
                     $monthYearList[] = $monthYear;
                 }
-           }
+            }
 
-           if (!empty($monthYearList)) {
+            if (!empty($monthYearList)) {
                 return $monthYearList;
             } else {
                 throw new \Exception("No month/year data found.");
@@ -226,7 +302,8 @@ class InventoryController extends ApiController
                 if ($existingIndex !== false) {
                     $inventoryList[$existingIndex]['inventory_ids'] = array_merge(
                         $inventoryList[$existingIndex]['inventory_ids'],
-                        $inventoryIds);
+                        $inventoryIds
+                    );
 
                     $inventoryList[$existingIndex]['inventory_ids'] = array_unique($inventoryList[$existingIndex]['inventory_ids']);
 
@@ -244,7 +321,7 @@ class InventoryController extends ApiController
                     ];
                 }
 
-                usort($inventoryList, function($a, $b) {
+                usort($inventoryList, function ($a, $b) {
                     return strcmp($b['month_year'], $a['month_year']);
                 });
             }
@@ -309,7 +386,7 @@ class InventoryController extends ApiController
         try {
             $inventoryFiles = File::where('file_type', 'inventory_file')->get();
 
-            foreach($inventoryFiles as $inventoryFile) {
+            foreach ($inventoryFiles as $inventoryFile) {
                 $fileSettings = json_decode($inventoryFile->settings);
                 $existingFileName = $fileSettings->file_name;
                 $month_Year = $fileSettings->monthYear;
@@ -435,21 +512,21 @@ class InventoryController extends ApiController
         ];
 
         foreach ($data as $row) {
-           if(!empty($row[0])) {
-            $carbonDate = Carbon::createFromFormat('m/d/Y', $row[0]);
+            if (!empty($row[0])) {
+                $carbonDate = Carbon::createFromFormat('m/d/Y', $row[0]);
 
-            if ($carbonDate) {
-                $rowMonthYear = $carbonDate->format('Y-m');
-                if ($rowMonthYear === $monthYear) {
-                    $isMonthYearPresent = true;
-                    break;
+                if ($carbonDate) {
+                    $rowMonthYear = $carbonDate->format('Y-m');
+                    if ($rowMonthYear === $monthYear) {
+                        $isMonthYearPresent = true;
+                        break;
+                    }
+                } else {
+                    throw new \Exception("Invalid date format in the Inventory file.");
                 }
             } else {
-                throw new \Exception("Invalid date format in the Inventory file.");
-            }
-           } else {
                 break;
-           }
+            }
         }
 
         if (!$isMonthYearPresent) {
@@ -492,15 +569,17 @@ class InventoryController extends ApiController
                 }
             }
 
-            $material = Material::updateOrCreate(
-                ['material_code' => $itemCode],
-                [
+            $material = Material::where('material_code', $itemCode)->first();
+
+            if (!$material) {
+                $material = Material::create([
+                    'material_code' => $itemCode,
                     'material_desc' => $itemDescription,
                     'material_cost' => $itemCost,
                     'date' => $formattedDate,
                     'unit' => $unit,
-                ]
-            );
+                ]);
+            }
 
             if ($carbonDate->format('Y-m') === $monthYear) {
                 $purchasesData[$material->material_id] = [
@@ -595,16 +674,105 @@ class InventoryController extends ApiController
             $inventoryQty = $inventoryData[$materialId]['inventory_qty'] ?? 0;
             $usageQty = $usagesData[$materialId]['usage_qty'] ?? 0;
 
-            $stockStatus = $inventoryQty < $usageQty ? 'Low Stock' : 'In Stock';
+            $transactions = Transaction::whereNotNull('material_id')
+                ->get()
+                ->filter(function ($transaction) use ($material) {
+                    $materialRecord = Material::find($transaction->material_id);
+                    if ($materialRecord && $materialRecord->material_code === $material->material_code) {
+                        $settings = json_decode($transaction->settings, true);
+                        $transactionDate = Carbon::parse($transaction->date);
+                        return isset($settings['qty']) && 
+                               $settings['qty'] < 0 && 
+                               $transactionDate->format('Y-m') === $this->monthYear;
+                    }
+                    return false;
+                });
 
+            $negativeQtySum = 0;
+            if (!$transactions->isEmpty()) {
+                $negativeQtySum = $transactions->sum(function ($transaction) {
+                    $settings = json_decode($transaction->settings, true);
+                    return abs($settings['qty']);
+                });
+            }
+
+            $finalUsageQty = $usageQty + $negativeQtySum;
+
+            $stockStatus = $inventoryQty < $finalUsageQty ? 'Low Stock' : 'In Stock';
             $inventoryRecord = Inventory::create([
                 'material_id' => $materialId,
                 'material_category' => $category,
                 'stock_status' => $stockStatus,
                 'purchased_qty' => $purchasedQty,
-                'usage_qty' => $usageQty,
+                'usage_qty' => $finalUsageQty,
                 'total_qty' => $inventoryQty,
+                'curr_stock' => $inventoryQty - $finalUsageQty,
             ]);
+
+            if (!$transactions->isEmpty()) {
+                $bomRecords = Bom::all();
+
+                foreach ($bomRecords as $bom) {
+                    $formulationIds = json_decode($bom->formulations, true);
+                    $formulations = Formulation::whereIn('formulation_id', $formulationIds)->get();
+
+                    foreach ($formulations as $formulation) {
+                        $materialQtyList = json_decode($formulation->material_qty_list, true);
+                        foreach ($materialQtyList as $index => $materialDetails) {
+                            foreach ($materialDetails as $materialId => $details) {
+                                // Verify material code matches
+                                $materialRecord = Material::find($materialId);
+
+                                if ($materialRecord && $materialRecord->material_code === $material->material_code) {
+                                    $requiredQty = $details['qty'];
+
+                                    // Check if current stock is less than required quantity
+                                    if ($inventoryRecord->curr_stock < $requiredQty) {
+                                        $materialQtyList[$index][$materialId]['status'] = 0;
+                                        $formulation->material_qty_list = json_encode($materialQtyList);
+                                        $formulation->save();
+                                        // Get FG record and set is_least_cost to 0
+                                        $fgRecord = FinishedGood::find($formulation->fg_id);
+                                        if ($fgRecord) {
+                                            $fgRecord->update(['is_least_cost' => 0]);
+
+                                            // Find next formulation with sufficient stock
+                                            foreach ($formulations as $altFormulation) {
+                                                $altMaterialQtyList = json_decode($altFormulation->material_qty_list, true);
+                                                $hasStock = true;
+
+                                                foreach ($altMaterialQtyList as $index => $altMaterialDetails) {
+                                                    foreach ($altMaterialDetails as $altMaterialId => $altDetails) {
+                                                        $altMaterialRecord = Material::find($altMaterialId);
+
+                                                        if ($altMaterialRecord && $altMaterialRecord->material_code === $material->material_code) {
+                                                            $requiredQty = $altDetails['qty'];
+
+                                                            if ($inventoryRecord->curr_stock < $altDetails['qty']) {
+                                                                $hasStock = false;
+                                                                break;
+                                                            }
+                                                        }
+                                                    }
+
+                                                    if ($hasStock) {
+                                                        // Update FG record with new least cost formulation
+                                                        $altFgRecord = FinishedGood::find($altFormulation->fg_id);
+                                                        if ($altFgRecord) {
+                                                            $altFgRecord->update(['is_least_cost' => 1]);
+                                                        }
+                                                        break;
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
 
             $this->inventoryIds[] = $inventoryRecord->inventory_id;
         }

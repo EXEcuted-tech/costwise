@@ -95,6 +95,7 @@ export interface FormulationRecord extends Record<string, unknown> {
     unit: string | null;
     isLeastCost?: number;
     cost?: number | null;
+    status?: number | null;
 }
 
 export interface BOM {
