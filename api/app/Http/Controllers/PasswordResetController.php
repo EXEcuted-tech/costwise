@@ -40,7 +40,7 @@ class PasswordResetController extends Controller
         $tokens = PersonalAccessToken::where('token', hash('sha256', $token))
                                 ->first();
 
-        if (!$tokens || Carbon::parse($tokens->created_at)->addMinutes(30)->isPast()) {
+        if (!$tokens || Carbon::parse($tokens->created_at)->addMinutes(15)->isPast()) {
             return response()->json(['message' => 'Invalid or expired token'], 400);
         }
 

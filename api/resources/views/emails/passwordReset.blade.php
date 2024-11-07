@@ -9,6 +9,6 @@
             We received a request to reset your password. Please click the link below to reset it:
         </p>
         <a href="{{ $resetLink }}">Reset Password</a>
-        <p>This link will expire in 30 minutes.</p>
+        <p>This link will expire in 15 minutes.</p>
     </body>
 </html>
