@@ -81,7 +81,7 @@ class EventController extends ApiController
         Event::on('archive_mysql')->create($archivedEventData);
         $event->delete();
 
-        $this->status = 204;
+        $this->status = 200;
         return $this->getResponse("Event archived successfully.");
     }
 }
