@@ -5,6 +5,9 @@ import ConfirmDelete from '@/components/modals/ConfirmDelete';
 import { Router } from 'next/router';
 import { useUserContext } from '@/contexts/UserContext';
 import { HiArchiveBoxXMark } from 'react-icons/hi2';
+import Alert from '../alerts/Alert';
+import Loader from '../loaders/Loader';
+import { truncate } from 'lodash';
 
 type ViewEditEventModalProps = {
     event: { id: number, title: string };
@@ -22,28 +25,55 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
     const [deleteModal, setDeleteModal] = useState(false);
     const [id, setId] = useState(0);
     const { currentUser, setError } = useUserContext();
+    const [creatorId, setCreatorId] = useState(0);
+    const [isCreator, setIsCreator] = useState(false);
     const sysRoles = currentUser?.roles;
+    const [errorMsg, setErrorMsg] = useState('');
+    const [successMsg, setSuccessMsg] = useState('');
 
     useEffect(() => {
         const fetchEventDetails = async () => {
+            setIsLoading(true);
             try {
                 const response = await api.get(`/events/retrieve`, { params: { col: 'event_id', val: event.id } });
                 if (response.data.status === 200) {
                     const eventData = response.data.data;
+                    const eventUserId = Number(eventData.user_id);
+                    const user = localStorage.getItem('currentUser');
+                    const parsedUser = JSON.parse(user || '{}');
+
                     setId(eventData.event_id);
                     setTitle(eventData.title);
                     setDescription(eventData.description);
                     setStartTime(formatTime(eventData.start_time));
                     setEndTime(formatTime(eventData.end_time));
                     setDate(new Date(eventData.event_date));
+
+                    setIsCreator(eventUserId === parsedUser?.userId);
                 }
             } catch (error) {
                 console.error('Failed to fetch event details:', error);
+            } finally {
+                setIsLoading(false);
             }
         };
 
         fetchEventDetails();
-    }, [event, event.id]);
+
+    }, [event.id]);
+
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [onClose]);
+
 
     const formatTime = (isoString: string) => {
         const date = new Date(isoString);
@@ -75,9 +105,13 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
                 })
                 .catch(error => {
                 });
-            if (response.data.status !== 401) {
+            if (response.data.status === 200) {
+                setSuccessMsg(response.data.message);
                 setIsLoading(false);
                 setIsEditing(false);
+            } else {
+                setErrorMsg(response.data.message);
+                setIsLoading(false);
             }
         }
     };
@@ -105,13 +139,26 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
             });
             
         const response = await api.post(`/events/delete`, { event_id: id });
-        if (response.data.status !== 401) {
+        if (response.data.status === 200) {
+            setSuccessMsg(response.data.message);
             setIsLoading(false);
-            window.location.reload();
+            setTimeout(() => {
+                onClose();
+            }, 2000);
+        } else {
+            setErrorMsg(response.data.message);
+            setIsLoading(false);
         }
     };
 
     return (
+        <>
+            {errorMsg && 
+                <Alert message={errorMsg} variant='critical' setClose={() => setErrorMsg('')} />
+            }
+            {successMsg && 
+                <Alert message={successMsg} variant='success' setClose={() => setSuccessMsg('')} />
+            }
         <div className="font-lato fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
             <div className="animate-pop-out bg-white dark:bg-[#3C3C3C] p-6 rounded-lg w-[50%]">
                 <h2 className="text-xl text-[20px] font-bold mb-4 flex items-center gap-2 dark:text-white">
@@ -123,51 +170,67 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
                     <div className="mb-4 flex gap-4">
                         <div className="flex-1">
                             <label htmlFor="startTime" className="block mb-1 font-semibold text-[17px] dark:text-white">Start Time</label>
-                            <input
-                                type="time"
-                                id="startTime"
-                                value={startTime}
-                                onChange={(e) => setStartTime(e.target.value)}
-                                className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
-                                required
-                                disabled={!isEditing}
-                            />
+                            {isLoading ? (
+                                <div className="w-full h-[34px] flex items-center"><Loader className='h-8 w-4'/></div>
+                            ) : (
+                                <input
+                                    type="time"
+                                    id="startTime"
+                                    value={startTime}
+                                    onChange={(e) => setStartTime(e.target.value)}
+                                    className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
+                                    required
+                                    disabled={!isEditing}
+                                />
+                            )}
                         </div>
                         <div className="flex-1">
                             <label htmlFor="endTime" className="block mb-1 font-semibold text-[17px] dark:text-white">End Time</label>
-                            <input
-                                type="time"
-                                id="endTime"
-                                value={endTime}
-                                onChange={(e) => setEndTime(e.target.value)}
-                                className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
-                                required
-                                disabled={!isEditing}
-                            />
+                            {isLoading ? (
+                                <div className="w-full h-[34px] flex items-center"><Loader className='h-8 w-4'/></div>
+                            ) : (
+                                <input
+                                    type="time"
+                                    id="endTime"
+                                    value={endTime}
+                                    onChange={(e) => setEndTime(e.target.value)}
+                                    className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
+                                    required
+                                    disabled={!isEditing}
+                                />
+                            )}
                         </div>
                     </div>
                     <div className="mb-4">
                         <label htmlFor="title" className="block mb-1 font-semibold text-[17px] dark:text-white">Title</label>
-                        <input
-                            type="text"
-                            id="title"
-                            value={title}
-                            onChange={(e) => setTitle(e.target.value)}
-                            className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
-                            required
-                            disabled={!isEditing}
-                        />
+                        {isLoading ? (
+                            <div className="w-full h-[34px] flex items-center"><Loader className='h-8 w-4'/></div>
+                        ) : (
+                            <input
+                                type="text"
+                                id="title"
+                                value={title}
+                                onChange={(e) => setTitle(e.target.value)}
+                                className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
+                                required
+                                disabled={!isEditing}
+                            />
+                        )}
                     </div>
                     <div className="mb-4">
                         <label htmlFor="description" className="block mb-1 font-semibold text-[17px] dark:text-white">Description</label>
-                        <textarea
-                            id="description"
-                            value={description}
-                            onChange={(e) => setDescription(e.target.value)}
-                            className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
-                            rows={3}
-                            disabled={!isEditing}
-                        ></textarea>
+                        {isLoading ? (
+                            <div className="w-full h-[82px] flex items-center"><Loader className='h-20 w-4'/></div>
+                        ) : (
+                            <textarea
+                                id="description"
+                                value={description}
+                                onChange={(e) => setDescription(e.target.value)}
+                                className="w-full border rounded px-2 py-1 dark:bg-[#3C3C3C] dark:text-white"
+                                rows={3}
+                                disabled={!isEditing}
+                            ></textarea>
+                        )}
                     </div>
                     
                     <div className="flex justify-end">
@@ -178,7 +241,8 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
                         >
                             Close
                         </button>
-                        {isEditing ? (
+                        {isCreator && (
+                        isEditing ? (
                             <button
                                 type="submit"
                                 className="px-4 py-2 bg-primary text-white rounded font-semibold transition-colors hover:bg-red-800"
@@ -204,12 +268,15 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
                                     <HiArchiveBoxXMark className="inline-block mr-1" /> Archive
                                 </button>
                             </>
+                        )
                         )}
                     </div>
                 </form>
             </div>
             {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="event" onProceed={handleDelete} />}
         </div>
+    );
+        </>
     );
 };
 

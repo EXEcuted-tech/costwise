@@ -56,6 +56,19 @@ const ViewUserRoles: React.FC<AddUserRolesProps> = ({ onClose, user_id }) => {
     }
   }
 
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+            onClose();
+        }
+    };
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => {
+        document.removeEventListener('keydown', handleEscapeKey);
+    };
+}, [onClose]);
+
+
 
   return (
     <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]'>

@@ -1,92 +1,86 @@
 "use client"
-import React, { useState, useRef, useEffect } from 'react';
-import { FaBoxOpen } from "react-icons/fa6";
+import React, { useState } from 'react';
+import { AiOutlineDown } from 'react-icons/ai';
+import useOutsideClick from '@/hooks/useOutsideClick';
+import { BiFoodTag } from "react-icons/bi";
 
 interface CustomGoodsSelectProps {
   options: { value: number, label: string }[];
   placeholder: string;
-  isOpen: boolean;
   onChange: (selectedValue: { name: string, id: number }) => void;
   disabledOptions: { name: string, id: number }[];
 }
 
-const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placeholder, isOpen, onChange, disabledOptions }) => {
+const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placeholder, onChange, disabledOptions }) => {
   const [selectedOption, setSelectedOption] = useState<{ name: string, id: number } | null>(null);
-  const [width, setWidth] = useState<number>(0);
-  const textRef = useRef<HTMLSpanElement>(null);
-  const [previousSelectedOption, setPreviousSelectedOption] = useState<any>();
+  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [inputValue, setInputValue] = useState('');
+  const [width, setWidth] = useState('27%');
+  const ref = useOutsideClick(() => setIsDropdownOpen(false));
 
   const numberDisabledOptions = disabledOptions.map(option => option.id);
-  useEffect(() => {
-    if (textRef.current) {
-      setWidth(textRef.current.offsetWidth);
-    }
 
-  }, [selectedOption]);
-
-  const handleChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    const selectedId = Number(event.target.value);
-    const selectedOption = options.find(option => option.value === selectedId);
-    if (selectedOption) {
-      const newSelectedValue = { name: selectedOption.label, id: selectedOption.value };
-      setPreviousSelectedOption(selectedOption);
-      setSelectedOption(newSelectedValue);
-      onChange(newSelectedValue);
-    }
+  const handleOptionClick = (option: { value: number, label: string }) => {
+    const newSelectedValue = { name: option.label, id: option.value };
+    setSelectedOption(newSelectedValue);
+    const textLength = option.label.length;
+    const newWidth = Math.max(27, Math.min(29, textLength * 1.1));
+    setWidth(`${newWidth}%`);
+    onChange(newSelectedValue);
+    setInputValue('');
+    setIsDropdownOpen(false);
   };
 
-  const [filteredOptions, setFilteredOptions] = useState(numberDisabledOptions);
+  const handleInputChange = (value: string) => {
+    setInputValue(value);
+    setIsDropdownOpen(true);
+  };
 
-  useEffect(() => {
-    const filtered = filteredOptions.filter(option => {
-      return !numberDisabledOptions.includes(option) && !filteredOptions.includes(option);
-    });
-    setFilteredOptions(filtered);
-  }, [])
+  const filteredOptions = options.filter(
+    (option) => option.label.toLowerCase().includes(inputValue.toLowerCase())
+  );
 
-  const xlWidth = isOpen ? width + 10 : width + 150;
-  const defaultWidth = width + 150;
-  // const computedWidth = window.innerWidth >= 1280 ? defaultWidth : xlWidth;
-  const computedWidth = typeof window !== 'undefined' && window.innerWidth >= 1280 ? width + 150 : width + 10;
   return (
-    <div className="relative flex items-center">
-      <select
-        value={selectedOption?.id || ''}
-        onChange={handleChange}
-        className={`
-          ${isOpen ? 'pl-0 xl:text-[21px] 2xl:text-[26px] 3xl:text-[26px] 4xl:text-[26px]' : 'pl-2'}
-          pr-2 bg-transparent uppercase cursor-pointer appearance-none truncate focus:outline-none
-        `}
-        style={{
-          width: `${computedWidth}px`,
-          minWidth: `${width}px`,
-          transition: 'width 0.3s ease',
-        }}
+    <div ref={ref} className={`relative font-lato z-[1000]`} style={{ width }}>
+      <div
+        title="Click to open dropdown or type to search"
+        className="w-full rounded-lg px-3 text-white bg-primary cursor-pointer hover:bg-white hover:text-[#6B6B6B] hover:animate-pull-down group transition-colors duration-200 ease-in-out dark:bg-[#3C3C3C]"
+        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
       >
-        <option value="" disabled selected className='truncate bg-gray-200 text-gray-600 font-bold flex items-center'>
-        📦 {placeholder}
-        </option>
-        {options.map((option) => (
-          <option 
-            key={option.value} 
-            value={option.value} 
-            className={`${numberDisabledOptions.includes(option.value) ? 'font-medium bg-secondary dark:bg-secondary dark:text-black text-gray-700' : 'dark:bg-[#3C3C3C] dark:text-white text-[#ACACAC]'} truncate`}
-            disabled={numberDisabledOptions.includes(option.value)}>
-            {numberDisabledOptions.includes(option.value) && '📋'}{option.label}
-          </option>
-        ))}
-      </select>
-      <div className="pointer-events-none absolute right-0 flex items-center px-2 text-white">
-        <svg className="fill-current h-6 w-6" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-          <path d="M9.293 12.95l.707.707L15.657 8l-1.414-1.414L10 10.828 5.757 6.586 4.343 8z" />
-        </svg>
+        <div className="flex items-center w-full">
+          <input
+            type="text"
+            className={`${selectedOption ? 'w-[calc(100%-20px)] text-white group-hover:text-[#6B6B6B]' : 'w-full text-white hover:text-[#6B6B6B] placeholder:text-white group-hover:placeholder:text-[#6B6B6B]'} bg-transparent  outline-none focus:ring-0 border-none pr-4  dark:bg-[#3C3C3C] dark:text-[#d1d1d1] dark:placeholder:text-[#d1d1d1]`}
+            onChange={(e) => handleInputChange(e.target.value)}
+            placeholder={`🔍 ${placeholder}`}
+            value={selectedOption ? `📋 ${selectedOption.name}` : inputValue}
+          />
+        </div>
+
+        <div className="absolute inset-y-0 right-0 flex items-center pr-3">
+          <AiOutlineDown className="text-white text-[15px] group-hover:text-[#6B6B6B] transition-colors duration-200 ease-in-out" />
+        </div>
       </div>
-      <span
-        ref={textRef}
-        className="absolute opacity-0 pointer-events-none whitespace-nowrap"
-      >
-        {selectedOption?.name || placeholder}
-      </span>
+
+      {isDropdownOpen && (
+        <div className="animate-pull-down absolute min-w-full w-max text-[17px] text-[#6B6B6B] bg-white dark:bg-[#3C3C3C] z-10 mt-1 border border-[#B6B6B6] dark:border-[#5C5C5C] dark:text-[#d1d1d1] drop-shadow-lg rounded-l-[10px] rounded-r-[5px] max-h-[180px] overflow-y-auto">
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((option) => (
+              <div
+                key={option.value}
+                className={`flex items-center p-2 pl-4 pt-2 hover:bg-gray-100 dark:hover:bg-[#4c4c4c] whitespace-nowrap ${
+                  numberDisabledOptions.includes(option.value) ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+                }`}
+                onClick={() => !numberDisabledOptions.includes(option.value) && handleOptionClick(option)}
+              >
+                <span>{option.label}</span>
+              </div>
+            ))
+          ) : (
+            <div className="p-2 text-center text-[#6B6B6B] whitespace-nowrap">No options found for the month year.</div>
+          )}
+        </div>
+      )}
     </div>
   );
 };

@@ -5,7 +5,7 @@ import { BsPersonLock } from 'react-icons/bs';
 import { CiSquareCheck } from "react-icons/ci";
 
 interface AddUserRolesProps { 
-  onConfirm: (roles: number[], roleNames: string[]) => void;
+  onConfirm: (roles: number[], roleNames: string[], userType: string) => void;
   onClose: () => void;
   initialSelectedRoles: string[];
   initialSelectedRoleValues: number[];
@@ -33,13 +33,14 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
   const [checkboxStates, setCheckboxStates] = useState<CheckboxState>(
     getInitialCheckboxStates(initialSelectedRoleValues)
 );
+const [selectedUserType, setSelectedUserType] = useState<string>('Regular');
 
   const handleCloseModal = () => {
     onClose();
   };
 
   const handleConfirm = () => {
-    onConfirm(selectedRoleValues, selectedRoles);
+    onConfirm(selectedRoleValues, selectedRoles, selectedUserType);
     onClose();
   }
 
@@ -97,7 +98,30 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
     setIsAllChecked(false);
   };
 
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+            onClose();
+        }
+    };
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => {
+        document.removeEventListener('keydown', handleEscapeKey);
+    };
+  }, [onClose]);
 
+  const handleUserTypeChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const newUserType = e.target.value;
+    setSelectedUserType(newUserType);
+    
+    if (newUserType === 'Admin') {
+      setIsAllChecked(true);
+      setSelectedRoles(Object.values(roleMap).flatMap(r => r.names));
+      setSelectedRoleValues(Object.values(roleMap).flatMap(r => r.ids));
+      setCheckboxStates({ allRoles: true, accounts: true, audit: true, files: true, formulations: true, events: true, export: true });
+    }
+  };
+  
   return (
     <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]'>
       <div className='animate-pop-out flex flex-col bg-white dark:bg-[#3C3C3C] w-[950px] h-auto rounded-[20px] px-[10px] overflow-y-auto'>
@@ -111,8 +135,19 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
         <div className='flex flex-col justify-center items-center pb-[20px]'>
           <h1 className='font-black text-[28px] dark:text-white'>Assign User Roles</h1>
           <p className='text-center text-[#9D9D9D] dark:text-[#d1d1d1] text-[17px] px-[30px]'>
-            Select the roles (access rights) you want to assign to the user.
+            Select the user's type and roles (access rights) you want to assign to the user.
           </p>
+        </div>
+
+        <div className='flex flex-row justify-center items-center gap-[10px] mb-2'>
+          <p className='text-[17px] dark:text-white'>User Type: <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+          <select className='w-[150px] text-[17px] rounded-lg border border-gray-300 p-1'
+            value={selectedUserType}
+            onChange={handleUserTypeChange}
+          >
+            <option value="Regular">Regular</option>
+            <option value="Admin">Super Admin</option>
+          </select>
         </div>
 
         {/* Role Select */}

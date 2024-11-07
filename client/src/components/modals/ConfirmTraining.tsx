@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { RiFileWarningFill } from "react-icons/ri";
 import { IoIosClose } from "react-icons/io";
 import { useFileManagerContext } from '@/contexts/FileManagerContext';
@@ -10,6 +10,18 @@ interface ConfirmDialogProps {
 }
 
 const ConfirmTraining: React.FC<ConfirmDialogProps> = ({ setConfirmDialog, onProceed }) => {
+    
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setConfirmDialog(false);
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [setConfirmDialog]);
 
     return (
         <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-[.25] z-[1000] z-[1000]'>

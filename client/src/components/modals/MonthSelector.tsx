@@ -1,6 +1,6 @@
 import CustomMonthSelector from '@/components/form-controls/CustomMonthSelector';
 import { useSidebarContext } from '@/contexts/SidebarContext';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { IoClose } from "react-icons/io5";
 import { MdCalendarMonth } from "react-icons/md";
 
@@ -29,6 +29,20 @@ const MonthSelector:React.FC<ModalProps> = ({months, onClose, onMonthSelect}) =>
         }
         
     };
+
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [onClose]);
+
+    
     return (
         <div className={`flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]`}>
             <div className={`${isOpen ? '4xl:w-[860px] 3xl:w-[820px] 2xl:w-[800px] xl:w-[550px]' : '4xl:w-[860px] 3xl:w-[820px] 2xl:w-[800px] xl:w-[550px]'} px-[35px] mx-[50px] 2xl:mx-0 animate-pop-out bg-white dark:bg-[#3c3c3c] w-[860px] min-h-[210px] mt-[-50px] rounded-[10px]`}>

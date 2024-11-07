@@ -2,7 +2,7 @@
 import { useSidebarContext } from "@/contexts/SidebarContext";
 import { useDrawerContext } from "@/contexts/DrawerContext";
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { MdClose } from "react-icons/md";
 import useOutsideClick from '@/hooks/useOutsideClick';
 
@@ -32,6 +32,18 @@ const AuditDrawer: React.FC<AuditDrawerProps> = ({ data }) => {
     const { drawerOpen, setDrawerOpen } = useDrawerContext();
     const toggleDrawer = () => setDrawerOpen(!drawerOpen);
     const ref = useOutsideClick(() => setDrawerOpen(false));
+
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setDrawerOpen(false);
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [setDrawerOpen]);
 
     if (!data) return null;
 
