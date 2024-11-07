@@ -34,7 +34,11 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
     }, [note_id]);
 
     const handleClose = () => {
-        setShowConfirmChanges(true);
+        if (isEditing) {
+            setShowConfirmChanges(true);
+        } else {
+            setViewNotes(false);
+        }
     }
     //Retrieve release note data
     const retrieveReleaseNote = async () => {
@@ -166,7 +170,9 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
             if (response.status === 200) {
                 setAlertMessages(["Release note successfully archived"]);
                 setAlertStatus("success");
-                window.location.reload();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             }
         } catch (error) {
             setAlertMessages(["Failed to archive release note"]);

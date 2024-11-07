@@ -61,9 +61,13 @@ const CreateReleaseNotes: React.FC<CreateReleaseNotesProps> = ({setCreateNotes})
             removed: []
         };
 
+        const hasAnyContent = Object.values(content).some(value => value.trim() !== '');
+
         Object.entries(content).forEach(([key, value]) => {
             if (value.trim()) {
                 formattedContent[key.toLowerCase()].push(value.trim());
+            } else if (hasAnyContent) {
+                formattedContent[key.toLowerCase()].push("No changes.");
             }
         });
 
@@ -112,7 +116,7 @@ const CreateReleaseNotes: React.FC<CreateReleaseNotesProps> = ({setCreateNotes})
         }
 
         if (Object.values(noteContent).every(content => content.trim() === '')) {
-            newAlertMessages.push("Content is required");
+            newAlertMessages.push("At least one section must have content");
             setAlertStatus("critical");
             setContentError(true);
         }
@@ -216,23 +220,24 @@ const CreateReleaseNotes: React.FC<CreateReleaseNotesProps> = ({setCreateNotes})
                     </div>
                     <div className='h-[3rem] px-[30px] mt-[25px]'>
                         <div className='flex gap-[20px] text-[22px] font-medium'>
+                            <span>Sections: </span>
                             {['Added', 'Updated', 'Removed'].map((type) => {
                                 let activeColor, activeTextColor, inactiveColor;
                                 switch (type) {
                                     case 'Added':
-                                        activeColor = 'bg-[#9EE29E]';
+                                        activeColor = 'bg-[#9EE29E] hover:bg-[#86c386]';
                                         activeTextColor = 'text-[#007100]';
-                                        inactiveColor = 'bg-[#C8E6C9]';
+                                        inactiveColor = 'bg-[#C8E6C9] hover:bg-[#b3d3b3]';
                                         break;
                                     case 'Updated':
-                                        activeColor = 'bg-[#90CAF9]';
+                                        activeColor = 'bg-[#90CAF9] hover:bg-[#79b3d3]';
                                         activeTextColor = 'text-[#1565C0]';
-                                        inactiveColor = 'bg-[#BBDEFB]';
+                                        inactiveColor = 'bg-[#BBDEFB] hover:bg-[#a3c3d3]';
                                         break;
                                     case 'Removed':
-                                        activeColor = 'bg-[#EF9A9A]';
+                                        activeColor = 'bg-[#EF9A9A] hover:bg-[#d38686]';
                                         activeTextColor = 'text-[#B71C1C]';
-                                        inactiveColor = 'bg-[#FFCDD2]';
+                                        inactiveColor = 'bg-[#FFCDD2] hover:bg-[#e3b3b3]';
                                         break;
                                 }
                                 return (
