@@ -176,7 +176,7 @@ const Inventory = () => {
             }
         };
         fetchInventoryLists();
-    }, []);
+    });
 
     useEffect(() => {
         if (monthOptions.length > 0 && !selectedMonth) {

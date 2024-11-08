@@ -135,7 +135,7 @@ const [selectedUserType, setSelectedUserType] = useState<string>('Regular');
         <div className='flex flex-col justify-center items-center pb-[20px]'>
           <h1 className='font-black text-[28px] dark:text-white'>Assign User Roles</h1>
           <p className='text-center text-[#9D9D9D] dark:text-[#d1d1d1] text-[17px] px-[30px]'>
-            Select the user's type and roles (access rights) you want to assign to the user.
+            Select the user&apos;s type and roles (access rights) you want to assign to the user.
           </p>
         </div>
 

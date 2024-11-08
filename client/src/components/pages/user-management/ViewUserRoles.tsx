@@ -15,7 +15,7 @@ const ViewUserRoles: React.FC<AddUserRolesProps> = ({ onClose, user_id }) => {
 
   useEffect(() => {
     fetchRoles();
-  }, []);
+  });
 
   const handleCloseModal = () => {
     onClose();
