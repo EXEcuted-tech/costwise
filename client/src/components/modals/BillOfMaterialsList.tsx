@@ -66,7 +66,7 @@ const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateActio
                     setIsLoading(false);
                 }, 1000);
 
-                setBomData(response.data.data);
+                setBomData([...response.data.data].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
             }
         } catch (error) {
             console.error('Error fetching data:', error);

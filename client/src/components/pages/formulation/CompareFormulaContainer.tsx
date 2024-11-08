@@ -42,9 +42,9 @@ const CompareFormulaContainer = () => {
     const [saveBomName, setSaveBomName] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
-
+    const [error,setError]=useState(false);
     const minProductCost = Math.min(...data.filter(info => info.rowType === 'finishedGood').map(info => Number(info.cost) || 0));
-
+    const { setBomName } = useFormulationContext();
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -188,6 +188,7 @@ const CompareFormulaContainer = () => {
         if (bomName === '') {
             setAlertMessages(prev => [...prev, 'Please provide a name for this BOM.']);
             setIsLoading(false);
+            setError(true);
             return;
         }
         try {
@@ -204,6 +205,7 @@ const CompareFormulaContainer = () => {
             setIsLoading(false);
             setSuccessMessage('Saved to BOM List successfully');
             setSaveBomName(false);
+            setBomName('');
             router.push('/formulation');
         }
     };
@@ -215,6 +217,8 @@ const CompareFormulaContainer = () => {
                     setSaveBomName={setSaveBomName}
                     handleSaveToBOMList={handleSaveToBOMList}
                     isLoading={isLoading}
+                    error={error}
+                    setError={setError}
                 />
             }
             <div className="absolute top-0 right-0">
