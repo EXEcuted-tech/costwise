@@ -296,13 +296,15 @@ const Inventory = () => {
 
                         {/* Month Button */}
                         <button
+                            title="Month Selector"
                             onClick={openMonthSelectorModal}
-                            className='mt-1 mr-3 text-white text-[28px] bg-[#bd2a2a] px-2 py-1 rounded-lg cursor-pointer hover:bg-[#D9D9D98E] transition-colors duration-300 ease-in-out'>
-                            <MdCalendarToday className='' />
+                            className='flex items-center mt-1 text-white  bg-[#cb3636] px-2 py-1 rounded-lg cursor-pointer hover:bg-[#D9D9D98E] transition-colors duration-300 ease-in-out'>
+                            <MdCalendarToday className='text-[28px] mr-4' />
+                            <p className="animate-appearance-in mr-2">
+                                {monthOptions.find(m => m.value === selectedMonth)?.display || ''}</p>
                         </button>
 
-                        <p className="animate-appearance-in">
-                            {monthOptions.find(m => m.value === selectedMonth)?.display || ''}</p>
+                        
 
                         {/* Navigator Buttons */}
                         <div className='flex w-[8rem] ml-auto'>
@@ -369,6 +371,7 @@ const Inventory = () => {
 
                             {/* Action Buttons */}
                             <button
+                                title="Import Inventory List"
                                 className={`${isOpen ? 'text-[15px] 3xl:text-[18px] 2xl:text-[17px]' : 'text-[15px] 2xl:text-[18px]'} h-8 w-[7rem] pl-[4px] pr-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center justify-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
                                 onClick={openImportInventoryListModal}
                             >
@@ -377,6 +380,7 @@ const Inventory = () => {
                             </button>
                             {inventoryList.length > 0 && (
                                 <button
+                                    title="Archive Inventory List"
                                     className={`${isOpen ? 'text-[15px] 3xl:text-[18px]' : 'text-[15px] 2xl:text-[18px]'} h-8 px-[8px] py-[5px] bg-primary text-white rounded-[5px] drop-shadow-lg flex items-center hover:bg-[#9c1c1c] transition-colors duration-200 ease-in-out`}
                                     onClick={openDeleteModal}
                                 >
