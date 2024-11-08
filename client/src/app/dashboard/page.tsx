@@ -234,6 +234,7 @@ const DashboardPage = () => {
         </div>
         <div>
           <div
+            title="Toggle Dark Mode"
             className={`${isOpen
                 ? "text-[1.2em] 2xl:text-[1.8em]"
                 : "text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]"

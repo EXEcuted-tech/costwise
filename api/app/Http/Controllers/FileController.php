@@ -8,6 +8,7 @@ use App\Helpers\ControllerHelper;
 use App\Models\Bom;
 use App\Models\Fodl;
 use App\Models\Formulation;
+use App\Models\Inventory;
 use App\Models\Transaction;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Auth;
@@ -47,8 +48,8 @@ class FileController extends ApiController
     {
         try {
             $allRecords = File::whereIn('file_type', ['master_file', 'transactional_file'])
-                              ->orderBy('created_at', 'desc')
-                              ->get();
+                ->orderBy('created_at', 'desc')
+                ->get();
             $this->status = 200;
             $this->response['data'] = $allRecords;
             return $this->getResponse();
@@ -396,9 +397,114 @@ class FileController extends ApiController
                 $settings = [
                     'qty' => $qty,
                 ];
+
+
+                if ($qty < 0) {
+                    $material = Material::find($materialId);
+                    $matchingInventory = null;
+
+                    $inventoryFile = File::where('file_type', 'inventory_file')
+                        ->get()
+                        ->first(function($file) use ($yearMonthInt) {
+                            $fileSettings = json_decode($file->settings, true);
+                            $fileMonthYear = str_replace('-', '', $fileSettings['monthYear']);
+                            return (int)$fileMonthYear === $yearMonthInt;
+                        });
+
+                    $inventoryIds = [];
+                    if ($inventoryFile) {
+                        $fileSettings = json_decode($inventoryFile->settings, true);
+                        $inventoryIds = $fileSettings['inventory_ids'] ?? [];
+                    }
+                    $inventories = Inventory::whereIn('inventory_id', $inventoryIds)->get();
+                    foreach ($inventories as $inventory) {
+                        $inventoryMaterial = Material::find($inventory->material_id);
+                        if ($inventoryMaterial && $inventoryMaterial->material_code === $material->material_code) {
+                            $matchingInventory = $inventory;
+                            break;
+                        }
+                    }
+
+                    if ($matchingInventory) {
+                        $usageQty = abs($qty);
+                        $matchingInventory->usage_qty += $usageQty;
+                        $matchingInventory->curr_stock = $matchingInventory->total_qty - $matchingInventory->usage_qty;
+                        $matchingInventory->save();
+
+                        // Process BOMs and Formulations
+                        $bomRecords = Bom::all();
+                        foreach ($bomRecords as $bom) {
+                            $formulationIds = json_decode($bom->formulations, true);
+                            $formulations = Formulation::whereIn('formulation_id', $formulationIds)->get();
+
+                            foreach ($formulations as $formulation) {
+                                $materialQtyList = json_decode($formulation->material_qty_list, true);
+                                $needsUpdate = false;
+
+                                foreach ($materialQtyList as $index => $materialDetails) {
+                                    foreach ($materialDetails as $materialListId => $details) {
+                                        $materialRecord = Material::find($materialListId);
+                                        
+                                        if ($materialRecord && $materialRecord->material_code === $material->material_code) {
+                                            $requiredQty = $details['qty'];
+                                            
+                                            if ($matchingInventory->curr_stock < $requiredQty) {
+                                                $needsUpdate = true;
+                                                $materialQtyList[$index][$materialListId]['status'] = 0;
+                                                $formulation->material_qty_list = json_encode($materialQtyList);
+                                                $formulation->save();
+                                                break 2;
+                                            }
+                                        }
+                                    }
+                                }
+
+                                if ($needsUpdate) {
+                                    // Update current formulation's FG
+                                    $fgRecord = FinishedGood::find($formulation->fg_id);
+                                    if ($fgRecord) {
+                                        $fgRecord->update(['is_least_cost' => 0]);
+
+                                        // Find alternative formulation with sufficient stock
+                                        foreach ($formulations as $altFormulation) {
+                                            if ($altFormulation->formulation_id === $formulation->formulation_id) {
+                                                continue;
+                                            }
+
+                                            $altMaterialQtyList = json_decode($altFormulation->material_qty_list, true);
+                                            $hasStock = true;
+
+                                            foreach ($altMaterialQtyList as $altMaterialDetails) {
+                                                foreach ($altMaterialDetails as $altMaterialId => $altDetails) {
+                                                    $altMaterialRecord = Material::find($altMaterialId);
+                                                    
+                                                    if ($altMaterialRecord && $altMaterialRecord->material_code === $material->material_code) {
+                                                        if ($matchingInventory->curr_stock < $altDetails['qty']) {
+                                                            $hasStock = false;
+                                                            break 2;
+                                                        }
+                                                    }
+                                                }
+                                            }
+
+                                            if ($hasStock) {
+                                                $altFgRecord = FinishedGood::find($altFormulation->fg_id);
+                                                if ($altFgRecord) {
+                                                    $altFgRecord->update(['is_least_cost' => 1]);
+                                                    break;
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
             }
 
             $passSettings = empty($settings) ? json_encode(new \stdClass()) : json_encode($settings);
+
 
             $transaction = Transaction::create([
                 'material_id' => $materialId,
@@ -592,14 +698,14 @@ class FileController extends ApiController
                 $materialLevel = intval($level);
                 $materialQty = $batchQty;
 
-                $year = intval(substr($this->monthYear,0,4));
-                $month = intval(substr($this->monthYear,4,2));
-                
+                $year = intval(substr($this->monthYear, 0, 4));
+                $month = intval(substr($this->monthYear, 4, 2));
+
                 $material = Material::where('material_code', $materialCode)
-                ->whereYear('date', $year)
-                ->whereMonth('date', $month)
-                ->orderBy('date', 'desc')
-                ->first();
+                    ->whereYear('date', $year)
+                    ->whereMonth('date', $month)
+                    ->orderBy('date', 'desc')
+                    ->first();
 
                 if ($material) {
                     $currentFormulation[] = [
@@ -766,7 +872,7 @@ class FileController extends ApiController
 
                 $settings = json_decode($file->settings, true);
                 $fileName = $settings['file_name_with_extension'];
-                
+
                 $monthYear = $settings['monthYear'];
                 $year = substr($monthYear, 0, 4);
                 $month = substr($monthYear, 4, 2);

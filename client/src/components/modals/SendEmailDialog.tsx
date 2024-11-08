@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RiFileWarningFill } from "react-icons/ri";
 import { IoIosClose } from "react-icons/io";
 import api from '@/utils/api';
@@ -50,6 +50,18 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+            setDialog(false);
+        }
+    };
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => {
+        document.removeEventListener('keydown', handleEscapeKey);
+    };
+}, [setDialog]);
+
 
   return (
     <>
@@ -91,7 +103,7 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
                 placeholder="Employee Number"
                 onChange={(e) => setEmployeeNum(e.target.value)}
               />
-              <div className='flex w-full justify-center'>
+              <div className='flex w-full justify-center mt-4'>
                 <button className='w-[50%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] bg-primary text-white rounded-xl hover:bg-[#9c1c1c]'
                   type='submit'
                 >

@@ -17,6 +17,7 @@ class Inventory extends Model
         'purchased_qty',
         'usage_qty',
         'total_qty',
+        'curr_stock'
     ];
 
     public $timestamps = true;

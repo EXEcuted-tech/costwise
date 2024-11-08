@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { IoIosClose } from 'react-icons/io';
 import { TiWarning } from "react-icons/ti";
 import Spinner from '../loaders/Spinner';
@@ -11,6 +11,19 @@ interface ConfirmDeleteProps {
 }
 
 const ConfirmDelete: React.FC<ConfirmDeleteProps> = ({ onClose, onProceed, subject, isLoading}) => {
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [onClose]);
+
+    
     return (
         <div className='flex justify-center items-center z-[1500] w-full h-full fixed top-0 left-0 p-4 overflow-auto backdrop-brightness-50'>
             <div className="flex flex-col w-[28rem] min-h-[380px] mx-[50px] px-3 py-2 bg-white dark:bg-[#5e5e5e] rounded-[20px] animate-pop-out drop-shadow">

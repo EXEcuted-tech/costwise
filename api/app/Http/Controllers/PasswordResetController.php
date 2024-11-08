@@ -11,6 +11,7 @@ use App\Mail\PasswordResetMail;
 use App\Models\User;
 use App\Models\PersonalAccessToken;
 
+
 class PasswordResetController extends Controller
 {
     public function sendResetLinkEmail(Request $request)
@@ -33,12 +34,14 @@ class PasswordResetController extends Controller
         return response()->json(['message' => 'Password reset link sent!']);
     }
 
-    public function verifyToken($token)
+    public function verifyToken(Request $request, $token)
     {
-        $resetRequest = DB::table('password_resets')->where('token', $token)->first();
 
-        if (!$resetRequest || Carbon::parse($resetRequest->created_at)->addMinutes(60)->isPast()) {
-            return response()->json(['message' => 'Invalid or expired token'], 404);
+        $tokens = PersonalAccessToken::where('token', hash('sha256', $token))
+                                ->first();
+
+        if (!$tokens || Carbon::parse($tokens->created_at)->addMinutes(15)->isPast()) {
+            return response()->json(['message' => 'Invalid or expired token'], 400);
         }
 
         return response()->json(['message' => 'Token is valid']);

@@ -28,11 +28,11 @@ const AllFG: React.FC<AllFGrops> = ({ isOpen, title, sheetData }) => {
       <div
         className={`${
           isOpen
-            ? "xl:py-3 xl:text-[21px] 2xl:text-[23px] 3xl:text-[26px] 4xl:text-[26px]"
-            : "xl:py-3 xl:text-[21px] 2xl:text-[26px] 3xl:text-[26px] 4xl:text-[26px] text-[26px]"
-        } h-14 rounded-t-2xl bg-[#B22222] text-white font-bold py-2 pl-7 uppercase drop-shadow-xl`}
+            ? "xl:py-3 xl:text-[22px] 2xl:text-[23px] 3xl:text-[24px] 4xl:text-[24px]"
+            : "xl:py-3 xl:text-[22px] 2xl:text-[24px] 3xl:text-[24px] 4xl:text-[24px] text-[24px]"
+        } h-14 rounded-t-2xl bg-[#B22222] text-white font-bold py-2 pl-7 capitalize drop-shadow-xl`}
       >
-        <p>{title}</p>
+        <p>📋 {title}</p>
       </div>
 
       {/* Main Content Area */}

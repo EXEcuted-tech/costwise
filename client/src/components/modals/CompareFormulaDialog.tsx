@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { IoClose } from 'react-icons/io5'
 import { MdCompare } from 'react-icons/md'
 import CustomCompareSelect from '../form-controls/CustomCompareSelect'
@@ -27,6 +27,19 @@ const CompareFormulaDialog: React.FC<{ setCompareFormula: React.Dispatch<React.S
         setViewFormulas(true);
         setCompareFormula(false);
     }
+
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setCompareFormula(false);
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [setCompareFormula]);
+
 
     return (
         <>
