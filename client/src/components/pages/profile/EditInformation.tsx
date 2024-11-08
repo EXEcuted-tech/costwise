@@ -43,7 +43,7 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
         setEmailError(false);
         setPhoneNumberError(false);
 
-        const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+        const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com|virginiafood\.com\.ph)$/i;
         const phoneRegex = /^\+63\s?9\d{9}$/;
 
         let errors: string[] = [];
@@ -61,7 +61,7 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
             errors.push("Email address is required.");
         } else if (!emailRegex.test(email)) {
             setEmailError(true);
-            errors.push("Please enter a valid email address.");
+            errors.push("Invalid email address DNS.");
         }
         if (!phoneNum) {
             setPhoneNumberError(true);
@@ -126,15 +126,14 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                     {/* 1st Col */}
                     <div className='flex flex-col ml-3 mr-8 w-[30%] gap-4'>
                         <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353]">First Name<span className='text-[#B22222] ml-1 font-bold'>*</span></p>
-                            <div className="flex flex-col w-full">
+                        <p className={`${firstNameError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>First Name <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                        <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white h-12 w-[95%] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
+                                        className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
                                         type="fname"
                                         name="fname"
                                         value={fName}
-                                        required
                                         onChange={(e) => setFName(e.target.value)}
                                         placeholder={userAcc?.fName}
                                     />
@@ -143,14 +142,13 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                         </div>
 
                         <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353]">Email Address<span className='text-[#B22222] ml-1 font-bold'>*</span></p>
-                            <div className="flex flex-col w-full">
+                        <p className={`${emailError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Email Address <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                        <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white h-12 w-[95%] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
+                                        className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                         type="email"
                                         name="email"
-                                        required
                                         value={email}
                                         onChange={(e) => setEmail(e.target.value)}
                                         placeholder={userAcc?.email}
@@ -160,11 +158,11 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                         </div>
 
                         <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353]">Department</p>
+                            <p className="text-[#5B5353] dark:text-[#d1d1d1]">Department</p>
                             <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[95%] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
+                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
                                         name="dept"
                                         placeholder={userAcc?.dept}
                                         disabled
@@ -178,11 +176,11 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                     {/* 2nd Col */}
                     <div className='flex flex-col mr-8 w-[30%] gap-4'>
                         <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353]">Middle Name</p>
+                            <p className="text-[#5B5353] dark:text-[#d1d1d1]">Middle Name</p>
                             <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[95%] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
+                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white w-full h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
                                         type="mname"
                                         name="mname"
                                         value={mName}
@@ -194,14 +192,13 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                         </div>
 
                         <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353]">Phone Number<span className='text-[#B22222] ml-1 font-bold'>*</span></p>
-                            <div className="flex flex-col w-full">
+                        <p className={`${phoneNumberError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Phone Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                        <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[95%] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
+                                        className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                         type="contactnum"
                                         name="contactnum"
-                                        required
                                         value={phoneNum}
                                         onChange={(e) => setPhoneNum(e.target.value)}
                                         placeholder={userAcc?.phoneNum}
@@ -211,11 +208,11 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                         </div>
 
                         <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353]">Employee Number</p>
+                            <p className="text-[#5B5353] dark:text-[#d1d1d1]">Employee Number</p>
                             <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[95%] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
+                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
                                         type="enum"
                                         name="enum"
                                         placeholder={userAcc?.employeeNum}
@@ -229,14 +226,13 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                     {/* 3rd Col */}
                     <div className='flex flex-col mr-6 w-[30%] gap-4'>
                         <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353]">Last Name<span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                        <p className={`${lastNameError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Last Name<span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                             <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[95%] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
+                                        className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
                                         type="lname"
                                         name="lname"
-                                        required
                                         value={lName}
                                         onChange={(e) => setLName(e.target.value)}
                                         placeholder={userAcc?.lName}
@@ -246,11 +242,11 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                         </div>
 
                         <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353]">Suffix</p>
+                            <p className="text-[#5B5353] dark:text-[#d1d1d1]">Suffix</p>
                             <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[95%] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
+                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
                                         type="suffix"
                                         name="suffix"
                                         value={suffix}
@@ -262,11 +258,11 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                         </div>
 
                         <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353]">Role</p>
+                            <p className="text-[#5B5353] dark:text-[#d1d1d1]">Role</p>
                             <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[95%] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
+                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
                                         type="role"
                                         name="role"
                                         placeholder={userAcc?.position}
