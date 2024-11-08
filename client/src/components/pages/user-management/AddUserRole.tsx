@@ -130,18 +130,18 @@ const [selectedUserType, setSelectedUserType] = useState<string>('Regular');
             onClick={handleCloseModal} />
         </div>
         <div className='flex justify-center '>
-          <BsPersonLock className='text-[55px] text-[#5B5353]' />
+          <BsPersonLock className='text-[55px] text-[#5B5353] dark:text-white' />
         </div>
         <div className='flex flex-col justify-center items-center pb-[20px]'>
           <h1 className='font-black text-[28px] dark:text-white'>Assign User Roles</h1>
           <p className='text-center text-[#9D9D9D] dark:text-[#d1d1d1] text-[17px] px-[30px]'>
-            Select the user's type and roles (access rights) you want to assign to the user.
+            Select the user&apos;s type and roles (access rights) you want to assign to the user.
           </p>
         </div>
 
         <div className='flex flex-row justify-center items-center gap-[10px] mb-2'>
           <p className='text-[17px] dark:text-white'>User Type: <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
-          <select className='w-[150px] text-[17px] rounded-lg border border-gray-300 p-1'
+          <select className='w-[150px] text-[17px] rounded-lg border border-gray-300 p-1 dark:bg-[#5e5e5e] dark:text-white'
             value={selectedUserType}
             onChange={handleUserTypeChange}
           >
