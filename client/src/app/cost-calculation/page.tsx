@@ -27,9 +27,7 @@ const CostCalculation = () => {
   const [alertMessages, setAlertMessages] = useState<string[]>([]);
   const [alertStatus, setAlertStatus] = useState<string>("");
   const { currentUser, setError } = useUserContext();
-  const [isMonthYearLoading, setIsMonthYearLoading] = useState(true);
   const [showScrollTop, setShowScrollTop] = useState(false);
-
   const [monthYearOptions, setMonthYearOptions] = useState<
     { value: number; label: string }[]
   >([]);
@@ -77,6 +75,7 @@ const CostCalculation = () => {
   const [trainingSpeed, setTrainingSpeed] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [prompt, setPrompt] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(false);
 
   useEffect(() => {
     const handleScroll = () => {
@@ -248,14 +247,15 @@ const CostCalculation = () => {
       sheetData = allFGData;
     }
 
-    if (
-      selectedFG === "All-FG" &&
-      !costData.some((entry) => entry.monthYear === currentMonthYear) &&
-      costData[0].products.every((product) =>
-        allFGData.some(
-          (allFGProduct) => product.productName == allFGProduct.fg_desc
+    if (selectedFG === "All-FG" && 
+        costData.length > 0 &&
+        !costData.some((entry) => entry.monthYear === currentMonthYear) &&
+        costData[0].products &&
+        costData[0].products.every((product) =>
+          allFGData.some(
+            (allFGProduct) => product.productName === allFGProduct.fg_desc
+          )
         )
-      )
     ) {
       setPrompt(true);
     } else {
@@ -354,24 +354,16 @@ const CostCalculation = () => {
   }, [trained]);
 
   //Retrieve month and year options
-  const retrieveMonthYearOptions = async () => {
-    setIsMonthYearLoading(true);
-    try {
+  const retrieveMonthYearOptions = async () => {    try {
       const response = await api.get(
         "/cost_calculation/retrieve_month_year_options"
       );
       if (response.status === 200) {
         setMonthYearOptions(response.data.data);
-        if (response.data.data.length > 0) {
-          const latestOption = response.data.data[0];
-          handleMonthYear(latestOption.value.toString(), latestOption.label);
-        }
       }
     } catch (error) {
       setAlertMessages(["Error retrieving month and year options."]);
       setAlertStatus("critical");
-    } finally {
-      setIsMonthYearLoading(false);
     }
   };
 
@@ -401,6 +393,7 @@ const CostCalculation = () => {
   };
 
   const retrieveAllFG = async (monthYear: number) => {
+    setIsDataLoading(true);
     try {
       const response = await api.get("/finished_goods/retrieve_allFG", {
         params: { monthYear: monthYear },
@@ -416,6 +409,8 @@ const CostCalculation = () => {
       console.error("Error retrieving FG options:", error);
       setAlertMessages([...alertMessages, "Error retrieving FG options."]);
       setAlertStatus("critical");
+    } finally {
+      setIsDataLoading(false);
     }
   };
 
@@ -425,7 +420,6 @@ const CostCalculation = () => {
     if (monthYear.value !== 0) {
       retrieveAllFG(monthYear.value);
       retrieveFGOptions(monthYear.value);
-      setIsMonthYearLoading(false);
     } else {
       setFGOptions([]);
     }
@@ -492,32 +486,25 @@ const CostCalculation = () => {
           </div>
           <div className="mt-2">
             <BiCalendarEvent className="absolute text-[30px] text-[#6b6b6b82] dark:text-[#d1d1d1] mt-[6px] ml-2 z-[3]" />
-            {isMonthYearLoading ? (
-              <div className="w-[280px] h-[45px] pl-12 pr-3 flex items-center justify-center bg-white dark:bg-[#1E1E1E] border-1 border-[#929090] rounded-md drop-shadow-md">
-                <Loader className='h-6'/>
-              </div>
-            ) : (
-              <select
-                className="w-[280px] h-[45px] text-[21px] pl-[42px] pr-4 text-[#000000] dark:text-[#d1d1d1] bg-white dark:bg-[#1E1E1E] border-1 border-[#929090] rounded-md drop-shadow-md cursor-pointer"
-                name="Month & Year"
-                defaultValue={monthYear.value.toString()}
-                onChange={(e) =>
-                  handleMonthYear(
-                    e.target.value,
-                    e.target.options[e.target.selectedIndex].text
-                  )
-                }
-              >
-                <option value="" className="dark:text-white" disabled>
-                  mm-yyyy
+            <select
+              className="w-[280px] h-[45px] text-[21px] pl-[42px] pr-4 text-[#000000] dark:text-[#d1d1d1] bg-white dark:bg-[#1E1E1E] border-1 border-[#929090] rounded-md drop-shadow-md cursor-pointer"
+              name="Month & Year"
+              onChange={(e) =>
+                handleMonthYear(
+                  e.target.value,
+                  e.target.options[e.target.selectedIndex].text
+                )
+              }
+            >
+              <option value="" className="dark:text-white" selected disabled>
+                mm-yyyy
+              </option>
+              {monthYearOptions.map((option, index) => (
+                <option key={index} value={option.value}>
+                  {option.label}
                 </option>
-                {monthYearOptions.map((option, index) => (
-                  <option key={index} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            )}
+              ))}
+            </select>
           </div>
           {/* FG Selector */}
           <div className="flex mt-4">
@@ -595,6 +582,7 @@ const CostCalculation = () => {
             title={`Cost Summary Report: ${monthYear.label}`}
             isOpen={isOpen}
             sheetData={allFGData}
+            isLoading={isDataLoading}
           />
         ) : (
           sheets.map((sheet) => (

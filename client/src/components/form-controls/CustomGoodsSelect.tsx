@@ -50,7 +50,7 @@ const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placehol
         <div className="flex items-center w-full">
           <input
             type="text"
-            className={`${selectedOption ? 'w-[calc(100%-20px)] text-white group-hover:text-[#6B6B6B]' : 'w-full text-white hover:text-[#6B6B6B] placeholder:text-white group-hover:placeholder:text-[#6B6B6B]'} bg-transparent  outline-none focus:ring-0 border-none pr-4  dark:bg-[#3C3C3C] dark:text-[#d1d1d1] dark:placeholder:text-[#d1d1d1]`}
+            className={`${selectedOption ? 'w-[calc(100%-20px)] text-white group-hover:text-[#6B6B6B]' : 'w-full text-white hover:text-[#6B6B6B] placeholder:text-white group-hover:placeholder:text-[#d1d1d1]'} bg-transparent  outline-none focus:ring-0 border-none pr-4  dark:bg-[#3C3C3C] dark:text-[#d1d1d1] dark:placeholder:text-[#d1d1d1]`}
             onChange={(e) => handleInputChange(e.target.value)}
             placeholder={`🔍 ${placeholder}`}
             value={selectedOption ? `📋 ${selectedOption.name}` : inputValue}
@@ -77,7 +77,7 @@ const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placehol
               </div>
             ))
           ) : (
-            <div className="p-2 text-center text-[#6B6B6B] whitespace-nowrap">No options found for the month year.</div>
+            <div className="p-2 text-center text-[#6B6B6B] whitespace-nowrap dark:text-[#d1d1d1]">No options found for the month year.</div>
           )}
         </div>
       )}

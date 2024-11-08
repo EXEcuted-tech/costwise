@@ -1,14 +1,18 @@
-import React from "react";
+import React, { useState } from "react";
 import { AllFinishedGood } from "@/types/data";
+import Spinner from "@/components/loaders/Spinner";
+import { RiFileCloseFill } from "react-icons/ri";
 
 type AllFGrops = {
   isOpen?: boolean;
   title: String;
   sheetData: AllFinishedGood[];
+  isLoading: boolean;
 };
 
-const AllFG: React.FC<AllFGrops> = ({ isOpen, title, sheetData }) => {
-  const columnNames = [
+const AllFG: React.FC<AllFGrops> = ({ isOpen, title, sheetData, isLoading }) => {
+
+    const columnNames = [
     "No.",
     "Item Code",
     "Description",
@@ -55,9 +59,22 @@ const AllFG: React.FC<AllFGrops> = ({ isOpen, title, sheetData }) => {
             </tr>
           </thead>
           <tbody>
-            {sheetData.map((data, index) => (
-              <tr
-                key={data.fg_id}
+          {isLoading ? (
+                <tr>
+                  <td
+                    colSpan={columnNames.length}
+                    className="text-center py-[14rem] dark:text-white"
+                  >
+                    <div className='flex justify-center items-center'>
+                      <Spinner />
+                    </div>
+                  </td>
+                </tr>
+              ) : sheetData.length > 0 ? (
+                <>
+                  {sheetData.map((data, index) => (
+                    <tr
+                      key={data.fg_id}
                 className={`text-[#6B6B6B] dark:text-[#d1d1d1] ${
                   isOpen
                     ? "xl:text-[16px] 2xl:text-[17px] 3xl:text-[20px] 4xl:text-[20px]"
@@ -73,7 +90,18 @@ const AllFG: React.FC<AllFGrops> = ({ isOpen, title, sheetData }) => {
                 <td className="text-right px-6">{data.total_cost}</td>
               </tr>
             ))}
-          </tbody>
+            
+          </>
+        ) : (
+          <tr>
+          <td colSpan={columnNames.length} className="items-center justify-items-center text-center font-semibold pt-[13rem] text-[#555555] dark:text-white">
+            <RiFileCloseFill className='text-[85px] mb-4' />
+            No report created. <br /> Select a month year period to
+            create the cost summary report.
+            </td>
+          </tr>
+          )}
+        </tbody>
         </table>
       </div>
     </div>
