@@ -44,7 +44,7 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
         setEmployeeNumError(true);
         newAlertMessages.push("Employee number is required.");
       } else if (employeeNum.length !== 10){
-        setAlertMessage("Invalid employee number.");
+        setAlertMessages(["Invalid employee number."]);
       }
 
       const response = await api.post('/password-reset/email', { email, employeeNum });
