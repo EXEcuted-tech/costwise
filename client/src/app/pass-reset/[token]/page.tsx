@@ -46,7 +46,7 @@ const PasswordReset = () => {
       
         if (!passwordConfirmation) {
             errors.push("Confirm Password is required.");
-        }else if (password != passwordConfirmation){
+        }else if (password != passwordConfirmation && password){
             errors.push("Please make sure your passwords match.");
         }
     
