@@ -191,6 +191,7 @@ const TransactionFileContainer = (data: File) => {
 
       if (saveResponse.data.status === 200) {
         setSuccessMessage('Transaction sheet saved successfully.');
+        setIsEdit(false);
       } else {
         if (saveResponse.data.message) {
           setAlertMessages([saveResponse.data.message]);
@@ -244,6 +245,7 @@ const TransactionFileContainer = (data: File) => {
 
         if (deleteResponse.data.status === 200) {
           setSuccessMessage('Transaction/s archived successfully.');
+          setIsEdit(false);
         } else {
           setAlertMessages(['Failed to bulk archive Transactions.']);
         }

@@ -72,13 +72,13 @@ const ViewUserRoles: React.FC<AddUserRolesProps> = ({ onClose, user_id }) => {
 
   return (
     <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000]'>
-      <div className='animate-pop-out flex flex-col bg-white w-[850px] h-auto rounded-[20px] px-[10px] overflow-y-auto'>
+      <div className='animate-pop-out flex flex-col bg-white w-[850px] h-auto rounded-[20px] px-[10px] overflow-y-auto dark:bg-[#1E1E1E] dark:text-[#d1d1d1]'>
         <div className='flex justify-end'>
           <IoIosClose className='text-[60px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out'
             onClick={handleCloseModal} />
         </div>
         <div className='flex justify-center '>
-          <BsPersonLock className='text-[55px] text-[#5B5353]' />
+          <BsPersonLock className='text-[55px] text-[#5B5353] dark:text-[#d1d1d1]' />
         </div>
         <div className='flex flex-col justify-center items-center pb-[20px]'>
           <h1 className='font-black text-[28px]'>User Roles</h1>
@@ -93,7 +93,7 @@ const ViewUserRoles: React.FC<AddUserRolesProps> = ({ onClose, user_id }) => {
               <div className='grid grid-cols-3 gap-x-4 gap-y-2 p-3'>
                 {roles.map((role, index) => (
                   <div key={index} className='flex items-center pl-3 animate-zoomIn'>
-                    <CiSquareCheck className='text-primary text-[19px] mr-2 flex-shrink-0' />
+                    <CiSquareCheck className='text-primary text-[19px] mr-2 flex-shrink-0 dark:text-[#FF4343FF]' />
                     <p className=' text-[21px] truncate'>{role}</p>
                   </div>
                 ))}

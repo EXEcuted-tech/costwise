@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from 'react'
 import { RiFileWarningFill } from "react-icons/ri";
-import { IoIosClose } from "react-icons/io";
+import { IoIosClose, IoIosWarning } from "react-icons/io";
 import api from '@/utils/api';
 import { useSearchParams, useParams } from 'next/navigation';
 import { useUserContext } from '@/contexts/UserContext';
@@ -9,6 +9,7 @@ import PasswordChangeComplete from '@/components/modals/PasswordChangeComplete';
 import Alert from '@/components/alerts/Alert';
 import Spinner from '@/components/loaders/Spinner';
 import ErrorToken from '@/components/modals/ErrorToken';
+import { IoMdInformationCircle } from "react-icons/io";
 
 
 const PasswordReset = () => {
@@ -39,7 +40,10 @@ const PasswordReset = () => {
 
         if (!password) {
             errors.push("Password is required.");
+        } else if(password.length < 8) {
+          errors.push("Password must be at least 8 characters.");
         }
+      
         if (!passwordConfirmation) {
             errors.push("Confirm Password is required.");
         }else if (password != passwordConfirmation){
@@ -69,7 +73,6 @@ const PasswordReset = () => {
     const fetchData = async () => {
       
       try {
-          console.log("hi bitch")
           const tokens = await api.get(`/password-reset/${token}`, { params: { email } });
           if (tokens.data.message === 'Invalid or expired token') {
             setUnavail(true);
@@ -94,11 +97,14 @@ const PasswordReset = () => {
           }} />
         ))}
       </div>
-      <div className='flex flex-col animate-pop-out bg-white w-[550px] h-auto pb-[30px] rounded-[20px] px-[10px] gap-5'>
+      <div className='flex flex-col animate-pop-out bg-white w-[550px] h-auto pb-[30px] rounded-[20px] px-[10px] gap-3'>
       <div className='flex justify-center'>
           <h1 className='font-black text-[30px] mt-[20px]'>Password Change</h1>
       </div>
-
+        <div className='flex bg-[#E8E8E8] mx-5 h-10 items-center gap-2 rounded-[10px]'>
+            <IoMdInformationCircle className='text-[30px] ml-[10px]' />
+            <p className='text-[18px] font-bold'>Use at least 8 characters</p>
+        </div>
       <form onSubmit={handleSubmit} className='flex flex-col w-full px-5 gap-5'>
           <label>
           Enter New Password:
