@@ -195,10 +195,7 @@ const AccountCreation = () => {
         if (!employee_number) {
             newAlertMessages.push('Employee number is required.');
             setEmployeeNumberError(true);
-        } else if (employee_number.length < 10) {
-            newAlertMessages.push('Employee number must be 10 digits.');
-            setEmployeeNumberError(true);
-        } else if (employee_number.length > 10) {
+        } else if (employee_number.length < 10 || employee_number.length > 10) {
             newAlertMessages.push('Employee number must be 10 digits.');
             setEmployeeNumberError(true);
         }
@@ -212,11 +209,6 @@ const AccountCreation = () => {
         if (!position) {
             newAlertMessages.push('Position is required.');
             setPositionError(true);
-        }
-        if (!profileImage) {
-            newAlertMessages.push('Profile picture is required.');
-            setAlertStatus('critical');
-            setProfilePictureError(true);
         }
         if (selectedRoleValues.length === 0) {
             newAlertMessages.push("Please assign atleast one role to the user.")
@@ -326,6 +318,7 @@ const AccountCreation = () => {
                     onConfirm={handleConfirmRoles}
                     initialSelectedRoles={selectedRoles}
                     initialSelectedRoleValues={selectedRoleValues}
+                    isEditing={false}
                 />
             )}
 
