@@ -40,7 +40,7 @@ function ForgotPassPage() {
     if (!employeeNum) {
       errors.push("Employee number is required.");
     } else if (!/^\d{10}$/.test(employeeNum)) {
-      errors.push("Employee number should be 10 digits.");
+      errors.push("Invalid employee number.");
     }
 
     if (errors.length > 0) {

@@ -2,7 +2,7 @@ import React from 'react'
 import { RiFileWarningFill } from "react-icons/ri";
 import { IoIosWarning } from "react-icons/io";
 
-const EmailSent: React.FC = () => {
+const ErrorToken: React.FC = () => {
 
   const handleClose = () => {
     window.close();
@@ -38,4 +38,4 @@ const EmailSent: React.FC = () => {
   )
 }
 
-export default EmailSent
+export default ErrorToken

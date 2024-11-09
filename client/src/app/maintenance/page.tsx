@@ -68,7 +68,7 @@ const SystemMaintenance = () => {
 
     fetchSystemData();
     retrieveAllReleaseNotes();
-  }, []);
+  });
 
   useEffect(() => {
     //Search function
