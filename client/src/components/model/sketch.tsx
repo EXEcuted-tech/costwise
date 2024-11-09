@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import * as _ from 'lodash';
+import * as _ from "lodash";
 import * as tf from "@tensorflow/tfjs";
 import api from "@/utils/api";
 import {
@@ -376,7 +376,9 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
               <button
                 onClick={prev}
                 disabled={currentIndex === 0}
-                className={`${isOpen ? 'pl-[0px]' : 'pl-[5%]'} p-1 text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200`}
+                className={`${
+                  isOpen ? "pl-[0px]" : "pl-[5%]"
+                } p-1 text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200`}
                 aria-label="Previous predictions"
               >
                 &#9664; {/* Left arrow */}
@@ -403,7 +405,9 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
               <button
                 onClick={next}
                 disabled={currentIndex + itemsPerPage >= totalPrediction.length}
-                className={`${isOpen ? 'pr-[0px]' : 'pr-[5%]'} p-1 text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200`}
+                className={`${
+                  isOpen ? "pr-[0px]" : "pr-[5%]"
+                } p-1 text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200`}
                 aria-label="Next predictions"
               >
                 &#9654; {/* Right arrow */}
