@@ -19,8 +19,8 @@ const ReleaseNoteTile:React.FC<ReleaseNoteTileProps> = ({note, onViewNotes}) => 
     const { isOpen } = useSidebarContext();
     
     return (
-        <div className='flex w-full h-[65px] mb-5 items-center bg-[#F5F5F5] dark:bg-[#121212] drop-shadow-lg rounded-lg group hover:bg-[#e3e3e3] dark:hover:bg-[#4C4C4C] transition-colors duration-300 ease-in-out leading-tight'>
-            <div className='flex w-[8rem] h-full px-10 font-semibold text-[20px] text-[#5B5353] text-center items-center border-r-2 border-[#92909041] bg-[#f1f1f1a1] dark:bg-[#121212] dark:text-white '>
+        <div className='flex w-full h-[65px] mb-5 items-center bg-[#F5F5F5] dark:bg-[#5e5e5e] drop-shadow-lg rounded-lg group hover:bg-[#e3e3e3] dark:hover:bg-[#4C4C4C] transition-colors duration-300 ease-in-out leading-tight'>
+            <div className='flex w-[8rem] h-full px-10 font-semibold text-[20px] text-[#5B5353] text-center items-center border-r-2 border-[#92909041] bg-[#f1f1f1a1] dark:bg-[#5e5e5e] dark:text-white '>
                 <span>{formatDate(note.created_at)}</span>
             </div>
             <div className='flex flex-row w-[80%]'>

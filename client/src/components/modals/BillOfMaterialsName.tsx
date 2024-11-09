@@ -1,24 +1,42 @@
 import { useFormulationContext } from '@/contexts/FormulationContext';
-import React from 'react'
+import React, { useEffect } from 'react'
 import { FaFileSignature } from "react-icons/fa";
 import { IoIosClose } from "react-icons/io";
 import Spinner from '../loaders/Spinner';
 
 
-const BillOfMaterialsName = ({ setSaveBomName, handleSaveToBOMList, isLoading }: {
+const BillOfMaterialsName = ({ setSaveBomName, handleSaveToBOMList, setError, isLoading, error }: {
     setSaveBomName: (value: boolean) => void,
     handleSaveToBOMList: () => void,
-    isLoading: boolean
-    }) => {
+    setError: (value: boolean) => void,
+    isLoading: boolean,
+    error: boolean
+}) => {
 
     const { setBomName } = useFormulationContext();
+
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setSaveBomName(false);
+                setError(false);
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [setError, setSaveBomName]);
 
     return (
         <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[1000] z-[1000]'>
             <div className='animate-pop-out bg-white dark:bg-[#3c3c3c] w-[460px] h-[380px] rounded-[20px] px-[10px]'>
                 <div className='flex justify-end'>
                     <IoIosClose className='mt-[2px] text-[70px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out'
-                        onClick={() => { setSaveBomName(false) }} />
+                        onClick={() => { 
+                            setSaveBomName(false)
+                            setError(false)
+                        }} />
                 </div>
                 <div className='flex justify-center'>
                     <FaFileSignature className='text-[75px] text-[#FFCC00]' />
@@ -33,7 +51,7 @@ const BillOfMaterialsName = ({ setSaveBomName, handleSaveToBOMList, isLoading }:
                     <input
                         type="text"
                         placeholder="Enter BOM name"
-                        className='w-full px-[15px] py-[10px] border border-gray-300 rounded-[10px] text-[16px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]'
+                        className={`${error ? 'border-red-500 placeholder:text-red-500' : 'border-gray-300'} w-full px-[15px] py-[10px] border rounded-[10px] text-[16px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
                         onChange={(e) => setBomName(e.target.value)}
                     />
                 </div>

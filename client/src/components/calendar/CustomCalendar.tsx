@@ -20,6 +20,8 @@ type Event = {
 
 const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
     const [currentDate, setCurrentDate] = useState(new Date());
+    const [todayDate, setTodayDate] = useState<Date>(new Date());
+    const [handleToday, setHandleToday] = useState(false);
     const { isOpen, isAdmin } = useSidebarContext();
 
     const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -43,6 +45,7 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
         const firstDayOfMonth = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1).getDay();
         const daysInCurrentMonth = daysInMonth(currentDate.getMonth(), currentDate.getFullYear());
 
+
         const calendarArray: (number | null)[] = [];
 
         for (let i = 0; i < firstDayOfMonth; i++) {
@@ -54,6 +57,8 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
         }
 
         setCalendarDays(calendarArray);
+
+        setTodayDate(new Date());
 
         const fetchEvents = async () => {
             try {
@@ -160,15 +165,25 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
         );
     };
 
+    const handleTodayDate = () => {
+        setCurrentDate(new Date());
+    }
+
     return (
         <>
             <div className={`bg-white dark:bg-[#3C3C3C] rounded-lg shadow-lg overflow-hidden ${className}`}>
                 <div className="bg-primary dark:bg-[#8B0000] text-center p-[10px] flex justify-between items-center">
                     <span className={`${isOpen ? 'text-[12px] 2xl:text-[15px] 3xl:text-[22px]' : 'text-[16px] 2xl:text-[22px] 3xl:text-[28px]'} flex items-center ml-[15px] text-white font-bold`}>
-                        <BsCalendarDateFill className='text-white mr-[6px]' />
+                        <div 
+                            title="Click to view today's date."
+                            onClick={() => handleTodayDate()}
+                            className="flex items-center justify-center w-8 h-8 mr-2 text-[21px] bg-primary border-3 border-white rounded-lg cursor-pointer hover:animate-border-pulse hover:bg-white hover:text-red-600  transition-colors duration-250 ease-in-out"
+                        >
+                            {todayDate.getDate()}
+                        </div>
                         {monthNames[currentDate.getMonth()]} {currentDate.getFullYear()}
                     </span>
-                    <div className='flex gap-1 mr-[15px]'>
+                    <div className='flex gap-1 mr-[5px]'>
                         <button
                             onClick={handlePreviousMonth}
                             className="hover:animate-shake-tilt"
@@ -194,10 +209,11 @@ const CustomCalendar: React.FC<CustomCalendarProps> = ({ className }) => {
                     {calendarDays.map((day, index) => (
                         <span
                             key={index}
+                            title={day !== null ? "Click to view or create an event." : ""}
                             className={`text-[12px] 2xl:text-[16px] py-2 font-medium rounded-full transition-colors cursor-pointer
                             ${day === null ? 'invisible' : ''}
-                            ${isEventDay(day) ? 'bg-primary text-white hover:bg-red-600' : ''}
-                            ${day === new Date().getDate() && new Date().getMonth() === currentDate.getMonth() && new Date().getFullYear() === currentDate.getFullYear() ? 'bg-secondary dark:bg-brightness-50 text-black hover:brightness-90' : 'dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600'}`}
+                            ${isEventDay(day) ? 'bg-[#fffbb6] border-secondary border-2 text-black hover:bg-secondary dark:bg-[#fffbb6] dark:text-[#030303] dark:hover:bg-secondary dark:hover:text-black' : ''}
+                            ${day === new Date().getDate() && new Date().getMonth() === currentDate.getMonth() && new Date().getFullYear() === currentDate.getFullYear() ? 'bg-[#fcbdbd] border-primary border-2 dark:bg-brightness-50 dark:text-black text-black hover:bg-primary hover:text-white' : 'dark:text-white hover:bg-gray-200 dark:hover:bg-gray-600'}`}
                             onClick={() => handleDayClick(day)}
                         >
                             {day}

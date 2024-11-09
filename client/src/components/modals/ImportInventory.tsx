@@ -175,7 +175,6 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
             setIsLoading(false);
         }
 
-
         // Reset form
         setFile(null);
         setFileName('');
@@ -183,6 +182,18 @@ const ImportInventoryList: React.FC<ImportInventoryListProps> = ({ onClose }) =>
         setFileSize(0);
         setMonthYear('');
     }
+
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                onClose();
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [onClose]);
 
     return (
         <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed bg-[rgba(0,0,0,0.5)] z-[1000]'>

@@ -250,10 +250,13 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
                                 onClick={() => {
                                     if (onSave) {
                                         onSave(tableData);
+                                        if (!isTransaction) {
+                                            setIsEdit(false);
+                                        }
                                     } else if (onSaveBOM && bomId) {
                                         onSaveBOM(tableData, bomId);
+                                        setIsEdit(false);
                                     }
-                                    setIsEdit(false);
                                 }}>
                                 <IoIosSave className='mr-[5px]' />
                                 Save

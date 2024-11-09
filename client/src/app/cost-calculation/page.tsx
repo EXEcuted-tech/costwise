@@ -18,6 +18,8 @@ import { request } from "http";
 import TrainingLoader from "@/components/loaders/TrainingLoader";
 import { useUserContext } from "@/contexts/UserContext";
 import ConfirmTraining from "@/components/modals/ConfirmTraining";
+import Loader from "@/components/loaders/Loader";
+import { IoIosArrowUp } from "react-icons/io";
 
 const CostCalculation = () => {
   const { isOpen } = useSidebarContext();
@@ -25,7 +27,7 @@ const CostCalculation = () => {
   const [alertMessages, setAlertMessages] = useState<string[]>([]);
   const [alertStatus, setAlertStatus] = useState<string>("");
   const { currentUser, setError } = useUserContext();
-
+  const [showScrollTop, setShowScrollTop] = useState(false);
   const [monthYearOptions, setMonthYearOptions] = useState<
     { value: number; label: string }[]
   >([]);
@@ -73,6 +75,23 @@ const CostCalculation = () => {
   const [trainingSpeed, setTrainingSpeed] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [prompt, setPrompt] = useState(false);
+  const [isDataLoading, setIsDataLoading] = useState(false);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      setShowScrollTop(window.scrollY > 300);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  const scrollToTop = () => {
+    window.scrollTo({
+      top: 0,
+      behavior: 'smooth'
+    });
+  };
 
   const fetchData = async () => {
     try {
@@ -119,10 +138,22 @@ const CostCalculation = () => {
         prevSheets[prevSheets.length - 1].data !== null
       ) {
         const newId = Math.max(...prevSheets.map((sheet) => sheet.id), 0) + 1;
+        setTimeout(() => {
+          window.scrollTo({
+            top: document.documentElement.scrollHeight,
+            behavior: 'smooth'
+          });
+        }, 100);
         return [...prevSheets, { id: newId, data: null }];
       }
-      setAlertMessages(["Choose a Finished Good first!"]);
+      setAlertMessages(["Choose a Finished Good in the empty sheet first!"]);
       setAlertStatus("critical");
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth'
+        });
+      }, 100);
       return prevSheets;
     });
   };
@@ -216,14 +247,15 @@ const CostCalculation = () => {
       sheetData = allFGData;
     }
 
-    if (
-      selectedFG === "All-FG" &&
-      !costData.some((entry) => entry.monthYear === currentMonthYear) &&
-      costData[0].products.every((product) =>
-        allFGData.some(
-          (allFGProduct) => product.productName == allFGProduct.fg_desc
+    if (selectedFG === "All-FG" && 
+        costData.length > 0 &&
+        !costData.some((entry) => entry.monthYear === currentMonthYear) &&
+        costData[0].products &&
+        costData[0].products.every((product) =>
+          allFGData.some(
+            (allFGProduct) => product.productName === allFGProduct.fg_desc
+          )
         )
-      )
     ) {
       setPrompt(true);
     } else {
@@ -322,8 +354,7 @@ const CostCalculation = () => {
   }, [trained]);
 
   //Retrieve month and year options
-  const retrieveMonthYearOptions = async () => {
-    try {
+  const retrieveMonthYearOptions = async () => {    try {
       const response = await api.get(
         "/cost_calculation/retrieve_month_year_options"
       );
@@ -362,6 +393,7 @@ const CostCalculation = () => {
   };
 
   const retrieveAllFG = async (monthYear: number) => {
+    setIsDataLoading(true);
     try {
       const response = await api.get("/finished_goods/retrieve_allFG", {
         params: { monthYear: monthYear },
@@ -377,6 +409,8 @@ const CostCalculation = () => {
       console.error("Error retrieving FG options:", error);
       setAlertMessages([...alertMessages, "Error retrieving FG options."]);
       setAlertStatus("critical");
+    } finally {
+      setIsDataLoading(false);
     }
   };
 
@@ -441,7 +475,7 @@ const CostCalculation = () => {
 
       <Header icon={BiSolidReport} title="Cost Calculation" />
 
-      <div className="flex mt-[30px] ml-[80px] mr-[35px]">
+      <div className="flex mt-[16px] ml-[80px] mr-[35px]">
         <div className="w-[30rem] pb-8">
           {/* Date Range */}
           <div className="flex">
@@ -453,9 +487,8 @@ const CostCalculation = () => {
           <div className="mt-2">
             <BiCalendarEvent className="absolute text-[30px] text-[#6b6b6b82] dark:text-[#d1d1d1] mt-[6px] ml-2 z-[3]" />
             <select
-              className="w-[220px] h-[45px] text-[21px] pl-[42px] pr-4 text-[#000000] dark:text-[#d1d1d1] bg-white dark:bg-[#1E1E1E] border-1 border-[#929090] rounded-md drop-shadow-md cursor-pointer"
+              className="w-[280px] h-[45px] text-[21px] pl-[42px] pr-4 text-[#000000] dark:text-[#d1d1d1] bg-white dark:bg-[#1E1E1E] border-1 border-[#929090] rounded-md drop-shadow-md cursor-pointer"
               name="Month & Year"
-              defaultValue=""
               onChange={(e) =>
                 handleMonthYear(
                   e.target.value,
@@ -463,7 +496,7 @@ const CostCalculation = () => {
                 )
               }
             >
-              <option value="" className="dark:text-white" disabled>
+              <option value="" className="dark:text-white" selected disabled>
                 mm-yyyy
               </option>
               {monthYearOptions.map((option, index) => (
@@ -476,24 +509,26 @@ const CostCalculation = () => {
           {/* FG Selector */}
           <div className="flex mt-4">
             <div
+              title="Click to create specific finished goods report"
               onClick={() => handleFGClick("Specific-FG")}
               className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-l-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                    ${
-                                      selectedFG === "Specific-FG"
-                                        ? "bg-[#B22222] text-white"
-                                        : "bg-white hover:bg-[#ebebeb] dark:bg-[#1E1E1E] dark:text-white text-black transition-colors duration-200 ease-in-out"
-                                    }`}
+              ${
+                selectedFG === "Specific-FG"
+                  ? "bg-[#B22222] text-white"
+                  : "bg-white hover:bg-[#ebebeb] dark:bg-[#1E1E1E] dark:text-white text-black transition-colors duration-200 ease-in-out"
+              }`}
             >
               Specific-FG
             </div>
             <div
+              title="Click to create summarized finished goods report"
               onClick={() => handleFGClick("All-FG")}
               className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-r-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-                                    ${
-                                      selectedFG === "All-FG"
-                                        ? "bg-[#B22222] text-white"
-                                        : "bg-white hover:bg-[#ebebeb] dark:bg-[#1E1E1E] dark:text-white text-black transition-colors duration-200 ease-in-out"
-                                    }`}
+              ${
+                selectedFG === "All-FG"
+                  ? "bg-[#B22222] text-white"
+                  : "bg-white hover:bg-[#ebebeb] dark:bg-[#1E1E1E] dark:text-white text-black transition-colors duration-200 ease-in-out"
+              }`}
             >
               All-FG
             </div>
@@ -517,6 +552,7 @@ const CostCalculation = () => {
             </select>
 
             <button
+              title="Export File"
               className="w-[40px] h-[45px] bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out px-[5px] rounded-r-md cursor-pointer"
               onClick={handleExport}
             >
@@ -528,10 +564,11 @@ const CostCalculation = () => {
           <div className="h-[45px] mt-4">
             {selectedFG === "Specific-FG" && (
               <div
+                title="Click to add a finished goods sheet"
                 onClick={handleAddSheet}
-                className="flex items-center w-[170px] px-4 h-[45px] text-white bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out rounded-md cursor-pointer"
+                className="flex items-center w-[130px] px-1 h-[45px] text-white bg-[#B22222] hover:bg-[#961d1d] transition-colors duration-200 ease-in-out rounded-md cursor-pointer"
               >
-                <IoMdAdd className="text-[28px] mr-3" />{" "}
+                <IoMdAdd className="text-[28px] mr-1" />{" "}
                 <p className="text-[21px] font-bold">FG Sheet</p>
               </div>
             )}
@@ -545,6 +582,7 @@ const CostCalculation = () => {
             title={`Cost Summary Report: ${monthYear.label}`}
             isOpen={isOpen}
             sheetData={allFGData}
+            isLoading={isDataLoading}
           />
         ) : (
           sheets.map((sheet) => (
@@ -562,6 +600,16 @@ const CostCalculation = () => {
           ))
         )}
       </div>
+
+      {showScrollTop && (
+        <button
+          onClick={scrollToTop}
+          className="fixed bottom-8 right-8 bg-[#B22222] hover:bg-[#961d1d] text-white p-3 rounded-full shadow-lg transition-all duration-300 z-50"
+          title="Back to top"
+        >
+          <IoIosArrowUp className="text-2xl" />
+        </button>
+      )}
     </>
   );
 };

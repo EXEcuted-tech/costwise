@@ -1,5 +1,5 @@
 "use client";
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { MdModeEdit } from "react-icons/md";
 import EditUserInfo from '@/components/modals/EditUserInfo';
 import { FaUserLargeSlash } from "react-icons/fa6";
@@ -30,12 +30,35 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({
     setIsEditModalOpen,
     setIsDeleteModalOpen }) => {
     const [currentPage, setCurrentPage] = useState<number>(1);
-    const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
+    
+    const [itemsPerPage, setItemsPerPage] = useState<number>(8);
+
+    useEffect(() => {
+        const handleResize = () => {
+            if(window.innerWidth <= 1280) {
+                setItemsPerPage(7);
+            } else if(window.innerWidth <= 1520){
+                setItemsPerPage(6);
+            } else {
+                setItemsPerPage(8);
+            }
+        };
+
+        handleResize(); // Set initial value
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
+    useEffect(() => {
+        setCurrentPage(1);
+    }, [fileData.length]);
+
+    const handlePageChange = (_: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
     };
 
-    const indexOfLastItem = currentPage * 6;
-    const indexOfFirstItem = indexOfLastItem - 6;
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
     const currentListPage = fileData.slice(indexOfFirstItem, indexOfLastItem);
 
     const [errorMsg, setErrorMsg] = useState<string>('');
@@ -135,12 +158,14 @@ const ManageAccounts: React.FC<ManageAccountsPageProps> = ({
 
                 {/* Footer */}
                 <div className="flex w-full justify-center h-[5rem] mt-4 rounded-b-xl bg-white dark:bg-[#3C3C3C] border-[#868686]">
-                    <PrimaryPagination
-                        data={fileData}
-                        itemsPerPage={6}
-                        handlePageChange={handlePageChange}
-                        currentPage={currentPage}
-                    />
+                    {fileData.length > 0 && (
+                        <PrimaryPagination
+                            data={fileData}
+                            itemsPerPage={itemsPerPage}
+                            handlePageChange={handlePageChange}
+                            currentPage={currentPage}
+                        />
+                    )}
                 </div>
             </div>
         </>

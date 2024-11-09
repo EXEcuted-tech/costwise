@@ -4,14 +4,14 @@ import { IoIosClose } from "react-icons/io";
 import { useFileManagerContext } from '@/contexts/FileManagerContext';
 import { useRouter } from 'next/navigation';
 
-interface ConfirmDialogProps { 
+interface ConfirmFileDuplicateProps { 
   setConfirmDialog: React.Dispatch<React.SetStateAction<boolean>>;
   setTab: React.Dispatch<React.SetStateAction<string>>;
   setIsEmpty: React.Dispatch<React.SetStateAction<boolean>>;
   tab?: string;
 }
 
-const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ tab, setConfirmDialog, setTab, setIsEmpty }) => {
+const ConfirmFileDuplicate: React.FC<ConfirmFileDuplicateProps> = ({ tab, setConfirmDialog, setTab, setIsEmpty }) => {
   const { setFileType } = useFileManagerContext();
   const router = useRouter();
   
@@ -53,7 +53,7 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ tab, setConfirmDialog, se
         <div className='flex flex-col justify-center items-center pb-[20px]'>
           <h1 className='font-black text-[30px]'>Are You Sure?</h1>
           <p className='text-center text-[#9D9D9D] text-[19px] px-[30px]'>
-            Switching tabs will close your current file. Do you want to proceed?
+            You are importing a file that already exists. Do you want to proceed?
           </p>
         </div>
         <div className='my-[2px] px-[50px] grid grid-cols-2 gap-4'>
@@ -75,4 +75,4 @@ const ConfirmDialog: React.FC<ConfirmDialogProps> = ({ tab, setConfirmDialog, se
   )
 }
 
-export default ConfirmDialog
+export default ConfirmFileDuplicate

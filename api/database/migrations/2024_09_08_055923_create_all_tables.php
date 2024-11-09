@@ -155,6 +155,7 @@ return new class extends Migration {
             $table->decimal('purchased_qty', 10, 2);
             $table->decimal('usage_qty', 10, 2);
             $table->decimal('total_qty', 10, 2);
+            $table->decimal('curr_stock', 10, 2);
             $table->timestamps();
             $table->foreign('material_id')->references('material_id')->on('materials')->onDelete('cascade');
         });

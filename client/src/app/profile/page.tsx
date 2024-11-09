@@ -149,7 +149,7 @@ const ProfilePage = () => {
                 </div>
             </div>
 
-            <div className={`${isOpen ? 'h-[65%] 3xl:h-[74%]' : 'h-[74%]'} flex flex-col w-[80%] mx-[50px] py-6 mt-[1%] bg-white shadow-md shadow-gray-800 rounded-lg`}>
+            <div className={`${isOpen ? 'h-[65%] 3xl:h-[74%]' : 'h-[74%]'} flex flex-col w-[80%] mx-[50px] py-6 mt-[1%] bg-white shadow-md shadow-gray-800 rounded-lg dark:bg-[#1E1E1E] dark:text-[#d1d1d1]`}>
                 {/* Title */}
                 <div className='flex flex-col mt mb-2 border-b-2 border-[#A0A0A0]'>
                     <div className="flex text-[24px] font-semibold mx-8 2xl:mx-12 mb-2">

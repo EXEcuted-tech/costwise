@@ -1,10 +1,12 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { RiFileWarningFill } from "react-icons/ri";
 import { IoIosClose } from "react-icons/io";
 import api from '@/utils/api';
 import EmailSent from './EmailSent';
 import Spinner from '@/components/loaders/Spinner'
 import Alert from '../alerts/Alert';
+import { MdEmail } from 'react-icons/md';
+import { IoPerson } from 'react-icons/io5';
 
 interface SendEmailDialogProps {
   setDialog: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,56 +19,76 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
   const [modal, setModal] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [access, setAccess] = useState(false);
-  const [alertMessage, setAlertMessage] = useState('');
+  const [alertMessages, setAlertMessages] = useState<string[]>([]);
+  const [alertStatus, setAlertStatus] = useState<string>('');
+  const [emailError, setEmailError] = useState(false);
+  const [employeeNumError, setEmployeeNumError] = useState(false);
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
+    const newAlertMessages: string[] = [];
+
     e.preventDefault();
     setModal(true);
     setIsLoading(true);
-    const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-    try {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com|virginiafood\.com\.ph)$/i;
 
+    try {
       if(!email){
-        setAlertMessage("Email address is required.");
+        setEmailError(true);
+        newAlertMessages.push("Email address is required.");
       }else if (!emailRegex.test(email)){
-        setAlertMessage("Invalid email address.");
+        setEmailError(true);
+        newAlertMessages.push("Invalid email address.");
       }
       if(!employeeNum){
-        setAlertMessage("Employee number is required.");
+        setEmployeeNumError(true);
+        newAlertMessages.push("Employee number is required.");
       } else if (employeeNum.length !== 10){
-        setAlertMessage("Employee number must be 10 digits.");
+        setAlertMessages(["Invalid employee number."]);
       }
 
       const response = await api.post('/password-reset/email', { email, employeeNum });
       if(response.status==404){
-        setAlertMessage(response.data.message);
+        setAlertMessages([response.data.message]);
+        setAlertStatus('success');
       } else {
         setAccess(true);
       }
     } catch (error) {
-      setAlertMessage("User not found.");
+      newAlertMessages.push("User not found.");
+      setAlertStatus('critical');
       console.error('Error sending reset email:', error);
     } finally {
       setIsLoading(false);
     }
   };
+  useEffect(() => {
+    const handleEscapeKey = (event: KeyboardEvent) => {
+        if (event.key === 'Escape') {
+            setDialog(false);
+        }
+    };
+    document.addEventListener('keydown', handleEscapeKey);
+    return () => {
+        document.removeEventListener('keydown', handleEscapeKey);
+    };
+}, [setDialog]);
+
 
   return (
     <>
       <div className="fixed top-4 right-4 z-[3000]">
-        <div className="flex flex-col items-end space-y-2">
-          {alertMessage != '' &&
-            <Alert className="!relative" variant='critical' message={alertMessage} setClose={() => {
-              setAlertMessage('')
+          {alertMessages && alertMessages.map((msg, index) => (
+            <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
+              setAlertMessages(prev => prev.filter((_, i) => i !== index));
             }} />
-          }
-        </div>
+          ))}
       </div>
       {access &&
         <EmailSent onClose={setAccess} email={email} />
       }
       <div className='flex items-center justify-center w-full h-full top-0 left-0 fixed backdrop-brightness-50 z-[2000]'>
-        <div className='flex flex-col animate-pop-out bg-white w-[550px] h-auto pb-[30px] rounded-[20px] py-[20px] px-[10px] gap-2'>
+        <div className='flex flex-col animate-pop-out bg-white w-[550px] h-auto pb-[30px] rounded-[20px] py-[20px] px-[10px] gap-2 dark:bg-[#3C3C3C] dark:text-white'>
           <div className='flex justify-between items-center'>
             <div className="w-full flex justify-center">
               <h1 className='font-black text-[30px] ml-[40px]'>Password Change</h1>
@@ -75,27 +97,36 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
           </div>
           <form onSubmit={handleSubmit}>
             <div className='flex flex-col w-full px-5 gap-2'>
-              <p className='text-[20px]'>Enter email address</p>
+              <p className={`${emailError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} text-[20px] flex items-center gap-2`}>
+                <MdEmail />
+                Email Address
+                <span className='text-[#B22222] font-bold'>*</span>
+              </p>
               <input
-                className="bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border border-[#B3B3B3] rounded-lg focus:outline"
+                className={`${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-2 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} text-[20px] dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                 type="email"
                 name="fname"
-                placeholder="Email Address"
+                placeholder="Enter email address"
                 onChange={(e) => setEmail(e.target.value)}
               />
-              <p className='text-[20px]'>Enter employee number</p>
+              <p className={`${employeeNumError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} text-[20px] flex items-center gap-2`}>
+                <IoPerson />  
+                Employee Number
+                <span className='text-[#B22222] font-bold'>*</span>
+              </p>
               <input
-                className="bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border border-[#B3B3B3] rounded-lg focus:outline"
+                className={`${employeeNumError ? 'text-[#B22222] focus:!outline-[#B22222] border-2 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} text-[20px] dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                 type="text"
                 name="fname"
-                placeholder="Employee Number"
+                maxLength={13}
+                placeholder="Enter employee number"
                 onChange={(e) => setEmployeeNum(e.target.value)}
               />
-              <div className='flex w-full justify-center'>
-                <button className='w-[50%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] bg-primary text-white rounded-xl hover:bg-[#9c1c1c]'
+              <div className='flex w-full justify-center mt-4'>
+                <button className='w-[50%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-primary text-white rounded-xl hover:bg-[#9c1c1c]'
                   type='submit'
                 >
-                  {isLoading ? <span className='flex justify-center items-center'><Spinner />Send Reset Email</span> : 'Send Reset Email'}
+                  {isLoading ? <span className='flex justify-center items-center gap-2'><Spinner /> Send Reset Email</span> : 'Send Reset Email'}
                 </button>
               </div>
             </div>

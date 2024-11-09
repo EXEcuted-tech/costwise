@@ -66,7 +66,7 @@ const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateActio
                     setIsLoading(false);
                 }, 1000);
 
-                setBomData(response.data.data);
+                setBomData([...response.data.data].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()));
             }
         } catch (error) {
             console.error('Error fetching data:', error);
@@ -102,6 +102,19 @@ const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateActio
         setBOM(false);
         setViewBOM(true);
     }
+
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setBOM(false);
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [setBOM]);
+
 
     return (
         <>

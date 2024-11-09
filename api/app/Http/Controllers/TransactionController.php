@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Bom;
 use App\Models\File;
 use App\Models\FinishedGood;
 use App\Models\Fodl;
 use App\Models\Formulation;
+use App\Models\Inventory;
 use App\Models\Material;
 use App\Models\Transaction;
 use Illuminate\Http\Request;
@@ -277,7 +279,7 @@ class TransactionController extends ApiController
     public static function deleteTransaction($transactionId)
     {
         $transaction = Transaction::find($transactionId);
-
+        //dump($transaction);
         if (!$transaction) {
             return false;
         }
@@ -314,6 +316,41 @@ class TransactionController extends ApiController
 
                 $masterFileReferences = Formulation::whereRaw("JSON_CONTAINS(material_qty_list, '{\"" . $material->material_id . "\":{}}', '$')")
                     ->exists();
+                
+                
+                $settings = json_decode($transaction->settings, true);
+                if ($transaction->settings && isset($settings['qty']) && $settings['qty'] < 0) {
+                    $negativeQty = abs($settings['qty']);
+                    $monthYear = Carbon::parse($transaction->date)->format('Y-m');
+
+
+                    // dump($monthYear);
+                    $inventoryFile = File::where('file_type', 'inventory_file')
+                        ->whereRaw("JSON_EXTRACT(settings, '$.monthYear') = ?", [$monthYear])
+                        ->first();
+
+                    if ($inventoryFile) {
+                        $fileSettings = json_decode($inventoryFile->settings, true);
+                        $inventoryIds = $fileSettings['inventory_ids'] ?? [];
+                        $inventory = Inventory::whereIn('inventory_id', $inventoryIds)
+                            ->whereHas('material', function($query) use ($material) {
+                                $query->where('material_code', $material->material_code);
+                            })
+                            ->first();
+
+                        if ($inventory) {
+                            $inventory->usage_qty -= $negativeQty;
+                            if($inventory->usage_qty < 0) {
+                                $inventory->usage_qty = 0;
+                            }
+                            $inventory->save();
+
+                            $boms = Bom::where('created_at', '>=', Carbon::parse($transaction->date)->format('Y-m-01'))->get();
+                            self::calculateLeastCost($boms);
+                        }
+
+                    }
+                }
 
                 if (!$otherReferences && !$masterFileReferences) {
                     $newMaterial = Material::on('archive_mysql')->create($material->toArray());
@@ -330,6 +367,76 @@ class TransactionController extends ApiController
         $transaction->delete();
 
         return true;
+    }
+
+    private static function calculateLeastCost($boms)
+    {
+        foreach ($boms as $bom) {
+            $formulations = json_decode($bom->formulations, true);
+            $leastCost = PHP_FLOAT_MAX;
+            $leastCostFormulationId = null;
+
+            foreach ($formulations as $formulationId) {
+                $formulation = Formulation::findOrFail($formulationId);
+
+                $materialQtyList = json_decode($formulation->material_qty_list, true);
+                foreach ($materialQtyList as &$item) {
+                    foreach ($item as &$data) {
+                        if (isset($data['status'])) {
+                            unset($data['status']);
+                        }
+                    }
+                }
+                $formulation->material_qty_list = json_encode($materialQtyList);
+                $formulation->save();
+
+                $finishedGood = FinishedGood::firstOrCreate(
+                    ['fg_id' => $formulation->fg_id],
+                );
+
+                $totalMaterialCost = self::calculateFormulationCost($formulation) / $finishedGood->total_batch_qty;
+                $finishedGood->update(['rm_cost' => $totalMaterialCost]);
+
+                $fodl = Fodl::where('fodl_id', $finishedGood->fodl_id)->first();
+                $totalCost = $totalMaterialCost + ($fodl->factory_overhead ?? 0) + ($fodl->direct_labor ?? 0);
+                $finishedGood->update(['total_cost' => $totalCost]);
+                $finishedGood->update(['is_least_cost' => false]);
+
+                if ($totalMaterialCost < $leastCost) {
+                    $leastCost = $totalMaterialCost;
+                    $leastCostFormulationId = $formulationId;
+                }
+            }
+
+            if ($leastCostFormulationId) {
+                $leastCostFormulation = Formulation::findOrFail($leastCostFormulationId);
+                $leastCostFinishedGood = FinishedGood::where('fg_id', $leastCostFormulation->fg_id)->first();
+
+                if ($leastCostFinishedGood) {
+                    $leastCostFinishedGood->update(['is_least_cost' => true]);
+                }
+            }
+        }
+    }
+
+    private static function calculateFormulationCost($formulation)
+    {
+        $materialQtyList = json_decode($formulation->material_qty_list, true);
+
+        $totalCost = 0;
+
+        foreach ($materialQtyList as $item) {
+            foreach ($item as $materialId => $data) {
+                $material = Material::findOrFail($materialId);
+                $quantity = $data['qty'];
+                $materialCost = $material->material_cost;
+                $productCost = $materialCost * $quantity;
+
+                $totalCost += $productCost;
+            }
+        }
+
+        return $totalCost;
     }
 
     public function deleteBulk(Request $request)

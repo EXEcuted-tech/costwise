@@ -42,9 +42,9 @@ const CompareFormulaContainer = () => {
     const [saveBomName, setSaveBomName] = useState(false);
     const [successMessage, setSuccessMessage] = useState('');
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
-
+    const [error,setError]=useState(false);
     const minProductCost = Math.min(...data.filter(info => info.rowType === 'finishedGood').map(info => Number(info.cost) || 0));
-
+    const { setBomName } = useFormulationContext();
     const fetchData = useCallback(async () => {
         setIsLoading(true);
         try {
@@ -188,6 +188,7 @@ const CompareFormulaContainer = () => {
         if (bomName === '') {
             setAlertMessages(prev => [...prev, 'Please provide a name for this BOM.']);
             setIsLoading(false);
+            setError(true);
             return;
         }
         try {
@@ -204,6 +205,7 @@ const CompareFormulaContainer = () => {
             setIsLoading(false);
             setSuccessMessage('Saved to BOM List successfully');
             setSaveBomName(false);
+            setBomName('');
             router.push('/formulation');
         }
     };
@@ -215,6 +217,8 @@ const CompareFormulaContainer = () => {
                     setSaveBomName={setSaveBomName}
                     handleSaveToBOMList={handleSaveToBOMList}
                     isLoading={isLoading}
+                    error={error}
+                    setError={setError}
                 />
             }
             <div className="absolute top-0 right-0">
@@ -311,15 +315,23 @@ const CompareFormulaContainer = () => {
                                 }, []).map((group, groupIndex) => (
                                     <React.Fragment key={groupIndex}>
                                         {group.map((info, index) => (
-                                            <tr key={index} className={`${info.rowType === 'finishedGood' ? (Number(info.cost) === minProductCost ? 'bg-[#fff873] text-black dark:text-black' : 'text-black dark:text-white') : (index % 2 === 1 ? 'bg-[#FCF7F7] dark:bg-[#4C4C4C]' : '')} animate-zoomIn text-center ${info.rowType === 'finishedGood' ? 'font-bold' : 'font-medium'} ${info.rowType === 'finishedGood' ? '' : 'text-[#6B6B6B] dark:text-[#d1d1d1]'} text-[18px] ${info.rowType === 'finishedGood' ? 'border-y border-[#ACACAC]' : ''}`}>
+                                            <tr key={index} className={`${info.rowType === 'finishedGood' ? (info.isLeastCost === 1 ? 'bg-[#fff873] text-black dark:text-black' : 'text-black dark:text-white') : (index % 2 === 1 ? 'bg-[#FCF7F7] dark:bg-[#4C4C4C]' : '')} animate-zoomIn text-center ${info.rowType === 'finishedGood' ? 'font-bold' : 'font-medium'} ${info.rowType === 'finishedGood' ? '' : 'text-[#6B6B6B] dark:text-[#d1d1d1]'} text-[18px] ${info.rowType === 'finishedGood' ? 'border-y border-[#ACACAC]' : ''}`}>
                                                 <td className={`py-[10px] ${info.rowType === 'finishedGood' ? 'relative text-left px-6' : ''}`}>
                                                     {info.rowType === 'finishedGood' && (
                                                         <>
-                                                            {Number(info.cost) === minProductCost && (
+                                                            {info.isLeastCost === 1 && (
                                                                 <>
                                                                     <div className="absolute bottom-[-5px] left-[30%] transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[10px] border-b-[#D9D9D9]"></div>
                                                                     <div className="absolute font-light text-black top-[50px] left-0 right-0 mx-auto w-max bg-[#D9D9D9] rounded-full px-4 py-2 shadow-lg z-10">
                                                                         Least-Cost Formula
+                                                                    </div>
+                                                                </>
+                                                            )}
+                                                            {Number(info.cost) === minProductCost && info.isLeastCost === 0 && (
+                                                                <>
+                                                                    <div className="absolute bottom-[-5px] left-[30%] transform -translate-x-1/2 w-0 h-0 border-l-[10px] border-l-transparent border-r-[10px] border-r-transparent border-b-[10px] border-b-[#D9D9D9]"></div>
+                                                                    <div className="absolute font-light text-black top-[50px] left-0 right-0 mx-auto w-max bg-[#D9D9D9] rounded-full px-4 py-2 shadow-lg z-10">
+                                                                    Not Ideal Due to Material Shortage
                                                                     </div>
                                                                 </>
                                                             )}

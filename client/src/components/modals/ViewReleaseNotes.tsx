@@ -34,7 +34,11 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
     }, [note_id]);
 
     const handleClose = () => {
-        setShowConfirmChanges(true);
+        if (isEditing) {
+            setShowConfirmChanges(true);
+        } else {
+            setViewNotes(false);
+        }
     }
     //Retrieve release note data
     const retrieveReleaseNote = async () => {
@@ -166,7 +170,9 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
             if (response.status === 200) {
                 setAlertMessages(["Release note successfully archived"]);
                 setAlertStatus("success");
-                window.location.reload();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             }
         } catch (error) {
             setAlertMessages(["Failed to archive release note"]);
@@ -199,6 +205,19 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
         }
     };
 
+    useEffect(() => {
+        const handleEscapeKey = (event: KeyboardEvent) => {
+            if (event.key === 'Escape') {
+                setViewNotes(false);
+            }
+        };
+        document.addEventListener('keydown', handleEscapeKey);
+        return () => {
+            document.removeEventListener('keydown', handleEscapeKey);
+        };
+    }, [setViewNotes]);
+
+
     return (
         <div className='flex justify-center items-center z-[1000] w-full h-full fixed top-0 left-0 p-4 overflow-auto backdrop-brightness-50'>
             <div className='absolute top-0 right-0'>
@@ -219,8 +238,8 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
             )}
             <div className="flex flex-col w-[60%] h-[750px] bg-white dark:bg-[#3C3C3C] rounded-[20px] animate-pop-out drop-shadow">
                 {/* Header */}
-                <div className='flex items-center rounded-t-[10px] h-[10%] bg-[#F5F5F5] dark:bg-[#121212] text-[22px]'>
-                    <div className='flex items-center justify-center w-[17%] 2xl:w-[15%] 3xl:w-[12%] 4xl:w-[10%] h-full bg-[#F1F1F1] dark:bg-[#121212] border-r-[2px] rounded-tl-[10px] px-[10px]'>
+                <div className='flex items-center rounded-t-[10px] h-[10%] bg-[#F5F5F5] dark:bg-[#5e5e5e] text-[22px]'>
+                    <div className='flex items-center justify-center w-[17%] 2xl:w-[15%] 3xl:w-[12%] 4xl:w-[10%] h-full bg-[#F1F1F1] dark:bg-[#5e5e5e] border-r-[2px] rounded-tl-[10px] px-[10px]'>
                         {isLoading ? <Loader className='h-6 w-4'/>
                             : <p className='dark:text-white text-[22px]'>{formatDateShort(note?.created_at as string)}</p>
                         }
@@ -235,7 +254,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                                 name="title"
                                 value={editedNote?.title || ''}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border rounded dark:text-white"
+                                className="w-full p-2 border rounded dark:text-white dark:bg-[#5e5e5e]"
                             />
                         ) : (
                             <p className='dark:text-white'>{note?.title}</p>
@@ -260,7 +279,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                                     min="1"
                                     value={editedNote?.version || ''}
                                     onChange={handleInputChange}
-                                    className="w-20 mx-2 p-1 border rounded"
+                                    className="w-20 mx-2 p-1 border rounded dark:bg-[#5e5e5e]"
                                 />
                                 <span>- {formatDateLong(note?.created_at as string)}</span>
                             </div>
@@ -297,7 +316,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                                                     <textarea
                                                         value={item}
                                                         onChange={(e) => handleContentChange(noteType as keyof ReleaseNote['content'], idx, e.target.value)}
-                                                        className="w-full p-2 border rounded"
+                                                        className="w-full p-2 border rounded dark:bg-[#5e5e5e]"
                                                     />
                                                 ) : (
                                                     item
@@ -313,7 +332,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
 
                 {/* Footer */}
                 <div className='flex h-[5rem] items-center text-[24px] rounded-b-[10px]'>
-                    <div className='flex items-center justify-center w-[7%] h-full bg-[#F1F1F1] border-t-[3px] dark:bg-[#121212] border-r-[2px] rounded-bl-[10px] hover:bg-[#921B1BFF] group transition-colors duration-250 ease-in-out'>
+                    <div className='flex items-center justify-center w-[7%] h-full bg-[#F1F1F1] border-t-[3px] dark:bg-[#5e5e5e] border-r-[2px] rounded-bl-[10px] hover:bg-[#921B1BFF] group transition-colors duration-250 ease-in-out'>
                         <RiDeleteBinLine 
                             className='text-[28px] text-[#5B5353] dark:text-[#d1d1d1] cursor-pointer group-hover:text-white group-hover:animate-shake transition-colors duration-250 ease-in-out'
                             onClick={deleteReleaseNote}
