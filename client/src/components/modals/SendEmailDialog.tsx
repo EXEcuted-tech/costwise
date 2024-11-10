@@ -25,43 +25,55 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
   const [employeeNumError, setEmployeeNumError] = useState(false);
 
   const handleSubmit = async (e: { preventDefault: () => void; }) => {
-    const newAlertMessages: string[] = [];
-
     e.preventDefault();
     setModal(true);
     setIsLoading(true);
-    const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com|virginiafood\.com\.ph)$/i;
+    setEmailError(false);
+    setEmployeeNumError(false);
 
-    try {
-      if(!email){
+    const newAlertMessages: string[] = [];
+    const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+
+    if (!email) {
         setEmailError(true);
         newAlertMessages.push("Email address is required.");
-      }else if (!emailRegex.test(email)){
+    } else if (!emailRegex.test(email)) {
         setEmailError(true);
         newAlertMessages.push("Invalid email address.");
-      }
-      if(!employeeNum){
+    }
+    if (!employeeNum) {
         setEmployeeNumError(true);
         newAlertMessages.push("Employee number is required.");
-      } else if (employeeNum.length !== 10){
-        setAlertMessages(["Invalid employee number."]);
-      }
+    } else if (employeeNum.length !== 10) {
+        setEmployeeNumError(true);
+        newAlertMessages.push("Invalid employee number.");
+    }
 
-      const response = await api.post('/password-reset/email', { email, employeeNum });
-      if(response.status==404){
-        setAlertMessages([response.data.message]);
-        setAlertStatus('success');
-      } else {
-        setAccess(true);
-      }
+    if (newAlertMessages.length > 0) {
+        setAlertMessages(newAlertMessages);
+        setAlertStatus("critical");
+        setIsLoading(false);
+        return;
+    }
+
+    try {
+        const response = await api.post('/password-reset/email', { email, employeeNum });
+        if (response.status === 404) {
+            setAlertMessages([response.data.message]);
+            setAlertStatus("warning");
+        } else {
+            setAccess(true);
+            setAlertMessages(["Email sent successfully."]);
+            setAlertStatus("success");
+        }
     } catch (error) {
-      newAlertMessages.push("User not found.");
-      setAlertStatus('critical');
-      console.error('Error sending reset email:', error);
+        setAlertMessages(["User not found."]);
+        setAlertStatus("critical");
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
   };
+
   useEffect(() => {
     const handleEscapeKey = (event: KeyboardEvent) => {
         if (event.key === 'Escape') {
@@ -72,7 +84,7 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
     return () => {
         document.removeEventListener('keydown', handleEscapeKey);
     };
-}, [setDialog]);
+  }, [setDialog]);
 
 
   return (
@@ -83,6 +95,7 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
               setAlertMessages(prev => prev.filter((_, i) => i !== index));
             }} />
           ))}
+          
       </div>
       {access &&
         <EmailSent onClose={setAccess} email={email} />
