@@ -139,7 +139,7 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className='w-full h-screen flex flex-col items-center bg-repeat' style={{ backgroundImage: `url(${background.src})` }}>
+        <div className='w-full h-screen flex flex-col items-center bg-repeat transition-all duration-300 ease-in-out' style={{ backgroundImage: `url(${background.src})` }}>
             {dialog &&
                 <SendEmailDialog
                     setDialog={setDialog}
@@ -161,10 +161,7 @@ const ProfilePage = () => {
                         </div>
                         <div
                         title="Toggle Dark Mode"
-                        className={`${isOpen
-                            ? "text-[1.2em] 2xl:text-[1.8em]"
-                            : "text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]"
-                        } text-primary p-3 drop-shadow-lg ml-auto mr-4 mb-1 bg-white rounded-full cursor-pointer hover:text-white hover:bg-primary transition-colors duration-300 ease-in-out`}
+                        className={`text-[2em] text-primary p-3 ml-auto mr-4 mb-1 bg-white rounded-full cursor-pointer hover:text-white hover:bg-primary transition-colors duration-300 ease-in-out`}
                         onClick={() =>
                             setColorMode(colorMode === "light" ? "dark" : "light")
                         }

@@ -47,14 +47,14 @@ const UserInformation: React.FC<UserInformationProps> = ({
           userAcc={userAcc}
         />
       ) : (
-        <div className="mx-8 2xl:mx-12">
+        <div className="mx-8 2xl:mx-12 transition-all duration-400 ease-in-out">
           <div className="flex justify-between">
             <div
               className={`${
                 isOpen
                   ? "text-[24px] 2xl:text-[32px]"
                   : "text-[28px] 2xl:text-[32px]"
-              } flex text-[#8E8E8E] font-semibold mt-3 mb-2`}
+              } flex text-[#8E8E8E] dark:text-[#d1d1d1] font-semibold mt-3 mb-2`}
             >
               User Information
               <button
@@ -65,13 +65,13 @@ const UserInformation: React.FC<UserInformationProps> = ({
                 } px-3 text-black mr-2 mt-1 rounded-lg`}
                 onClick={() => setProps(true)}
               >
-                <MdModeEdit className="hover:text-primary hover:animate-shake-tilt" />
+                <MdModeEdit className="hover:text-primary hover:animate-shake-tilt dark:text-white hover:dark:text-primary" />
               </button>
             </div>
             {/* Roles */}
             <div className="flex items-center">
               <button
-                className="flex items-center ml-12 bg-gray-100 rounded-lg p-2 px-3 border border-gray-300 hover:bg-gray-200 cursor-pointer transition-colors duration-300 ease-in-out"
+                className="flex items-center ml-12 bg-gray-100 dark:text-black rounded-lg p-2 px-3 border border-gray-300 hover:bg-gray-200 cursor-pointer transition-colors duration-300 ease-in-out"
                 onClick={handleShowRolesSelectModal}
               >
                 <BsPersonLock className="text-[1.7em] mr-2 text-[#5B5353]" />
@@ -96,20 +96,20 @@ const UserInformation: React.FC<UserInformationProps> = ({
                 {/* 1st Col */}
                 <div className="flex flex-col ml-3">
                   <div className="flex flex-col justify-start mb-4">
-                    <p className="text-[#8E8E8E] font-semibold">First Name</p>
-                    <p>{userAcc?.fName}</p>
+                    <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">First Name</p>
+                    <p className="dark:text-white">{userAcc?.fName}</p>
                   </div>
 
                   <div className="flex flex-col justify-start mb-4">
-                    <p className="text-[#8E8E8E] font-semibold">
+                    <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">
                       Email Address
                     </p>
-                    <p>{userAcc?.email}</p>
+                    <p className="dark:text-white">{userAcc?.email}</p>
                   </div>
 
                   <div className="flex flex-col justify-start mb-4">
-                    <p className="text-[#8E8E8E] font-semibold">Department</p>
-                    <p>{userAcc?.dept}</p>
+                    <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">Department</p>
+                    <p className="dark:text-white">{userAcc?.dept}</p>
                   </div>
                 </div>
 
@@ -118,52 +118,52 @@ const UserInformation: React.FC<UserInformationProps> = ({
                   <div className="flex flex-col justify-start mb-4">
                     <p
                       className={`${
-                        !userAcc?.mName ? "opacity-25" : "text-[#808080]"
+                        !userAcc?.mName ? "opacity-25 dark:text-[#d1d1d1]" : "text-[#808080] dark:text-[#d1d1d1]"
                       } font-semibold`}
                     >
                       Middle Name
                     </p>
-                    <p className={`${!userAcc?.mName && "opacity-25"}`}>
+                    <p className={`${!userAcc?.mName && "opacity-25 dark:text-white"} dark:text-white`}>
                       {!userAcc?.mName ? "N/A" : userAcc?.mName}
                     </p>
                   </div>
 
                   <div className="flex flex-col justify-start mb-4">
-                    <p className="text-[#8E8E8E] font-semibold">Phone Number</p>
-                    <p>{userAcc?.phoneNum}</p>
+                    <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">Phone Number</p>
+                    <p className="dark:text-white">{userAcc?.phoneNum}</p>
                   </div>
 
                   <div className="flex flex-col justify-start mb-4">
-                    <p className="text-[#8E8E8E] font-semibold">
+                    <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">
                       Employee Number
                     </p>
-                    <p>{userAcc?.employeeNum}</p>
+                    <p className="dark:text-white">{userAcc?.employeeNum}</p>
                   </div>
                 </div>
 
                 {/* 3rd Col */}
                 <div className="flex flex-col mr-6">
                   <div className="flex flex-col justify-start mb-4">
-                    <p className="text-[#8E8E8E] font-semibold">Last Name</p>
-                    <p>{userAcc?.lName}</p>
+                    <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">Last Name</p>
+                    <p className="dark:text-white">{userAcc?.lName}</p>
                   </div>
 
                   <div className="flex flex-col justify-start mb-4">
                     <p
                       className={`${
-                        !userAcc?.suffix ? "opacity-25" : "text-[#808080]"
+                        !userAcc?.suffix ? "opacity-25 dark:text-[#d1d1d1]" : "text-[#808080] dark:text-[#d1d1d1]"
                       } font-semibold`}
                     >
                       Suffix
                     </p>
-                    <p className={`${!userAcc?.suffix && "opacity-25"}`}>
+                    <p className={`${!userAcc?.suffix && "opacity-25 dark:text-white"} dark:text-white`}>
                       {!userAcc?.suffix ? "N/A" : userAcc?.suffix}
                     </p>
                   </div>
 
                   <div className="flex flex-col justify-start mb-4">
-                    <p className="text-[#8E8E8E] font-semibold">Position</p>
-                    <p>{userAcc?.position}</p>
+                    <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">Position</p>
+                    <p className="dark:text-white">{userAcc?.position}</p>
                   </div>
                 </div>
               </div>
