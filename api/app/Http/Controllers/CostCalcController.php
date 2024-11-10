@@ -53,7 +53,12 @@ class CostCalcController extends ApiController
         try {
             $fgOptions = FinishedGood::where('is_least_cost', 1)
                 ->where('monthYear', $monthYear)
-                ->get();
+                ->get()
+                ->groupBy('fg_desc')
+                ->map(function ($group) {
+                    return $group->sortBy('total_cost')->first();
+                })
+                ->values();
 
             $this->status = 200;
             $this->response['data'] = $fgOptions;
@@ -94,7 +99,7 @@ class CostCalcController extends ApiController
                     'unit' => $emulsion->unit,
                 ];
             } else {
-                $fgData['components'][] = []; 
+                $fgData['components'][] = [];
             }
 
             foreach ($materialQtyList as $index => $materialItem) {

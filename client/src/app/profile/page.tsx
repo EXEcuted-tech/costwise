@@ -107,16 +107,16 @@ const ProfilePage = () => {
         const parsedUser = JSON.parse(user || '{}');
 
         const auditData = {
-          userId: parsedUser?.userId,
-          action: 'general',
-          act: 'photo',
+            userId: parsedUser?.userId,
+            action: 'general',
+            act: 'photo',
         };
 
         api.post('/auditlogs/logsaudit', auditData)
-          .then(response => {
-          })
-          .catch(error => {
-          });
+            .then(response => {
+            })
+            .catch(error => {
+            });
     };
 
     const handleLogout = async () => {
