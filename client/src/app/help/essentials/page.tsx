@@ -12,16 +12,16 @@ import Alert from "@/components/alerts/Alert";
 
 const EssentialsPage = () => {
   const [isEditing, setIsEditing] = useState(false);
-  const [sections, setSections] = useState([
+  const [sections, setSections] = useState<any>([
     { heading: "Insert Heading", content: "Insert Content" },
   ]);
   const [originalSections, setOriginalSections] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const { isAdmin } = useSidebarContext();
-  const [alertMessages, setAlertMessages] = useState({});
-  const [alertStatus, setAlertStatus] = useState("");
+  const [alertMessages, setAlertMessages] = useState<any>({});
+  const [alertStatus, setAlertStatus] = useState<any>("");
 
-  const sectionRefs = useRef([]);
+  const sectionRefs = useRef<any>([]);
 
   const handleEditClick = () => {
     if (!isEditing) {
@@ -30,7 +30,7 @@ const EssentialsPage = () => {
     setIsEditing(!isEditing);
   };
 
-  const handleChange = (e, index) => {
+  const handleChange = (e: React.ChangeEvent<HTMLTextAreaElement> | React.ChangeEvent<HTMLInputElement>, index: any) => {
     const { name, value } = e.target;
     const updatedSections = [...sections];
     updatedSections[index] = { ...updatedSections[index], [name]: value };
@@ -41,8 +41,8 @@ const EssentialsPage = () => {
     setSections([...sections, { heading: "New Heading", content: "New content" }]);
   };
 
-  const removeSection = (index) => {
-    const updatedSections = sections.filter((_, i) => i !== index);
+  const removeSection = (index: any) => {
+    const updatedSections = sections.filter((_:any, i: any) => i !== index);
     setSections(updatedSections);
   };
 
@@ -79,14 +79,14 @@ const EssentialsPage = () => {
   const saveEdit = async () => {
     const content = JSON.stringify(sections);
     const hasEmptySection = sections.some(
-      (section) => !section.heading.trim() || !section.content.trim()
+      (section: { heading: string; content: string; }) => !section.heading.trim() || !section.content.trim()
     );
 
     if (hasEmptySection) {
-      const updatedAlertMessages = {};
+      const updatedAlertMessages: any = {};
       let firstEmptyIndex = -1;
 
-      sections.forEach((section, index) => {
+      sections.forEach((section: { heading: string; content: string; }, index: number) => {
         if (!section.heading.trim() || !section.content.trim()) {
           updatedAlertMessages[index] = "Section head and content are required.";
           if (firstEmptyIndex === -1) {
@@ -156,10 +156,10 @@ const EssentialsPage = () => {
             <LoadingSpinner />
           ) : (
             <div id="scroll-style" className="px-28 overflow-y-scroll">
-              {sections.map((section, index) => (
+              {sections.map((section:any, index:any) => (
                 <div
                   key={index}
-                  ref={(el) => (sectionRefs.current[index] = el)}
+                  ref={(el:any) => (sectionRefs.current[index] = el)}
                   className="flex flex-col pt-[50px] text-[30px] text-tertiary dark:text-white"
                 >
                   {isEditing ? (
@@ -216,8 +216,8 @@ const EssentialsPage = () => {
                   </button>
                 </div>
               )}
-              {alertStatus && alertMessages.general && (
-                <Alert type={alertStatus} message={alertMessages.general} />
+              {alertStatus!="" && alertMessages.general && (
+                <Alert variant={alertStatus} message={alertMessages.general} setClose={() => setAlertStatus("")} />
               )}
             </div>
           )}
