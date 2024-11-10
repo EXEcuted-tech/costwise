@@ -9,6 +9,7 @@ interface AddUserRolesProps {
   onClose: () => void;
   initialSelectedRoles: string[];
   initialSelectedRoleValues: number[];
+  isEditing: boolean;
 }
 
 export interface CheckboxState {
@@ -26,6 +27,7 @@ const AddUserRoles: React.FC<AddUserRolesProps> = ({
   onConfirm, 
   initialSelectedRoles, 
   initialSelectedRoleValues, 
+  isEditing
 }) => {
   const [selectedRoles, setSelectedRoles] = useState<string[]>(initialSelectedRoles);
   const [selectedRoleValues, setSelectedRoleValues] = useState<number[]>(initialSelectedRoleValues);    
@@ -141,9 +143,11 @@ const [selectedUserType, setSelectedUserType] = useState<string>('Regular');
 
         <div className='flex flex-row justify-center items-center gap-[10px] mb-2'>
           <p className='text-[17px] dark:text-white'>User Type: <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
-          <select className='w-[150px] text-[17px] rounded-lg border border-gray-300 p-1 dark:bg-[#5e5e5e] dark:text-white'
+          <select 
+            className={`${isEditing ? 'bg-gray-200' : ''} text-[17px] rounded-lg border border-gray-300 p-1 dark:bg-[#5e5e5e] dark:text-white`}
             value={selectedUserType}
             onChange={handleUserTypeChange}
+            disabled={isEditing}
           >
             <option value="Regular">Regular</option>
             <option value="Admin">Super Admin</option>
