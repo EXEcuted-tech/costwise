@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\Bom;
 use App\Models\File;
 use App\Models\Formulation;
+use App\Models\Inventory;
 use App\Models\Material;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Validator;
@@ -144,7 +145,9 @@ class MaterialController extends ApiController
                         ]);
                         $material->save();
                     } else {
-                        $existingCode = Material::where('material_code', $materialData['material_code'])->first();
+                        $existingCode = Material::where('material_code', $materialData['material_code'])
+                            ->where('inventory_record', 0)
+                            ->first();
 
                         if ($existingCode) {
                             $this->status = 401;
@@ -371,8 +374,18 @@ class MaterialController extends ApiController
 
     private function calculateMonthMaterialCost($month)
     {
-        return Material::whereRaw("DATE_FORMAT(date, '%Y-%m') = ?", [$month])
-            ->sum('material_cost');
+        $materials = Material::whereRaw("DATE_FORMAT(date, '%Y-%m') = ?", [$month])
+            ->where('inventory_record', 1)
+            ->get();
+
+        $totalCost = 0;
+        foreach ($materials as $material) {
+            $inventory = Inventory::where('material_id', $material->material_id)->first();
+            if ($inventory) {
+                $totalCost += $material->material_cost * $inventory->usage_qty;
+            }
+        }
+        return $totalCost;
     }
 
 }

@@ -341,6 +341,7 @@ class FileController extends ApiController
             $material = Material::where('material_code', $itemCode)
                 ->where('material_cost', $amount / $qty)
                 ->where('date', $dateOnly)
+                ->where('inventory_record', 0)
                 ->first();
 
             $fg = FinishedGood::where('fg_code', $itemCode)
@@ -466,6 +467,9 @@ class FileController extends ApiController
                                         $fgRecord->update(['is_least_cost' => 0]);
 
                                         // Find alternative formulation with sufficient stock
+                                        $lowestRmCost = PHP_FLOAT_MAX;
+                                        $lowestCostFormulation = null;
+
                                         foreach ($formulations as $altFormulation) {
                                             if ($altFormulation->formulation_id === $formulation->formulation_id) {
                                                 continue;
@@ -489,11 +493,15 @@ class FileController extends ApiController
 
                                             if ($hasStock) {
                                                 $altFgRecord = FinishedGood::find($altFormulation->fg_id);
-                                                if ($altFgRecord) {
-                                                    $altFgRecord->update(['is_least_cost' => 1]);
-                                                    break;
+                                                if ($altFgRecord && $altFgRecord->rm_cost < $lowestRmCost) {
+                                                    $lowestRmCost = $altFgRecord->rm_cost;
+                                                    $lowestCostFormulation = $altFgRecord;
                                                 }
                                             }
+                                        }
+
+                                        if ($lowestCostFormulation) {
+                                            $lowestCostFormulation->update(['is_least_cost' => 1]);
                                         }
                                     }
                                 }
@@ -704,6 +712,7 @@ class FileController extends ApiController
                 $material = Material::where('material_code', $materialCode)
                     ->whereYear('date', $year)
                     ->whereMonth('date', $month)
+                    ->where('inventory_record', 0)
                     ->orderBy('date', 'desc')
                     ->first();
 

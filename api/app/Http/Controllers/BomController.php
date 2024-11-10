@@ -233,7 +233,9 @@ class BomController extends ApiController
                     $material->unit = $materialData['unit'];
                     $material->save();
                 } else {
-                    $existingCode = Material::where('material_code', $materialData['material_code'])->first();
+                    $existingCode = Material::where('material_code', $materialData['material_code'])
+                        ->where('inventory_record', 0)
+                        ->first();
 
                     if ($existingCode) {
                         $materialData['material_id'] = $existingCode->material_id;
@@ -433,7 +435,14 @@ class BomController extends ApiController
 
             $bomId = $request->input('bom_id');
             $bom = Bom::findOrFail($bomId);
-
+            $formulations = json_decode($bom->formulations, true) ?? [];
+            foreach ($formulations as $formulationId) {
+                $formulation = Formulation::findOrFail($formulationId);
+                $fg = FinishedGood::findOrFail($formulation->fg_id);
+                $fg->is_least_cost = 0;
+                $fg->save();
+            }
+            
             Bom::on('archive_mysql')->create($bom->toArray());
             $bom->delete();
 

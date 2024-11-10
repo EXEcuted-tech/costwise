@@ -193,7 +193,9 @@ class TransactionController extends ApiController
                 if (!isset($transactionData['material_id']) && !isset($transactionData['fg_id'])) {
                     $itemCode = $transactionData['item_code'] ?? '';
                     if (str_starts_with($itemCode, 'RM') || str_starts_with($itemCode, 'SA')) {
-                        $existingMaterial = Material::where('material_code', $itemCode)->first();
+                        $existingMaterial = Material::where('material_code', $itemCode)
+                            ->where('inventory_record', 0)
+                            ->first();
                         if ($existingMaterial) {
                             $transactionData['material_id'] = $existingMaterial->material_id;
                         } else {
@@ -279,7 +281,6 @@ class TransactionController extends ApiController
     public static function deleteTransaction($transactionId)
     {
         $transaction = Transaction::find($transactionId);
-        //dump($transaction);
         if (!$transaction) {
             return false;
         }
@@ -323,8 +324,6 @@ class TransactionController extends ApiController
                     $negativeQty = abs($settings['qty']);
                     $monthYear = Carbon::parse($transaction->date)->format('Y-m');
 
-
-                    // dump($monthYear);
                     $inventoryFile = File::where('file_type', 'inventory_file')
                         ->whereRaw("JSON_EXTRACT(settings, '$.monthYear') = ?", [$monthYear])
                         ->first();
@@ -348,7 +347,6 @@ class TransactionController extends ApiController
                             $boms = Bom::where('created_at', '>=', Carbon::parse($transaction->date)->format('Y-m-01'))->get();
                             self::calculateLeastCost($boms);
                         }
-
                     }
                 }
 

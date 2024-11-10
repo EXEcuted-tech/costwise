@@ -19,7 +19,7 @@ import { useUserContext } from '@/contexts/UserContext';
 
 const Inventory = () => {
     const { isOpen } = useSidebarContext();
-    const columnNames = ["Item Code", "Description", "Unit", "Purchased Qty", "Total Qty", "Usage Qty", "Status"];
+    const columnNames = ["Item Code", "Description", "Unit", "Purchased Qty", "Usage Qty", "Total Qty", "Status"];
 
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
@@ -418,9 +418,9 @@ const Inventory = () => {
                                                 {data.material_code}</td>
                                             <td className='break-words'>{data.material_desc}</td>
                                             <td>{data.unit}</td>
-                                            <td className='w-[10%] text-right pr-4'>{numberWithCommas(data.purchased_qty)}</td>
-                                            <td className='text-right pr-6 font-semibold'>{numberWithCommas(data.total_qty)}</td>
+                                            <td className='w-[10%] text-right pr-4'>{numberWithCommas(data.purchased_qty)}</td>                                           
                                             <td className='text-right pr-6'>{numberWithCommas(data.usage_qty)}</td>
+                                            <td className='text-right pr-6 font-semibold'>{numberWithCommas(data.total_qty)}</td>
                                             <td className={`${isOpen ? '4xl:pr-2 3xl:pr-4 2xl:pr-4 xl:pr-2': '4xl:pr-2 3xl:pr-4 2xl:pr-4 xl:pr-2'}`}>
                                                 <div className='flex justify-center'>
                                                     <p

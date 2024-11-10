@@ -137,7 +137,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('upload', [InventoryController::class, 'upload']);
         Route::get('retrieveAll', [InventoryController::class, 'retrieveAll']);
         Route::get('lists', [InventoryController::class, 'retrieveInventoryList']);
-        Route::delete('archive', [InventoryController::class, 'archiveInventoryList']);
+        Route::post('archive', [InventoryController::class, 'archiveInventoryList']);
     });
 
     Route::prefix('/events')->group(function () {

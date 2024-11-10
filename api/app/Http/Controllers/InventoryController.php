@@ -134,15 +134,15 @@ class InventoryController extends ApiController
 
             foreach ($materialIdList as $materialId) {
                 $material = Material::where('material_id', $materialId)->first();
-                Log::info("material", ['material' => $material]);
 
                 if ($material) {
                     $existingMaterial = DB::connection('archive_mysql')->table('materials')->where('material_id', $materialId)->first();
-                    Log::info("existingMaterial", ['existingMaterial' => $existingMaterial]);
                     if (!$existingMaterial) {
                         $materialRecords = $material->toArray();
                         Material::on('archive_mysql')->create($materialRecords);
                     }
+
+                    $material->delete();
                 }
             }
 
@@ -177,7 +177,9 @@ class InventoryController extends ApiController
             }
 
             $boms = Bom::where('created_at', '>=', "$inventoryMonthYear-01")->get();
-            $this->calculateLeastCost($boms);
+            if (!$boms->isEmpty()) {
+                $this->calculateLeastCost($boms);
+            }
             DB::commit();
 
             return response()->json(['message' => 'Inventory list archived successfully']);
@@ -480,6 +482,7 @@ class InventoryController extends ApiController
         $isMonthYearPresent = false;
 
         $defaultUnits = [
+            'RM-XX' => 'kg',
             'RM-MM' => 'kg',
             'SA' => 'kg',
             'BP' => 'kg',
@@ -569,7 +572,9 @@ class InventoryController extends ApiController
                 }
             }
 
-            $material = Material::where('material_code', $itemCode)->first();
+            $material = Material::where('material_code', $itemCode)
+                ->where('inventory_record', 1)
+                ->first();
 
             if (!$material) {
                 $material = Material::create([
@@ -578,6 +583,7 @@ class InventoryController extends ApiController
                     'material_cost' => $itemCost,
                     'date' => $formattedDate,
                     'unit' => $unit,
+                    'inventory_record' => 1,
                 ]);
             }
 
@@ -602,7 +608,9 @@ class InventoryController extends ApiController
             $itemCode = $rowData['Item Code'];
             $inventoryQty = $rowData['Quantity'];
 
-            $material = Material::where('material_code', $itemCode)->first();
+            $material = Material::where('material_code', $itemCode)
+                ->where('inventory_record', 1)
+                ->first();
 
             if ($material) {
                 $inventoryData[$material->material_id] = [
@@ -624,7 +632,9 @@ class InventoryController extends ApiController
             $itemCode = $rowData['Item Code'];
             $usageQty = $rowData['Quantity'];
 
-            $material = Material::where('material_code', $itemCode)->first();
+            $material = Material::where('material_code', $itemCode)
+                ->where('inventory_record', 1)
+                ->first();
 
             if ($material) {
                 $usagesData[$material->material_id] = [
@@ -681,9 +691,9 @@ class InventoryController extends ApiController
                     if ($materialRecord && $materialRecord->material_code === $material->material_code) {
                         $settings = json_decode($transaction->settings, true);
                         $transactionDate = Carbon::parse($transaction->date);
-                        return isset($settings['qty']) && 
-                               $settings['qty'] < 0 && 
-                               $transactionDate->format('Y-m') === $this->monthYear;
+                        return isset($settings['qty']) &&
+                            $settings['qty'] < 0 &&
+                            $transactionDate->format('Y-m') === $this->monthYear;
                     }
                     return false;
                 });
@@ -736,6 +746,9 @@ class InventoryController extends ApiController
                                         if ($fgRecord) {
                                             $fgRecord->update(['is_least_cost' => 0]);
 
+                                            $lowestRmCost = PHP_FLOAT_MAX;
+                                            $lowestCostFormulation = null;
+
                                             // Find next formulation with sufficient stock
                                             foreach ($formulations as $altFormulation) {
                                                 $altMaterialQtyList = json_decode($altFormulation->material_qty_list, true);
@@ -758,12 +771,17 @@ class InventoryController extends ApiController
                                                     if ($hasStock) {
                                                         // Update FG record with new least cost formulation
                                                         $altFgRecord = FinishedGood::find($altFormulation->fg_id);
-                                                        if ($altFgRecord) {
-                                                            $altFgRecord->update(['is_least_cost' => 1]);
+                                                        if ($altFgRecord && $altFgRecord->rm_cost < $lowestRmCost) {
+                                                            $lowestRmCost = $altFgRecord->rm_cost;
+                                                            $lowestCostFormulation = $altFgRecord;
                                                         }
                                                         break;
                                                     }
                                                 }
+                                            }
+
+                                            if ($lowestCostFormulation) {
+                                                $lowestCostFormulation->update(['is_least_cost' => 1]);
                                             }
                                         }
                                     }
