@@ -18,6 +18,7 @@ const MainLayout = () => {
   const [notificationSound, setNotificationSound] = useState<HTMLAudioElement | null>(null);
   const { setError, error } = useUserContext();
   const { silentMode, setSilentMode } = useSilentModeContext();
+  const [hasPlayedInitialSound, setHasPlayedInitialSound] = useState(false);
   
   const notificationSoundSrc = '/notification-ring.mp3';
 
@@ -39,9 +40,10 @@ const MainLayout = () => {
 
         if (response.data.data.length > 0) {
           setHasNewNotifications(true);
-          if (!silentMode && !hasPlayedSound) {
+          if (!silentMode && !hasPlayedSound && !hasPlayedInitialSound) {
             notificationSound?.play();
             hasPlayedSound = true;
+            setHasPlayedInitialSound(true);
           }
         } else {
           setHasNewNotifications(false);
@@ -53,10 +55,12 @@ const MainLayout = () => {
       }
     };
 
+    checkForNewNotifications();
+
     const intervalId = setInterval(checkForNewNotifications, 15000);
 
     return () => clearInterval(intervalId);
-  }, [notificationSound, setHasNewNotifications]);
+  }, [notificationSound, setHasNewNotifications, hasPlayedInitialSound, silentMode]);
 
   return (
     <>

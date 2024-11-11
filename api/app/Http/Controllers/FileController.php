@@ -850,7 +850,7 @@ class FileController extends ApiController
     public function exportAll(Request $request)
     {
         try {
-            $files = File::all();
+            $files = File::whereIn('file_type', ['master_file', 'transactional_file'])->get();
 
             if ($files->isEmpty()) {
                 \Log::info('No files to export');

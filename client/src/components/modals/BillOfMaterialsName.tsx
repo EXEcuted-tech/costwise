@@ -34,6 +34,7 @@ const BillOfMaterialsName = ({ setSaveBomName, handleSaveToBOMList, setError, is
                 <div className='flex justify-end'>
                     <IoIosClose className='mt-[2px] text-[70px] text-[#CECECE] cursor-pointer hover:text-[#b3b3b3] transition-colors duration-250 ease-in-out'
                         onClick={() => { 
+                            setBomName('')
                             setSaveBomName(false)
                             setError(false)
                         }} />
@@ -52,7 +53,10 @@ const BillOfMaterialsName = ({ setSaveBomName, handleSaveToBOMList, setError, is
                         type="text"
                         placeholder="Enter BOM name"
                         className={`${error ? 'border-red-500 placeholder:text-red-500' : 'border-gray-300'} w-full px-[15px] py-[10px] border rounded-[10px] text-[16px] dark:border-[#5C5C5C] dark:bg-[#4C4C4C] dark:text-[#d1d1d1]`}
-                        onChange={(e) => setBomName(e.target.value)}
+                        onChange={(e) => {
+                            setBomName(e.target.value)
+                            setError(false)
+                        }}
                     />
                 </div>
                 <div className='flex justify-center items-center my-[15px] px-[50px]'>
