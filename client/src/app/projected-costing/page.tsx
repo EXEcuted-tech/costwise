@@ -16,6 +16,7 @@ import useOutsideClick from '@/hooks/useOutsideClick';
 import { Tooltip } from "@nextui-org/react";
 import useColorMode from "@/hooks/useColorMode";
 import HeaderProjected from "@/components/header/HeaderProjected";
+import { AiOutlineFundProjectionScreen, AiOutlineProject } from "react-icons/ai";
 
 const ProjectedCostPage = () => {
   const { isOpen } = useSidebarContext();
@@ -25,7 +26,7 @@ const ProjectedCostPage = () => {
   const [activeEnd, setActiveEnd] = useState("(Select Half)");
   const [activeFG, setActiveFG] = useState({
     product_num: 1,
-    product_name: "(Click on a product below to see its predictions.)",
+    product_name: "",
     cost: 0,
   });
   const monthNames = [
@@ -263,26 +264,28 @@ const ProjectedCostPage = () => {
                   } flex flex-col bg-white dark:bg-[#3c3c3c] p-[10px] mr-1 w-full border-l-[15px] border-blue-500 rounded-e-lg shadow-lg`}
               >
                 <div className="border-b-1 border-[#D9D9D9] flex flex-row">
+                  <AiOutlineFundProjectionScreen className="mr-[10px] mt-1 text-[29px]" />
                   <p className="text-[24px] font-bold w-[95%] dark:text-white">
-                    Prediction: {activeFG.product_name}
+                    Prediction:
+                    <span className="text-primary ml-[10px]">{activeFG.product_name}</span>
                   </p>
                   <Tooltip className="dark:text-white" content="Projected cost and cost percentage overview based on the model's predictions" placement="left">
                     <span><IoIosInformationCircle className="dark:text-[#d1d1d1] text-[35px] text-[#625F5F] hover:brightness-50" /></span>
                   </Tooltip>
                 </div>
                 <div className="flex flex-row w-full h-full items-center justify-center">
-                  <div className="flex flex-col w-full items-center justify-center text-[#005898] font-bold">
-                    <p className="text-[32px] dark:brightness-200">₱{activeFG.cost.toFixed(6)}</p>
-                    <p className="text-[1em] dark:brightness-200">Projected Cost</p>
+                  <div className="flex flex-col w-full items-center justify-center  font-bold">
+                    <p className={`${activeFG.cost === 0 ? "text-[#6B6B6B]" : "text-[#005898]"} text-[32px] dark:brightness-200`}>₱{activeFG.cost.toFixed(6)}</p>
+                    <p className={`${activeFG.cost === 0 ? "text-[#6B6B6B]" : "text-[#005898]"} text-[1em] dark:brightness-200`}>Projected Cost</p>
                   </div>
                   <div className="flex flex-col w-full items-center justify-center text-primary font-bold">
-                    <p className="text-[32px] dark:brightness-200">
+                    <p className={`${activeFG.cost === 0 ? "text-[#6B6B6B]" : "text-primary"} text-[32px] dark:brightness-200`}>
                       {activeFG.cost / recentCost <= 0 || NaN
                         ? 0
                         : ((activeFG.cost / recentCost) * 100).toFixed(2)}
                       %
                     </p>
-                    <p className="text-[1em] dark:brightness-200">Cost Percentage</p>
+                    <p className={`${activeFG.cost === 0 ? "text-[#6B6B6B]" : "text-primary"} text-[1em] dark:brightness-200`}>Cost Percentage</p>
                   </div>
                 </div>
               </div>
@@ -290,6 +293,7 @@ const ProjectedCostPage = () => {
             {/* Projected Product Cost Case Section */}
             <div className="flex flex-col bg-white dark:bg-[#3c3c3c] p-[10px] h-full w-full rounded-lg shadow-lg">
               <div className="flex flex-row p-[5px]">
+                <AiOutlineProject className="mr-[10px] mt-1 text-[29px]" />
                 <p className="text-[24px] font-bold w-[95%] dark:text-white">
                   Projected Finished Goods Cost
                 </p>
@@ -297,9 +301,13 @@ const ProjectedCostPage = () => {
                   <span><IoIosInformationCircle className="dark:text-[#d1d1d1] text-[35px] text-[#625F5F] hover:brightness-50" /></span>
                 </Tooltip>
               </div>
+              <div className="flex flex-col w-full px-10 py-1 border-t-1 border-[#D9D9D9] text-[#585858] dark:text-white">
+                  <p className="text-[1em]">Please select one of the finished goods below to calculate the prediction above.</p>
+              </div>
               <div className="table-container overflow-x-auto">
                 <table className="table-auto w-full">
                   <thead className="sticky top-0 bg-white dark:bg-[#3c3c3c] z-10 border-y-1 border-[#D9D9D9]">
+
                     <tr className="border-y-1 border-[#D9D9D9]">
                       <th className="px-10 py-2 text-left">
                         <p className="dark:text-[#d1d1d1]">Item</p>
@@ -316,11 +324,11 @@ const ProjectedCostPage = () => {
                         <tr
                           key={item.product_num}
                           className={`text-[#383838] ${item.product_name === activeFG.product_name
-                            ? "bg-primary font-bold text-white"
+                            ? "bg-primary font-bold text-white "
                             : item.product_num % 2 === 0
                               ? "bg-[#F6EBEB] dark:bg-[#4c4c4c]"
                               : ""
-                            } w-full cursor-pointer`}
+                            } w-full cursor-pointer hover:bg-primary hover:text-white dark:hover:bg-primary dark:hover:text-white hover:animate-pull-down transition-colors duration-300 ease-in-out`}
                           onClick={() => setActiveFG(item)}
                         >
                           <td className="px-10 py-2">
