@@ -68,10 +68,10 @@ const SystemMaintenance = () => {
 
     fetchSystemData();
     retrieveAllReleaseNotes();
-  });
+  }, []);
 
+  //Search function
   useEffect(() => {
-    //Search function
     if (releaseNotes.length > 0) {
       if (searchTerm === "") {
         setFilteredReleaseNotes(releaseNotes);
@@ -197,6 +197,7 @@ const SystemMaintenance = () => {
               )}
             </div>
             <button
+              title="View Database"
               className="w-[9rem] text-[16px] mt-6 border border-[#9290905b] font-light bg-white shadow-lg rounded-lg"
               onClick={handleViewDatabase}
             >
@@ -313,9 +314,10 @@ const SystemMaintenance = () => {
               Release Notes
             </span>
             <button
+              title="Create Release Note"
               className={`${
                 isOpen ? "ml-2 2xl:ml-5" : "ml-5"
-              } w-[2rem] h-[2rem] text-[25px] mt-1 px-[3px] text-gray-500 border border-[#9290905b] bg-white drop-shadow-md rounded-lg`}
+              } w-[2rem] h-[2rem] text-[25px] mt-1 px-[3px] text-gray-500 border border-[#9290905b] bg-white drop-shadow-md rounded-lg hover:bg-[#f0f0f0] hover:animate-shake-tilt transition-colors duration-200 ease-in-out`}
               onClick={() => setCreateNotes(true)}
             >
               <IoMdAdd />

@@ -82,14 +82,14 @@ const CostCalculation = () => {
       setShowScrollTop(window.scrollY > 300);
     };
 
-    window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener("scroll", handleScroll);
+    return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
   const scrollToTop = () => {
     window.scrollTo({
       top: 0,
-      behavior: 'smooth'
+      behavior: "smooth",
     });
   };
 
@@ -141,7 +141,7 @@ const CostCalculation = () => {
         setTimeout(() => {
           window.scrollTo({
             top: document.documentElement.scrollHeight,
-            behavior: 'smooth'
+            behavior: "smooth",
           });
         }, 100);
         return [...prevSheets, { id: newId, data: null }];
@@ -151,7 +151,7 @@ const CostCalculation = () => {
       setTimeout(() => {
         window.scrollTo({
           top: document.documentElement.scrollHeight,
-          behavior: 'smooth'
+          behavior: "smooth",
         });
       }, 100);
       return prevSheets;
@@ -247,15 +247,16 @@ const CostCalculation = () => {
       sheetData = allFGData;
     }
 
-    if (selectedFG === "All-FG" && 
-        costData.length > 0 &&
-        !costData.some((entry) => entry.monthYear === currentMonthYear) &&
-        costData[0].products &&
-        costData[0].products.every((product) =>
-          allFGData.some(
-            (allFGProduct) => product.productName === allFGProduct.fg_desc
-          )
+    if (
+      selectedFG === "All-FG" &&
+      costData.length > 0 &&
+      !costData.some((entry) => entry.monthYear === currentMonthYear) &&
+      costData[0].products &&
+      costData[0].products.every((product) =>
+        allFGData.some(
+          (allFGProduct) => product.productName === allFGProduct.fg_desc
         )
+      )
     ) {
       setPrompt(true);
     } else {
@@ -287,8 +288,7 @@ const CostCalculation = () => {
     try {
       await updateTraininingData(updatedCostData);
       await exportFile(allFGData);
-    } catch (error) {
-    }
+    } catch (error) {}
   };
 
   const exportFile = async (sheetData: any) => {
@@ -344,7 +344,6 @@ const CostCalculation = () => {
         setTrainingSpeed,
         setLossHistory
       );
-      setIsLoading(false);
     }
   };
 
@@ -354,7 +353,8 @@ const CostCalculation = () => {
   }, [trained]);
 
   //Retrieve month and year options
-  const retrieveMonthYearOptions = async () => {    try {
+  const retrieveMonthYearOptions = async () => {
+    try {
       const response = await api.get(
         "/cost_calculation/retrieve_month_year_options"
       );
@@ -538,7 +538,9 @@ const CostCalculation = () => {
         <div className="flex flex-col ml-auto">
           {/* Export Button */}
           <div className="flex ml-auto">
-            <div className="text-[19px] mr-5 pt-4 dark:text-white">Export File</div>
+            <div className="text-[19px] mr-5 pt-4 dark:text-white">
+              Export File
+            </div>
           </div>
           <div className="flex mt-2 ml-auto">
             <select

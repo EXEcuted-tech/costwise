@@ -75,7 +75,6 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
     const [employeeNumberError, setEmployeeNumberError] = useState(false);
     const [phoneNumberError, setPhoneNumberError] = useState(false);
     const [positionError, setPositionError] = useState(false);
-    const [profilePictureError, setProfilePictureError] = useState(false);
     const [roleError, setRoleError] = useState(false);
 
     useEffect(() => {
@@ -237,7 +236,6 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
         setEmployeeNumberError(false);
         setPhoneNumberError(false);
         setPositionError(false);
-        setProfilePictureError(false);
         setRoleError(false);
 
         // Check required fields
@@ -286,11 +284,6 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
         if (!position) {
             newAlertMessages.push('Position is required.');
             setPositionError(true);
-        }
-        if (!profileImage && !user.display_picture) {
-            newAlertMessages.push('Profile picture is required.');
-            setAlertStatus('critical');
-            setProfilePictureError(true);
         }
         if (selectedRoles.length === 0) {
             newAlertMessages.push("Please assign atleast one role to the user.")
@@ -416,6 +409,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
                     onConfirm={handleConfirmRoles}
                     initialSelectedRoles={selectedRoles}
                     initialSelectedRoleValues={selectedRoleValues}
+                    isEditing={true}
                 />
             )}
 
@@ -489,8 +483,8 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
                             </div>
                         </div>
                         <div className="dark:text-white">
-                            <div className='text-[1.4em] font-semibold capitalize'> {user.first_name} {user.last_name} </div>
-                            <div className='text-[1.1em] capitalize'> {user.position} </div>
+                            <div className='text-[1.4em] font-semibold capitalize'> {user.first_name} {user.last_name}</div>
+                            <div className='text-[1.1em] capitalize'> {user.position} | <span className='text-primary'>{user.user_type}</span> </div>
                         </div>
                     </div>
 
@@ -538,13 +532,16 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
                                     <select
                                         className={` ${departmentError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
                                         name="dept"
+                                        value={department}
                                         onChange={(e) => updateSelect(setDepartment)(e)}
                                     >
-                                        <option value="" disabled>{user.department || 'Choose department'}</option>
-                                        <option value="cost accounting">Cost Accounting</option>
-                                        <option value="human resources">Human Resources</option>
-                                        <option value="research development">Research & Development</option>
-                                        <option value="research development">IT Department</option>
+                                        <option value="">{department || 'Choose department'}</option>
+                                        {['Cost Accounting', 'Human Resources', 'Research & Development', 'IT Department']
+                                            .filter(dept => dept !== department)
+                                            .map(dept => (
+                                                <option key={dept} value={dept}>{dept}</option>
+                                            ))
+                                        }
                                     </select>
                                 </div>
                             </div>

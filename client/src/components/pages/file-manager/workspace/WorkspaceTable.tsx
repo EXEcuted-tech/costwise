@@ -70,6 +70,14 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
     };
 
     const addRow = () => {
+        if (isTransaction) {
+            const scrollHeight = document.documentElement.scrollHeight;
+            window.scrollTo({
+                top: scrollHeight,
+                behavior: 'smooth'
+            });
+        }
+
         const nextId = typeof transactionCount === 'number'
             ? transactionCount + 1
             : (tableData.length > 0

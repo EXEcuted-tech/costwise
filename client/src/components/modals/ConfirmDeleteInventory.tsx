@@ -25,12 +25,10 @@ const ConfirmDeleteInventory: React.FC<ConfirmDeleteProps> = ({ onClose, invento
             const inventoryIds = inventoryList.map(inventory => inventory.inventory_id);
             const materialIds = inventoryList.map(inventory => inventory.material_id);
 
-            const response = await api.delete('/inventory/archive', {
-                data: {
-                    inventory_ids: inventoryIds,
-                    material_ids: materialIds,
-                    inventory_monthYear: monthYear
-                }
+            const response = await api.post('/inventory/archive', {
+                inventory_ids: inventoryIds,
+                material_ids: materialIds,
+                inventory_monthYear: monthYear
             });
             setAlertMessages([response.data.message]);
             setAlertStatus('success');

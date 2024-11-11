@@ -35,7 +35,7 @@ function ForgotPassPage() {
     if (!email) {
       errors.push("Email address is required.");
     } else if (!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email)) {
-      errors.push("Please enter a valid email address.");
+      errors.push("Invalid email address.");
     }
     if (!employeeNum) {
       errors.push("Employee number is required.");

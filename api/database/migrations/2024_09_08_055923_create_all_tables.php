@@ -104,6 +104,7 @@ return new class extends Migration {
             $table->decimal('material_cost', 10, 2);
             $table->string('unit', 10);
             $table->date('date');
+            $table->boolean('inventory_record')->default(false);
             $table->index(['material_id', 'material_code', 'material_cost']);
         });
 

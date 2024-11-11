@@ -16,6 +16,7 @@ class Material extends Model
         'material_cost',
         'unit',
         'date',
+        'inventory_record',
     ];
 
     public $timestamps = false;

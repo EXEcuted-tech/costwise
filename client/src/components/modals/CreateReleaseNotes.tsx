@@ -153,7 +153,9 @@ const CreateReleaseNotes: React.FC<CreateReleaseNotesProps> = ({setCreateNotes})
                 setTitle("");
                 setVersion("");
 
-                window.location.reload();
+                setTimeout(() => {
+                    window.location.reload();
+                }, 2000);
             }
         } catch (error) {
             setAlertMessages(["Failed to create release note"]);

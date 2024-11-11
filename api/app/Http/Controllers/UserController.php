@@ -117,17 +117,24 @@ class UserController extends ApiController
 
     public function updateUser(Request $request, $id)
     {
-        Log::info("DATA RECEIVED", $request->all());
         try {
             $user = User::findOrFail($id);
 
+            $uniqueEmployeeNumber = $request->employee_number !== $user->employee_number
+                ? 'nullable|unique:users,employee_number,'.$id.',user_id'
+                : 'nullable';
+
+            $uniqueEmail = $request->email_address !== $user->email_address
+                ? 'nullable|email|unique:users,email_address,'.$id.',user_id'
+                : 'nullable|email';
+
             $validator = Validator::make($request->all(), [
-                'employee_number' => 'nullable|unique:users,employee_number,' . $id. ',user_id',
+                'employee_number' => $uniqueEmployeeNumber,
                 'first_name' => 'nullable',
                 'middle_name' => 'nullable',
                 'last_name' => 'nullable',
                 'suffix' => 'nullable',
-                'email_address' => 'nullable|email|unique:users,email_address,' . $id. ',user_id',
+                'email_address' => $uniqueEmail,
                 'department' => 'nullable',
                 'phone_number' => 'nullable|regex:/^(\+?[0-9]{1,4})?\s?-?[0-9]{10}$/',
                 'position' => 'nullable',
@@ -173,6 +180,7 @@ class UserController extends ApiController
             return response()->json(['message' => 'Error updating user', 'error' => $e->getMessage()], 500);
         }
     }
+
     public function archiveUser($id)
     {
         try {
