@@ -344,8 +344,10 @@ class TransactionController extends ApiController
                             }
                             $inventory->save();
 
-                            $boms = Bom::where('created_at', '>=', Carbon::parse($transaction->date)->format('Y-m-01'))->get();
-                            self::calculateLeastCost($boms);
+                            $boms = Bom::where('created_at', 'LIKE', Carbon::parse($transaction->date)->format('Y-m').'%')->get();
+                            if(!$boms->isEmpty()) {
+                                self::calculateLeastCost($boms);
+                            }
                         }
                     }
                 }
@@ -451,8 +453,7 @@ class TransactionController extends ApiController
                 $file->save();
             }
         } else {
-            $this->status = 404;
-            $this->response['message'] = "File not found.";
+            $this->status = 200;
             return $this->getResponse();
         }
 
@@ -470,7 +471,7 @@ class TransactionController extends ApiController
             $this->status = 206;
             $this->response['message'] = "$deletedCount out of " . count($transaction_ids) . " transactions archived successfully.";
         } else {
-            $this->status = 404;
+            $this->status = 200;
             $this->response['message'] = "No transactions were archived.";
         }
 

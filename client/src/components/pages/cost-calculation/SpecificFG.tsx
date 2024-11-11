@@ -122,6 +122,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
             placeholder=" Select or Search Finished Good"
             onChange={handleChange}
             disabledOptions={selectedGoods}
+            isLoading={isLoading}
           />
 
           {/* Delete Button */}

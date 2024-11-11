@@ -74,12 +74,16 @@ const AddEventModal: React.FC<AddEventModalProps> = ({ date, onClose, onAddEvent
 
     return (
         <>
-            {errorMsg && 
-                <Alert message={errorMsg} variant='critical' setClose={() => setErrorMsg('')} />
-            }
-            {successMsg && 
-                <Alert message={successMsg} variant='success' setClose={() => setSuccessMsg('')} />
-            }
+            <div className="fixed top-4 right-4 z-[10000]">
+                <div className="flex flex-col items-end space-y-2">
+                    {errorMsg &&
+                        <Alert className="!relative" message={errorMsg} variant='critical' setClose={() => setErrorMsg('')} />
+                    }
+                    {successMsg &&
+                        <Alert className="!relative" message={successMsg} variant='success' setClose={() => setSuccessMsg('')} />
+                    }
+                </div>
+            </div>
             <div className="font-lato fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[1000]">
                 <div className="animate-pop-out bg-white dark:bg-[#3C3C3C] p-6 rounded-lg w-[50%]">
                     <h2 className="text-xl text-[20px] font-bold mb-4 flex items-center gap-2 dark:text-white">

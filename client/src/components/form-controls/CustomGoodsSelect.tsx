@@ -9,29 +9,36 @@ interface CustomGoodsSelectProps {
   placeholder: string;
   onChange: (selectedValue: { name: string, id: number }) => void;
   disabledOptions: { name: string, id: number }[];
+  isLoading?: boolean;
 }
 
-const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placeholder, onChange, disabledOptions }) => {
+const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placeholder, onChange, disabledOptions, isLoading = false }) => {
   const [selectedOption, setSelectedOption] = useState<{ name: string, id: number } | null>(null);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [inputValue, setInputValue] = useState('');
-  const [width, setWidth] = useState('27%');
   const ref = useOutsideClick(() => setIsDropdownOpen(false));
 
   const numberDisabledOptions = disabledOptions.map(option => option.id);
 
+  const calculateWidth = (text: string) => {
+    const baseWidth = 205; // Minimum width in pixels
+    const textLength = text.length;
+    return Math.max(baseWidth, textLength * 15 + 50) + 'px';
+  };
+
   const handleOptionClick = (option: { value: number, label: string }) => {
+    if (isLoading) return;
+    
     const newSelectedValue = { name: option.label, id: option.value };
     setSelectedOption(newSelectedValue);
-    const textLength = option.label.length;
-    const newWidth = Math.max(27, Math.min(29, textLength * 1.1));
-    setWidth(`${newWidth}%`);
     onChange(newSelectedValue);
     setInputValue('');
     setIsDropdownOpen(false);
   };
 
   const handleInputChange = (value: string) => {
+    if (isLoading) return;
+    
     setInputValue(value);
     setIsDropdownOpen(true);
   };
@@ -41,11 +48,11 @@ const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placehol
   );
 
   return (
-    <div ref={ref} className={`relative font-lato z-[1000]`} style={{ width }}>
+    <div ref={ref} className="relative font-lato z-[1000]" style={{ width: calculateWidth(selectedOption ? selectedOption.name : inputValue || placeholder) }}>
       <div
-        title="Click to open dropdown or type to search"
-        className="w-full rounded-lg px-3 text-white bg-primary cursor-pointer hover:bg-white hover:text-[#6B6B6B] hover:animate-pull-down group transition-colors duration-200 ease-in-out dark:bg-[#3C3C3C]"
-        onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+        title={isLoading ? "Loading..." : "Click to open dropdown or type to search"}
+        className={`${isLoading ? 'opacity-50 cursor-wait' : 'hover:bg-white hover:text-[#6B6B6B] hover:animate-pull-down group transition-colors duration-200 ease-in-out'} w-full rounded-lg px-3 text-white bg-primary cursor-pointer  dark:bg-[#3C3C3C]`}
+        onClick={() => !isLoading && setIsDropdownOpen(!isDropdownOpen)}
       >
         <div className="flex items-center w-full">
           <input
@@ -62,7 +69,7 @@ const CustomGoodsSelect: React.FC<CustomGoodsSelectProps> = ({ options, placehol
         </div>
       </div>
 
-      {isDropdownOpen && (
+      {isDropdownOpen && !isLoading && (
         <div className="animate-pull-down absolute min-w-full w-max text-[17px] text-[#6B6B6B] bg-white dark:bg-[#3C3C3C] z-10 mt-1 border border-[#B6B6B6] dark:border-[#5C5C5C] dark:text-[#d1d1d1] drop-shadow-lg rounded-l-[10px] rounded-r-[5px] max-h-[180px] overflow-y-auto">
           {filteredOptions.length > 0 ? (
             filteredOptions.map((option) => (

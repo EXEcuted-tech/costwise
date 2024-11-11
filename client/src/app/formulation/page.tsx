@@ -173,6 +173,7 @@ const FormulationPage = () => {
                     setErrorMsg('An error occurred during file upload');
                 }
             } finally {
+                setAddFormula(false);
                 setIsLoading(false);
             }
         },

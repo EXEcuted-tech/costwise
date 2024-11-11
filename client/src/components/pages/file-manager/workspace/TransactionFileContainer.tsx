@@ -250,7 +250,8 @@ const TransactionFileContainer = (data: File) => {
           setAlertMessages(['Failed to bulk archive Transactions.']);
         }
       } catch (error: any) {
-        if (error.response?.data?.message) {
+        if (error.response?.data?.message == "Not Found") {
+        } else if (error.response?.data?.message && error.response?.data?.message != "Not Found") {
           setAlertMessages([error.response.data.message]);
         } else if (error.response?.data?.errors) {
           const errorMessages = [];

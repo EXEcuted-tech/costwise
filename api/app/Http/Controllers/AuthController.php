@@ -29,7 +29,7 @@ class AuthController extends ApiController
                     'phone_number' => 'required|regex:/^\+63\s?9\d{9}$/',
                     'position' => 'required',
                     'sys_role' => 'required',
-                    'display_picture' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                    'display_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
                 ]
             );
 

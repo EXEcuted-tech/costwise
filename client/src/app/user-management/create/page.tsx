@@ -133,6 +133,10 @@ const AccountCreation = () => {
         reader.readAsDataURL(file);
         setAlertMessages(['Profile picture uploaded successfully.']);
         setAlertStatus('success');
+
+        setTimeout(() => {
+            setAlertMessages([]);
+        }, 8000);
     };
 
     const handleUpload = (event: ChangeEvent<HTMLInputElement>) => {
@@ -410,6 +414,10 @@ const AccountCreation = () => {
                                             setPreviewUrl(null);
                                             setAlertMessages(['Profile picture removed.']);
                                             setAlertStatus('warning');
+
+                                            setTimeout(() => {
+                                                setAlertMessages([]);
+                                            }, 3000);
                                         }}
                                         className="absolute top-7 right-5 bg-[#B22222] text-white rounded-full p-2 invisible opacity-0 group-hover:visible group-hover:opacity-100 animate-zoom-in transition-all duration-300 ease-in-out"
                                     >
@@ -513,10 +521,10 @@ const AccountCreation = () => {
                                                 onChange={(e) => updateField(setDepartment)(e)}
                                             >
                                                 <option value="" disabled>Choose department</option>
-                                                <option value="cost accounting">Cost Accounting</option>
-                                                <option value="human resources">Human Resources</option>
-                                                <option value="research development">Research & Development</option>
-                                                <option value="research development">IT Department</option>
+                                                <option value="Cost Accounting">Cost Accounting</option>
+                                                <option value="Human Resources">Human Resources</option>
+                                                <option value="Research & Development">Research & Development</option>
+                                                <option value="IT Department">IT Department</option>
                                             </select>
                                         </div>
                                     </div>

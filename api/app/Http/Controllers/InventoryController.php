@@ -133,7 +133,11 @@ class InventoryController extends ApiController
             DB::beginTransaction();
 
             foreach ($materialIdList as $materialId) {
-                $material = Material::where('material_id', $materialId)->first();
+                $material = Material::where('material_id', $materialId)
+                    ->where('inventory_record', 1)
+                    ->whereYear('date', substr($inventoryMonthYear, 0, 4))
+                    ->whereMonth('date', substr($inventoryMonthYear, 5, 2))
+                    ->first();
 
                 if ($material) {
                     $existingMaterial = DB::connection('archive_mysql')->table('materials')->where('material_id', $materialId)->first();
@@ -175,8 +179,8 @@ class InventoryController extends ApiController
                     $fileData->delete();
                 }
             }
-
-            $boms = Bom::where('created_at', '>=', "$inventoryMonthYear-01")->get();
+            
+            $boms = Bom::where('created_at', 'LIKE', "$inventoryMonthYear%")->get();
             if (!$boms->isEmpty()) {
                 $this->calculateLeastCost($boms);
             }
