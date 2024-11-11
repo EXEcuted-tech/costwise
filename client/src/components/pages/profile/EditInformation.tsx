@@ -44,7 +44,7 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
         setPhoneNumberError(false);
 
         const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com|virginiafood\.com\.ph)$/i;
-        const phoneRegex = /^\+63\s?9\d{9}$/;
+        const phoneRegex = /^\+63\s\d{10}$/;
 
         let errors: string[] = [];
 
@@ -130,7 +130,8 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                         <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
+                                        className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
+                                                     ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'}bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
                                         type="fname"
                                         name="fname"
                                         value={fName}
@@ -146,7 +147,8 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                         <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
+                                        className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
+                                                     ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'}  bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                         type="email"
                                         name="email"
                                         value={email}
@@ -196,7 +198,8 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                         <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
+                                        className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
+                                                     ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
                                         type="contactnum"
                                         name="contactnum"
                                         value={phoneNum}
@@ -230,7 +233,8 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                             <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
+                                        className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
+                                                     ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
                                         type="lname"
                                         name="lname"
                                         value={lName}

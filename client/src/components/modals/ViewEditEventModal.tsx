@@ -173,7 +173,7 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
                     <form onSubmit={handleSubmit}>
                         <div className="mb-4 flex gap-4">
                             <div className="flex-1">
-                                <label htmlFor="startTime" className="block mb-1 font-semibold text-[17px] dark:text-white">Start Time</label>
+                                <label htmlFor="startTime" className="block mb-1 font-semibold text-[17px] dark:text-white">Start Time {isEditing ? <span className='text-[#B22222] ml-1 font-bold'>*</span> : ''}</label>
                                 {isLoading ? (
                                     <div className="w-full h-[34px] flex items-center"><Loader className='h-8 w-4' /></div>
                                 ) : (
@@ -189,7 +189,7 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
                                 )}
                             </div>
                             <div className="flex-1">
-                                <label htmlFor="endTime" className="block mb-1 font-semibold text-[17px] dark:text-white">End Time</label>
+                                <label htmlFor="endTime" className="block mb-1 font-semibold text-[17px] dark:text-white">End Time {isEditing ? <span className='text-[#B22222] ml-1 font-bold'>*</span> : ''}</label>
                                 {isLoading ? (
                                     <div className="w-full h-[34px] flex items-center"><Loader className='h-8 w-4' /></div>
                                 ) : (
@@ -206,7 +206,7 @@ const ViewEditEventModal: React.FC<ViewEditEventModalProps> = ({ event, onClose 
                             </div>
                         </div>
                         <div className="mb-4">
-                            <label htmlFor="title" className="block mb-1 font-semibold text-[17px] dark:text-white">Title</label>
+                            <label htmlFor="title" className="block mb-1 font-semibold text-[17px] dark:text-white">Title {isEditing ? <span className='text-[#B22222] ml-1 font-bold'>*</span> : ''}</label>
                             {isLoading ? (
                                 <div className="w-full h-[34px] flex items-center"><Loader className='h-8 w-4' /></div>
                             ) : (

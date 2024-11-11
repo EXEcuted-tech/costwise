@@ -153,7 +153,7 @@ const AccountCreation = () => {
 
         // Updated email regex to validate specific domains
         const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com|virginiafood\.com\.ph)$/i;
-        const phoneRegex = /^\+63\s?9\d{9}$/;
+        const phoneRegex = /^\+63\s\d{10}$/;
 
         // Reset errors
         setFirstNameError(false);
