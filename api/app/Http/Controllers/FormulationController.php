@@ -154,6 +154,7 @@ class FormulationController extends ApiController
             $existingMaterials = Material::whereIn('material_code', $materialCodes)
                 ->whereIn('material_desc', $materialDescs)
                 ->whereIn('unit', $materialUnits)
+                ->where('inventory_record', 0)
                 ->whereYear('date', $currentDate->year)
                 ->whereMonth('date', $currentDate->month)
                 ->get(['material_code', 'material_desc', 'unit', 'date'])
@@ -177,8 +178,10 @@ class FormulationController extends ApiController
             }
 
             $materialQtyList = [];
+            $totalMaterialCost = 0;
             foreach ($request->input('materials') as $material) {
                 $matchingMaterial = Material::where('material_code', $material['material_code'])
+                    ->where('inventory_record', 0)
                     ->whereYear('date', $currentDate->year)
                     ->whereMonth('date', $currentDate->month)
                     ->first();
@@ -187,11 +190,12 @@ class FormulationController extends ApiController
                     $materialQtyList[] = [
                         $matchingMaterial->material_id => [
                             'level' => $material['level'],
-                            'qty' => $material['batchQty'],
+                            'qty' => floatval($material['batchQty']),
                             'total_cost' => $matchingMaterial->material_cost * $material['batchQty']
                         ]
                     ];
                 }
+                $totalMaterialCost += $matchingMaterial->material_cost * $material['batchQty'];
             }
 
             $formulation = new Formulation();
@@ -199,6 +203,23 @@ class FormulationController extends ApiController
             $formulation->formula_code = $request->input('formula_code');
             $formulation->emulsion = json_encode($request->input('emulsion'));
             $formulation->material_qty_list = json_encode($materialQtyList);
+
+            $finishedGood = FinishedGood::find($request->input('fg_id'));
+            if ($finishedGood) {
+                $rmCost = $totalMaterialCost / $finishedGood->total_batch_qty;
+                $finishedGood->rm_cost = $rmCost;
+
+                if ($finishedGood->fodl_id) {
+                    $fodl = Fodl::find($finishedGood->fodl_id);
+                    if ($fodl) {
+                        $totalCost = $rmCost + $fodl->factory_overhead + $fodl->direct_labor;
+                        $finishedGood->total_cost = $totalCost;
+                    }
+                }
+
+                $finishedGood->save();
+            }
+
             $formulation->save();
 
             $this->status = 200;
@@ -253,6 +274,7 @@ class FormulationController extends ApiController
         $materials = [];
 
         $formulation = new Formulation();
+        $totalMaterialCost = 0;
         foreach ($data as $row) {
             if (!empty($row[0])) {
                 $formulaCode = $row[0];
@@ -282,6 +304,7 @@ class FormulationController extends ApiController
                 $material = Material::where('material_code', $row[2])
                     ->where('material_desc', $row[3])
                     ->where('unit', $row[6])
+                    ->where('inventory_record', 0)
                     ->whereYear('date', date('Y'))
                     ->whereMonth('date', date('m'))
                     ->first();
@@ -293,6 +316,7 @@ class FormulationController extends ApiController
                             'total_cost' => $material->material_cost * floatval(str_replace(',', '', $row[5]))
                         ]
                     ];
+                    $totalMaterialCost += $material->material_cost * floatval(str_replace(',', '', $row[5]));
                 } else {
                     $this->error = true;
                     break;
@@ -302,6 +326,23 @@ class FormulationController extends ApiController
                 $formulation->fg_id = $fgResult->fg_id;
                 $formulation->emulsion = json_encode($emulsion);
                 $formulation->material_qty_list = json_encode($material_qty_list);
+                
+                $finishedGoodUpdated = FinishedGood::find($fgResult->fg_id);
+                if ($finishedGoodUpdated) {
+                    $rmCost = $totalMaterialCost / $finishedGoodUpdated->total_batch_qty;
+                    $finishedGoodUpdated->rm_cost = $rmCost;
+    
+                    if ($finishedGoodUpdated->fodl_id) {
+                        $fodl = Fodl::find($finishedGoodUpdated->fodl_id);
+                        if ($fodl) {
+                            $totalCost = $rmCost + $fodl->factory_overhead + $fodl->direct_labor;
+                            $finishedGoodUpdated->total_cost = $totalCost;
+                        }
+                    }
+    
+                    $finishedGoodUpdated->save();
+                }
+                
                 $formulation->save();
                 break;
             }

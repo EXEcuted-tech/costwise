@@ -16,6 +16,8 @@ import fs from 'fs/promises';
 import path from 'path';
 import config from "@/server/config";
 import Loader from "@/components/loaders/Loader";
+import { MdDarkMode } from "react-icons/md";
+import useColorMode from "@/hooks/useColorMode";
 
 interface UserProps {
     fName: string;
@@ -40,6 +42,7 @@ const ProfilePage = () => {
     const [profilePicture, setProfilePicture] = useState<string | null>(null);
     const [isLoading, setIsLoading] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
+    const [colorMode, setColorMode] = useColorMode();
 
     useEffect(() => {
         const fetchData = async () => {
@@ -107,16 +110,16 @@ const ProfilePage = () => {
         const parsedUser = JSON.parse(user || '{}');
 
         const auditData = {
-          userId: parsedUser?.userId,
-          action: 'general',
-          act: 'photo',
+            userId: parsedUser?.userId,
+            action: 'general',
+            act: 'photo',
         };
 
         api.post('/auditlogs/logsaudit', auditData)
-          .then(response => {
-          })
-          .catch(error => {
-          });
+            .then(response => {
+            })
+            .catch(error => {
+            });
     };
 
     const handleLogout = async () => {
@@ -136,7 +139,7 @@ const ProfilePage = () => {
     };
 
     return (
-        <div className='w-full h-screen flex flex-col items-center bg-repeat' style={{ backgroundImage: `url(${background.src})` }}>
+        <div className='w-full h-screen flex flex-col items-center bg-repeat transition-all duration-300 ease-in-out' style={{ backgroundImage: `url(${background.src})` }}>
             {dialog &&
                 <SendEmailDialog
                     setDialog={setDialog}
@@ -152,8 +155,19 @@ const ProfilePage = () => {
             <div className={`${isOpen ? 'h-[65%] 3xl:h-[74%]' : 'h-[74%]'} flex flex-col w-[80%] mx-[50px] py-6 mt-[1%] bg-white shadow-md shadow-gray-800 rounded-lg dark:bg-[#1E1E1E] dark:text-[#d1d1d1]`}>
                 {/* Title */}
                 <div className='flex flex-col mt mb-2 border-b-2 border-[#A0A0A0]'>
-                    <div className="flex text-[24px] font-semibold mx-8 2xl:mx-12 mb-2">
-                        Account Profile
+                    <div className='flex justify-between items-center'>
+                        <div className="flex text-[24px] font-semibold mx-8 2xl:mx-12 mb-2">
+                            Account Profile
+                        </div>
+                        <div
+                        title="Toggle Dark Mode"
+                        className={`text-[2em] text-primary p-3 ml-auto mr-4 mb-1 bg-white rounded-full cursor-pointer hover:text-white hover:bg-primary transition-colors duration-300 ease-in-out`}
+                        onClick={() =>
+                            setColorMode(colorMode === "light" ? "dark" : "light")
+                        }
+                        >
+                            <MdDarkMode />
+                        </div>
                     </div>
                     <div className=' bg-primary w-[175px] h-[20px] rounded-[5px] mb-[-11px] ml-[31px] 2xl:ml-[45px]'></div>
                 </div>

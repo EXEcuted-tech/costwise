@@ -25,7 +25,7 @@ const ProjectedCostPage = () => {
   const [activeEnd, setActiveEnd] = useState("(Select Half)");
   const [activeFG, setActiveFG] = useState({
     product_num: 1,
-    product_name: " ",
+    product_name: "(Click on a product bellow to see its predictions.)",
     cost: 0,
   });
   const monthNames = [
@@ -139,7 +139,7 @@ const ProjectedCostPage = () => {
   return (
     <div className="overflow-auto overflow-x-hidden bg-cover bg-center items-center justify-center bg-[#FFFAF8] dark:bg-[#1E1E1E] bg-opacity-20">
       <div>
-        <HeaderProjected icon={MdOutlineAnalytics} title={"Projected Costing"} setColorMode={setColorMode} colorMode={colorMode}/>
+        <HeaderProjected icon={MdOutlineAnalytics} title={"Projected Costing"} setColorMode={setColorMode} colorMode={colorMode} />
       </div>
       <div className="w-full ml-[60px] pr-[45px] h-full 2xl:h-[90vh] flex flex-col items-start justify-start pt-[15px] py-[15px]">
         <p className="text-[30px] text-tertiary dark:text-white">Projected Product Costs</p>
@@ -243,7 +243,7 @@ const ProjectedCostPage = () => {
               </Tooltip>
             </div>
             <div className="flex items-center justify-center bg-white dark:bg-[#3c3c3c] p-2 2xl:p-2 rounded-b-[20px] shadow-b-lg">
-              <TrainingModel isOpen={isOpen}/>
+              <TrainingModel isOpen={isOpen} />
             </div>
           </div>
           {/* Right Div */}
@@ -272,7 +272,7 @@ const ProjectedCostPage = () => {
                 </div>
                 <div className="flex flex-row w-full h-full items-center justify-center">
                   <div className="flex flex-col w-full items-center justify-center text-[#005898] font-bold">
-                    <p className="text-[32px] dark:brightness-200">₱{activeFG.cost}</p>
+                    <p className="text-[32px] dark:brightness-200">₱{activeFG.cost.toFixed(6)}</p>
                     <p className="text-[1em] dark:brightness-200">Projected Cost</p>
                   </div>
                   <div className="flex flex-col w-full items-center justify-center text-primary font-bold">
@@ -327,7 +327,7 @@ const ProjectedCostPage = () => {
                             <p className="dark:text-white">{item.product_name}</p>
                           </td>
                           <td className="px-10 py-2">
-                            <p className="dark:text-white">{item.cost}</p>
+                            <p className="dark:text-white">{item.cost.toFixed(6)}</p>
                           </td>
                         </tr>
                       ))}

@@ -2,7 +2,7 @@
 import Header from '@/components/header/Header';
 import FileContainer from '@/components/pages/file-manager/FileContainer'
 import FileTabs from '@/components/pages/file-manager/FileTabs';
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { BsFolderFill } from "react-icons/bs";
 import { PiScrewdriverFill } from "react-icons/pi";
 import { VscExport } from "react-icons/vsc";
@@ -21,6 +21,7 @@ import Alert from "@/components/alerts/Alert";
 import { File } from '@/types/data';
 import { useUserContext } from '@/contexts/UserContext';
 import Spinner from '@/components/loaders/Spinner';
+import ConfirmFileDuplicate from '@/components/modals/ConfirmFileDuplicate';
 
 const FileManagerPage = () => {
   const { isOpen } = useSidebarContext();
@@ -34,10 +35,14 @@ const FileManagerPage = () => {
   const [allData, setAllData] = useState<File[]>([]);
   const [masterFileData, setMasterFileData] = useState<File[]>([]);
   const [transactionData, setTransactionData] = useState<File[]>([]);
+  const [duplicateModal, setDuplicateModal] = useState(false);
+  
   const { fileToDelete, setFileToDelete, fileSettings } = useFileManagerContext();
   const { currentUser, setError } = useUserContext();
 
   const [exportLoading, setExportLoading] = useState(false);
+
+  const proceedRef = useRef("await");
 
   const ref = useOutsideClick(() => setUpload(false));
 
@@ -92,12 +97,39 @@ const FileManagerPage = () => {
     }
   }, []);
 
+  const onClose = () => {
+    proceedRef.current = "close";
+    setDuplicateModal(false);
+    setIsLoading(false);
+  };
+  
+  const onProceed = () => {
+    proceedRef.current = "proceed";
+    setDuplicateModal(false);
+  };
+
   const onDrop = useCallback(
     (acceptedFiles: any[]) => {
       setErrorMsg('');
       setInfoMsg('');
       setUpload(false);
-      setIsLoading(true);
+
+      const waitForUserChoice = () => {
+        return new Promise((resolve) => {
+          const checkProceed = () => {
+            if (proceedRef.current == "proceed") {
+              proceedRef.current = "await";
+              resolve(true);
+            } else if (proceedRef.current == "close") {
+              proceedRef.current = "await";
+              resolve(false);
+            } else {
+              setTimeout(checkProceed, 3000);
+            }
+          };
+          checkProceed();
+        });
+      };
 
       const processFile = async (file: any) => {
         const reader = new FileReader();
@@ -106,6 +138,22 @@ const FileManagerPage = () => {
           reader.onload = async (e: ProgressEvent<FileReader>) => {
             const data = e.target?.result;
             const fileName = file.name;
+
+            if (
+              allData.some(
+                (existingFile) =>
+                  JSON.parse(existingFile.settings).file_name_with_extension === file.name
+              )
+            ) {
+              setDuplicateModal(true);
+              const shouldProceed = await waitForUserChoice();
+              if (!shouldProceed) {
+                proceedRef.current = "await";
+                return;
+              }
+            }
+
+            setIsLoading(true);
             if (data && data instanceof ArrayBuffer) {
               const dataArray = new Uint8Array(data);
               const workbook = XLSX.read(dataArray, { type: 'array' });
@@ -195,7 +243,7 @@ const FileManagerPage = () => {
           }, 1000);
         });
     },
-    [fetchData, uploadType]
+    [allData, duplicateModal, fetchData, uploadType]
   );
 
   const { getRootProps, getInputProps, open } = useDropzone({
@@ -231,8 +279,8 @@ const FileManagerPage = () => {
   const handleExportAll = async () => {
     const sysRoles = currentUser?.roles;
     if (!sysRoles?.includes(17)) {
-        setError('You are not authorized to export records or files.');
-        return;
+      setError('You are not authorized to export records or files.');
+      return;
     }
     setExportLoading(true);
     try {
@@ -301,7 +349,7 @@ const FileManagerPage = () => {
           })
           .catch(error => {
           });
-          setIsLoading(false);
+        setIsLoading(false);
       } catch (error) {
         console.error('Delete failed:', error);
       } finally {
@@ -346,7 +394,10 @@ const FileManagerPage = () => {
           </p>
         </div>
       }
-      {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" onProceed={handleDelete} isLoading={isLoading}/>}
+      {duplicateModal && (
+        <ConfirmFileDuplicate onClose={onClose} onProceed={onProceed} />
+      )}
+      {deleteModal && <ConfirmDelete onClose={() => { setDeleteModal(false) }} subject="file" onProceed={handleDelete} isLoading={isLoading} />}
       <Header icon={BsFolderFill} title={"File Manager"} />
       <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px] mt-[75px] 2xl:mt-[40px]' : 'px-[50px] mt-[36px]'} ml-[45px]`}>
         <div className='flex relative'>

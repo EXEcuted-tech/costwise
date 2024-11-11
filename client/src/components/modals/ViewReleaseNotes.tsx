@@ -84,31 +84,28 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
         setContentError(false); 
 
         //Check errors
-        if (editedNote.title === "" && editedNote.version === "" && Object.values(editedNote.content).some(arr => arr.length === 0 || arr.some(item => item.trim() === ''))) {
-            setTitleError(true);
-            setVersionError(true);
-            setContentError(true);
-            setIsEditing(true);
-            setAlertMessages(["Title, version, and content are required"]);
-            setAlertStatus("critical");
-            return;
-        }
-        if (editedNote.title === "") {
+        if (!editedNote.title.trim()) {
             newAlertMessages.push("Title is required");
             setTitleError(true);
             setAlertStatus("critical");
         }
-        if (editedNote.version === "") {
+
+        if (!editedNote.version) {
             newAlertMessages.push("Version is required");
             setVersionError(true);
             setAlertStatus("critical"); 
         }
+
         // Check if all content sections are empty
-        const isContentEmpty = Object.values(editedNote.content).every(arr => arr.length === 0 || arr.every(item => item.trim() === ''));
+        const isContentEmpty = Object.values(editedNote.content).every(arr => 
+            !arr || arr.length === 0 || arr.every(item => !item || item.trim() === '')
+        );
+
         if (isContentEmpty) {
-            newAlertMessages.push("At least one content section must have a non-empty item");
+            newAlertMessages.push("At least one section must have content");
             setContentError(true);
         }
+
         if (newAlertMessages.length > 0) {
             setAlertMessages(newAlertMessages);
             setAlertStatus("critical");
@@ -254,7 +251,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                                 name="title"
                                 value={editedNote?.title || ''}
                                 onChange={handleInputChange}
-                                className="w-full p-2 border rounded dark:text-white dark:bg-[#5e5e5e]"
+                                className={`${isEditing ? 'bg-gray-200 border-2 border-gray-300' : ''} ${titleError ? 'border-2 border-red-500' : ''} w-full p-2 border rounded dark:text-white dark:bg-[#5e5e5e]`}
                             />
                         ) : (
                             <p className='dark:text-white'>{note?.title}</p>
@@ -279,7 +276,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                                     min="1"
                                     value={editedNote?.version || ''}
                                     onChange={handleInputChange}
-                                    className="w-20 mx-2 p-1 border rounded dark:bg-[#5e5e5e]"
+                                    className={`${isEditing ? 'bg-gray-200 border-2 border-gray-300' : ''} ${versionError ? 'border-2 border-red-500' : ''} w-20 mx-2 p-1 border rounded dark:bg-[#5e5e5e]`}
                                 />
                                 <span>- {formatDateLong(note?.created_at as string)}</span>
                             </div>
@@ -288,13 +285,19 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                         )}
                         {isEditing ? 
                             <div className='flex justify-center items-center h-full gap-1 animate-pop-out'>
-                                <FaCheck className='text-[28px] mt-3 ml-4 text-[#007100] cursor-pointer hover:animate-shake-infinite'
+                                <FaCheck 
+                                    title='Save Changes'
+                                    className='text-[28px] mt-3 ml-4 text-[#007100] cursor-pointer hover:animate-shake-infinite'
                                     onClick={handleSaveEdit}/>
-                                <IoIosClose className='text-[45px] mt-3 text-[#921B1BFF] cursor-pointer hover:animate-shake-infinite'
+                                <IoIosClose 
+                                    title='Cancel Edit'
+                                    className='text-[45px] mt-3 text-[#921B1BFF] cursor-pointer hover:animate-shake-infinite'
                                     onClick={handleCancelEdit}/>
                             </div>
                             : 
-                            <div className='flex justify-center items-center h-full gap-1 animate-pop-out'>
+                            <div 
+                                title='Edit Release Note'
+                                className='flex justify-center items-center h-full gap-1 animate-pop-out'>
                                 <MdModeEdit className='text-[24px] mt-3 ml-4 mb-1 text-[#5B5353] dark:text-[#d1d1d1] cursor-pointer animate-pop-out hover:text-[#921B1BFF] hover:animate-shake transition-colors duration-250 ease-in-out'
                                     onClick={handleEdit}/>
                             </div>
@@ -316,7 +319,7 @@ const ViewReleaseNotes: React.FC<ViewReleaseNotesProps> = ({note_id, setViewNote
                                                     <textarea
                                                         value={item}
                                                         onChange={(e) => handleContentChange(noteType as keyof ReleaseNote['content'], idx, e.target.value)}
-                                                        className="w-full p-2 border rounded dark:bg-[#5e5e5e]"
+                                                        className={`${isEditing ? 'bg-gray-200 border-2 border-gray-300' : ''} ${contentError ? 'border-2 border-red-500' : ''} w-full p-2 border rounded dark:bg-[#5e5e5e]`}
                                                     />
                                                 ) : (
                                                     item
