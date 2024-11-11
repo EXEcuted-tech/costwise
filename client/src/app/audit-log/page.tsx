@@ -224,11 +224,11 @@ const AuditLogPage = () => {
                                     className={`${isOpen ? 'w-[300px] 3xl:w-[400px]' : 'w-[400px]'} p-[6px] 4xl:p-[7px] dark:text-white dark:bg-[#3C3C3C] text-[16px] 4xl:text-[20px] pl-[35px] 4xl:pl-[40px] border border-[#868686] rounded-full`}
                                     placeholder="Search here..." />
                             </div>
-                            <button onClick={sortAuditLogs} className="flex justify-center items-center bg-white dark:bg-[#3C3C3C] hover:bg-[#ebebeb] dark:hover:bg-[#787878] transition-colors duration-300 ease-in-out 4xl:p-[6px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]">
+                            <button title={`${sortAscending ? 'Sort by ascending order' : 'Sort by descending order'}`} onClick={sortAuditLogs} className="flex justify-center items-center bg-white dark:bg-[#3C3C3C] hover:bg-[#ebebeb] dark:hover:bg-[#787878] transition-colors duration-300 ease-in-out 4xl:p-[6px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]">
                                 {sortAscending ? <LuArrowUpDown className="text-[20px] 4xl:text-[25px] text-[#414141] dark:text-[#d1d1d1]" /> : <LuArrowDownUp className="text-[20px] 4xl:text-[25px] text-[#414141] dark:text-[#d1d1d1]" />}
                             </button>
                             <div ref={ref} className="relative">
-                                <button className="absolute flex justify-center items-center bg-white hover:bg-[#ebebeb] dark:bg-[#3C3C3C] dark:hover:bg-[#787878] transition-colors duration-300 ease-in-out 4xl:p-[10px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]"
+                                <button title="Filter by action" className="absolute flex justify-center items-center bg-white hover:bg-[#ebebeb] dark:bg-[#3C3C3C] dark:hover:bg-[#787878] transition-colors duration-300 ease-in-out 4xl:p-[10px] border border-[#868686] rounded-[10px] h-[40px] 4xl:h-[46px] w-[50px] 4xl:w-[60px]"
                                     onClick={() => { setShowFilter(!showFilter) }}>
                                     <FaFilter className="text-[20px] 4xl:text-[25px] text-[#414141] dark:text-[#d1d1d1]" />
                                 </button>
@@ -246,7 +246,7 @@ const AuditLogPage = () => {
                                 }
                             </div>
                         </div>
-                        <button className="flex bg-white dark:bg-[#3C3C3C] dark:hover:bg-[#787878] dark:text-white hover:bg-[#ebebeb] transition-colors duration-300 ease-in-out text-[16px] 4xl:text-[20px] p-[6px] h-[40px] 4xl:h-[46px] border border-[#868686] rounded-[10px] justify-end gap-2"
+                        <button title="Export all audit logs"className="flex bg-white dark:bg-[#3C3C3C] dark:hover:bg-[#787878] dark:text-white hover:bg-[#ebebeb] transition-colors duration-300 ease-in-out text-[16px] 4xl:text-[20px] p-[6px] h-[40px] 4xl:h-[46px] border border-[#868686] rounded-[10px] justify-end gap-2"
                             onClick={handleExport}
                         >
                             <FaFileExport className="text-[25px] text-[#414141] dark:text-white m-auto" />

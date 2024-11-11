@@ -39,7 +39,8 @@ const ConfirmDeleteInventory: React.FC<ConfirmDeleteProps> = ({ onClose, invento
             const auditData = {
                 userId: parsedUser?.userId,
                 action: 'crud',
-                act: 'archive_inventory'
+                act: 'archive_inventory',
+                monthYear: monthYear
             };
 
             api.post('/auditlogs/logsaudit', auditData)

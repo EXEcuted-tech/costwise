@@ -1,6 +1,7 @@
 <?php
 namespace App\Http\Controllers;
 
+use App\Helpers\DateHelper;
 use App\Models\AuditLog;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -42,6 +43,7 @@ class AuditLogController extends Controller
             $material_desc = $request->input('material_desc');
             $event = $request->input('event');
             $date = $request->input('date');
+            $monthYear = $request->input('monthYear');
 
             $firstName = $user->first_name;
             $middleInitial = $user->middle_name ? substr($user->middle_name, 0, 1) . '.' : '';
@@ -100,7 +102,8 @@ class AuditLogController extends Controller
                         $description = "$firstName $middleInitial $lastName archived $fileName.";
                         break;
                     case "archive_inventory":
-                        $description = "$firstName $middleInitial $lastName archived the entire inventory list.";
+                        $formattedDate = DateHelper::formatMonthYearV2($monthYear);
+                        $description = "$firstName $middleInitial $lastName archived the inventory list for $formattedDate.";
                         break;     
                     default:
                         $description = "Unknown source or action.";
