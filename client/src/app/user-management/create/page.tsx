@@ -16,6 +16,8 @@ import ConfirmChanges from '@/components/modals/ConfirmChanges';
 import AddUserRoles from '@/components/pages/user-management/AddUserRole';
 // import dotenv from "dotenv";
 import { useUserContext } from '@/contexts/UserContext';
+import CredentialsSent from '@/components/modals/CredentialsSent';
+import Spinner from '@/components/loaders/Spinner';
 
 const AccountCreation = () => {
     const router = useRouter();
@@ -30,6 +32,7 @@ const AccountCreation = () => {
     const [imageSize, setImageSize] = useState<number | null>(null);
     const [first_name, setFirst_name] = useState<string>('');
     const [email_address, setEmail] = useState<string>('');
+    const [displayEmail, setDisplayEmail] = useState<string>('');
     const [department, setDepartment] = useState<string>('');
     const [middle_name, setMiddle_name] = useState<string>('');
     const [employee_number, setEmployee_number] = useState<string>('');
@@ -41,7 +44,7 @@ const AccountCreation = () => {
     const [selectedRoleValues, setSelectedRoleValues] = useState<number[]>([]);
     const [selectedUserType, setSelectedUserType] = useState<string>('Regular');
     const user_type = selectedUserType;
-    const defaultPassword = process.env.NEXT_PUBLIC_DEFAULT_PASSWORD; //default password
+    //const defaultPassword = process.env.NEXT_PUBLIC_DEFAULT_PASSWORD; //default password
 
     const [alertMessages, setAlertMessages] = useState<string[]>([]);
     const [alertStatus, setAlertStatus] = useState<string>('');
@@ -55,6 +58,9 @@ const AccountCreation = () => {
     const [positionError, setPositionError] = useState(false);
     const [profilePictureError, setProfilePictureError] = useState(false);
     const [roleError, setRoleError] = useState(false);
+
+    const [isLoading, setIsLoading] = useState(false);
+    const [isEmailSent, setIsEmailSent] = useState(false);
 
     const { currentUser } = useUserContext();
 
@@ -155,6 +161,8 @@ const AccountCreation = () => {
         const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com|virginiafood\.com\.ph)$/i;
         const phoneRegex = /^\+63\s\d{10}$/;
 
+        setIsLoading(true);
+
         // Reset errors
         setFirstNameError(false);
         setLastNameError(false);
@@ -171,6 +179,7 @@ const AccountCreation = () => {
         if (!first_name && !last_name && !email_address && !department && !employee_number && !phone_number && !position && !profileImage && selectedRoleValues.length === 0) {
             newAlertMessages.push('Fill in all required fields!');
             setAlertMessages(newAlertMessages);
+            setIsLoading(false);
             return;
         }
         if (!first_name) {
@@ -221,6 +230,7 @@ const AccountCreation = () => {
         }
         if (newAlertMessages.length > 0) {
             setAlertMessages(newAlertMessages);
+            setIsLoading(false);
             return;
         }
 
@@ -229,6 +239,7 @@ const AccountCreation = () => {
             const accessToken = localStorage.getItem('accessToken');
             const formData = new FormData();
 
+            setDisplayEmail(email_address);
             formData.append('user_type', user_type);
             formData.append('first_name', first_name);
             formData.append('email_address', email_address);
@@ -239,7 +250,7 @@ const AccountCreation = () => {
             formData.append('last_name', last_name);
             formData.append('suffix', suffix);
             formData.append('position', position);
-            formData.append('password', defaultPassword || '');
+            //formData.append('password', defaultPassword || '');
             formData.append('sys_role', JSON.stringify(selectedRoleValues));
 
             if (profileImage) {
@@ -256,6 +267,8 @@ const AccountCreation = () => {
 
             setAlertMessages([response.data.message]);
             setAlertStatus('success');
+            setIsLoading(false);
+            setIsEmailSent(true);
 
             const user = localStorage.getItem('currentUser');
             const parsedUser = JSON.parse(user || '{}');
@@ -307,6 +320,7 @@ const AccountCreation = () => {
                 errorMessages.push('Unexpected error occurred. Please try again.');
             }
 
+            setIsLoading(false);
             setAlertMessages(errorMessages);
             setAlertStatus('critical');
         }
@@ -335,15 +349,25 @@ const AccountCreation = () => {
                     }}
                 />
             )}
-            <div className="w-full h-full flex flex-row font-lato animate-fade-in3">
-                <div className='absolute top-0 right-0'>
+
+            <div className="fixed top-4 right-4 z-[100000]">
+                <div className="flex flex-col items-end space-y-2">
                     {alertMessages && alertMessages.map((msg, index) => (
                         <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
                             setAlertMessages(prev => prev.filter((_, i) => i !== index));
                         }} />
                     ))}
                 </div>
+            </div>
 
+            {isEmailSent && (
+                <CredentialsSent
+                    onClose={() => setIsEmailSent(false)}
+                    email={displayEmail}
+                />
+            )}
+            
+            <div className="w-full h-full flex flex-row font-lato animate-fade-in3">
                 <div className='hidden 2xl:flex h-full bg-cover bg-center 2xl:w-[30%]' style={{ backgroundImage: `url(${background.src})` }} />
                 {/* Wait lang butngan panig margin */}
                 <div className={` ${isOpen ? 'w-full' : 'w-full'} 
@@ -638,10 +662,11 @@ const AccountCreation = () => {
                     <div className='flex flex-col mt-5 w-full text-[1.1em] 2xl:text-[1.2em] items-center gap-[10px]'>
                         <div className="relative bg-primary overflow-hidden text-white w-[240px] h-[2.5em] 4xl:h-[3rem] flex items-center justify-center rounded-[10px] cursor-pointer transition-all hover:border-1 hover:border-primary group">
                             <button
-                                className="font-black"
+                                className="font-black flex items-center justify-center"
                                 type="submit"
                                 onClick={handleSubmit}
                             >
+                                {isLoading && <Spinner className='mr-2 group-hover:hidden' />}
                                 <span className="w-full h-48 rounded bg-white absolute bottom-0 left-0 translate-x-full ease-out duration-500 transition-all translate-y-full mb-9 ml-9 group-hover:ml-0 group-hover:mb-32 group-hover:translate-x-0"></span>
                                 <span className="relative w-full text-left text-white transition-colors duration-300 ease-in-out group-hover:text-primary">Confirm</span>
                             </button>
