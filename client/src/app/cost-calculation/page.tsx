@@ -114,6 +114,7 @@ const CostCalculation = () => {
   }, []);
 
   const handleFGClick = (fg: React.SetStateAction<string>) => {
+    setSelectedGoods([]);
     setSelectedFG(fg);
   };
 
@@ -207,6 +208,9 @@ const CostCalculation = () => {
   };
 
   const handleMonthYear = (value: string, label: string) => {
+    setSelectedGoods([]);
+    setSheets([{ id: 0, data: null }]);
+
     const numericValue = parseInt(value, 10);
     if (!isNaN(numericValue)) {
       setMonthYear({ value: numericValue, label: label });
@@ -310,10 +314,14 @@ const CostCalculation = () => {
         const a = document.createElement("a");
         a.href = url;
         a.download = `${fileName}.${exportType}`;
+        a.style.display = 'none';
         document.body.appendChild(a);
         a.click();
-        a.remove();
         window.URL.revokeObjectURL(url);
+        setTimeout(() => {
+          document.body.removeChild(a);
+        }, 100);
+        
         setExportLoading(false);
         setAlertMessages(["Report exported successfully."]);
         setAlertStatus("success");

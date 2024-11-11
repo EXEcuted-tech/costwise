@@ -340,7 +340,9 @@ class FinishedGoodController extends ApiController
                 ->where('monthYear', $finishedGood->monthYear)
                 ->first();
 
-            $finishedGood->fodl_id = $matchingFodl?->fodl_id;
+            if ($matchingFodl) {
+                $finishedGood->fodl_id = $matchingFodl->fodl_id;
+            }
 
             $finishedGood->save();
 

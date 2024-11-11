@@ -25,7 +25,7 @@ const ProjectedCostPage = () => {
   const [activeEnd, setActiveEnd] = useState("(Select Half)");
   const [activeFG, setActiveFG] = useState({
     product_num: 1,
-    product_name: "(Click on a product bellow to see its predictions.)",
+    product_name: "(Click on a product below to see its predictions.)",
     cost: 0,
   });
   const monthNames = [

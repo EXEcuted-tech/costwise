@@ -59,6 +59,43 @@ class DateHelper
         return $monthName . ' ' . $year;
     }
 
+    public static function formatMonthYearV2($yyyymm)
+    {
+        if (is_null($yyyymm)) {
+            return 'Invalid Date';
+        }
+
+        if (is_string($yyyymm) && preg_match('/^(\d{4})-(\d{2})$/', $yyyymm, $matches)) {
+            $year = (int)$matches[1];
+            $month = (int)$matches[2];
+        }
+        else if (is_int($yyyymm)) {
+            $year = floor($yyyymm / 100);
+            $month = $yyyymm % 100;
+        }
+        else {
+            return 'Invalid Date';
+        }
+
+        if ($month < 1 || $month > 12) {
+            return 'Invalid Date';
+        }
+
+        $monthMapping = [
+            1 => 'January', 2 => 'February', 3 => 'March',
+            4 => 'April', 5 => 'May', 6 => 'June',
+            7 => 'July', 8 => 'August', 9 => 'September',
+            10 => 'October', 11 => 'November', 12 => 'December'
+        ];
+
+        $monthName = $monthMapping[$month] ?? null;
+        if ($monthName === null) {
+            return 'Invalid Date';
+        }
+
+        return $monthName . ' ' . $year;
+    }
+
     public static function formatMonth($yyyymm)
     {
         if (is_null($yyyymm) || !is_int($yyyymm)) {

@@ -203,7 +203,7 @@ class BomController extends ApiController
             } else {
                 $emulsion = [
                     'level' => $emulsionData['level'],
-                    'batch_qty' => number_format(floatval($emulsionData['batch_qty']), 2, '.', ''),
+                    'batch_qty' => round(floatval($emulsionData['batch_qty']), 2),
                     'unit' => $emulsionData['unit'],
                 ];
             }
@@ -219,7 +219,7 @@ class BomController extends ApiController
                 foreach ($item as $material_id => $details) {
                     $materialQtyMap[$material_id] = [
                         'level' => $details['level'],
-                        'qty' => $details['qty'],
+                        'qty' => floatval($details['qty']),
                     ];
                 }
             }
@@ -252,11 +252,11 @@ class BomController extends ApiController
                 $materialID = $materialData['material_id'];
                 if (isset($materialQtyMap[$materialID])) {
                     $materialQtyMap[$materialID]['level'] = (int) $materialData['level'];
-                    $materialQtyMap[$materialID]['qty'] = $materialData['batchQty'];
+                    $materialQtyMap[$materialID]['qty'] = floatval($materialData['batchQty']);
                 } else {
                     $materialQtyMap[$materialID] = [
                         'level' => $materialData['level'],
-                        'qty' => $materialData['batchQty'],
+                        'qty' => floatval($materialData['batchQty']),
                     ];
                 }
                 ;
@@ -268,7 +268,7 @@ class BomController extends ApiController
                 $updatedMaterialQtyList[] = [
                     $material_id => [
                         'level' => $details['level'],
-                        'qty' => $details['qty'],
+                        'qty' => floatval($details['qty']),
                     ],
                 ];
             }

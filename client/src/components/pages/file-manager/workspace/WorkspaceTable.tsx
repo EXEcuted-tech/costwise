@@ -57,13 +57,23 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
     const handleInputChange = (rowIndex: number, key: string, value: string) => {
         const updatedData = [...tableData];
 
-        if (key == 'level' || key == 'formulation' || key == 'year' || key == 'month' || key == 'date' || key == 'glAccount') {
+        if (key == 'level' || key == 'formulation' || key == 'date' || key == 'description' || key == 'project'
+            || key == 'glDescription' || key == 'itemCode' || key == 'warehouse' || key == 'itemDescription' || key == 'unitCode'
+        ) {
             const formattedValue = String(value);
             updatedData[rowIndex][key] = formattedValue;
         } else if (!isNaN(Number(value)) || value === '' || value === '.') {
             // Allow empty string and decimal point during typing
             updatedData[rowIndex][key] = value;
         } else {
+            // If trying to input non-numeric value in a numeric field, keep previous value
+            // if (!isNaN(Number(updatedData[rowIndex][key]))) {
+            //     return;
+            // }
+
+            if (key == 'month' || key == 'year' || key == 'journal' || key == 'entryNumber' || key == 'glAccount') {
+                return;
+            }
             updatedData[rowIndex][key] = value;
         }
         setTableData(updatedData);

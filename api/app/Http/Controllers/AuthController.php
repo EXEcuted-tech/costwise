@@ -29,7 +29,7 @@ class AuthController extends ApiController
                     'phone_number' => 'required|regex:/^\+63\s?9\d{9}$/',
                     'position' => 'required',
                     'sys_role' => 'required',
-                    'display_picture' => 'required|image|mimes:jpeg,png,jpg|max:2048',
+                    'display_picture' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
                 ]
             );
 
@@ -85,7 +85,7 @@ class AuthController extends ApiController
 
             if (!Auth::attempt($request->only(['email_address', 'password']))) {
                 $this->status = 401;
-                return $this->getResponse("Account does not exist. Re-check your credentials.");
+                return $this->getResponse("Incorrect password! Please try again.");
             }
 
             $user = User::where('email_address', $request->email_address)->first();

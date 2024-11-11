@@ -12,6 +12,8 @@ import { BOM, Bom } from '@/types/data';
 import Spinner from '../loaders/Spinner';
 import ConfirmDelete from './ConfirmDelete';
 import Alert from '../alerts/Alert';
+import { AiOutlineEye } from 'react-icons/ai';
+import { HiArchiveBoxXMark } from 'react-icons/hi2';
 
 const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateAction<boolean>> }> = ({ setBOM }) => {
     const [inputValue, setInputValue] = useState('');
@@ -167,15 +169,21 @@ const BillOfMaterialsList: React.FC<{ setBOM: React.Dispatch<React.SetStateActio
                                             {miniMenu === index && (
                                                 <div ref={ref} className='animate-pop-out fixed bg-white dark:bg-[#3C3C3C] shadow-lg rounded-md border dark:border-[#5C5C5C] z-[5000] right-[55px]'
                                                     style={{ top: menuPosition }}>
-                                                    <p className='px-4 py-2 cursor-pointer dark:text-white border-b border-bg-gray-200 dark:border-b-[#5C5C5C] hover:bg-gray-200 dark:hover:bg-[#4c4c4c] transition-colors duration-250 ease-in-out'
+                                                    <p className='px-4 py-2 cursor-pointer dark:text-white border-b border-bg-gray-200 dark:border-b-[#5C5C5C] hover:bg-gray-200 dark:hover:bg-[#4c4c4c] transition-colors duration-250 ease-in-out flex items-center gap-2'
                                                         onClick={() => {
                                                             handleView(options.bom_id);
-                                                        }}>View</p>
-                                                    <p className='px-4 py-2 cursor-pointer dark:text-white hover:bg-primary hover:bg-primary hover:text-white rounded-b-md transition-colors duration-250 ease-in-out'
+                                                        }}>
+                                                        <AiOutlineEye className="text-[16px]" />
+                                                        View
+                                                    </p>
+                                                    <p className='px-4 py-2 cursor-pointer dark:text-white hover:bg-primary hover:bg-primary hover:text-white rounded-b-md transition-colors duration-250 ease-in-out flex items-center gap-2'
                                                         onClick={() => {
                                                             setBomToDelete({ id: options.bom_id, index });
                                                             setDeleteModal(true);
-                                                        }}>Archive</p>
+                                                        }}>
+                                                        <HiArchiveBoxXMark className="text-[16px]" />
+                                                        Archive
+                                                    </p>
                                                 </div>
                                             )}
                                         </div>

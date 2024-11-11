@@ -294,6 +294,15 @@ class FormulationController extends ApiController
                     'unit' => $finishedGood['unit'],
                     'monthYear' => date('Ym')
                 ]);
+
+                $fodl = Fodl::where('fg_code', $row[2])
+                    ->where('monthYear', date('Ym'))
+                    ->first();
+                    
+                if ($fodl) {
+                    $fgResult->fodl_id = $fodl->fodl_id;
+                    $fgResult->save();
+                }
             } elseif (strtoupper($row[3]) === 'EMULSION') {
                 $emulsion = [
                     'level' => $row[1],
@@ -378,7 +387,7 @@ class FormulationController extends ApiController
 
     private function addFormulationSheet($spreadsheet, $data)
     {
-        $sheet = $spreadsheet->createSheet();
+        $sheet = $spreadsheet->getActiveSheet();
         $name = $data['formula_code'];
         $sheet->setTitle("Formulation-{$name}");
 
