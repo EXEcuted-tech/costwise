@@ -24,7 +24,7 @@ class PasswordResetController extends Controller
             return response()->json(['message' => 'User not found'], 404);
         }
 
-        $token = $user->createToken('passwordResetToken', ['*'], now()->addMinutes(60));
+        $token = $user->createToken('passwordResetToken', ['*'], now()->addMinutes(30));
         $plainTextToken = explode('|', $token->plainTextToken)[1];
         \Log::info('Received Token: ' . $plainTextToken);
 
@@ -40,7 +40,7 @@ class PasswordResetController extends Controller
         $tokens = PersonalAccessToken::where('token', hash('sha256', $token))
                                 ->first();
 
-        if (!$tokens || Carbon::parse($tokens->created_at)->addMinutes(15)->isPast()) {
+        if (!$tokens || Carbon::parse($tokens->created_at)->addMinutes(30)->isPast()) {
             return response()->json(['message' => 'Invalid or expired token'], 400);
         }
 
