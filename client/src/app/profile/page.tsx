@@ -18,6 +18,7 @@ import config from "@/server/config";
 import Loader from "@/components/loaders/Loader";
 import { MdDarkMode } from "react-icons/md";
 import useColorMode from "@/hooks/useColorMode";
+import Alert from "@/components/alerts/Alert";
 
 interface UserProps {
     fName: string;
@@ -43,6 +44,8 @@ const ProfilePage = () => {
     const [isLoading, setIsLoading] = useState(true);
     const fileInputRef = useRef<HTMLInputElement>(null);
     const [colorMode, setColorMode] = useColorMode();
+    const [alertMessages, setAlertMessages] = useState<string[]>([]);
+    const [alertStatus, setAlertStatus] = useState<string>('');
 
     useEffect(() => {
         const fetchData = async () => {
@@ -94,6 +97,8 @@ const ProfilePage = () => {
                     localStorage.setItem('currentUser', JSON.stringify(updatedUser));
                     setCurrentUser(updatedUser as User);
                     setProfilePicture(response.data.display_picture);
+                    setAlertMessages([response.data.message]);
+                    setAlertStatus('success');
                 } else {
                     console.error('Error updating profile picture:', response.data.message);
                 }
@@ -139,12 +144,20 @@ const ProfilePage = () => {
     };
 
     return (
+        <>
         <div className='w-full h-screen flex flex-col items-center bg-repeat transition-all duration-300 ease-in-out' style={{ backgroundImage: `url(${background.src})` }}>
             {dialog &&
                 <SendEmailDialog
                     setDialog={setDialog}
                 />
             }
+            <div className='absolute top-0 right-0'>
+                {alertMessages && alertMessages.map((msg, index) => (
+                    <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
+                            setAlertMessages(prev => prev.filter((_, i) => i !== index));
+                        }} />
+                ))}
+            </div>
             <div className="relative w-full h-[170px]">
                 <div className="absolute w-full h-[50%] bg-[#FF0000] border-[5px] border-[#A60000] rounded-b-[100px]"></div>
                 <div className="absolute flex justify-center items-center w-[20%] 2xl:w-[16%] 4xl:w-[13%] h-[70%] top-[20px] left-1/2 -translate-x-1/2 bg-[#FF0000] border-[10px] border-[#A60000] rounded-[50%]">
@@ -233,6 +246,7 @@ const ProfilePage = () => {
                 <UserInformation isOpen={isOpen} userAcc={userAcc} isLoading={isLoading} />
             </div>
         </div>
+        </>
     );
 }
 
