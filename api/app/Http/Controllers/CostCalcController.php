@@ -174,7 +174,7 @@ class CostCalcController extends ApiController
                 $callback = function () use ($data) {
                     $handle = fopen('php://output', 'w');
 
-                    fputcsv($handle, ["Formula", "Level", "Item Code", "Description", "Batch Qty", "Unit", "Cost", "Total Cost"]);
+                    fputcsv($handle, ["Formula", "Level", "Item Code", "Description", "Batch Qty", "Unit", "Item Cost", "Total Cost"]);
 
                     foreach ($data as $fg) {
                         fputcsv($handle, [
@@ -261,7 +261,7 @@ class CostCalcController extends ApiController
 
         $sheet->setTitle("{$fg['desc']}");
 
-        $headers = ["Formula", "Level", "Item Code", "Description", "Batch Qty", "Unit", "Cost", "Total Cost"];
+        $headers = ["Formula", "Level", "Item Code", "Description", "Batch Qty", "Unit", "Item Cost", "Total Cost"];
 
         $sheet->fromArray($headers, NULL, 'A1');
         $sheet->getStyle('A1:H1')->getAlignment()->setHorizontal(Alignment::HORIZONTAL_CENTER)->setVertical(Alignment::VERTICAL_CENTER);
