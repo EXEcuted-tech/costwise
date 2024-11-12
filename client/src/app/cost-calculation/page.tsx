@@ -290,10 +290,10 @@ const CostCalculation = () => {
     const updatedCostData = [...costData, newData];
     setCostData(updatedCostData);
     try {
-      await (async () => {
-        await updateTraininingData(updatedCostData);
-        await exportFile(allFGData);
-      })();
+        updateTraininingData(updatedCostData);
+        setTimeout(() => {
+          exportFile(allFGData);
+        }, 5000);
     } catch (error) {}
   };
 
