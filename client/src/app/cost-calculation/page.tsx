@@ -293,7 +293,7 @@ const CostCalculation = () => {
         await updateTraininingData(updatedCostData);
         setTimeout(() => {
           exportFile(allFGData);
-        }, 1000);
+        }, 18000);
     } catch (error) {}
   };
 
