@@ -99,7 +99,7 @@ class AuthController extends ApiController
 
             if (!Auth::attempt($request->only(['email_address', 'password']))) {
                 $this->status = 401;
-                return $this->getResponse("Incorrect password! Please try again.");
+                return $this->getResponse("Incorrect credentials! Please try again.");
             }
 
             $user = User::where('email_address', $request->email_address)->first();

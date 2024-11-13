@@ -79,12 +79,14 @@ function ForgotPassPage() {
       {access &&
         <EmailSent onClose={setAccess} email={email} />
       }
-      <div className="absolute top-0 right-0">
-        {alertMessages && alertMessages.map((msg, index) => (
-          <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
-            setAlertMessages(prev => prev.filter((_, i) => i !== index));
-          }} />
-        ))}
+      <div className="fixed top-4 right-4 z-[1500]">
+        <div className="flex flex-col items-end space-y-2">
+          {alertMessages && alertMessages.map((msg, index) => (
+            <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+              setAlertMessages(prev => prev.filter((_, i) => i !== index));
+            }} />
+          ))}
+        </div>
       </div>
       <div className="font-lato animate-pop-out flex h-full max-h-[670px] z-10">
         <div className="bg-primary p-6 flex flex-col items-center rounded-l-3xl py-[90px] px-[45px] 2xl:p-[55px] !z-1">

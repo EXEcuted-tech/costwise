@@ -99,12 +99,14 @@ const PasswordReset = () => {
       {access && <PasswordChangeComplete />}
       {unavail && < ErrorToken/>}
 
-      <div className="absolute top-0 right-0">
+      <div className="fixed top-4 right-4 z-[1500]">
+        <div className="flex flex-col items-end space-y-2">
         {alertMessages && alertMessages.map((msg, index) => (
           <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
             setAlertMessages(prev => prev.filter((_, i) => i !== index));
           }} />
         ))}
+        </div>
       </div>
       <div className='flex flex-col animate-pop-out bg-white w-[550px] h-auto pb-[30px] rounded-[20px] px-[10px] gap-3'>
         <div className='flex justify-center'>
