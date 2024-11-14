@@ -358,7 +358,7 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
               Average Loss
             </h2>
             <p className="text-[40px] font-bold text-primary dark:text-white">
-              {(lossHistory[lossHistory.length - 1] / 4).toFixed(6)}
+              ₱{(lossHistory[lossHistory.length - 1] / 4).toFixed(6)}
             </p>
             <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
               Average loss of all predictions
