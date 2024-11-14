@@ -98,7 +98,11 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
         )
       );
 
+      const colors = ["#e91e63", "#9c27b0", "#60c689", "#4BC0C0", "#9966FF", "#FF9F40"];
+
       const datasets = costNames.map((costName, index) => {
+        const color = colors[index % colors.length];
+
         const data = filteredData.map((entry) => {
           const product = entry.products.find(
             (product) => product.productName === costName
@@ -109,9 +113,10 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
         return {
           label: costName,
           data,
-          borderColor: `hsl(${(index * 60) % 360}, 100%, 50%)`,
+          borderColor: color,
+          backgroundColor: `${color}33`,
           borderWidth: 2,
-          fill: false,
+          fill: true,
         };
       });
 
@@ -157,7 +162,7 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
           plugins: {
             legend: {
               position: "top",
-              labels:{
+              labels: {
                 color: isDarkMode ? "#ffffff" : "#666666",
               },
             },
