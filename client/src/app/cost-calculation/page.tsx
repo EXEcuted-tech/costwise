@@ -356,8 +356,10 @@ const CostCalculation = () => {
   };
 
   useEffect(() => {
-    makePrediction(trained, model, costData);
-    setIsLoading(false);
+    if (trained) {
+      makePrediction(trained, model, costData);
+      setIsLoading(false);
+    }
   }, [trained]);
 
   //Retrieve month and year options
