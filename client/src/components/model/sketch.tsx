@@ -211,6 +211,7 @@ export const makePrediction = async (
           productName
         );
       }
+      predictionTensor.dispose()
     }
     model.dispose();
   } else {
