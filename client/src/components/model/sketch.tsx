@@ -104,10 +104,10 @@ export async function initializeModel(
   setModel: React.Dispatch<React.SetStateAction<tf.Sequential | null>>,
   setTrained: React.Dispatch<React.SetStateAction<boolean>>,
   setTrainingSpeed: React.Dispatch<React.SetStateAction<number>>,
-  setLossHistory: React.Dispatch<React.SetStateAction<number[]>>
+  setLossHistory: React.Dispatch<React.SetStateAction<number>>
 ) {
   const monthYears = costData.map((d) => monthYearToNumber(d.monthYear));
-  let currentLossHistory: number[] = [];
+  let currentLossHistory: number;
 
   const productNames = _.uniq(
     costData.flatMap((entry) =>
@@ -135,8 +135,8 @@ export async function initializeModel(
 
   const earlyStopping = tf.callbacks.earlyStopping({
     monitor: "val_loss",
-    patience: 5,
-    minDelta: 0.01,
+    patience: 1,
+    minDelta: 0.3,
   });
 
   const startTime = performance.now();
@@ -147,9 +147,10 @@ export async function initializeModel(
       validationSplit: 0.2,
       callbacks: {
         onEpochEnd: (epoch, logs) => {
-          if (logs) {
-            currentLossHistory.push(logs.loss);
+          if (logs && epoch === 999) {
+            currentLossHistory = logs.loss;
           }
+          console.log(epoch)
         },
         ...[earlyStopping],
       },
@@ -167,7 +168,7 @@ export async function initializeModel(
   } finally {
     inputTensor.dispose();
     labelTensor.dispose();
-    // newModel.dispose();
+    console.log(tf.memory().numTensors)
   }
 }
 
@@ -220,10 +221,10 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
   const [costData, setCostData] = useState<CostDataEntry[]>([]);
   const [model, setModel] = useState<tf.Sequential | null>(null);
   const [trained, setTrained] = useState(false);
-  const [lossHistory, setLossHistory] = useState<number[]>([0]);
+  const [lossHistory, setLossHistory] = useState<number>(0);
   const [trainingSpeed, setTrainingSpeed] = useState<number>(0);
-  const [isLoading, setIsLoading] = useState(true); // Loading state
-
+  const [isLoading, setIsLoading] = useState(true);
+  const [modelInitialized, setModelInitialized] = useState(false);
   const [totalPrediction, setTotalPrediction] = useState<any[]>([]);
 
   // Helper function for cost extraction
@@ -294,9 +295,10 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
   };
 
   useEffect(() => {
-    if (costData.length > 1) {
+    if (costData.length > 1 && !modelInitialized) {
       setIsLoading(true);
       try {
+        setModelInitialized(true);
         initializeModel(
           costData,
           model,
@@ -314,7 +316,7 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
   }, [costData]);
 
   useEffect(() => {
-    if (trainingSpeed > 0 || lossHistory.length > 0) {
+    if (trainingSpeed > 0 || lossHistory > 0) {
       setIsLoading(false);
     }
   }, [trainingSpeed, lossHistory, trained]);
@@ -358,7 +360,7 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
               Average Loss
             </h2>
             <p className="text-[40px] font-bold text-primary dark:text-white">
-              {(lossHistory[lossHistory.length - 1] / 4).toFixed(6)}
+              ₱{(lossHistory / 4).toFixed(6)}
             </p>
             <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
               Average loss of all predictions
@@ -376,9 +378,8 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
               <button
                 onClick={prev}
                 disabled={currentIndex === 0}
-                className={`${
-                  isOpen ? "pl-[0px]" : "pl-[5%]"
-                } p-1 text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200`}
+                className={`${isOpen ? "pl-[0px]" : "pl-[5%]"
+                  } p-1 text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200`}
                 aria-label="Previous predictions"
               >
                 &#9664; {/* Left arrow */}
@@ -405,9 +406,8 @@ function TrainingModel({ isOpen }: { isOpen: boolean }) {
               <button
                 onClick={next}
                 disabled={currentIndex + itemsPerPage >= totalPrediction.length}
-                className={`${
-                  isOpen ? "pr-[0px]" : "pr-[5%]"
-                } p-1 text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200`}
+                className={`${isOpen ? "pr-[0px]" : "pr-[5%]"
+                  } p-1 text-white hover:text-gray-900 disabled:opacity-50 transition-opacity duration-200`}
                 aria-label="Next predictions"
               >
                 &#9654; {/* Right arrow */}

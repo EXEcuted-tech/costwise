@@ -71,7 +71,7 @@ const CostCalculation = () => {
   const [costData, setCostData] = useState<CostDataEntry[]>([]);
   const [model, setModel] = useState<tf.Sequential | null>(null);
   const [trained, setTrained] = useState(false);
-  const [lossHistory, setLossHistory] = useState<number[]>([0]);
+  const [lossHistory, setLossHistory] = useState<number>(0);
   const [trainingSpeed, setTrainingSpeed] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(false);
   const [prompt, setPrompt] = useState(false);
