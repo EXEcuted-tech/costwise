@@ -42,7 +42,7 @@ const ManageAccountPage = () => {
   };
 
   const removeSection = (index: any) => {
-    const updatedSections = sections.filter((_:any, i:any) => i !== index);
+    const updatedSections = sections.filter((_: any, i: any) => i !== index);
     setSections(updatedSections);
   };
 
@@ -82,6 +82,9 @@ const ManageAccountPage = () => {
       (section: { heading: string; content: string; }) => !section.heading.trim() || !section.content.trim()
     );
 
+    // Check if there are actual changes
+    const changesMade = JSON.stringify(sections) !== JSON.stringify(originalSections);
+
     if (hasEmptySection) {
       const updatedAlertMessages: any = {};
       let firstEmptyIndex = -1;
@@ -108,21 +111,35 @@ const ManageAccountPage = () => {
       setAlertMessages({});
     }
 
+    if (!changesMade) {
+      setAlertMessages({ general: "No changes detected." });
+      setAlertStatus("info");
+      return;
+    }
+
     try {
       await updateArticle("Manage Account", content);
+      setAlertMessages({ general: "Changes saved successfully!" });
+      setAlertStatus("success");
       fetchArticle();
     } catch (error) {
       console.error("Error updating article:", error);
       setAlertMessages({ general: "Failed to save changes. Please try again." });
+      setAlertStatus("critical");
     }
     setIsEditing(false);
   };
+
+
 
   return (
     <div className="bg-cover dark:bg-[#121212] bg-center items-center justify-center bg-[#FFFAF8] bg-opacity-20 h-[100vh] overflow-hidden transition-all duration-400 ease-in-out">
       <Header icon={PiBookOpenText} title="User's Manual" />
       <div className="flex h-[90%] w-[98%] pl-[90px] pt-[15px] -z-50">
         <div className="flex flex-col bg-white dark:bg-[#3C3C3C] w-full rounded-xl p-10 drop-shadow-lg">
+          {alertStatus !== "" && alertMessages.general && (
+            <Alert variant={alertStatus} message={alertMessages.general} setClose={() => setAlertStatus("")} />
+          )}
           <div className="flex flex-row w-full items-center justify-start border-b border-[#ACACAC] gap-[15px]">
             <Link href="/help">
               <GoArrowLeft className="dark:text-white text-primary text-[1.5em] xl:text-[2em] hover:opacity-75 hover:animate-shrink-in transition ease-in-out duration-200" />
@@ -159,7 +176,7 @@ const ManageAccountPage = () => {
               {sections.map((section: { heading: string; content: string; }, index: number) => (
                 <div
                   key={index}
-                  ref={(el:any) => (sectionRefs.current[index] = el)}
+                  ref={(el: any) => (sectionRefs.current[index] = el)}
                   className="flex flex-col pt-[50px] text-[30px] text-tertiary dark:text-white"
                 >
                   {isEditing ? (
@@ -216,7 +233,7 @@ const ManageAccountPage = () => {
                   </button>
                 </div>
               )}
-              {alertStatus!="" && alertMessages.general && (
+              {alertStatus != "" && alertMessages.general && (
                 <Alert variant={alertStatus} message={alertMessages.general} setClose={() => setAlertStatus("")} />
               )}
             </div>
