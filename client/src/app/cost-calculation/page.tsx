@@ -182,11 +182,11 @@ const CostCalculation = () => {
       const newSheets =
         existingIndex !== -1
           ? prevSheets.map((sheet, index) =>
-              index === existingIndex ? { ...sheet, data } : sheet
-            )
+            index === existingIndex ? { ...sheet, data } : sheet
+          )
           : prevSheets.map((sheet) =>
-              sheet.id === id ? { ...sheet, data } : sheet
-            );
+            sheet.id === id ? { ...sheet, data } : sheet
+          );
 
       previousSheets.forEach((previousSheet, index) => {
         if (previousSheet.data === null || newSheets[index].data === null) {
@@ -291,8 +291,7 @@ const CostCalculation = () => {
     setCostData(updatedCostData);
     try {
       await updateTraininingData(updatedCostData);
-      await exportFile(allFGData);
-    } catch (error) {}
+    } catch (error) { }
   };
 
   const exportFile = async (sheetData: any) => {
@@ -321,7 +320,7 @@ const CostCalculation = () => {
         setTimeout(() => {
           document.body.removeChild(a);
         }, 100);
-        
+
         setExportLoading(false);
         setAlertMessages(["Report exported successfully."]);
         setAlertStatus("success");
@@ -344,7 +343,7 @@ const CostCalculation = () => {
       });
     } catch (err) {
     } finally {
-      initializeModel(
+      await initializeModel(
         costData,
         model,
         setModel,
@@ -353,6 +352,7 @@ const CostCalculation = () => {
         setLossHistory
       );
     }
+    exportFile(allFGData);
   };
 
   useEffect(() => {
@@ -462,12 +462,12 @@ const CostCalculation = () => {
                 className="!relative"
                 variant={
                   alertStatus as
-                    | "default"
-                    | "information"
-                    | "warning"
-                    | "critical"
-                    | "success"
-                    | undefined
+                  | "default"
+                  | "information"
+                  | "warning"
+                  | "critical"
+                  | "success"
+                  | undefined
                 }
                 key={index}
                 message={msg}
@@ -520,11 +520,10 @@ const CostCalculation = () => {
               title="Click to create specific finished goods report"
               onClick={() => handleFGClick("Specific-FG")}
               className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-l-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-              ${
-                selectedFG === "Specific-FG"
+              ${selectedFG === "Specific-FG"
                   ? "bg-[#B22222] text-white"
                   : "bg-white hover:bg-[#ebebeb] dark:bg-[#1E1E1E] dark:text-white text-black transition-colors duration-200 ease-in-out"
-              }`}
+                }`}
             >
               Specific-FG
             </div>
@@ -532,11 +531,10 @@ const CostCalculation = () => {
               title="Click to create summarized finished goods report"
               onClick={() => handleFGClick("All-FG")}
               className={`w-[140px] h-[45px] text-[21px] py-1 text-center rounded-r-md border-1 border-[#929090] drop-shadow-md cursor-pointer 
-              ${
-                selectedFG === "All-FG"
+              ${selectedFG === "All-FG"
                   ? "bg-[#B22222] text-white"
                   : "bg-white hover:bg-[#ebebeb] dark:bg-[#1E1E1E] dark:text-white text-black transition-colors duration-200 ease-in-out"
-              }`}
+                }`}
             >
               All-FG
             </div>

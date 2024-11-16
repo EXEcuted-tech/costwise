@@ -37,7 +37,7 @@ const SpecificFG: React.FC<SpecificFGProps> = ({
     "Description",
     "Batch Qty",
     "Unit",
-    "Cost",
+    "Item Cost",
     "Total Cost",
   ];
   const [alertMessages, setAlertMessages] = useState<string[]>([]);

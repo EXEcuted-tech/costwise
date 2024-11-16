@@ -85,7 +85,7 @@ const AddFormulationPage = () => {
         setFormulaData(prevData => prevData.filter((_, i) => i !== index));
 
         // Add the removed row to removedRows
-        if(rowToRemoveData.itemCode != '' && rowToRemoveData.description != ''){
+        if (rowToRemoveData.itemCode != '' && rowToRemoveData.description != '') {
             setRemovedRows(prevRows => [...prevRows, rowToRemoveData]);
         }
 
@@ -106,7 +106,7 @@ const AddFormulationPage = () => {
             if (emulsionIndex !== -1) {
                 let totalBatchQty = 0;
                 for (let i = 0; i < updated.length; i++) {
-                    if (i !== emulsionIndex 
+                    if (i !== emulsionIndex
                         && !updated[i].description?.toUpperCase().includes('EMULSION')
                         && !updated[i].description?.toUpperCase().includes('PACKAGING')
                         && updated[i].formulation === "") {
@@ -217,13 +217,15 @@ const AddFormulationPage = () => {
 
     return (
         <>
-            <div className="absolute top-0 right-0">
-                {alertMessages && alertMessages.map((msg, index) => (
-                    <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
-                        setAlertMessages(prev => prev.filter((_, i) => i !== index));
-                    }} />
-                ))}
-                {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+            <div className="fixed top-4 right-4 z-[1500]">
+                <div className="flex flex-col items-end space-y-2">
+                    {alertMessages && alertMessages.map((msg, index) => (
+                        <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+                            setAlertMessages(prev => prev.filter((_, i) => i !== index));
+                        }} />
+                    ))}
+                    {successMessage && <Alert className="!relative" variant='success' message={successMessage} setClose={() => setSuccessMessage('')} />}
+                </div>
             </div>
             {confirmDialog && (
                 <div className="absolute z-[1000]">

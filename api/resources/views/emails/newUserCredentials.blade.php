@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Password Reset</title>
+    <title>Your Account Credentials</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -24,39 +24,37 @@
             border-radius: 5px;
             border: 1px solid #dee2e6;
         }
+        .credentials {
+            background-color: #f8f9fa;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 15px 0;
+        }
         .footer {
             margin-top: 20px;
             font-size: 0.9em;
             color: #6c757d;
         }
-        .reset-button {
-            display: inline-block;
-            padding: 10px 20px;
-            background-color: #B22222;
-            color: #ffffff !important;
-            text-decoration: none;
-            border-radius: 5px;
-            margin: 15px 0;
-        }
-        .reset-button:hover {
-            background-color: #8B0000;
-            color: #ffffff !important;
-        }
     </style>
 </head>
 <body>
     <div class="header">
-        <h1>Password Reset Request</h1>
+        <h1>Welcome to CostWise!</h1>
     </div>
     
     <div class="content">
-        <p>We received a request to reset your password. Please click the button below to reset it:</p>
+        <p>Dear {{ $details['name'] }},</p>
         
-        <a href="{{ $resetLink }}" class="reset-button" style="color: #ffffff !important;">Reset Password</a>
+        <p>Your account has been successfully created. Below are your login credentials:</p>
         
-        <p>This link will expire in 30 minutes.</p>
+        <div class="credentials">
+            <p><strong>Email:</strong> {{ $details['email'] }}</p>
+            <p><strong>Password:</strong> {{ $details['password'] }}</p>
+        </div>
         
-        <p>If you did not request a password reset, please ignore this email.</p>
+        <p>For security reasons, we recommend changing your password after your first login.</p>
+        
+        <p>If you have any questions or need assistance, please don't hesitate to contact our support team.</p>
         
         <div class="footer">
             <p>Best regards,<br>CostWise Team</p>

@@ -42,7 +42,7 @@ const EssentialsPage = () => {
   };
 
   const removeSection = (index: any) => {
-    const updatedSections = sections.filter((_:any, i: any) => i !== index);
+    const updatedSections = sections.filter((_: any, i: any) => i !== index);
     setSections(updatedSections);
   };
 
@@ -82,6 +82,9 @@ const EssentialsPage = () => {
       (section: { heading: string; content: string; }) => !section.heading.trim() || !section.content.trim()
     );
 
+    // Check if there are actual changes
+    const changesMade = JSON.stringify(sections) !== JSON.stringify(originalSections);
+
     if (hasEmptySection) {
       const updatedAlertMessages: any = {};
       let firstEmptyIndex = -1;
@@ -108,12 +111,21 @@ const EssentialsPage = () => {
       setAlertMessages({});
     }
 
+    if (!changesMade) {
+      setAlertMessages({ general: "No changes detected." });
+      setAlertStatus("info");
+      return;
+    }
+
     try {
       await updateArticle("Essentials", content);
+      setAlertMessages({ general: "Changes saved successfully!" });
+      setAlertStatus("success");
       fetchArticle();
     } catch (error) {
       console.error("Error updating article:", error);
       setAlertMessages({ general: "Failed to save changes. Please try again." });
+      setAlertStatus("critical");
     }
     setIsEditing(false);
   };
@@ -156,10 +168,10 @@ const EssentialsPage = () => {
             <LoadingSpinner />
           ) : (
             <div id="scroll-style" className="px-28 overflow-y-scroll">
-              {sections.map((section:any, index:any) => (
+              {sections.map((section: any, index: any) => (
                 <div
                   key={index}
-                  ref={(el:any) => (sectionRefs.current[index] = el)}
+                  ref={(el: any) => (sectionRefs.current[index] = el)}
                   className="flex flex-col pt-[50px] text-[30px] text-tertiary dark:text-white"
                 >
                   {isEditing ? (
@@ -216,7 +228,7 @@ const EssentialsPage = () => {
                   </button>
                 </div>
               )}
-              {alertStatus!="" && alertMessages.general && (
+              {alertStatus != "" && alertMessages.general && (
                 <Alert variant={alertStatus} message={alertMessages.general} setClose={() => setAlertStatus("")} />
               )}
             </div>

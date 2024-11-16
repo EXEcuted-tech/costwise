@@ -7,9 +7,11 @@ use App\Models\PersonalAccessToken;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Log;
+use App\Mail\NewUserCredentials;
 
 class AuthController extends ApiController
 {
@@ -24,7 +26,7 @@ class AuthController extends ApiController
                     'first_name' => 'required',
                     'last_name' => 'required',
                     'email_address' => 'required|email|unique:users',
-                    'password' => 'required|min:8|max:16|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/',
+                    //'password' => 'required|min:8|max:16|regex:/^(?=.*?[A-Z])(?=.*?[a-z])(?=.*?[0-9])(?=.*?[#?!@$%^&*-]).{8,}$/',
                     'department' => 'required',
                     'phone_number' => 'required|regex:/^\+63\s?9\d{9}$/',
                     'position' => 'required',
@@ -40,7 +42,19 @@ class AuthController extends ApiController
             }
 
             $validatedData = $validator->validated();
-            $validatedData['password'] = Hash::make($request->password);
+
+            $randomPassword = Str::random(12);
+            $validatedData['password'] = Hash::make($randomPassword);
+            
+            $details = [
+                'name' => $validatedData['first_name'] . ' ' . $validatedData['last_name'],
+                'email' => $validatedData['email_address'],
+                'password' => $randomPassword
+            ];
+            
+            Mail::to($validatedData['email_address'])->send(new NewUserCredentials($details));
+            
+            //$validatedData['password'] = Hash::make($request->password);
             $validatedData['sys_role'] = json_decode($request->sys_role);
 
 
@@ -85,7 +99,7 @@ class AuthController extends ApiController
 
             if (!Auth::attempt($request->only(['email_address', 'password']))) {
                 $this->status = 401;
-                return $this->getResponse("Incorrect password! Please try again.");
+                return $this->getResponse("Incorrect credentials! Please try again.");
             }
 
             $user = User::where('email_address', $request->email_address)->first();

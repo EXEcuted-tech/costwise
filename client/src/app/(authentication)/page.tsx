@@ -27,7 +27,7 @@ function LoginPage() {
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
     const tokenExpiresAt = localStorage.getItem('tokenExpiresAt');
-    
+
     if (accessToken && tokenExpiresAt) {
       const expiresAt = new Date(tokenExpiresAt);
       if (expiresAt > new Date()) {
@@ -107,12 +107,14 @@ function LoginPage() {
 
   return (
     <div onKeyDown={handleKeyDown}>
-      <div className="absolute top-0 right-0">
-        {alertMessages && alertMessages.map((msg, index) => (
-          <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
-            setAlertMessages(prev => prev.filter((_, i) => i !== index));
-          }} />
-        ))}
+      <div className="fixed top-4 right-4 z-50">
+        <div className="flex flex-col items-end space-y-2">
+          {alertMessages && alertMessages.map((msg, index) => (
+            <Alert className="!relative" variant='critical' key={index} message={msg} setClose={() => {
+              setAlertMessages(prev => prev.filter((_, i) => i !== index));
+            }} />
+          ))}
+        </div>
       </div>
       <div className="animate-pop-out relative z-10 flex-col h-[670px] w-[350px] sm:w-[500px] lg:w-[900px] 2xl:w-[1100px] rounded-3xl bg-white font-lato drop-shadow-3xl">
 

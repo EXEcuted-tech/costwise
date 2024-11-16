@@ -42,7 +42,7 @@ const GettingStartedPage = () => {
   };
 
   const removeSection = (index: any) => {
-    const updatedSections = sections.filter((_:any, i:any) => i !== index);
+    const updatedSections = sections.filter((_: any, i: any) => i !== index);
     setSections(updatedSections);
   };
 
@@ -82,8 +82,11 @@ const GettingStartedPage = () => {
       (section: { heading: string; content: string; }) => !section.heading.trim() || !section.content.trim()
     );
 
+    // Check if there are actual changes
+    const changesMade = JSON.stringify(sections) !== JSON.stringify(originalSections);
+
     if (hasEmptySection) {
-      const updatedAlertMessages:any = {};
+      const updatedAlertMessages: any = {};
       let firstEmptyIndex = -1;
 
       sections.forEach((section: { heading: string; content: string; }, index: number) => {
@@ -108,12 +111,21 @@ const GettingStartedPage = () => {
       setAlertMessages({});
     }
 
+    if (!changesMade) {
+      setAlertMessages({ general: "No changes detected." });
+      setAlertStatus("info");
+      return;
+    }
+
     try {
       await updateArticle("Getting Started", content);
+      setAlertMessages({ general: "Changes saved successfully!" });
+      setAlertStatus("success");
       fetchArticle();
     } catch (error) {
       console.error("Error updating article:", error);
       setAlertMessages({ general: "Failed to save changes. Please try again." });
+      setAlertStatus("critical");
     }
     setIsEditing(false);
   };
@@ -216,7 +228,7 @@ const GettingStartedPage = () => {
                   </button>
                 </div>
               )}
-              {alertStatus!="" && alertMessages.general && (
+              {alertStatus != "" && alertMessages.general && (
                 <Alert variant={alertStatus} message={alertMessages.general} setClose={() => setAlertStatus("")} />
               )}
             </div>

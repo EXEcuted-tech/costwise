@@ -90,12 +90,13 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
   return (
     <>
       <div className="fixed top-4 right-4 z-[3000]">
+        <div className="flex flex-col items-end space-y-2">
           {alertMessages && alertMessages.map((msg, index) => (
             <Alert className="!relative" variant={alertStatus as "default" | "information" | "warning" | "critical" | "success" | undefined} key={index} message={msg} setClose={() => {
               setAlertMessages(prev => prev.filter((_, i) => i !== index));
             }} />
           ))}
-          
+        </div>
       </div>
       {access &&
         <EmailSent onClose={setAccess} email={email} />
