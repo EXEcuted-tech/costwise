@@ -160,7 +160,9 @@ class AuthController extends ApiController
     public function logout()
     {
         try {
-            auth()->user()->tokens()->delete();
+            auth()->user()->tokens()->where('name', 'accessToken')
+                                    ->orwhere('name', 'refreshToken')
+                                    ->delete();
             $this->status = 200;
             return $this->getResponse("Logged out successfully!");
         } catch (\Throwable $th) {
