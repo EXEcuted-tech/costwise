@@ -10,6 +10,10 @@ import { useFileManagerContext } from '@/contexts/FileManagerContext'
 import { useUserContext } from '@/contexts/UserContext'
 import WorkspaceTable from './WorkspaceTable';
 
+/**
+ * Container component for displaying and managing transaction files
+ * @param data File data containing settings and metadata
+ */
 const TransactionFileContainer = (data: File) => {
   const [isEdit, setIsEdit] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
@@ -22,13 +26,9 @@ const TransactionFileContainer = (data: File) => {
   const [successMessage, setSuccessMessage] = useState('');
   const [removedIds, setRemovedIds] = useState<number[]>([]);
 
-
   const { currentUser } = useUserContext();
 
-  // useEffect(() => {
-  //   setTransactionsCount(transactionData.length); // Update the count based on current data
-  // }, [transactionData]);
-
+  // Hide scroll message after 15 seconds
   useEffect(() => {
     const timer = setTimeout(() => {
       setShowScrollMessage(false);
@@ -36,6 +36,7 @@ const TransactionFileContainer = (data: File) => {
     return () => clearTimeout(timer);
   }, []);
 
+  // Initial data loading effect
   useEffect(() => {
     if (localStorage.getItem("edit") === "true") {
       setIsEdit(true);
@@ -62,6 +63,10 @@ const TransactionFileContainer = (data: File) => {
     }
   }, []);
 
+  /**
+   * Fetches transaction data for given transaction IDs
+   * @param transaction_ids Array of transaction IDs to fetch
+   */
   const fetchTransactionsSheet = async (transaction_ids: Number[]) => {
     try {
       const response = await api.get('/transactions/retrieve_batch', {
@@ -130,8 +135,12 @@ const TransactionFileContainer = (data: File) => {
     }
   };
 
+  /**
+   * Saves transaction sheet data and handles removed records
+   * @param transactions Array of transaction data to save
+   */
   const onSaveTransactionsSheet = async (transactions: any[]) => {
-    // try {
+    // Validate for empty entries
     const hasEmptyEntry = transactions.some(item => {
       return (
         (item.date === "" ||
@@ -159,7 +168,7 @@ const TransactionFileContainer = (data: File) => {
       return;
     }
 
-
+    // Transform transaction data for API
     const transformedTransactions = transactions.map((item) => ({
       transaction_id: item.id,
       material_id: item.rowType === 'material' ? item.track_id : null,
@@ -200,8 +209,8 @@ const TransactionFileContainer = (data: File) => {
         }
       }
 
+      // Log audit
       const settings = JSON.parse(data.settings);
-
       const user = localStorage.getItem('currentUser');
       const parsedUser = JSON.parse(user || '{}');
 
@@ -234,6 +243,7 @@ const TransactionFileContainer = (data: File) => {
       }
     }
 
+    // Handle removed transactions
     if (removedIds.length > 0) {
       try {
         const deletePayload = {
@@ -269,23 +279,22 @@ const TransactionFileContainer = (data: File) => {
       setRemovedIds([]);
     }
 
-
     setTimeout(() => {
       setAlertMessages([]);
-      // const updatedLastPage = Math.ceil(transactionData.length / itemsPerPage);
-      // setCurrentPage(updatedLastPage);
     }, 25000);
-
-    // window.location.reload();
   };
 
   const containerRef = useRef<HTMLDivElement | null>(null);
 
+  /**
+   * Scrolls container horizontally by a fixed amount
+   * @param direction 'left' or 'right' scroll direction
+   */
   const scrollHorizontalOnce = (direction: 'left' | 'right') => {
     const container = containerRef.current;
     if (!container) return;
 
-    const scrollAmount = 700; // Adjust this value to control scroll distance
+    const scrollAmount = 700;
     const targetScroll = container.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount);
 
     container.scrollTo({
@@ -294,11 +303,15 @@ const TransactionFileContainer = (data: File) => {
     });
   };
 
+  /**
+   * Scrolls container horizontally to the end
+   * @param direction 'left' or 'right' scroll direction
+   */
   const scrollHorizontalDown = (direction: 'left' | 'right') => {
     const container = containerRef.current;
     if (!container) return;
 
-    const scrollAmount = 10000; // Adjust this value to control scroll distance
+    const scrollAmount = 10000;
     const targetScroll = container.scrollLeft + (direction === 'left' ? -scrollAmount : scrollAmount);
 
     container.scrollTo({
@@ -307,8 +320,12 @@ const TransactionFileContainer = (data: File) => {
     });
   };
 
+  /**
+   * Scrolls window vertically by a fixed amount
+   * @param direction 'up' or 'down' scroll direction
+   */
   const scrollVerticalOnce = (direction: 'up' | 'down') => {
-    const scrollAmount = 700; // Adjust this value to control scroll distance
+    const scrollAmount = 700;
     const targetScroll = window.scrollY + (direction === 'up' ? -scrollAmount : scrollAmount);
 
     window.scrollTo({
@@ -317,6 +334,10 @@ const TransactionFileContainer = (data: File) => {
     });
   };
 
+  /**
+   * Scrolls window vertically to the end
+   * @param direction 'up' or 'down' scroll direction
+   */
   const scrollVerticalDown = (direction: 'up' | 'down') => {
     const scrollAmount = 10000; // Adjust this value to control scroll distance
     const targetScroll = window.scrollY + (direction === 'up' ? -scrollAmount : scrollAmount);
@@ -326,7 +347,6 @@ const TransactionFileContainer = (data: File) => {
       behavior: 'smooth'
     });
   };
-
 
   return (
     <>
@@ -461,6 +481,5 @@ const TransactionFileContainer = (data: File) => {
     </>
   )
 }
-
 
 export default TransactionFileContainer;

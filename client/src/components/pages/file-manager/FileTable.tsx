@@ -21,18 +21,30 @@ interface FileTableComponentProps {
     setExportLoading: (value: boolean) => void;
 }
 
+/**
+ * FileTable component displays a table of files with pagination and management actions
+ */
 const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoading, setIsLoading, setErrorMsg, setExportLoading }) => {
+    // State for pagination
     const [currentPage, setCurrentPage] = useState<number>(1);
     const { currentUser, setError } = useUserContext();
     const { setDeleteModal, setFileToDelete, setFileSettings } = useFileManagerContext();
+
+    // Handle pagination page changes
     const handlePageChange = (e: React.ChangeEvent<unknown>, page: number) => {
         setCurrentPage(page);
     };
+
+    // Calculate pagination indexes
     const indexOfLastItem = currentPage * 8;
     const indexOfFirstItem = indexOfLastItem - 8;
     const currentListPage = fileData.slice(indexOfFirstItem, indexOfLastItem);
     const router = useRouter();
 
+    /**
+     * Handles viewing a file, checking for proper authorization
+     * data File object containing file details
+     */
     const handleView = (data: File) => {
         const sysRoles = currentUser?.roles;
         if (!sysRoles?.includes(5)) {
@@ -42,6 +54,10 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
         router.push(`/file-manager/workspace?id=${data.file_id}&type=${data.file_type}`);
     }
 
+    /**
+     * Handles editing a file, checking for proper authorization
+     * data File object containing file details
+     */
     const handleEdit = (data: File) => {
         const sysRoles = currentUser?.roles;
         if (!sysRoles?.includes(7)) {
@@ -52,6 +68,12 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
         router.push(`/file-manager/workspace?id=${data.file_id}&type=${data.file_type}`);
     }
 
+    /**
+     * Handles exporting a file, checking for proper authorization
+     * Creates a downloadable blob and triggers file download
+     * Also logs the export action in audit logs
+     * data File object containing file details
+     */
     const handleExport = async (data: File) => {
         const sysRoles = currentUser?.roles;
         if (!sysRoles?.includes(17)) {
@@ -79,6 +101,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
             window.URL.revokeObjectURL(url);
             setExportLoading(false);
 
+            // Log export action in audit logs
             const user = localStorage.getItem('currentUser');
             const parsedUser = JSON.parse(user || '{}');
 
@@ -99,6 +122,10 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
         }
     };
 
+    /**
+     * Handles deleting/archiving a file, checking for proper authorization
+     * data File object containing file details
+     */
     const handleDelete = (data: File) => {
         const sysRoles = currentUser?.roles;
         if (!sysRoles?.includes(8)) {
@@ -112,6 +139,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
 
     return (
         <div>
+            {/* Table Header */}
             <table className='w-full'>
                 <thead className={` ${isOpen && 'text-[14px] 2xl:text-[16px]'} text-left font-bold text-[#868686] dark:text-[#e0e0e0] border-b-[0.6px] border-[#868686]`}>
                     <tr>
@@ -123,6 +151,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
                     </tr>
                 </thead>
                 <tbody>
+                    {/* Loading State */}
                     {isLoading &&
                         <td colSpan={5}>
                             <div className='h-[628px] flex justify-center items-center'>
@@ -130,6 +159,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
                             </div>
                         </td>
                     }
+                    {/* File List */}
                     {(!isLoading && currentListPage.length > 0) &&
                         (currentListPage.map((data, index) => {
                             let settings: FileSettings;
@@ -162,6 +192,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
                                     <td className={` text-[14px] 2xl:text-[16px] dark:text-white`}>{dateAdded}</td>
                                     <td className={` text-[14px] 2xl:text-[16px] dark:text-white`}>{addedBy}</td>
                                     <td className={`${isOpen ? 'w-[20%] 3xl:w-[15%] pr-[20px] 2xl:pr-[46px]' : 'w-[20%] 2xl:w-[15%] pr-[46px]'}`}>
+                                        {/* Action Buttons */}
                                         <div className='h-[30px] grid grid-cols-4 border-1 border-[#868686] rounded-[5px]'>
                                             <div title='View' className='flex justify-center items-center border-r-1 border-[#868686] h-full dark:text-white dark:hover:bg-[#4C4C4C]
                                                 cursor-pointer hover:bg-[#f7f7f7] rounded-l-[5px] transition-colors duration-200 ease-in-out'
@@ -190,6 +221,7 @@ const FileTable: React.FC<FileTableComponentProps> = ({ fileData, isOpen, isLoad
                         }))}
                 </tbody>
             </table>
+            {/* Pagination or No Files Message */}
             {!isLoading && currentListPage.length > 0
                 ?
                 <div className='relative py-[1%]'>

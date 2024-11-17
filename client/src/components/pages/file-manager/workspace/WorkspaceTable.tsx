@@ -7,6 +7,7 @@ import { IoIosSave } from "react-icons/io";
 import { IoTrash } from "react-icons/io5";
 import WkspConfirmDialog from '@/components/modals/WkspConfirmDialog';
 
+// Props interface for the WorkspaceTable component
 interface WorkspaceTableProps {
     setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
     isEdit: boolean;
@@ -23,6 +24,7 @@ interface WorkspaceTableProps {
     containerRef?: React.RefObject<HTMLDivElement>;
 }
 
+// Main WorkspaceTable component for displaying and editing tabular data
 const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
     data,
     isEdit,
@@ -50,13 +52,17 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
     //         setTableData(data);
     //     }
     // }, [data, initialData.length]);
+
+    // Update table data when input data changes
     useEffect(()=>{
         setTableData(data);
     },[data])
 
+    // Handles input changes in editable cells
     const handleInputChange = (rowIndex: number, key: string, value: string) => {
         const updatedData = [...tableData];
 
+        // Handle text fields
         if (key == 'level' || key == 'formulation' || key == 'date' || key == 'description' || key == 'project'
             || key == 'glDescription' || key == 'itemCode' || key == 'warehouse' || key == 'itemDescription' || key == 'unitCode'
         ) {
@@ -66,11 +72,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
             // Allow empty string and decimal point during typing
             updatedData[rowIndex][key] = value;
         } else {
-            // If trying to input non-numeric value in a numeric field, keep previous value
-            // if (!isNaN(Number(updatedData[rowIndex][key]))) {
-            //     return;
-            // }
-
+            // Handle special numeric fields
             if (key == 'month' || key == 'year' || key == 'journal' || key == 'entryNumber' || key == 'glAccount') {
                 return;
             }
@@ -79,6 +81,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
         setTableData(updatedData);
     };
 
+    // Adds a new empty row to the table for regular tables
     const addRow = () => {
         if (isTransaction) {
             const scrollHeight = document.documentElement.scrollHeight;
@@ -102,6 +105,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
         setTableData([...tableData, emptyRow]);
     };
 
+    // Adds a new row specifically for BOM tables with special row types
     const addBomRow = () => {
         const nextId = tableData.length > 0
             ? Math.max(...tableData.map(row => (row.id as number) || 0)) + 1
@@ -153,11 +157,13 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
         }
     };
 
+    // Initiates row removal process
     const removeRow = (index: number) => {
         setRowToRemove({ index });
         setConfirmDialog(true);
     };
 
+    // Confirms and executes row removal for regular tables
     const confirmRemoveRow = () => {
         if (rowToRemove === null) return;
 
@@ -177,6 +183,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
         setRowToRemove(null);
     };
 
+    // Initiates BOM row removal process
     const removeBomRow = (index: number, rowType: string) => {
         if (rowType == 'endIdentifier') {
             alert("That's a row identifier!");
@@ -186,6 +193,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
         setConfirmDialog(true);
     };
 
+    // Confirms and executes row removal for BOM tables
     const confirmRemoveBomRow = () => {
         if (rowToRemove === null) return;
 
@@ -201,6 +209,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
 
         let indicesToRemove: number[] = [index];
 
+        // Remove all related rows if removing a finished good
         if (rowType === 'finishedGood') {
             for (let i = index + 1; i < tableData.length; i++) {
                 const currentRow = tableData[i];
@@ -238,8 +247,6 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
         setConfirmDialog(false);
         setRowToRemove(null);
     };
-
-
 
     return (
         <>
@@ -433,6 +440,7 @@ const WorkspaceTable: React.FC<WorkspaceTableProps> = ({
     );
 }
 
+// Helper function to render different types of values in the table
 function renderValue(value: unknown): React.ReactNode {
     if (typeof value === 'string' || typeof value === 'boolean') {
         return String(value);

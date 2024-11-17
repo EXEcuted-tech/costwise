@@ -15,6 +15,7 @@ import { File } from '@/types/data';
 import Spinner from '@/components/loaders/Spinner';
 
 const WorkspacePage = () => {
+    // State for managing active tab and file type
     const [tab, setTab] = useState('master files');
     const { fileType, setFileType } = useFileManagerContext(); //0 is none, 1 is master file, 2 is transactions
     const [fileData, setFileData] = useState<File | null>(null);
@@ -23,14 +24,17 @@ const WorkspacePage = () => {
     const [bomSheets, setBomSheets] = useState<number[]>([]);
     const [isHovered, setIsHovered] = useState(false);
 
+    // Hooks for navigation and sidebar state
     const { isOpen } = useSidebarContext();
     const router = useRouter();
     const searchParams = useSearchParams();
 
+    // Set workspace flag in localStorage on component mount
     useEffect(() => {
         localStorage.setItem("wkspBool", "true");
     }, [])
 
+    // Main data fetching effect that runs when URL params change
     useEffect(() => {
         const fetchData = async () => {
             const id = searchParams.get('id');
@@ -60,6 +64,7 @@ const WorkspacePage = () => {
         fetchData();
     }, [searchParams, setFileType, setTab]);
 
+    // Helper function to retrieve file data from API
     const retrieveFileData = async (id: number) => {
         try {
             const response = await api.get('/files/retrieve', {
@@ -76,6 +81,7 @@ const WorkspacePage = () => {
         }
     }
 
+    // Handler for navigating back to file manager
     const redirectBack = () => {
         //add ug confirm dialog if wala pa na save ang mga changes if naa na backend
         setIsEmpty(true);
@@ -87,7 +93,7 @@ const WorkspacePage = () => {
 
     return (
         <>
-            {/* Navigation Pane */}
+            {/* Navigation Pane - Only shown for master files (fileType === 1) */}
             {fileType === 1 && (
                 <div 
                     className="fixed right-[-105px] hover:right-0 top-[30%] transform -translate-y-1/2 z-[950] transition-all ease-in-out duration-300"
@@ -102,6 +108,7 @@ const WorkspacePage = () => {
                         )}
                         <span className="font-semibold text-primary dark:text-white">Navigation</span>
                     </div>
+                    {/* Navigation links for different sections of the master file */}
                     <ul className="fixed right-[-15px] bg-white dark:bg-[#5e5e5e] rounded-l-lg shadow-md p-4">
                         <li>
                             <a
@@ -119,6 +126,7 @@ const WorkspacePage = () => {
                                 Material Sheet
                             </a>
                         </li>
+                        {/* Dynamically generate BOM sheet links based on bomSheets array */}
                         {bomSheets.map((bomId, index) => (
                             <li key={bomId}>
                                 <a
@@ -149,6 +157,7 @@ const WorkspacePage = () => {
                             setIsEmpty={setIsEmpty} />
                     </div>
                 </div>
+                {/* Main content area - shows loading spinner, no file message, or appropriate file container */}
                 <div className={`${isOpen ? 'px-[10px] 2xl:px-[50px]' : 'px-[50px]'} mt-[25px] ml-[45px]`}>
                     {isLoading ? (
                         <div className='flex flex-col justify-center items-center bg-white dark:bg-[#3C3C3C] rounded-[10px] drop-shadow text-white h-[660px] mx-auto'>

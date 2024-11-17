@@ -1,4 +1,5 @@
 "use client"
+// Import necessary components, hooks, and utilities
 import Header from '@/components/header/Header';
 import FileContainer from '@/components/pages/file-manager/FileContainer'
 import FileTabs from '@/components/pages/file-manager/FileTabs';
@@ -24,6 +25,7 @@ import Spinner from '@/components/loaders/Spinner';
 import ConfirmFileDuplicate from '@/components/modals/ConfirmFileDuplicate';
 
 const FileManagerPage = () => {
+  // Context and state management
   const { isOpen } = useSidebarContext();
   const { deleteModal, setDeleteModal } = useFileManagerContext();
   const [tab, setTab] = useState('all');
@@ -42,10 +44,13 @@ const FileManagerPage = () => {
 
   const [exportLoading, setExportLoading] = useState(false);
 
+  // Reference for handling file upload proceed/cancel
   const proceedRef = useRef("await");
 
+  // Hook to handle clicking outside upload dropdown
   const ref = useOutsideClick(() => setUpload(false));
 
+  // Function to fetch file data based on selected tab
   const fetchData = useCallback(async () => {
     setIsLoading(true);
 
@@ -70,7 +75,7 @@ const FileManagerPage = () => {
         }
       } else if (tab === 'transactionfile') {
         const response = await api.get('/files/retrieve', {
-          params: { col: 'file_type', value: 'transactional_file' }, //will improve this to batch if needed
+          params: { col: 'file_type', value: 'transactional_file' },
         });
         if (response.data.status === 200) {
           setTimeout(() => {
@@ -86,10 +91,12 @@ const FileManagerPage = () => {
     }
   }, [tab]);
 
+  // Fetch data when tab changes
   useEffect(() => {
     fetchData();
   }, [fetchData]);
 
+  // Load previously selected tab from localStorage
   useEffect(() => {
     const currentTab = localStorage.getItem('fileTab');
     if (currentTab) {
@@ -97,6 +104,7 @@ const FileManagerPage = () => {
     }
   }, []);
 
+  // Handlers for duplicate file modal
   const onClose = () => {
     proceedRef.current = "close";
     setDuplicateModal(false);
@@ -108,12 +116,14 @@ const FileManagerPage = () => {
     setDuplicateModal(false);
   };
 
+  // File drop handler for file uploads
   const onDrop = useCallback(
     (acceptedFiles: any[]) => {
       setErrorMsg('');
       setInfoMsg('');
       setUpload(false);
 
+      // Function to wait for user's choice on duplicate files
       const waitForUserChoice = () => {
         return new Promise((resolve) => {
           const checkProceed = () => {
@@ -131,6 +141,7 @@ const FileManagerPage = () => {
         });
       };
 
+      // Process each dropped file
       const processFile = async (file: any) => {
         const reader = new FileReader();
 
@@ -139,6 +150,7 @@ const FileManagerPage = () => {
             const data = e.target?.result;
             const fileName = file.name;
 
+            // Check for duplicate files
             if (
               allData.some(
                 (existingFile) =>
@@ -155,6 +167,7 @@ const FileManagerPage = () => {
 
             setIsLoading(true);
             if (data && data instanceof ArrayBuffer) {
+              // Process Excel file and validate required sheets
               const dataArray = new Uint8Array(data);
               const workbook = XLSX.read(dataArray, { type: 'array' });
 
@@ -173,6 +186,7 @@ const FileManagerPage = () => {
                 hasRequiredSheets = requiredSheets.every(sheetName => sheetNames.includes(sheetName));
               }
 
+              // Upload file if validation passes
               if (
                 hasRequiredSheets &&
                 ((uploadType === 'master' && bomSheets.length > 0) || uploadType === 'transactional')
@@ -184,7 +198,7 @@ const FileManagerPage = () => {
                 try {
                   const response = await api.post('/files/upload', formData);
                   if (response.data.status === 200) {
-
+                    // Log audit trail for successful upload
                     const user = localStorage.getItem('currentUser');
                     const parsedUser = JSON.parse(user || '{}');
 
@@ -224,6 +238,7 @@ const FileManagerPage = () => {
         });
       };
 
+      // Process all dropped files and handle results
       Promise.all(acceptedFiles.map(processFile))
         .then((results) => {
           const successCount = results.filter(Boolean).length;
@@ -246,6 +261,7 @@ const FileManagerPage = () => {
     [allData, duplicateModal, fetchData, uploadType]
   );
 
+  // Configure dropzone for file uploads
   const { getRootProps, getInputProps, open } = useDropzone({
     onDrop,
     noClick: true,
@@ -257,6 +273,7 @@ const FileManagerPage = () => {
     },
   });
 
+  // Handle upload button click
   const handleUpload = (type: React.SetStateAction<string>) => {
     const sysRoles = currentUser?.roles;
     if (sysRoles?.includes(6)) {
@@ -269,6 +286,7 @@ const FileManagerPage = () => {
 
   const [shouldOpenDropzone, setShouldOpenDropzone] = useState(false);
 
+  // Open dropzone when upload type is selected
   useEffect(() => {
     if (shouldOpenDropzone) {
       open();
@@ -276,6 +294,7 @@ const FileManagerPage = () => {
     }
   }, [uploadType, shouldOpenDropzone, open]);
 
+  // Handle exporting all files
   const handleExportAll = async () => {
     const sysRoles = currentUser?.roles;
     if (!sysRoles?.includes(17)) {
@@ -289,6 +308,7 @@ const FileManagerPage = () => {
       });
 
       if (response.data instanceof Blob) {
+        // Create and trigger download link
         const url = window.URL.createObjectURL(response.data);
         const a = document.createElement('a');
         a.href = url;
@@ -303,6 +323,7 @@ const FileManagerPage = () => {
         setErrorMsg('Unexpected response format');
       }
 
+      // Log audit trail for export
       const user = localStorage.getItem('currentUser');
       const parsedUser = JSON.parse(user || '{}');
 
@@ -326,6 +347,7 @@ const FileManagerPage = () => {
     }
   };
 
+  // Handle file deletion/archiving
   const handleDelete = async () => {
     if (fileToDelete) {
       try {
@@ -334,6 +356,7 @@ const FileManagerPage = () => {
 
         const settings = JSON.parse(fileSettings);
 
+        // Log audit trail for deletion
         const user = localStorage.getItem('currentUser');
         const parsedUser = JSON.parse(user || '{}');
 
@@ -362,6 +385,7 @@ const FileManagerPage = () => {
     }
   }
 
+  // Render file manager interface
   return (
     <>
       <div className="fixed top-4 right-4 z-50">
@@ -452,7 +476,7 @@ const FileManagerPage = () => {
           </div>
         </div>
         <div>
-          {/* <FileContainer tab={tab} isOpen={isOpen} isLoading={isLoading} setIsLoading={setIsLoading} /> */}
+          {/* File container component to display files based on selected tab */}
           <FileContainer
             tab={tab}
             isOpen={isOpen}
