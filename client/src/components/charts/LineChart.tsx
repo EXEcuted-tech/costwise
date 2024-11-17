@@ -47,6 +47,7 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
   const [chartData, setChartData] = useState<any>(null);
   const [priceData, setPriceData] = useState<ChartDataEntry[]>([]);
 
+  // Fetching training file data
   useEffect(() => {
     const fetchFile = async () => {
       try {
@@ -95,6 +96,7 @@ const ProductCostChart: React.FC<ProductCostChartProps> = ({
         )
       );
 
+      // Color changes for chart
       const colors = ["#e91e63", "#9c27b0", "#60c689", "#4BC0C0", "#9966FF", "#FF9F40"];
 
       const datasets = costNames.map((costName, index) => {

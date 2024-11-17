@@ -55,6 +55,16 @@ const DashboardPage = () => {
   const [auditLogs, setAuditLogs] = useState<AuditLogs[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const [isAuditLoading, setIsAuditLoading] = useState(true);
+  const [currentYear, setCurrentYear] = useState<string>(new Date().getFullYear().toString());
+  const [currentHalf, setCurrentHalf] = useState<string>("Second");
+
+  useEffect(() => {
+    // Determine if the current month is in First or Second
+    const month = new Date().getMonth() + 1;
+    const half = month <= 6 ? "First" : "Second";
+
+    setCurrentHalf(half);
+  }, []);
 
   //Prediction Fetch
   const fetchPredictions = async () => {
@@ -150,9 +160,9 @@ const DashboardPage = () => {
         actionEvent: log.action as ActionType,
         profile: log.user.display_picture,
         time: new Date(log.timestamp),  // Store the Date object for sorting
-              formattedTime: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })  // Separate field for display
+        formattedTime: formatDistanceToNow(new Date(log.timestamp), { addSuffix: true })  // Separate field for display
       }));
-          const sortedLogs = logs.sort((a: AuditLogs, b: AuditLogs) => b.time.getTime() - a.time.getTime());
+      const sortedLogs = logs.sort((a: AuditLogs, b: AuditLogs) => b.time.getTime() - a.time.getTime());
       setAuditLogs(sortedLogs.slice(0, 15));
       setIsAuditLoading(false);
     } catch (error: any) {
@@ -169,8 +179,8 @@ const DashboardPage = () => {
     const fetchInterval = setInterval(fetchData, 30000);
 
     return () => {
-        clearTimeout(initialFetchTimeout);
-        clearInterval(fetchInterval);
+      clearTimeout(initialFetchTimeout);
+      clearInterval(fetchInterval);
     };
   };
 
@@ -188,8 +198,8 @@ const DashboardPage = () => {
         <div className="flex flex-col flex-wrap w-[72%] 4xl:w-[75%]">
           <h1
             className={`${isOpen
-                ? "text-[34px] 2xl:text-[42px] 3xl:text-[52px] 4xl:text-[58px]"
-                : "text-[40px] 2xl:text-[55px] 3xl:text-[68px]"
+              ? "text-[34px] 2xl:text-[42px] 3xl:text-[52px] 4xl:text-[58px]"
+              : "text-[40px] 2xl:text-[55px] 3xl:text-[68px]"
               } truncate text-ellipsis text-[#414141] font-bold animate-color-pulse dark:animate-color-pulse-dark`}
           >
             {new Date().getHours() < 12 ? "Good Morning" : new Date().getHours() < 17 ? "Good Afternoon" : "Good Evening"},{" "}
@@ -199,8 +209,8 @@ const DashboardPage = () => {
           </h1>
           <p
             className={`${isOpen
-                ? "text-[16px] 2xl:text-[18px] 3xl:text-[22px]"
-                : "text-[18px] 2xl:text-[20px] 3xl:text-[28px]"
+              ? "text-[16px] 2xl:text-[18px] 3xl:text-[22px]"
+              : "text-[18px] 2xl:text-[20px] 3xl:text-[28px]"
               } font-medium text-[#868686] dark:text-[#C6C6C6]`}
           >
             Welcome to CostWise: Virginia’s Product Costing System!
@@ -209,8 +219,8 @@ const DashboardPage = () => {
         <div className="w-[27%] 4xl:w-[20%] flex flex-col justify-center mr-[5px]">
           <h2
             className={`${isOpen
-                ? "text-[18px] 2xl:text-[24px]"
-                : "text-[19px] 2xl:text-[25px] 3xl:text-[30px]"
+              ? "text-[18px] 2xl:text-[24px]"
+              : "text-[19px] 2xl:text-[25px] 3xl:text-[30px]"
               } text-[#414141] dark:text-white font-bold text-right`}
           >
             {new Date().toLocaleDateString("en-US", {
@@ -221,8 +231,8 @@ const DashboardPage = () => {
           </h2>
           <p
             className={`${isOpen
-                ? "text-[14px] 2xl:text-[16px]"
-                : "text-[16px] 3xl:text-[21px]"
+              ? "text-[14px] 2xl:text-[16px]"
+              : "text-[16px] 3xl:text-[21px]"
               } text-[#414141] italic dark:text-white text-right`}
           >
             {new Date().toLocaleTimeString("en-US", {
@@ -236,8 +246,8 @@ const DashboardPage = () => {
           <div
             title="Toggle Dark Mode"
             className={`${isOpen
-                ? "text-[1.2em] 2xl:text-[1.8em]"
-                : "text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]"
+              ? "text-[1.2em] 2xl:text-[1.8em]"
+              : "text-[1.2em] 2xl:text-[1.5em] 3xl:text-[2.2em]"
               } text-primary p-3 drop-shadow-lg bg-white rounded-full cursor-pointer hover:text-white hover:bg-primary transition-colors duration-300 ease-in-out`}
             onClick={() =>
               setColorMode(colorMode === "light" ? "dark" : "light")
@@ -279,8 +289,8 @@ const DashboardPage = () => {
                     )}
                     <p
                       className={`text-[10px] 2xl:text-[12px] 3xl:text-[16px] ${productCostTrend === "decreased"
-                          ? "text-[#CD3939]"
-                          : "text-[#039300]"
+                        ? "text-[#CD3939]"
+                        : "text-[#039300]"
                         } font-semibold`}
                     >
                       {productCostPercentageChange
@@ -313,8 +323,8 @@ const DashboardPage = () => {
                     )}
                     <p
                       className={`text-[10px] 2xl:text-[12px] 3xl:text-[16px] ${fgTrend === "decreased"
-                          ? "text-[#CD3939]"
-                          : "text-[#039300]"
+                        ? "text-[#CD3939]"
+                        : "text-[#039300]"
                         } font-semibold`}
                     >
                       {fgPercentageChange
@@ -351,8 +361,8 @@ const DashboardPage = () => {
                     )}
                     <p
                       className={`text-[10px] 2xl:text-[12px] 3xl:text-[16px] ${materialCostTrend === "decreased"
-                          ? "text-[#CD3939]"
-                          : "text-[#039300]"
+                        ? "text-[#CD3939]"
+                        : "text-[#039300]"
                         } font-semibold`}
                     >
                       {materialCostPercentageChange
@@ -388,7 +398,7 @@ const DashboardPage = () => {
                   </div>
                   <div className="flex flex-col items-center">
                     <h1 className="text-[14px] 2xl:text-[21px] 3xl:text-[28px] font-bold text-primary dark:text-white">
-                    ₱{totalPrediction.length > 0 ? totalPrediction[0]?.cost : '0.00'}
+                      ₱{totalPrediction.length > 0 ? totalPrediction[0]?.cost : '0.00'}
                     </h1>
                     <p className="italic font-medium text-center text-[12px] 3xl:text-[14px] text-[#969696]">
                       Total Prediction Cost
@@ -402,8 +412,8 @@ const DashboardPage = () => {
         <div className="w-[30%]">
           <CustomCalendar
             className={`${isOpen
-                ? "min-h-[366px] 2xl:min-h-[378px]"
-                : "min-h-[355px] 2xl:min-h-[366px]"
+              ? "min-h-[366px] 2xl:min-h-[378px]"
+              : "min-h-[355px] 2xl:min-h-[366px]"
               } w-full`}
           />
         </div>
@@ -420,8 +430,8 @@ const DashboardPage = () => {
               } flex flex-grow bg-white dark:bg-[#3C3C3C] h-[600px] rounded-b-[10px] drop-shadow-lg items-center justify-center`}
           >
             <ProductCostChart
-              selectedHalf="Second"
-              selectedYear="2024"
+              selectedHalf={currentHalf}
+              selectedYear={currentYear}
               className={`${isOpen ? "w-full 3xl:w-[60%]" : "w-full"}`}
               colorMode={colorMode}
             />
