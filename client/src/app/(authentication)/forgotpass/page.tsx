@@ -11,7 +11,7 @@ import api from "@/utils/api";
 import EmailSent from "@/components/modals/EmailSent";
 import Alert from "@/components/alerts/Alert";
 
-
+//Forgot Password Page
 function ForgotPassPage() {
   const [isLoading, setIsLoading] = useState(false);
   const [onClose, setOnClose] = useState(false);
@@ -32,15 +32,18 @@ function ForgotPassPage() {
 
     let errors: string[] = [];
 
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com|virginiafood\.com\.ph)$/i;
     if (!email) {
       errors.push("Email address is required.");
-    } else if (!/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(email)) {
-      errors.push("Invalid email address.");
+    } else if (!emailRegex.test(email)) {
+      errors.push("Incorrect input details.");
+      return;
     }
     if (!employeeNum) {
       errors.push("Employee number is required.");
     } else if (!/^\d{10}$/.test(employeeNum)) {
       errors.push("Invalid employee number.");
+      return;
     }
 
     if (errors.length > 0) {

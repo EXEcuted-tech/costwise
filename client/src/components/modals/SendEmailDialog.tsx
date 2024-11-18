@@ -32,21 +32,23 @@ const SendEmailDialog: React.FC<SendEmailDialogProps> = ({ setDialog }) => {
     setEmployeeNumError(false);
 
     const newAlertMessages: string[] = [];
-    const emailRegex = /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|outlook\.com|virginiafood\.com\.ph)$/i;
 
     if (!email) {
         setEmailError(true);
         newAlertMessages.push("Email address is required.");
     } else if (!emailRegex.test(email)) {
         setEmailError(true);
-        newAlertMessages.push("Invalid email address.");
+        newAlertMessages.push("Incorrect input details.");
+        return;
     }
     if (!employeeNum) {
         setEmployeeNumError(true);
         newAlertMessages.push("Employee number is required.");
     } else if (employeeNum.length !== 10) {
         setEmployeeNumError(true);
-        newAlertMessages.push("Invalid employee number.");
+        newAlertMessages.push("Incorrect input details.");
+        return;
     }
 
     if (newAlertMessages.length > 0) {
