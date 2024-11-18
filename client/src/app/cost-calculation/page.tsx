@@ -251,6 +251,7 @@ const CostCalculation = () => {
       sheetData = allFGData;
     }
 
+    // AllFG Export and first time of the month
     if (
       selectedFG === "All-FG" &&
       costData.length > 0 &&
@@ -335,6 +336,7 @@ const CostCalculation = () => {
     }
   };
 
+  // Updates training data after retrain is done
   const updateTraininingData = async (updatedData: any[]) => {
     setIsLoading(true);
     try {

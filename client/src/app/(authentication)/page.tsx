@@ -1,5 +1,6 @@
 "use client"
-import { FaAt, FaRegEnvelope } from "react-icons/fa6";
+import { FaRegEnvelope } from "react-icons/fa6";
+import { VscEye, VscEyeClosed } from "react-icons/vsc";
 import { MdLockOutline } from "react-icons/md";
 import Link from "next/link";
 import { GiSmartphone } from "react-icons/gi";
@@ -23,6 +24,7 @@ function LoginPage() {
   const [alertMessages, setAlertMessages] = useState<string[]>([]);
   const [emailError, setEmailError] = useState(false);
   const [passwordError, setPasswordError] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);
 
   useEffect(() => {
     const accessToken = localStorage.getItem('accessToken');
@@ -183,13 +185,20 @@ function LoginPage() {
                 <p className="text-[1em] xl:text-[1.2em]">Password</p>
               </div>
             </div>
-            <div className=" h-[10%] flex w-[100%]">
+            <div className="h-[10%] flex w-[100%] relative">
               <input
-                type="password"
+                type={showPassword ? "text" : "password"}
                 className={`${passwordError ? 'text-[#ff0000] focus:!outline-[#ff0000] border-3 border-[#ff0000] shadow-[0_0_10px_#00000080]' : 'text-black'} text-[1.2em] font-semibold w-[100%] rounded-2xl px-[5%]`}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
+              <button
+                type="button"
+                className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-600"
+                onClick={() => setShowPassword(!showPassword)}
+              >
+                {showPassword ? <VscEyeClosed size={30} className="text-black mr-2"/> : <VscEye size={30} className="text-black mr-2"/>}
+              </button>
             </div>
             <div className=" h-[10%] items-center flex justify-end w-[100%] pr-[2%] pb-[2%]">
               <Link href="/forgotpass">
