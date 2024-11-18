@@ -1,3 +1,4 @@
+<!-- Password Reset Email Contents -->
 <!DOCTYPE html>
 <html>
 <head>
