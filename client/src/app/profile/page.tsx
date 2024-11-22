@@ -169,7 +169,7 @@ const ProfilePage = () => {
                 {/* Title */}
                 <div className='flex flex-col mt mb-2 border-b-2 border-[#A0A0A0]'>
                     <div className='flex justify-between items-center'>
-                        <div className="flex text-[24px] font-semibold mx-8 2xl:mx-12 mb-2">
+                        <div className="flex text-[28px] font-semibold mx-8 2xl:mx-12 mb-2">
                             Account Profile
                         </div>
                         <div
