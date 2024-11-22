@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Mail\PasswordResetMail;
@@ -35,6 +36,19 @@ class PasswordResetController extends Controller
         Mail::to($user->email_address)->send(new PasswordResetMail($resetUrl));
 
         return response()->json(['message' => 'Password reset link sent!']);
+    }
+
+    public function validatePassword(Request $request)
+{
+    $request->validate(['password' => 'required', 'email' => 'required']);
+
+    $user = auth()->user();
+
+    if (\Hash::check($request->password, $user->password)) {
+        return response()->json(['message' => 'Password is valid'], 200);
+    }
+
+    return response()->json(['message' => 'Incorrect password'], 401);
     }
 
     //Verifying Password Reset Token
