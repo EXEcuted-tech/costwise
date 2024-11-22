@@ -4,7 +4,7 @@ import { IoIosClose } from "react-icons/io";
 
 interface EmailSentProps {
   onClose: React.Dispatch<React.SetStateAction<boolean>>;
-  email: string;
+  email: string | undefined;
 }
 
 const EmailSent: React.FC<EmailSentProps> = ({ onClose, email }) => {

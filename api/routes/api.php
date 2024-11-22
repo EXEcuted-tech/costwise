@@ -48,6 +48,10 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
         Route::post('update_profile_picture', [UserController::class, 'updateProfilePicture']);
     });
 
+    Route::prefix('/pass-reset')->group(function () {
+        Route::post('confirmpass', [PasswordResetController::class, 'validatePassword']);
+    });
+
     Route::prefix('/files')->group(function () {
         Route::post('upload', [FileController::class, 'upload']);
         Route::get('retrieve_all', [FileController::class, 'retrieveAll']);
