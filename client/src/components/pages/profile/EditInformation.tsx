@@ -123,66 +123,33 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                     <button className='flex text-[1.3em] mt-[0.3rem] ml-3' onClick={() => setProps(false)}>
                         <IoIosArrowRoundBack className='text-[#6D6D6D] text-[40px] mr-[15px] hover:text-[#D13131] cursor-pointer' />
                     </button>
-                    {/* 1st Col */}
-                    <div className='flex flex-col ml-3 mr-8 w-[30%] gap-4'>
-                        <div className='flex flex-col justify-start'>
-                        <p className={`${firstNameError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>First Name <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
-                        <div className="flex flex-col w-full">
-                                <div className="text-gray-600">
-                                    <input
+
+                    <div className='flex flex-col gap-4'>
+                        {/* 1st Col */}
+                        <div className='flex flex-row gap-4 mx-3'>
+                            <div className='flex flex-col justify-start'>
+                                <p className={`${firstNameError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>First Name <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                                <div className="flex flex-col w-full">
+                                    <div className="text-gray-600">
+                                        <input
                                         className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
-                                                     ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'}bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
+                                                     ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'}bg-white dark:bg-[#3C3C3C] dark:text-white h-12 3xl:h-12 w-[20rem] px-2 2xl:px-5 border-2 rounded-lg capitalize 4xl:w-[18rem] 3xl:w-[16rem] 2xl:w-[13rem] xl:w-[10rem]`}
                                         type="fname"
                                         name="fname"
                                         value={fName}
                                         onChange={(e) => setFName(e.target.value)}
                                         placeholder={userAcc?.fName}
                                     />
+                                    </div>
                                 </div>
                             </div>
-                        </div>
 
-                        <div className='flex flex-col justify-start'>
-                        <p className={`${emailError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Email Address <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
-                        <div className="flex flex-col w-full">
-                                <div className="text-gray-600">
-                                    <input
-                                        className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
-                                                     ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'}  bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
-                                        type="email"
-                                        name="email"
-                                        value={email}
-                                        onChange={(e) => setEmail(e.target.value)}
-                                        placeholder={userAcc?.email}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353] dark:text-[#d1d1d1]">Department</p>
+                            <div className='flex flex-col justify-start'>
+                            <p className="text-gray-600 dark:text-[#d1d1d1]">Middle Name</p>
                             <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
-                                        name="dept"
-                                        placeholder={userAcc?.dept}
-                                        disabled
-                                    >
-                                    </input>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 2nd Col */}
-                    <div className='flex flex-col mr-8 w-[30%] gap-4'>
-                        <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353] dark:text-[#d1d1d1]">Middle Name</p>
-                            <div className="flex flex-col w-full">
-                                <div className="text-gray-600">
-                                    <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white w-full h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
+                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white w-[20rem] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline 4xl:w-[18rem] 3xl:w-[16rem] 2xl:w-[13rem] xl:w-[10rem]`}
                                         type="mname"
                                         name="mname"
                                         value={mName}
@@ -194,47 +161,12 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                         </div>
 
                         <div className='flex flex-col justify-start'>
-                        <p className={`${phoneNumberError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Phone Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
-                        <div className="flex flex-col w-full">
-                                <div className="text-gray-600">
-                                    <input
-                                        className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
-                                                     ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg`}
-                                        type="contactnum"
-                                        name="contactnum"
-                                        value={phoneNum}
-                                        onChange={(e) => setPhoneNum(e.target.value)}
-                                        placeholder={userAcc?.phoneNum}
-                                    />
-                                </div>
-                            </div>
-                        </div>
-
-                        <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353] dark:text-[#d1d1d1]">Employee Number</p>
-                            <div className="flex flex-col w-full">
-                                <div className="text-gray-600">
-                                    <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
-                                        type="enum"
-                                        name="enum"
-                                        placeholder={userAcc?.employeeNum}
-                                        disabled
-                                    />
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-
-                    {/* 3rd Col */}
-                    <div className='flex flex-col mr-6 w-[30%] gap-4'>
-                        <div className='flex flex-col justify-start'>
                         <p className={`${lastNameError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Last Name<span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                             <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
                                         className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
-                                                     ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} dark:bg-[#3C3C3C] dark:text-white bg-white h-10 3xl:h-12 w-full px-2 2xl:px-5 border-2 rounded-lg capitalize`}
+                                                     ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} dark:bg-[#3C3C3C] dark:text-white bg-white h-12 3xl:h-12 w-[20rem] px-2 2xl:px-5 border-2 rounded-lg capitalize 4xl:w-[18rem] 3xl:w-[16rem] 2xl:w-[13rem] xl:w-[10rem]`}
                                         type="lname"
                                         name="lname"
                                         value={lName}
@@ -242,45 +174,120 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                                         placeholder={userAcc?.lName}
                                     />
                                 </div>
-                            </div>
-                        </div>
-
-                        <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353] dark:text-[#d1d1d1]">Suffix</p>
-                            <div className="flex flex-col w-full">
-                                <div className="text-gray-600">
-                                    <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
-                                        type="suffix"
-                                        name="suffix"
-                                        value={suffix}
-                                        onChange={(e) => setSuffix(e.target.value)}
-                                        placeholder={userAcc?.suffix}
-                                    />
                                 </div>
                             </div>
-                        </div>
 
-                        <div className='flex flex-col justify-start'>
-                            <p className="text-[#5B5353] dark:text-[#d1d1d1]">Role</p>
-                            <div className="flex flex-col w-full">
-                                <div className="text-gray-600">
-                                    <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-full px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline`}
-                                        type="role"
-                                        name="role"
-                                        placeholder={userAcc?.position}
-                                        disabled
-                                    />
+                            <div className='flex flex-col justify-start'>
+                                <p className="text-[#5B5353] dark:text-[#d1d1d1]">Suffix</p>
+                                <div className="flex flex-col w-full">
+                                    <div className="text-gray-600">
+                                        <input
+                                            className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-white h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[7rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline 4xl:w-[7rem] 3xl:w-[4rem] 2xl:w-[4rem] xl:w-[4rem]`}
+                                            type="suffix"
+                                            name="suffix"
+                                            value={suffix}
+                                            onChange={(e) => setSuffix(e.target.value)}
+                                            placeholder={userAcc?.suffix}
+                                        />
                                 </div>
                             </div>
                         </div>
                     </div>
+
+                    {/* 2nd Col */}
+                    <div className='flex flex-row gap-4 mx-3'>
+                        <div className='flex flex-col justify-start'>
+                                <p className="text-gray-600 dark:text-[#d1d1d1]">Employee Number</p>
+                                <div className="flex flex-col w-full">
+                                    <div className="text-gray-600">
+                                        <input
+                                            className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[20rem]  px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline 4xl:w-[18rem] 3xl:w-[16rem] 2xl:w-[13rem] xl:w-[10rem]`}
+                                            type="enum"
+                                            name="enum"
+                                            placeholder={userAcc?.employeeNum}
+                                            disabled
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className='flex flex-col justify-start'>
+                            <p className={`${phoneNumberError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Phone Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                            <div className="flex flex-col w-full">
+                                    <div className="text-gray-600">
+                                        <input
+                                            className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
+                                                        ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} dark:bg-[#3C3C3C] dark:text-white bg-white h-12 3xl:h-12 w-[20rem]  px-2 2xl:px-5 border-2 rounded-lg 4xl:w-[18rem] 3xl:w-[16rem] 2xl:w-[13rem] xl:w-[10rem]`}
+                                            type="contactnum"
+                                            name="contactnum"
+                                            value={phoneNum}
+                                            onChange={(e) => setPhoneNum(e.target.value)}
+                                            placeholder={userAcc?.phoneNum}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className='flex flex-col justify-start'>
+                            <p className={`${emailError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Email Address <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                            <div className="flex flex-col w-full">
+                                    <div className="text-gray-600">
+                                        <input
+                                            className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
+                                                        ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'}  bg-white dark:bg-[#3C3C3C] dark:text-white h-12 3xl:h-12 w-[28rem] px-2 2xl:px-5 border-2 rounded-lg 4xl:w-[26rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[15rem]`}
+                                            type="email"
+                                            name="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            placeholder={userAcc?.email}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+
+                    {/* 3rd Col */}
+                    <div className='flex flex-row gap-4 mx-3'>
+
+                    <div className='flex flex-col justify-start'>
+                            <p className="text-[#5B5353] dark:text-[#d1d1d1]">Department</p>
+                            <div className="flex flex-col w-full">
+                                <div className="text-gray-600">
+                                    <input
+                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[41rem]  px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline 4xl:w-[37rem] 3xl:w-[33rem] 2xl:w-[26rem] xl:w-[21rem]`}
+                                        name="dept"
+                                        placeholder={userAcc?.dept}
+                                        disabled
+                                    >
+                                    </input>
+                                </div>
+                            </div>
+                        </div>
+
+                        
+                        <div className='flex flex-col justify-start'>
+                                <p className="text-[#5B5353] dark:text-[#d1d1d1]">Position</p>
+                                <div className="flex flex-col w-full">
+                                    <div className="text-gray-600">
+                                        <input
+                                            className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[28rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline 4xl:w-[26rem] 3xl:w-[20rem] 2xl:w-[19rem] xl:w-[15rem]`}
+                                            type="position"
+                                            name="position"
+                                            placeholder={userAcc?.position}
+                                            disabled
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                    </div>
+
+                </div>
+
                 </div>
 
                 {/* Buttons */}
                 <div className={`${isOpen ? 'mt-[15px] 3xl:mt-[37px]' : 'mt-[37px]'} flex flex-col w-full justify-center items-center animate-pop-out`}>
-                    <button type="submit" className={`${isLoading ? 'bg-black' : ''} flex justify-center items-center w-[25%] 2xl:w-[20%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-[#00930F] bg-primary text-white rounded-xl hover:bg-[#9c1c1c]`}
+                    <button type="submit" className={`${isLoading ? 'bg-black' : ''} flex justify-center items-center w-[25%] 2xl:w-[20%] h-[3rem] p-2 text-center text-[1.2em] font-semibold bg-primary text-white rounded-xl hover:bg-[#9c1c1c]`}
                         onClick={() => { handleSubmit }}
                     >
                         {isLoading && <Spinner className="group-hover:!text-white mr-1 !size-[25px]" />}
