@@ -13,7 +13,7 @@ import ErrorToken from '@/components/modals/ErrorToken';
 import { IoMdInformationCircle } from "react-icons/io";
 import { BsExclamationCircle } from 'react-icons/bs';
 
-
+//Password Reset Page
 const PasswordReset = () => {
 
   const [password, setPassword] = useState('');

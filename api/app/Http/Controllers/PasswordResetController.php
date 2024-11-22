@@ -12,8 +12,11 @@ use App\Models\User;
 use App\Models\PersonalAccessToken;
 
 
+// Password Reset Controller
+
 class PasswordResetController extends Controller
 {
+    //Sending Password Email
     public function sendResetLinkEmail(Request $request)
     {
         $user = User::where('email_address', $request->email)
@@ -34,6 +37,7 @@ class PasswordResetController extends Controller
         return response()->json(['message' => 'Password reset link sent!']);
     }
 
+    //Verifying Password Reset Token
     public function verifyToken(Request $request, $token)
     {
 
@@ -47,6 +51,7 @@ class PasswordResetController extends Controller
         return response()->json(['message' => 'Token is valid']);
     }
 
+    //Resetting Password
     public function resetPassword(Request $request)
     {
         $request->validate([
