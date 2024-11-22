@@ -149,6 +149,8 @@ const ProfilePage = () => {
             {dialog &&
                 <SendEmailDialog
                     setDialog={setDialog}
+                    email={currentUser?.email}
+                    employeeNum={currentUser?.empNum}
                 />
             }
             <div className='absolute top-0 right-0'>
