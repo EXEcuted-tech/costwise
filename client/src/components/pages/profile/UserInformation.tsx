@@ -108,9 +108,11 @@ const UserInformation: React.FC<UserInformationProps> = ({
                   </div>
 
                   <div className="flex flex-col justify-start mb-4">
-                    <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">Department</p>
-                    <p className="dark:text-white">{userAcc?.dept}</p>
+                    <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">Phone Number</p>
+                    <p className="dark:text-white">{userAcc?.phoneNum}</p>
                   </div>
+
+
                 </div>
 
                 {/* 2nd Col */}
@@ -129,14 +131,17 @@ const UserInformation: React.FC<UserInformationProps> = ({
                   </div>
 
                   <div className="flex flex-col justify-start mb-4">
-                    <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">Phone Number</p>
-                    <p className="dark:text-white">{userAcc?.phoneNum}</p>
-                  </div>
-
-                  <div className="flex flex-col justify-start mb-4">
                     <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">Position</p>
                     <p className="dark:text-white">{userAcc?.position}</p>
                   </div>
+
+                  <div className="flex flex-col justify-start mb-4">
+                    <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">
+                      Email Address
+                    </p>
+                    <p className="dark:text-white">{userAcc?.email}</p>
+                  </div>
+
                 </div>
 
                 {/* 3rd Col */}
@@ -147,12 +152,9 @@ const UserInformation: React.FC<UserInformationProps> = ({
                   </div>
 
                   <div className="flex flex-col justify-start mb-4">
-                    <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">
-                      Email Address
-                    </p>
-                    <p className="dark:text-white">{userAcc?.email}</p>
+                    <p className="text-[#8E8E8E] font-semibold dark:text-[#d1d1d1]">Department</p>
+                    <p className="dark:text-white">{userAcc?.dept}</p>
                   </div>
-
                 </div>
 
                 {/* 4th Col */}

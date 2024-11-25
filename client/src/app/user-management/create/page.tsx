@@ -89,6 +89,19 @@ const AccountCreation = () => {
         }
     };
 
+    // Update the phone number field handler
+    const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value;
+        
+        if (!value.startsWith('+63 ')) {
+            value = '+63 ' + value.replace('+63 ', '');
+        }
+        
+        if (value.length <= 14) {
+            setPhone_number(value);
+        }
+    };
+
     //Role options
     const handleConfirmRoles = (roles: number[], roleNames: string[], userType: string) => {
         setSelectedRoleValues(roles);
@@ -509,7 +522,7 @@ const AccountCreation = () => {
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-[2.5rem] w-[22rem] px-2 2xl:px-5 border-2 rounded-lg capitalize 4xl:w-[22rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[14rem] `}
+                                                className={` ${firstNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-12 w-[22rem] px-2 2xl:px-5 border-2 rounded-lg capitalize 4xl:w-[22rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[14rem] `}
                                                 type="fname"
                                                 name="fname"
                                                 value={first_name}
@@ -524,7 +537,7 @@ const AccountCreation = () => {
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${isOpen ? '' : ''} bg-white dark:bg-[#3C3C3C] dark:text-white h-[2.5rem] w-[22rem] px-2 2xl:px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline capitalize 4xl:w-[22rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[14rem] `}
+                                                className={` ${isOpen ? '' : ''} bg-white dark:bg-[#3C3C3C] dark:text-white h-12 w-[22rem] px-2 2xl:px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline capitalize 4xl:w-[22rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[14rem] `}
                                                 type="mname"
                                                 name="mname"
                                                 placeholder=""
@@ -540,7 +553,7 @@ const AccountCreation = () => {
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-[2.5rem] w-[22rem] px-2 2xl:px-5 border-2 rounded-lg capitalize 4xl:w-[22rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[14rem] `}
+                                                className={` ${lastNameError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-12 w-[22rem] px-2 2xl:px-5 border-2 rounded-lg capitalize 4xl:w-[22rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[14rem] `}
                                                 type="lname"
                                                 name="lname"
                                                 placeholder=""
@@ -556,7 +569,7 @@ const AccountCreation = () => {
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${suffixError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-[2.5rem] w-[8rem] px-2 2xl:px-5 border-2 rounded-lg capitalize 4xl:w-[8rem] 3xl:w-[7rem] 2xl:w-[6rem] xl:w-[4rem] `}
+                                                className={` ${suffixError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-12 w-[8rem] px-2 2xl:px-5 border-2 rounded-lg capitalize 4xl:w-[8rem] 3xl:w-[7rem] 2xl:w-[6rem] xl:w-[4rem] `}
                                                 type="suffix"
                                                 name="suffix"
                                                 placeholder=""
@@ -577,7 +590,7 @@ const AccountCreation = () => {
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${employeeNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white  h-[2.5rem] w-[22rem] px-2 2xl:px-5 border-2 rounded-lg 4xl:w-[22rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[14rem] `}
+                                                className={` ${employeeNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white  h-12 w-[22rem] px-2 2xl:px-5 border-2 rounded-lg 4xl:w-[22rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[14rem] `}
                                                 type="enum"
                                                 name="enum"
                                                 placeholder="10 digits"
@@ -589,47 +602,27 @@ const AccountCreation = () => {
                                 </div>
 
                                 <div className='flex flex-col justify-start'>
-                                    <p className={`${phoneNumberError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Phone Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                                    <p className={`${positionError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Position <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-[2.5rem] w-[22rem] px-2 2xl:px-5 border-2 rounded-lg 4xl:w-[22rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[14rem] `}
-                                                type="contactnum"
-                                                name="contactnum"
-                                                placeholder="+63 9123456789"
-                                                value={phone_number}
-                                                onChange={(e) => updateField(setPhone_number)(e)}
+                                                className={` ${positionError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-12 w-[22rem] px-2 2xl:px-5 border-2 rounded-lg capitalize 4xl:w-[22rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[14rem] `}
+                                                type="position"
+                                                name="position"
+                                                placeholder=""
+                                                value={position}
+                                                onChange={(e) => updateField(setPosition)(e)}
                                             />
                                         </div>
                                     </div>
                                 </div>
 
                                 <div className='flex flex-col justify-start'>
-                                    <p className={`${emailError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Email Address <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
-                                    <div className="flex flex-col w-full">
-                                        <div className="mt-2 text-gray-600">
-                                            <input
-                                                className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-[2.5rem] w-[31rem] px-2 2xl:px-5 border-2 rounded-lg 4xl:w-[31rem] 3xl:w-[28rem] 2xl:w-[25rem] xl:w-[19rem] `}
-                                                type="email"
-                                                name="email"
-                                                placeholder=""
-                                                value={email_address}
-                                                onChange={(e) => updateField(setEmail)(e)}
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-
-                            </div>
-
-                            {/* 3rd Col */}
-                            <div className='flex flex-row gap-4 mx-3'>
-                            <div className='flex flex-col justify-start'>
                                     <p className={`${departmentError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Department<span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <select
-                                                className={` ${departmentError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-[2.5rem] w-[45rem] px-2 2xl:px-5 border-2 rounded-lg 4xl:w-[45rem] 3xl:w-[41rem] 2xl:w-[37rem] xl:w-[29rem] `}
+                                                className={` ${departmentError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-12 w-[31rem] px-2 2xl:px-5 border-2 rounded-lg 4xl:w-[31rem] 3xl:w-[28rem] 2xl:w-[25rem] xl:w-[19rem] `}
                                                 defaultValue=""
                                                 value={department}
                                                 onChange={(e) => updateField(setDepartment)(e)}
@@ -644,22 +637,43 @@ const AccountCreation = () => {
                                     </div>
                                 </div>
 
+                            </div>
+
+                            {/* 3rd Col */}
+                            <div className='flex flex-row gap-4 mx-3'>
 
                                 <div className='flex flex-col justify-start'>
-                                    <p className={`${positionError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Position <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                                    <p className={`${phoneNumberError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Phone Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                                     <div className="flex flex-col w-full">
                                         <div className="mt-2 text-gray-600">
                                             <input
-                                                className={` ${positionError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-[2.5rem] w-[31rem] px-2 2xl:px-5 border-2 rounded-lg capitalize 4xl:w-[31rem] 3xl:w-[28rem] 2xl:w-[25rem] xl:w-[19rem] `}
-                                                type="position"
-                                                name="position"
-                                                placeholder=""
-                                                value={position}
-                                                onChange={(e) => updateField(setPosition)(e)}
+                                                className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} dark:bg-[#3C3C3C] dark:text-white bg-white h-12 w-[22rem] px-2 2xl:px-5 border-2 rounded-lg 4xl:w-[22rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[14rem] `}
+                                                type="contactnum"
+                                                name="contactnum"
+                                                placeholder="+63 "
+                                                value={phone_number}
+                                                onChange={handlePhoneNumberChange}
                                             />
                                         </div>
                                     </div>
                                 </div>
+
+                                <div className='flex flex-col justify-start'>
+                                    <p className={`${emailError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Email Address <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                                    <div className="flex flex-col w-full">
+                                        <div className="mt-2 text-gray-600">
+                                            <input
+                                                className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-12 w-[22rem] px-2 2xl:px-5 border-2 rounded-lg 4xl:w-[22rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[14rem] `}
+                                                type="email"
+                                                name="email"
+                                                placeholder=""
+                                                value={email_address}
+                                                onChange={(e) => updateField(setEmail)(e)}
+                                            />
+                                        </div>
+                                    </div>
+                                </div>
+
                             </div>
                         </div>
                     </div>

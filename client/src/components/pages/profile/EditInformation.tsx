@@ -33,6 +33,19 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
     const [emailError, setEmailError] = useState(false);
     const [phoneNumberError, setPhoneNumberError] = useState(false);
 
+    // Update the phone number field handler
+    const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value;
+        
+        if (!value.startsWith('+63 ')) {
+            value = '+63 ' + value.replace('+63 ', '');
+        }
+        
+        if (value.length <= 14) {
+            setPhoneNum(value);
+        }
+    };
+
     const handleSubmit = async (e: { preventDefault: () => void; }) => {
         e.preventDefault();
         setIsLoading(true);
@@ -201,7 +214,7 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                                 <div className="flex flex-col w-full">
                                     <div className="text-gray-600">
                                         <input
-                                            className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[20rem]  px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline 4xl:w-[18rem] 3xl:w-[16rem] 2xl:w-[13rem] xl:w-[10rem]`}
+                                            className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[18rem]  px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline 4xl:w-[18rem] 3xl:w-[16rem] 2xl:w-[13rem] xl:w-[10rem]`}
                                             type="enum"
                                             name="enum"
                                             placeholder={userAcc?.employeeNum}
@@ -211,50 +224,27 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                                 </div>
                             </div>
 
-                            <div className='flex flex-col justify-start'>
-                            <p className={`${phoneNumberError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Phone Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
-                            <div className="flex flex-col w-full">
+                        <div className='flex flex-col justify-start'>
+                            <p className="text-[#5B5353] dark:text-[#d1d1d1]">Position</p>
+                                <div className="flex flex-col w-full">
                                     <div className="text-gray-600">
                                         <input
-                                            className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
-                                                        ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} dark:bg-[#3C3C3C] dark:text-white bg-white h-12 3xl:h-12 w-[20rem]  px-2 2xl:px-5 border-2 rounded-lg 4xl:w-[18rem] 3xl:w-[16rem] 2xl:w-[13rem] xl:w-[10rem]`}
-                                            type="contactnum"
-                                            name="contactnum"
-                                            value={phoneNum}
-                                            onChange={(e) => setPhoneNum(e.target.value)}
-                                            placeholder={userAcc?.phoneNum}
+                                            className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[18rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline 4xl:w-[18rem] 3xl:w-[16rem] 2xl:w-[13rem] xl:w-[10rem]`}
+                                            type="position"
+                                            name="position"
+                                            placeholder={userAcc?.position}
+                                            disabled
                                         />
                                     </div>
                                 </div>
-                            </div>
+                        </div>
 
-                            <div className='flex flex-col justify-start'>
-                            <p className={`${emailError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Email Address <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
-                            <div className="flex flex-col w-full">
-                                    <div className="text-gray-600">
-                                        <input
-                                            className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
-                                                        ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'}  bg-white dark:bg-[#3C3C3C] dark:text-white h-12 3xl:h-12 w-[28rem] px-2 2xl:px-5 border-2 rounded-lg 4xl:w-[26rem] 3xl:w-[20rem] 2xl:w-[18rem] xl:w-[15rem]`}
-                                            type="email"
-                                            name="email"
-                                            value={email}
-                                            onChange={(e) => setEmail(e.target.value)}
-                                            placeholder={userAcc?.email}
-                                        />
-                                    </div>
-                                </div>
-                            </div>
-                    </div>
-
-                    {/* 3rd Col */}
-                    <div className='flex flex-row gap-4 mx-3'>
-
-                    <div className='flex flex-col justify-start'>
+                        <div className='flex flex-col justify-start'>
                             <p className="text-[#5B5353] dark:text-[#d1d1d1]">Department</p>
                             <div className="flex flex-col w-full">
                                 <div className="text-gray-600">
                                     <input
-                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[41rem]  px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline 4xl:w-[37rem] 3xl:w-[33rem] 2xl:w-[26rem] xl:w-[21rem]`}
+                                        className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[26rem]  px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline 4xl:w-[26rem] 3xl:w-[24rem] 2xl:w-[22rem] xl:w-[18rem]`}
                                         name="dept"
                                         placeholder={userAcc?.dept}
                                         disabled
@@ -264,17 +254,39 @@ const EditInformation: React.FC<EditInformationprops> = ({ setProps, setDialog, 
                             </div>
                         </div>
 
-                        
+                    </div>
+
+                    {/* 3rd Col */}
+                    <div className='flex flex-row gap-4 mx-3'>
                         <div className='flex flex-col justify-start'>
-                                <p className="text-[#5B5353] dark:text-[#d1d1d1]">Position</p>
-                                <div className="flex flex-col w-full">
+                            <p className={`${phoneNumberError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Phone Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                            <div className="flex flex-col w-full">
                                     <div className="text-gray-600">
                                         <input
-                                            className={`${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} bg-[#E3E1E3] h-12 text-[16px] 2xl:text-[18px] 3xl:text-[20px] w-[28rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline 4xl:w-[26rem] 3xl:w-[20rem] 2xl:w-[19rem] xl:w-[15rem]`}
-                                            type="position"
-                                            name="position"
-                                            placeholder={userAcc?.position}
-                                            disabled
+                                            className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
+                                                        ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'} dark:bg-[#3C3C3C] dark:text-white bg-white h-12 3xl:h-12 w-[20rem]  px-2 2xl:px-5 border-2 rounded-lg 4xl:w-[18rem] 3xl:w-[16rem] 2xl:w-[13rem] xl:w-[10rem]`}
+                                            type="contactnum"
+                                            name="contactnum"
+                                            value={phoneNum}
+                                            onChange={handlePhoneNumberChange}
+                                            placeholder={userAcc?.phoneNum}
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                        <div className='flex flex-col justify-start'>
+                            <p className={`${emailError ? 'text-[#B22222]' : 'dark:text-[#d1d1d1]'} flex `}>Email Address <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                            <div className="flex flex-col w-full">
+                                    <div className="text-gray-600">
+                                        <input
+                                            className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '}
+                                                        ${isOpen ? 'text-[14px] 2xl:text-[16px] 3xl:text-[20px] text-ellipsis' : 'text-[16px] 2xl:text-[18px] 3xl:text-[20px]'}  bg-white dark:bg-[#3C3C3C] dark:text-white h-12 3xl:h-12 w-[18rem] px-5 border-2 border-[#B3B3B3] rounded-lg focus:outline 4xl:w-[18rem] 3xl:w-[16rem] 2xl:w-[13rem] xl:w-[10rem]`}
+                                            type="email"
+                                            name="email"
+                                            value={email}
+                                            onChange={(e) => setEmail(e.target.value)}
+                                            placeholder={userAcc?.email}
                                         />
                                     </div>
                                 </div>
