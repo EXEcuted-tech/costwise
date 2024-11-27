@@ -49,7 +49,7 @@ Route::group(['middleware' => ['auth:sanctum']], function () {
     });
 
     Route::prefix('/pass-reset')->group(function () {
-        Route::post('confirmpass', [PasswordResetController::class, 'validatePassword']);
+        Route::post('changepass', [PasswordResetController::class, 'changePassword']);
     });
 
     Route::prefix('/files')->group(function () {

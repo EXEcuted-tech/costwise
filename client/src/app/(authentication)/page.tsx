@@ -174,7 +174,7 @@ function LoginPage() {
             <div className={`h-[10%] flex w-[100%]`}>
               <input
                 type="email"
-                className={`${emailError ? 'text-[#ff0000] focus:!outline-[#ff0000] border-3 border-[#ff0000] shadow-[0_0_10px_#00000080]' : 'text-black'} text-[1.2em] font-semibold w-[100%] rounded-2xl px-[5%]`}
+                className={`${emailError ? 'text-[#ffd500] focus:!outline-[#ffd500] border-4 border-[#ffd500] shadow-[0_0_10px_#00000080]' : 'text-black'} text-[1.2em] font-semibold w-[100%] rounded-2xl px-[5%]`}
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -188,7 +188,7 @@ function LoginPage() {
             <div className="h-[10%] flex w-[100%] relative">
               <input
                 type={showPassword ? "text" : "password"}
-                className={`${passwordError ? 'text-[#ff0000] focus:!outline-[#ff0000] border-3 border-[#ff0000] shadow-[0_0_10px_#00000080]' : 'text-black'} text-[1.2em] font-semibold w-[100%] rounded-2xl px-[5%]`}
+                className={`${passwordError ? 'text-[#ffd500] focus:!outline-[#ffd500] border-4 border-[#ffd500] shadow-[0_0_10px_#00000080]' : 'text-black'} text-[1.2em] font-semibold w-[100%] rounded-2xl px-[5%]`}
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
               />
