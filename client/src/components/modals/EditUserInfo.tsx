@@ -107,7 +107,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
         setEmail(user.email_address || '');
         setDepartment(user.department || '');
         setEmployee_number(user.employee_number || '');
-        setPhone_number(user.phone_number || '');
+        setPhone_number(user.phone_number?.startsWith('+63 ') ? user.phone_number : '+63 ' + (user.phone_number || ''));
         setPosition(user.position || '');
         setLocalProfileImage(`${config.API}/storage/${user.display_picture}`);
 
@@ -162,6 +162,19 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
     const updateSelect = (setter: React.Dispatch<React.SetStateAction<string>>) => (e: React.ChangeEvent<HTMLSelectElement>) => {
         setter(e.target.value);
     }
+
+    // Update the phone number field handler
+    const handlePhoneNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        let value = e.target.value;
+        
+        if (!value.startsWith('+63 ')) {
+            value = '+63 ' + value.replace('+63 ', '');
+        }
+        
+        if (value.length <= 14) {
+            setPhone_number(value);
+        }
+    };
 
     const handleFileUpload = (file: File) => {
         if (!file.type.startsWith('image/')) {
@@ -493,7 +506,7 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
 
                 {/* Form */}
                 <div className='flex flex-col justify-center dark:text-white'>
-                    {/* 1st Col */}
+                    {/* 1st Row */}
                     <div className='flex flex-row gap-4 mx-3'>
                         <div className='flex flex-col justify-start text-[1.2em] mb-4'>
                             <p className={`${firstNameError ? 'text-[#B22222]' : ''} flex `}>First Name <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
@@ -558,9 +571,8 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
 
                     </div>
 
-                    {/* 2nd Col */}
+                    {/* 2nd Row */}
                     <div className='flex flex-row gap-4 mx-3'>
-
                         <div className='flex flex-col justify-start text-[1.2em] mb-4'>
                             <p>Employee Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                             <div className="flex flex-col w-full">
@@ -577,46 +589,26 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
                         </div>
 
                         <div className='flex flex-col justify-start text-[1.2em] mb-4'>
-                            <p>Phone Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                            <p className={`${positionError ? 'text-[#B22222]' : ''} flex `}>Position <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-[16rem] px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
-                                        type="contactnum"
-                                        name="contactnum"
-                                        value={phone_number}
-                                        onChange={(e) => updateField(setPhone_number)(e)}
+                                        className={` ${positionError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-[16rem] px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
+                                        type="position"
+                                        name="position"
+                                        value={position}
+                                        onChange={(e) => updateField(setPosition)(e)}
                                     />
                                 </div>
                             </div>
                         </div>
 
                         <div className='flex flex-col justify-start text-[1.2em] mb-4'>
-                            <p className={`${emailError ? 'text-[#B22222]' : ''} flex `}>Email Address <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
-                            <div className="flex flex-col w-full">
-                                <div className="mt-2 text-gray-600">
-                                    <input
-                                        className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-[22rem] px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
-                                        type="email"
-                                        name="email"
-                                        value={email_address}
-                                        onChange={(e) => updateField(setEmail)(e)}
-                                    />
-                                </div>
-                            </div>
-                        </div> 
-
-                    </div>
-
-                    {/* 3rd Col */}
-                    <div className='flex flex-row gap-4 mx-3'>
-
-                        <div className='flex flex-col justify-start text-[1.2em] mb-4'>
                             <p>Department <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <select
-                                        className={` ${departmentError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-[33rem] px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        className={` ${departmentError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-[22rem] px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
                                         name="dept"
                                         value={department}
                                         onChange={(e) => updateSelect(setDepartment)(e)}
@@ -631,22 +623,43 @@ const EditUserInfo: React.FC<EditUserInfoProps> = ({ onClose, user }) => {
                                     </select>
                                 </div>
                             </div>
-                        </div>
+                        </div> 
 
+                    </div>
+
+                    {/* 3rd Row */}
+                    <div className='flex flex-row gap-4 mx-3'>
                         <div className='flex flex-col justify-start text-[1.2em] mb-4'>
-                            <p className={`${positionError ? 'text-[#B22222]' : ''} flex `}>Position <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                            <p>Phone Number <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
                             <div className="flex flex-col w-full">
                                 <div className="mt-2 text-gray-600">
                                     <input
-                                        className={` ${positionError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-[22rem] px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base capitalize`}
-                                        type="position"
-                                        name="position"
-                                        value={position}
-                                        onChange={(e) => updateField(setPosition)(e)}
+                                        className={` ${phoneNumberError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-[16rem] px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        type="contactnum"
+                                        name="contactnum"
+                                        placeholder="+63 "
+                                        value={phone_number}
+                                        onChange={handlePhoneNumberChange}
                                     />
                                 </div>
                             </div>
                         </div>
+
+                        <div className='flex flex-col justify-start text-[1.2em] mb-4'>
+                            <p className={`${emailError ? 'text-[#B22222]' : ''} flex `}>Email Address <span className='text-[#B22222] ml-1 font-bold'>*</span></p>
+                            <div className="flex flex-col w-full">
+                                <div className="mt-2 text-gray-600">
+                                    <input
+                                        className={` ${emailError ? 'text-[#B22222] focus:!outline-[#B22222] border-3 border-[#B22222]' : 'border-[#B3B3B3]  focus:outline '} bg-white dark:bg-[#3C3C3C] dark:text-white h-10 3xl:h-12 w-[16rem] px-2 2xl:px-5 border-2 rounded-lg text-[13px] 2xl:text-base`}
+                                        type="email"
+                                        name="email"
+                                        value={email_address}
+                                        onChange={(e) => updateField(setEmail)(e)}
+                                    />
+                                </div>
+                            </div>
+                        </div> 
+
                     </div>
                 </div>
 
