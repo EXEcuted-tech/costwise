@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Mail;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Carbon\Carbon;
 use App\Mail\PasswordResetMail;
@@ -90,5 +91,28 @@ class PasswordResetController extends Controller
         $token->delete();
 
         return response()->json(['message' => 'Password has been reset successfully.']);
+    }
+    public function changePassword(Request $request)
+    {
+        $request->validate([
+            'currentPassword' => 'required|string|min:8',
+            'newPassword' => 'required|string|min:8|different:currentPassword',
+            'confirmPassword' => 'required|string|same:newPassword',
+        ]);
+
+        try {
+            $user = auth()->user();
+
+            if (!Hash::check($request->currentPassword, $user->password)) {
+                return response()->json(['message' => 'Invalid current password.'], 401);
+            }
+
+            $user->password = Hash::make($request->newPassword);
+            $user->save();
+
+            return response()->json(['message' => 'Password changed successfully.'], 200);
+        } catch (\Throwable $th) {
+            return response()->json(['message' => 'Failed to change password.'], 500);
+        }
     }
 }
